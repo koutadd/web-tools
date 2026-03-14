@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Tools</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Web Tools</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Webサイトをよくするためのツール集</h1>
+        <p class="hero-description">診断・構造分析・改善提案を、実用的な形でお届けします。</p>
+      </div>
+    </section>
+
+    <section class="tools">
+      <div class="container">
+        <h2 class="section-title">ツール一覧</h2>
+        <div class="tool-grid">
+
+          <article class="tool-card">
+            <div class="tool-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+            </div>
+            <div class="tool-card__body">
+              <h3 class="tool-card__title">サイト診断</h3>
+              <p class="tool-card__description">サイトの構造を分析し、優先度の高い改善提案を3つお届けします。</p>
+            </div>
+            <div class="tool-card__footer">
+              <a href="tools/site-diagnosis/index.html" class="btn btn--primary">診断をはじめる</a>
+            </div>
+          </article>
+
+
+          <article class="tool-card">
+            <div class="tool-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <div class="tool-card__body">
+              <h3 class="tool-card__title">LP → Next.js 生成</h3>
+              <p class="tool-card__description">LPのURLを入力するだけ。Playwrightでスクリーンショットを撮影し、Claude がページ構造を解析してNext.jsのpage.tsxを自動生成します。</p>
+              <ul class="tool-card__features">
+                <li>Playwright によるページ解析・スクリーンショット</li>
+                <li>Tailwind CSS v4 + TypeScript 対応コード生成</li>
+                <li>LP 構造分析レポート付き</li>
+              </ul>
+            </div>
+            <div class="tool-card__footer">
+              <a href="tools/lp-generator/index.html" class="btn btn--primary">コード生成をはじめる</a>
+              <span class="tool-card__badge">New</span>
+            </div>
+          </article>
+
+
+          <article class="tool-card">
+            <div class="tool-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="8.5" y="14" width="7" height="7" rx="1"/>
+                <path d="M6.5 10v4h11v-4"/><line x1="12" y1="10" x2="12" y2="14"/>
+              </svg>
+            </div>
+            <div class="tool-card__body">
+              <h3 class="tool-card__title">組織図エディタ</h3>
+              <p class="tool-card__description">メンバーの名前・役職・責任範囲・タスクを設定できるインタラクティブな組織図ツール。データはブラウザに自動保存。</p>
+              <ul class="tool-card__features">
+                <li>名前・役職・カラーの自由編集</li>
+                <li>責任範囲の設定（タグ形式）</li>
+                <li>タスク管理（進捗バー付き）</li>
+              </ul>
+            </div>
+            <div class="tool-card__footer">
+              <a href="tools/org-chart/index.html" class="btn btn--primary">組織図を作る</a>
+              <span class="tool-card__badge">New</span>
+            </div>
+          </article>
+
+
+          <article class="tool-card">
+            <div class="tool-card__icon">🎰</div>
+            <div class="tool-card__body">
+              <h3 class="tool-card__title">ガチャワールド</h3>
+              <p class="tool-card__description">コインを買ってガチャを回そう！5種のガチャマシン、アイテム交換ストア、10連ガチャ搭載の本格ガチャゲーム。</p>
+              <ul class="tool-card__features">
+                <li>ハズレなし・全5種のガチャマシン</li>
+                <li>URレアリティまでの豪華アイテム</li>
+                <li>コイン交換ストアでレアグッズをゲット</li>
+              </ul>
+            </div>
+            <div class="tool-card__footer">
+              <a href="tools/gacha/index.html" class="btn btn--primary">ガチャをまわす</a>
+              <span class="tool-card__badge">New</span>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <div class="tool-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <path d="M8 21h8M12 17v4"/>
+                <path d="M7 8h3M7 11h3M14 8l2 2-2 2"/>
+              </svg>
+            </div>
+            <div class="tool-card__body">
+              <h3 class="tool-card__title">アイケアラボ 制作管理</h3>
+              <p class="tool-card__description">制作物・依頼管理のダッシュボード。Googleスプレッドシートと連携して、制作物の進捗・依頼・コメントを一元管理。</p>
+              <ul class="tool-card__features">
+                <li>制作物ギャラリー・タグフィルター</li>
+                <li>依頼管理・新規依頼作成</li>
+                <li>GoogleドライブURL・格納フォルダ連携</li>
+              </ul>
+            </div>
+            <div class="tool-card__footer">
+              <a href="aicare-portfolio.html" class="btn btn--primary">ダッシュボードを開く</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Web Tools. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

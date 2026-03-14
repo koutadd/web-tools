@@ -1,0 +1,714 @@
+/* ============================================================
+   site-diagnosis / ui.css
+   Tool-specific styles — do not add general styles here
+   ============================================================ */
+
+/* ── Design tokens ─────────────────────────────────────────── *
+ * 10 public tokens — remap here to match any design reference. *
+ * ──────────────────────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --bg:      #eef5ff;                      /* page bg — soft blue tint       */
+  --bg2:     #f8fbff;                      /* secondary surface (sections)   */
+  --card:    #ffffff;                      /* card / dialog surface          */
+
+  /* Text */
+  --text:    #0f172a;                      /* primary                        */
+  --muted:   #64748b;                      /* secondary / captions           */
+
+  /* Lines */
+  --border:  rgba(15, 30, 80, .10);        /* subtle dividers                */
+
+  /* Accent */
+  --primary: #2563eb;                      /* CTA blue                       */
+
+  /* Shape */
+  --radius:  20px;                         /* generous corners — SaaS feel   */
+
+  /* Elevation */
+  --shadow:  0 1px 2px rgba(15,30,80,.04),
+             0 4px 12px rgba(15,30,80,.07);    /* subtle lift             */
+  --shadow2: 0 1px 2px rgba(15,30,80,.04),
+             0 8px 24px rgba(15,30,80,.09),
+             0 32px 64px rgba(15,30,80,.11);   /* deep card elevation     */
+
+  /* ── Private / internal ─────────────────────────────────── */
+  --primary-dim: rgba(37, 99, 235, .08);   /* tinted highlight behind text   */
+  --danger:      #dc2626;
+  --radius-sm:   14px;                     /* smaller card corners           */
+  --maxw:        480px;                    /* form card width                */
+  --stage-maxw:  900px;                    /* stage incl. float margin       */
+  --orb-a:       rgba(59, 130, 246, 0.15); /* primary orb fill               */
+  --orb-b:       rgba(99, 102, 241, 0.09); /* secondary indigo orb fill      */
+}
+
+/* ── Page reset ────────────────────────────────────────────── */
+.diag-page {
+  background: var(--bg);
+}
+
+/* ── Scene ─────────────────────────────────────────────────── *
+ * Light gradient + two circular orbs for the Pace-like glow.  *
+ * ──────────────────────────────────────────────────────────── */
+.diag-scene {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 7rem;
+
+  /* Soft blue gradient: tinted top fading to bg2, then card-white */
+  background:
+    radial-gradient(ellipse 140% 70% at 50% -10%,
+      rgba(147, 197, 253, 0.45) 0%,
+      rgba(219, 234, 254, 0.22) 50%,
+      transparent 72%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 55%, var(--card) 100%);
+}
+
+/* Primary orb — large circle behind the form card */
+.diag-scene::before {
+  content: '';
+  position: absolute;
+  width: 860px;
+  height: 860px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--orb-a) 0%, transparent 68%);
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Secondary orb — accent accent at bottom-right */
+.diag-scene::after {
+  content: '';
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--orb-b) 0%, transparent 68%);
+  bottom: -80px;
+  right: -60px;
+  pointer-events: none;
+}
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.diag-nav {
+  position: relative;
+  z-index: 10;
+  padding: 1.375rem 0;
+}
+
+.diag-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+.diag-nav__logo {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text);          /* dark on light bg */
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.diag-nav__logo:hover {
+  color: var(--primary);
+}
+
+.diag-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);         /* muted on light bg */
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.diag-nav__link:hover {
+  color: var(--text);
+}
+
+/* ── Hero text ─────────────────────────────────────────────── */
+.diag-hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem var(--container-padding) 3.25rem;
+  max-width: 660px;
+  margin-inline: auto;
+}
+
+.diag-hero__eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-dim);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 999px;
+  padding: 0.3em 1em;
+  margin-bottom: 1.375rem;
+}
+
+.diag-hero__title {
+  font-size: clamp(1.75rem, 4vw, 2.875rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.18;
+  color: var(--text);          /* dark on light bg */
+  margin-bottom: 1rem;
+}
+
+.diag-hero__desc {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 0.625rem;
+}
+
+.diag-hero__support {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* ── Trust bar ─────────────────────────────────────────────── */
+.trust-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 1rem;
+}
+
+.trust-item svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.trust-sep {
+  width: 1px;
+  height: 13px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Stage ─────────────────────────────────────────────────── *
+ * Wider than form card so absolute float cards have margin.    *
+ * stage=900px, form=480px → ~210px each side for floats.      *
+ * ──────────────────────────────────────────────────────────── */
+.diag-stage {
+  position: relative;
+  z-index: 1;
+  max-width: var(--stage-maxw);
+  margin-inline: auto;
+  padding: 0 var(--container-padding);
+}
+
+/* ── Form card ─────────────────────────────────────────────── */
+.form-card-wrap {
+  position: relative;
+  z-index: 2;
+  max-width: var(--maxw);
+  margin-inline: auto;
+}
+
+.form-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  box-shadow: var(--shadow2);
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.form-sub-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+/* Input error state (used by form.js) */
+input.error,
+select.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: var(--danger);
+  margin-top: 0.15rem;
+  display: none;
+}
+
+.field-error--visible {
+  display: block;
+}
+
+.submit-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  padding-top: 0.375rem;
+}
+
+.btn--loading {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.privacy-note {
+  font-size: 0.73rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.65;
+}
+
+.privacy-note strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ── Float row ─────────────────────────────────────────────── *
+ * On desktop: static container; children break out via         *
+ * position:absolute relative to .diag-stage.                  *
+ * On mobile (≤860px): flex horizontal scroll strip.           *
+ * ──────────────────────────────────────────────────────────── */
+.float-row {
+  /* Desktop: zero height, children are positioned absolute */
+  position: static;
+  height: 0;
+  overflow: visible;
+}
+
+/* ── Float cards — base ────────────────────────────────────── */
+.float-card {
+  position: absolute;
+  z-index: 3;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.125rem;
+  box-shadow: var(--shadow);
+  min-width: 140px;
+  animation: float-bob 5s ease-in-out infinite;
+}
+
+/* Positions relative to .diag-stage */
+.float-card--a {           /* Score — left */
+  left: 0;
+  top: 3rem;
+  animation-delay: 0s;
+}
+
+.float-card--b {           /* Priority — upper-right */
+  right: 0;
+  top: 1rem;
+  animation-delay: -1.8s;
+}
+
+.float-card--c {           /* CV — lower-right */
+  right: 8px;
+  bottom: 3.5rem;
+  animation-delay: -3.5s;
+}
+
+/* Shared label */
+.float-card__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 0.55rem;
+}
+
+/* Card A — score */
+.float-card__score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.float-card__score-num {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.float-card__score-denom {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.float-card__bar-track {
+  height: 5px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.float-card__bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+}
+
+/* Card B — priority */
+.float-card__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.float-card__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.float-card__dot--high {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+.float-card__value {
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+/* Card C — CV status */
+.float-card__pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.25em 0.75em;
+}
+
+.float-card__pill--weak {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ── Submit toast ──────────────────────────────────────────── *
+ * Appears on index.html after successful POST, before redirect.*
+ * ──────────────────────────────────────────────────────────── */
+.submit-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 1rem;
+  right: 1rem;
+  max-width: 380px;
+  margin-inline: auto;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+
+  background: #111827;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 0.875rem 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+
+  /* start hidden + shifted down */
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.submit-toast--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Spinner dot before the message text */
+.submit-toast::before {
+  content: '';
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: toast-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes toast-pulse {
+  0%, 100% { opacity: 1; transform: scale(1);    }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ── Next-steps section ────────────────────────────────────── */
+.next-steps {
+  padding: 4.5rem 0 6rem;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+}
+
+.next-steps__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* ── Steps flow ────────────────────────────────────────────── */
+.steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0 1.25rem;
+}
+
+.step__num {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.step__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.step__note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.1rem;
+}
+
+.step__arrow {
+  color: var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Consultation CTA ──────────────────────────────────────── */
+.consult-cta {
+  max-width: 520px;
+  margin-inline: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.75rem 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.consult-cta__headline {
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+.consult-cta__plan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5em 0.9em;
+  margin-bottom: 1.5rem;
+}
+
+.consult-cta__plan-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  background: var(--primary-dim);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+}
+
+.consult-cta__plan-detail {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.consult-cta__btn {
+  display: inline-flex;
+  padding: 0.75rem 2rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 1.125rem;
+}
+
+.consult-cta__note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.consult-cta__mail {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.consult-cta__mail:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+/*
+  ≤860px: float cards switch from absolute to a horizontal
+  scroll row displayed between the hero and the form card.
+*/
+@media (max-width: 860px) {
+  .float-row {
+    height: auto;
+    overflow: visible;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 var(--container-padding) 1.5rem;
+    /* negative margin to align with scene edges */
+    margin-inline: calc(var(--container-padding) * -1);
+    scrollbar-width: none;
+  }
+
+  .float-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .float-card {
+    position: static;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    animation: none;
+    min-width: 148px;
+  }
+
+  /* Padding sentinels so last card isn't flush with edge */
+  .float-row::after {
+    content: '';
+    flex-shrink: 0;
+    width: var(--container-padding);
+  }
+}
+
+@media (max-width: 640px) {
+  .diag-hero {
+    padding: 2rem 1.25rem 2.25rem;
+  }
+
+  .diag-hero__title {
+    font-size: clamp(1.5rem, 6.5vw, 1.875rem);
+  }
+
+  .form-card {
+    border-radius: var(--radius-sm);
+    padding: 1.5rem 1.25rem;
+  }
+
+  .diag-scene {
+    padding-bottom: 4rem;
+  }
+
+  .trust-item {
+    padding: 0 0.625rem;
+    font-size: 0.78rem;
+  }
+
+  /* Steps: vertical on mobile */
+  .steps-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.125rem;
+    max-width: 260px;
+    margin-inline: auto;
+  }
+
+  .step {
+    padding: 0;
+  }
+
+  .step__arrow {
+    padding-left: calc(2.25rem / 2 - 8px); /* align with number center */
+    transform: rotate(90deg);
+  }
+
+  .consult-cta {
+    padding: 2rem 1.5rem;
+  }
+}

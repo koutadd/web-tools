@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP → Next.js ジェネレーター | 既存LPをNext.jsコードに自動変換</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    body { background: #fff; }
+
+    /* ── Nav ── */
+    .lp-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .lp-nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin-inline: auto; padding: 0.875rem 1.5rem;
+    }
+    .lp-nav__logo { font-size: 1.0625rem; font-weight: 800; color: #111; text-decoration: none; letter-spacing: -0.02em; }
+    .lp-nav__logo:hover { color: #2563eb; }
+    .lp-nav__cta { font-size: 0.875rem; padding: 0.5rem 1.125rem; border-radius: 8px; }
+
+    /* ── Hero ── */
+    .lp-hero {
+      padding: 5rem 1.5rem 4.5rem;
+      background: linear-gradient(155deg, #f0f9ff 0%, #fff 55%);
+      overflow: hidden;
+    }
+    .lp-hero__inner {
+      max-width: 1100px; margin-inline: auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3.5rem; align-items: center;
+    }
+    .lp-hero__tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .lp-hero__tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: #2563eb;
+      background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.18);
+      border-radius: 999px; padding: 0.25rem 0.75rem;
+    }
+    .lp-hero__h1 {
+      font-size: clamp(1.75rem, 3.5vw, 2.625rem); font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1.18; color: #0f172a; margin-bottom: 1.25rem;
+    }
+    .lp-hero__h1 em { font-style: normal; color: #2563eb; }
+    .lp-hero__sub { font-size: 1rem; color: #374151; line-height: 1.8; margin-bottom: 2.125rem; }
+    .lp-hero__cta { display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap; margin-bottom: 1.625rem; }
+    .lp-hero__cta-btn {
+      font-size: 1rem; padding: 0.875rem 2rem; font-weight: 700; border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.28);
+    }
+    .lp-hero__cta-btn:hover { box-shadow: 0 6px 28px rgba(37,99,235,0.38); transform: translateY(-1px); }
+    .lp-hero__cta-note { font-size: 0.8rem; color: #9ca3af; }
+    .lp-hero__trust { display: flex; gap: 1.375rem; flex-wrap: wrap; }
+    .lp-hero__trust-item {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.78rem; font-weight: 600; color: #6b7280;
+    }
+    .lp-hero__trust-item svg { color: #2563eb; flex-shrink: 0; }
+
+    /* ── Code preview (right column) ── */
+    .code-preview {
+      background: #0f172a; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 20px 60px rgba(0,0,0,0.18);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .code-preview__bar {
+      display: flex; align-items: center; gap: 0.375rem;
+      padding: 0.75rem 1rem; background: #1e293b; border-bottom: 1px solid #334155;
+    }
+    .code-preview__dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-preview__dot:nth-child(1) { background: #f87171; }
+    .code-preview__dot:nth-child(2) { background: #fbbf24; }
+    .code-preview__dot:nth-child(3) { background: #34d399; }
+    .code-preview__filename { font-size: 0.72rem; color: #64748b; margin-left: 0.5rem; }
+    .code-preview__body { padding: 1.25rem 1.5rem; font-size: 0.75rem; line-height: 1.7; }
+    .code-preview__line { white-space: pre; }
+    .tok-k  { color: #93c5fd; } /* keyword */
+    .tok-s  { color: #86efac; } /* string */
+    .tok-c  { color: #475569; } /* comment */
+    .tok-f  { color: #fbbf24; } /* function/component */
+    .tok-t  { color: #f0abfc; } /* type */
+    .tok-p  { color: #e2e8f0; } /* plain */
+    .tok-j  { color: #fb923c; } /* jsx tag */
+    .tok-a  { color: #67e8f9; } /* attr */
+    .code-preview__fade {
+      height: 60px; margin: 0 -1.5rem -1.25rem;
+      background: linear-gradient(to bottom, transparent, #0f172a);
+    }
+
+    /* ── Trust bar ── */
+    .lp-trust-bar {
+      border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb; padding: 2rem 1.5rem;
+    }
+    .lp-trust-bar__inner {
+      max-width: 900px; margin-inline: auto;
+      display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    }
+    .lp-trust-bar__item { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 2.5rem; gap: 0.25rem; }
+    .lp-trust-bar__sep { width: 1px; height: 40px; background: #d1d5db; flex-shrink: 0; }
+    .lp-trust-bar__num { font-size: 1.875rem; font-weight: 900; letter-spacing: -0.04em; color: #2563eb; line-height: 1; }
+    .lp-trust-bar__label { font-size: 0.72rem; font-weight: 500; color: #6b7280; }
+
+    /* ── Section base ── */
+    .lp-section { padding: 5.5rem 1.5rem; }
+    .lp-section--alt { background: #f8faff; }
+    .lp-section__inner { max-width: 1100px; margin-inline: auto; }
+    .lp-section__eyebrow {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+      color: #2563eb; text-align: center; margin-bottom: 0.75rem;
+    }
+    .lp-section__h2 {
+      font-size: clamp(1.375rem, 3vw, 2rem); font-weight: 900;
+      letter-spacing: -0.035em; line-height: 1.25; color: #0f172a;
+      text-align: center; margin-bottom: 0.875rem;
+    }
+    .lp-section__lead {
+      font-size: 0.9375rem; color: #6b7280; text-align: center; line-height: 1.8;
+      max-width: 560px; margin-inline: auto; margin-bottom: 3.5rem;
+    }
+
+    /* ── How it works ── */
+    .how-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+    }
+    .how-step {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .how-step__icon-wrap {
+      width: 3.5rem; height: 3.5rem; border-radius: 14px;
+      background: rgba(37,99,235,0.08); color: #2563eb;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .how-step__num {
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; color: #2563eb;
+      background: rgba(37,99,235,0.08); border-radius: 999px;
+      padding: 0.2rem 0.625rem; margin-bottom: 0.75rem;
+    }
+    .how-step__title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+    .how-step__body { font-size: 0.875rem; color: #6b7280; line-height: 1.7; }
+
+    .how-arrow { display: flex; align-items: center; justify-content: center; color: #d1d5db; padding-top: 1.5rem; }
+
+    /* ── Output cards ── */
+    .output-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .output-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
+      padding: 1.75rem 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .output-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); transform: translateY(-2px); }
+    .output-card__icon {
+      width: 2.75rem; height: 2.75rem; border-radius: 12px;
+      background: rgba(37,99,235,0.08); color: #2563eb;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;
+    }
+    .output-card__title { font-size: 0.9375rem; font-weight: 800; color: #0f172a; margin-bottom: 0.4rem; }
+    .output-card__body { font-size: 0.85rem; color: #6b7280; line-height: 1.7; }
+
+    /* ── Form section ── */
+    .lp-form-section {
+      padding: 5.5rem 1.5rem 6.5rem;
+      background: linear-gradient(180deg, #f0f5ff 0%, #fff 100%);
+    }
+    .lp-form-section__inner { max-width: 1100px; margin-inline: auto; }
+    .lp-form-section__head { text-align: center; margin-bottom: 2.75rem; }
+    .lp-form-section__eyebrow { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #2563eb; margin-bottom: 0.75rem; }
+    .lp-form-section__h2 { font-size: clamp(1.375rem, 3vw, 1.875rem); font-weight: 900; letter-spacing: -0.035em; color: #0f172a; margin-bottom: 0.5rem; }
+    .lp-form-section__sub { font-size: 0.875rem; color: #9ca3af; }
+
+    /* Form card */
+    .form-card-wrap { max-width: 540px; margin-inline: auto; }
+    .form-card { background: #fff; border-radius: 20px; padding: 2.5rem; box-shadow: 0 1px 2px rgba(15,30,80,.04), 0 8px 24px rgba(15,30,80,.09), 0 32px 64px rgba(15,30,80,.11); }
+    .form-stack { display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-hint { font-size: 0.78rem; color: #9ca3af; margin-top: 0.25rem; }
+    .field-error { font-size: 0.78rem; color: #dc2626; margin-top: 0.15rem; display: none; }
+    .field-error--visible { display: block; }
+    input.error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+    .submit-area { display: flex; flex-direction: column; align-items: stretch; gap: 0.625rem; padding-top: 0.375rem; }
+    .btn--loading { pointer-events: none; opacity: 0.65; }
+    .privacy-note { font-size: 0.73rem; color: #9ca3af; text-align: center; line-height: 1.65; }
+
+    /* Progress bar */
+    .progress-wrap { display: none; flex-direction: column; gap: 0.625rem; }
+    .progress-wrap.is-active { display: flex; }
+    .progress-bar-track { height: 4px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #2563eb; border-radius: 999px; width: 0%; transition: width 0.4s ease; }
+    .progress-label { font-size: 0.78rem; color: #6b7280; text-align: center; }
+
+    /* Submit toast */
+    .submit-toast {
+      position: fixed; bottom: 2rem; left: 1rem; right: 1rem; max-width: 380px; margin-inline: auto;
+      z-index: 9999; display: flex; align-items: center; gap: 0.625rem;
+      background: #111827; color: #fff; font-size: 0.875rem; font-weight: 500;
+      padding: 0.875rem 1.25rem; border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+      opacity: 0; transform: translateY(0.75rem); transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .submit-toast--in { opacity: 1; transform: translateY(0); }
+    .submit-toast::before {
+      content: ''; flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%;
+      background: #60a5fa; animation: toast-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes toast-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    /* ── Footer ── */
+    .lp-footer { background: #0f172a; color: #4b5563; padding: 2rem 1.5rem; text-align: center; }
+    .lp-footer p { font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .lp-hero__inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .how-grid { grid-template-columns: 1fr; max-width: 440px; margin-inline: auto; }
+      .how-arrow { display: none; }
+      .output-grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
+    }
+    @media (max-width: 600px) {
+      .lp-hero { padding: 3rem 1.25rem 2.75rem; }
+      .lp-trust-bar__item { padding: 0.5rem 1.25rem; }
+      .lp-trust-bar__sep { display: none; }
+      .lp-section { padding: 3.75rem 1.25rem; }
+      .lp-form-section { padding: 3.75rem 1.25rem 5rem; }
+      .form-card { padding: 1.5rem 1.25rem; border-radius: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="lp-nav">
+    <div class="lp-nav__inner">
+      <a href="../../" class="lp-nav__logo">Web Tools</a>
+      <div>
+        <a href="#form" class="btn btn--primary lp-nav__cta">無料で試す</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="lp-hero">
+    <div class="lp-hero__inner">
+      <div class="lp-hero__text">
+        <div class="lp-hero__tags">
+          <span class="lp-hero__tag">Playwright 解析</span>
+          <span class="lp-hero__tag">Claude Vision</span>
+          <span class="lp-hero__tag">Next.js 生成</span>
+        </div>
+        <h1 class="lp-hero__h1">
+          LPのURLを貼るだけで、<br>
+          <em>Next.js コード</em>に<br>
+          自動変換します。
+        </h1>
+        <p class="lp-hero__sub">
+          Playwrightでスクリーンショットを撮影し、<br>
+          Claude がページ構造・コンテンツを解析。<br>
+          Tailwind CSS 対応の page.tsx を即時生成します。
+        </p>
+        <div class="lp-hero__cta">
+          <a href="#form" class="btn btn--primary lp-hero__cta-btn">無料で試す →</a>
+          <span class="lp-hero__cta-note">URL入力のみ・約30〜60秒</span>
+        </div>
+        <div class="lp-hero__trust">
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            URLのみで完了
+          </span>
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            TypeScript + Tailwind
+          </span>
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            コピー即使用可能
+          </span>
+        </div>
+      </div>
+
+      <!-- Code preview -->
+      <div class="code-preview">
+        <div class="code-preview__bar">
+          <div class="code-preview__dot"></div>
+          <div class="code-preview__dot"></div>
+          <div class="code-preview__dot"></div>
+          <span class="code-preview__filename">page.tsx</span>
+        </div>
+        <div class="code-preview__body">
+          <div class="code-preview__line"><span class="tok-s">'use client'</span></div>
+          <div class="code-preview__line"></div>
+          <div class="code-preview__line"><span class="tok-k">import</span> <span class="tok-p">{ useState }</span> <span class="tok-k">from</span> <span class="tok-s">'react'</span></div>
+          <div class="code-preview__line"></div>
+          <div class="code-preview__line"><span class="tok-k">export default function</span> <span class="tok-f">Page</span><span class="tok-p">() {</span></div>
+          <div class="code-preview__line"><span class="tok-p">  </span><span class="tok-k">const</span> <span class="tok-p">[open, setOpen] =</span> <span class="tok-f">useState</span><span class="tok-p">(</span><span class="tok-k">false</span><span class="tok-p">)</span></div>
+          <div class="code-preview__line"><span class="tok-p">  </span><span class="tok-k">return</span> <span class="tok-p">(</span></div>
+          <div class="code-preview__line"><span class="tok-p">    </span><span class="tok-j">&lt;main</span> <span class="tok-a">className</span><span class="tok-p">=</span><span class="tok-s">"min-h-screen"</span><span class="tok-j">&gt;</span></div>
+          <div class="code-preview__line"><span class="tok-p">      </span><span class="tok-j">&lt;header</span> <span class="tok-a">className</span><span class="tok-p">=</span><span class="tok-s">"sticky top-0 z-50 bg-white"</span><span class="tok-j">&gt;</span></div>
+          <div class="code-preview__line"><span class="tok-p">        </span><span class="tok-c">/* Nav generated from LP */</span></div>
+          <div class="code-preview__line"><span class="tok-p">      </span><span class="tok-j">&lt;/header&gt;</span></div>
+          <div class="code-preview__line"><span class="tok-p">      </span><span class="tok-j">&lt;section</span> <span class="tok-a">className</span><span class="tok-p">=</span><span class="tok-s">"hero ..."</span><span class="tok-j">&gt;</span></div>
+          <div class="code-preview__line"><span class="tok-p">        </span><span class="tok-c">/* Hero content */</span></div>
+          <div class="code-preview__line"><span class="tok-p">      </span><span class="tok-j">&lt;/section&gt;</span></div>
+          <div class="code-preview__fade"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="lp-trust-bar">
+    <div class="lp-trust-bar__inner">
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">1<span style="font-size:1rem;font-weight:700">URL</span></span>
+        <span class="lp-trust-bar__label">入力のみ</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">30<span style="font-size:1rem;font-weight:700">秒</span></span>
+        <span class="lp-trust-bar__label">で生成完了</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">TSX</span>
+        <span class="lp-trust-bar__label">TypeScript対応</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">¥<span style="font-size:1rem;font-weight:700">0</span></span>
+        <span class="lp-trust-bar__label">完全無料</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="lp-section lp-section--alt">
+    <div class="lp-section__inner">
+      <p class="lp-section__eyebrow">仕組み</p>
+      <h2 class="lp-section__h2">3ステップで<br>Next.jsコードが手に入る</h2>
+      <p class="lp-section__lead">
+        URLを入力するだけ。Playwright と Claude が協調して、
+        実際のLPを解析しコードを生成します。
+      </p>
+      <div style="display:grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0; align-items: start; max-width: 900px; margin-inline: auto;">
+        <div class="how-step">
+          <div class="how-step__icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <span class="how-step__num">STEP 01</span>
+          <h3 class="how-step__title">URLを入力</h3>
+          <p class="how-step__body">分析したいLPのURLをフォームに貼り付けるだけ。</p>
+        </div>
+        <div class="how-arrow" style="padding-top: 2rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="how-step">
+          <div class="how-step__icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </div>
+          <span class="how-step__num">STEP 02</span>
+          <h3 class="how-step__title">Playwright で解析</h3>
+          <p class="how-step__body">スクリーンショット撮影 + DOM 構造・テキスト・CTAを自動抽出。</p>
+        </div>
+        <div class="how-arrow" style="padding-top: 2rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="how-step">
+          <div class="how-step__icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <span class="how-step__num">STEP 03</span>
+          <h3 class="how-step__title">Claude がコード生成</h3>
+          <p class="how-step__body">視覚情報 + DOM データを元に、完全な page.tsx を生成。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTPUT CARDS -->
+  <section class="lp-section">
+    <div class="lp-section__inner">
+      <p class="lp-section__eyebrow">生成されるもの</p>
+      <h2 class="lp-section__h2">コード以外にも、<br>分析結果を一緒にお届け</h2>
+      <p class="lp-section__lead">
+        単なるコード変換ではなく、LPの構造・目的・カラースキームまで
+        Claude が言語化します。
+      </p>
+      <div class="output-grid">
+        <div class="output-card">
+          <div class="output-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </div>
+          <h3 class="output-card__title">スクリーンショット</h3>
+          <p class="output-card__body">Playwright が撮影した実際のLP画面。どのページを解析したかが一目でわかります。</p>
+        </div>
+        <div class="output-card">
+          <div class="output-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <h3 class="output-card__title">LP 構造分析</h3>
+          <p class="output-card__body">ターゲット・メインCTA・セクション構成・カラースキーム・トーンを自動言語化。</p>
+        </div>
+        <div class="output-card">
+          <div class="output-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3 class="output-card__title">Next.js page.tsx</h3>
+          <p class="output-card__body">Tailwind CSS v4 対応・TypeScript・レスポンシブ対応の完全なコード。コピーして即使用可能。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="lp-form-section" id="form">
+    <div class="lp-form-section__inner">
+      <div class="lp-form-section__head">
+        <p class="lp-form-section__eyebrow">無料で試す</p>
+        <h2 class="lp-form-section__h2">LPのURLを入力してください</h2>
+        <p class="lp-form-section__sub">解析に30〜60秒かかります。そのままお待ちください。</p>
+      </div>
+
+      <div class="form-card-wrap">
+        <div class="form-card">
+          <form id="lpForm" novalidate>
+            <div class="form-stack">
+
+              <div class="form-group">
+                <label for="lpUrl">LP の URL<span class="required">*</span></label>
+                <input type="url" id="lpUrl" name="lpUrl" placeholder="https://example.com/lp" required autocomplete="off">
+                <span class="field-error" id="lpUrlError">有効なURL（https://）を入力してください。</span>
+                <p class="form-hint">公開されているページのURLを入力してください。</p>
+              </div>
+
+              <div class="submit-area">
+                <button type="submit" class="btn btn--primary btn--full" id="submitBtn">
+                  解析して Next.js コードを生成する →
+                </button>
+                <div class="progress-wrap" id="progressWrap">
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                  </div>
+                  <p class="progress-label" id="progressLabel">Playwright でページを解析中…</p>
+                </div>
+                <p class="privacy-note">入力したURLはAI解析のみに使用されます</p>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="lp-footer">
+    <p>&copy; 2025 Web Tools. All rights reserved.</p>
+  </footer>
+
+  <script src="form.js"></script>
+</body>
+</html>

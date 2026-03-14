@@ -1,0 +1,35 @@
+[    1264ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[    1264ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[    1282ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1283ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1292ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0
+[    1328ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1328ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1341ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://websdk.appsflyer.com/?st=banners,pba&:0
+[    1344ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[    1344ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[    1397ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[    1397ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[    1410ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1410ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1474ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1474ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2530ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2531ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    4420ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0

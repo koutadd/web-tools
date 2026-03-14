@@ -1,0 +1,81 @@
+[    1590ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[    1590ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[    1599ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0
+[    1666ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1666ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1687ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://websdk.appsflyer.com/?st=banners,pba&:0
+[    1689ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[    1689ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[    1762ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[    1762ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[    1775ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1776ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1829ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1829ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    3269ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    3269ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    4780ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0
+[ 4064289ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4064289ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4064292ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4064292ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4067566ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4067566ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4067576ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4067576ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4261504ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4261504ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4261507ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4261507ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4263552ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4263552ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4263557ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[ 4263557ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[ 4574577ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://cdn.growthbook.io/sub/sdk-kqaQJUbv2HOyYp3i:0
+[ 4592695ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://cdn.growthbook.io/sub/sdk-kqaQJUbv2HOyYp3i:0
+[10111787ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[10111787ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[10111792ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[10111792ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[10113947ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[10113947ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0
+[10113948ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/oripa/pokemon:0
+[10113948ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/oripa/pokemon:0

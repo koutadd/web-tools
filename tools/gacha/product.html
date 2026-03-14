@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>商品詳細 — ガチャワールド</title>
+  <style>
+    :root{
+      --bg:#f2f2f7;--card:#fff;
+      --green:#00a63c;--coin:#f0a000;--coin-bg:#fff8e1;
+      --red:#e53935;--text:#1a1a1a;--sub:#666;--dim:#999;
+      --border:#e5e5ea;--shadow:0 2px 8px rgba(0,0,0,0.08);--r:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;
+      background:var(--bg);color:var(--text);min-height:100vh;
+      padding-bottom:100px;}
+
+    /* ── HEADER ── */
+    .hdr{
+      position:sticky;top:0;z-index:80;
+      background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:10px;padding:10px 14px;
+    }
+    .hdr-back{background:none;border:none;font-size:1.3rem;cursor:pointer;
+      color:var(--green);padding:2px 6px;flex-shrink:0;}
+    .hdr-title{font-size:0.92rem;font-weight:800;flex:1;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .hdr-coin{display:flex;align-items:center;gap:4px;
+      background:var(--coin-bg);border:1.5px solid #f0c040;
+      border-radius:20px;padding:4px 10px;font-size:0.78rem;font-weight:700;
+      color:#a07000;flex-shrink:0;}
+
+    /* ── HERO ── */
+    .hero{
+      position:relative;height:260px;display:flex;
+      flex-direction:column;align-items:center;justify-content:flex-end;
+      overflow:hidden;padding:20px 16px;
+      background-size:cover;background-position:center;
+    }
+    .hero-overlay{position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,0.68) 0%,rgba(0,0,0,0.12) 60%,transparent 100%);}
+    .hero-bg-ico{position:absolute;font-size:9rem;opacity:0.12;
+      right:-10px;bottom:-20px;transform:rotate(-12deg);pointer-events:none;}
+    .hero-bottom{position:relative;z-index:2;width:100%;text-align:center;padding-bottom:4px;}
+    .hero-icon{font-size:3.5rem;margin-bottom:8px;
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,0.35));}
+    .hero-name{font-size:1.4rem;font-weight:900;color:white;
+      text-shadow:0 2px 10px rgba(0,0,0,0.5);margin-bottom:5px;}
+    .hero-copy{font-size:0.82rem;color:rgba(255,255,255,0.9);}
+    .hero-tags{position:absolute;top:12px;left:12px;display:flex;gap:5px;z-index:3;flex-wrap:wrap;}
+    .htag{padding:3px 9px;border-radius:12px;font-size:0.65rem;font-weight:700;
+      background:rgba(0,0,0,0.38);color:white;backdrop-filter:blur(4px);}
+    .hero-hot{position:absolute;top:12px;right:12px;z-index:3;
+      background:rgba(0,0,0,0.45);color:white;border-radius:12px;
+      padding:4px 9px;font-size:0.72rem;font-weight:700;}
+
+    /* ── STICKY INFO BAR ── */
+    .info-bar{
+      background:white;border-bottom:1px solid var(--border);
+      padding:10px 14px;
+      position:sticky;top:49px;z-index:70;
+    }
+    .info-bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+    .info-cost{font-size:1.1rem;font-weight:900;color:#a07000;}
+    .info-cost span{font-size:0.78rem;color:var(--sub);font-weight:500;margin-left:3px;}
+    .info-rem-label{display:flex;justify-content:space-between;
+      font-size:0.72rem;color:var(--sub);margin-bottom:4px;}
+    .info-rem-bar{height:6px;background:#e5e5ea;border-radius:3px;overflow:hidden;}
+    .info-rem-fill{height:100%;border-radius:3px;transition:width .4s;}
+
+    /* ── SECTIONS ── */
+    .page-wrap{max-width:640px;margin:0 auto;padding:14px 12px;}
+    .sec{background:white;border-radius:var(--r);box-shadow:var(--shadow);
+      margin-bottom:14px;overflow:hidden;}
+    .sec-hd{padding:13px 14px 10px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:8px;}
+    .sec-grade{
+      width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+      justify-content:center;font-size:0.8rem;font-weight:900;color:white;flex-shrink:0;
+    }
+    .grade-1{background:linear-gradient(135deg,#ffd700,#ff8f00);}
+    .grade-2{background:linear-gradient(135deg,#c0c0c0,#607d8b);}
+    .grade-3{background:linear-gradient(135deg,#cd7f32,#8d4c2f);}
+    .grade-other{background:linear-gradient(135deg,#78909c,#455a64);}
+    .sec-hd-info{flex:1;}
+    .sec-hd-title{font-size:0.95rem;font-weight:800;}
+    .sec-hd-sub{font-size:0.7rem;color:var(--sub);margin-top:2px;}
+    .sec-body{padding:12px 14px;}
+
+    /* ── PRIZE CARDS ── */
+    /* 1等: single large */
+    .prize-1{
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      background:linear-gradient(135deg,rgba(255,215,0,0.10),rgba(255,143,0,0.08));
+      border:2px solid rgba(255,193,7,0.45);border-radius:18px;
+      padding:22px 16px 18px;margin-bottom:0;
+      box-shadow:0 4px 24px rgba(255,193,7,0.12);
+    }
+    .prize-1-ico{font-size:7rem;flex-shrink:0;margin-bottom:14px;
+      filter:drop-shadow(0 6px 16px rgba(0,0,0,0.22));}
+    .prize-1-info{flex:1;width:100%;}
+    .prize-1-name{font-size:1.3rem;font-weight:900;margin-bottom:8px;line-height:1.3;}
+    .prize-1-cv{font-size:0.88rem;color:#a07000;margin-top:6px;}
+
+    /* 2等・3等共通: 2-col grid */
+    .prize-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .prize-card-m{
+      background:#fafafa;border:1px solid var(--border);border-radius:12px;
+      padding:14px 10px;text-align:center;
+    }
+    .prize-card-m-ico{font-size:3rem;margin-bottom:8px;}
+    .prize-card-m-name{font-size:0.8rem;font-weight:700;line-height:1.3;margin-bottom:5px;}
+    .prize-card-m-cv{font-size:0.7rem;color:#a07000;}
+
+    /* 3等: 2-col (same as m) */
+    .prize-card-s{
+      background:#fafafa;border:1px solid var(--border);border-radius:12px;
+      padding:14px 10px;text-align:center;
+    }
+    .prize-card-s-ico{font-size:3rem;margin-bottom:8px;}
+    .prize-card-s-name{font-size:0.78rem;font-weight:700;line-height:1.3;margin-bottom:4px;}
+    .prize-card-s-cv{font-size:0.68rem;color:#a07000;}
+
+    /* その他: compact list */
+    .prize-list{display:flex;flex-direction:column;gap:8px;}
+    .prize-list-item{display:flex;align-items:center;gap:12px;
+      background:#fafafa;border-radius:10px;padding:10px 12px;}
+    .prize-list-ico{font-size:2rem;flex-shrink:0;}
+    .prize-list-info{flex:1;min-width:0;}
+    .prize-list-name{font-size:0.82rem;font-weight:700;}
+    .prize-list-cv{font-size:0.7rem;color:#a07000;margin-top:2px;}
+
+    /* ── RARITY BADGE ── */
+    .rbadge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.68rem;font-weight:700;margin-bottom:4px;}
+    .rb-common    {background:#eceff1;color:#546e7a;}
+    .rb-uncommon  {background:#e8f5e9;color:#2e7d32;}
+    .rb-rare      {background:#e3f2fd;color:#1565c0;}
+    .rb-super-rare{background:#f3e5f5;color:#6a1b9a;}
+    .rb-ultra-rare{background:#fff3e0;color:#bf360c;}
+
+    /* ── NOTES ── */
+    .notes-list{display:flex;flex-direction:column;gap:7px;}
+    .note-item{display:flex;gap:8px;align-items:flex-start;font-size:0.8rem;color:var(--sub);line-height:1.6;}
+    .note-dot{color:var(--green);font-weight:900;flex-shrink:0;margin-top:1px;}
+
+    /* ── RATE TABLE ── */
+    .rate-table{width:100%;border-collapse:collapse;font-size:0.72rem;}
+    .rate-table th{background:#f8f8f8;padding:6px 8px;text-align:left;
+      font-weight:700;color:var(--sub);border-bottom:1px solid var(--border);}
+    .rate-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;}
+    .rate-table tr:last-child td{border-bottom:none;}
+    .rate-bar-wrap{display:flex;align-items:center;gap:6px;}
+    .rate-bar-track{flex:1;height:4px;background:#efefef;border-radius:3px;overflow:hidden;}
+    .rate-bar-fill{height:100%;border-radius:3px;}
+
+    /* ── FLOATING BOTTOM BAR ── */
+    .float-bar{
+      position:fixed;bottom:0;left:0;right:0;z-index:200;
+      background:white;border-top:1px solid var(--border);
+      padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+      box-shadow:0 -4px 20px rgba(0,0,0,0.1);
+    }
+    .float-bar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center;}
+    .float-coin-info{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+    .float-coin-label{font-size:0.62rem;color:var(--dim);}
+    .float-coin-val{font-size:0.92rem;font-weight:800;color:#a07000;}
+    .float-btns{display:flex;gap:8px;flex:1;}
+    .btn-draw-main{
+      flex:2;padding:13px;border-radius:12px;border:none;cursor:pointer;
+      font-size:0.95rem;font-weight:800;
+      background:var(--green);color:white;
+      box-shadow:0 4px 14px rgba(0,166,60,0.4);
+      transition:transform .12s,opacity .12s;
+    }
+    .btn-draw-main:active{transform:scale(0.96);opacity:0.88;}
+    .btn-draw-main:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
+    .btn-draw-10{
+      flex:1;padding:13px;border-radius:12px;border:none;cursor:pointer;
+      font-size:0.85rem;font-weight:700;
+      background:#1a1a1a;color:white;
+      transition:transform .12s,opacity .12s;
+    }
+    .btn-draw-10:active{transform:scale(0.96);}
+    .btn-draw-10:disabled{background:#ccc;cursor:not-allowed;}
+
+    /* ── RESULT OVERLAY ── */
+    .res-ov{
+      display:none;position:fixed;inset:0;z-index:500;
+      background:rgba(0,0,0,0.7);align-items:flex-end;justify-content:center;
+    }
+    .res-ov.open{display:flex;}
+    .res-sheet{
+      background:white;border-radius:22px 22px 0 0;
+      padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));
+      width:100%;max-width:480px;text-align:center;
+    }
+    .res-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;
+      margin:0 auto 18px;}
+    .res-ico{font-size:5.5rem;line-height:1;margin-bottom:10px;}
+    .res-name{font-size:1.15rem;font-weight:900;margin-bottom:8px;line-height:1.3;}
+    .res-cv{font-size:0.88rem;color:#a07000;margin-bottom:18px;}
+    .res-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+    .res-btn{padding:10px 22px;border-radius:24px;border:none;
+      cursor:pointer;font-weight:700;font-size:0.88rem;}
+    .res-btn-green{background:var(--green);color:white;}
+    .res-btn-gold{background:var(--coin);color:white;}
+    .res-btn-gray{background:#f0f0f0;color:var(--text);}
+
+    /* ── PRIZE ITEM IMAGES ── */
+    .item-strip{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:10px;}
+    .item-strip::-webkit-scrollbar{display:none;}
+    .item-thumb{flex-shrink:0;text-align:center;width:68px;}
+    .item-thumb-img{width:68px;height:68px;object-fit:cover;border-radius:10px;
+      border:1.5px solid var(--border);display:block;}
+    .item-thumb-ph{width:68px;height:68px;border-radius:10px;background:#f0f0f0;
+      border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+    .item-thumb-name{font-size:0.6rem;color:var(--sub);margin-top:4px;
+      line-height:1.3;overflow:hidden;display:-webkit-box;
+      -webkit-line-clamp:2;-webkit-box-orient:vertical;}
+    /* Result image */
+    .res-item-img{width:100px;height:100px;object-fit:cover;border-radius:14px;
+      display:block;margin:0 auto 10px;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:110px;left:50%;
+      transform:translateX(-50%) translateY(60px);
+      background:rgba(0,0,0,0.8);color:white;padding:9px 20px;
+      border-radius:20px;font-size:0.85rem;font-weight:600;
+      z-index:400;transition:transform .3s;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+
+    /* ── EMPTY ── */
+    .not-found{text-align:center;padding:60px 20px;color:var(--dim);}
+    .not-found-ico{font-size:3rem;margin-bottom:14px;}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <button class="hdr-back" onclick="history.back()">←</button>
+  <div class="hdr-title" id="hdrTitle">商品詳細</div>
+  <div class="hdr-coin" id="hdrCoin">🪙 —</div>
+</div>
+
+<!-- MAIN (filled by JS) -->
+<div id="main"></div>
+
+<!-- FLOATING BOTTOM BAR -->
+<div class="float-bar" id="floatBar" style="display:none">
+  <div class="float-bar-inner">
+    <div class="float-coin-info">
+      <div class="float-coin-label">所持コイン</div>
+      <div class="float-coin-val" id="floatCoin">🪙 —</div>
+    </div>
+    <div class="float-btns">
+      <button class="btn-draw-main" id="btnDraw1" onclick="Page.spin(1)">🎰 1回引く</button>
+      <button class="btn-draw-10"   id="btnDraw10" onclick="Page.spin(10)">⚡ 10連</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div class="res-ov" id="resOv">
+  <div class="res-sheet">
+    <div class="res-handle"></div>
+    <div class="res-ico"  id="resIco"></div>
+    <div id="resBadge"></div>
+    <div class="res-name" id="resName"></div>
+    <div class="res-cv"   id="resCv"></div>
+    <div class="res-btns">
+      <button class="res-btn res-btn-green" id="resBtnAgain" onclick="Page.spinAgain()">もう一度</button>
+      <button class="res-btn res-btn-gold"  onclick="Page.exchLast()">コイン交換</button>
+      <button class="res-btn res-btn-gray"  onclick="Page.closeResult()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE (same localStorage key as index.html) ──────
+const GW_KEY = 'gachaWorld_v3';
+const State = (()=>{
+  let s;
+  function load(){
+    try{ s = JSON.parse(localStorage.getItem(GW_KEY)); }catch(e){}
+    if(!s) s = {coins:1000,inv:{},spins:0,urCount:0,history:[],slots:{}};
+  }
+  function save(){ localStorage.setItem(GW_KEY, JSON.stringify(s)); }
+  load();
+  return {
+    get coins(){ return s.coins; },
+    set coins(v){ s.coins=v; save(); },
+    slots(id){ return s.slots[id]??0; },
+    setSlots(id,v){ s.slots[id]=v; save(); },
+    addItem(item){
+      if(s.inv[item.id]) s.inv[item.id].qty++;
+      else s.inv[item.id]={...item,qty:1};
+      save();
+    },
+    removeItem(id,qty=1){
+      if(!s.inv[id]) return 0;
+      const cv = s.inv[id].cv;
+      const taken = Math.min(qty, s.inv[id].qty);
+      s.inv[id].qty -= taken;
+      if(s.inv[id].qty<=0) delete s.inv[id];
+      save();
+      return cv*taken;
+    },
+    recordSpin(mid, prize){
+      s.spins++;
+      if(prize.rarity==='ultra-rare') s.urCount++;
+      if(s.slots[mid]>0) s.slots[mid]--;
+      const m = MACHINES.find(x=>x.id===mid);
+      s.history.unshift({time:new Date().toLocaleString('ja-JP'), machine:m?m.name:mid, prize});
+      if(s.history.length>100) s.history.pop();
+      save();
+    },
+  };
+})();
+
+// ─── MACHINES (defaults + localStorage overrides) ─────
+const MACHINES=[
+  {id:'beginner',name:'ビギナーズラック',icon:'🍀',grad:'linear-gradient(135deg,#66bb6a,#2e7d32)',copy:'初回限定！ラッキーな出会いを！',cost:30,cost10:270,totalSlots:99999,tags:['お手軽'],prizes:[{id:'bg_stk',name:'ラッキーステッカー',emoji:'🏷️',rarity:'common',cv:45,prob:0.55},{id:'bg_bdg',name:'クローバーバッジ',emoji:'🍀',rarity:'uncommon',cv:80,prob:0.30},{id:'bg_key',name:'ラッキーチャーム',emoji:'🔮',rarity:'rare',cv:150,prob:0.12},{id:'bg_fig',name:'幸運のフィギュア',emoji:'🧸',rarity:'super-rare',cv:280,prob:0.03}]},
+  {id:'starter',name:'スターターガチャ',icon:'🎪',grad:'linear-gradient(135deg,#43a047,#1b5e20)',copy:'まずはここから！誰でも引けるお手軽ガチャ',cost:50,cost10:450,totalSlots:99999,tags:['お手軽'],prizes:[{id:'st_stk',name:'キャラステッカー',emoji:'🏷️',rarity:'common',cv:75,prob:0.50},{id:'st_bdg',name:'コレクションバッジ',emoji:'📛',rarity:'uncommon',cv:120,prob:0.30},{id:'st_key',name:'キーホルダー',emoji:'🔑',rarity:'rare',cv:200,prob:0.15},{id:'st_fig',name:'ミニフィギュア',emoji:'🧸',rarity:'super-rare',cv:350,prob:0.05}]},
+  {id:'second',name:'セカンドチャンス',icon:'🎯',grad:'linear-gradient(135deg,#26c6da,#006064)',copy:'もう一度チャレンジ！お得な中級ガチャ',cost:80,cost10:720,totalSlots:80000,tags:['お手軽'],prizes:[{id:'sc_pin',name:'ピンバッジ',emoji:'📌',rarity:'common',cv:100,prob:0.50},{id:'sc_str',name:'ストラップ',emoji:'🔗',rarity:'uncommon',cv:160,prob:0.30},{id:'sc_bk',name:'ミニコミック',emoji:'📔',rarity:'rare',cv:250,prob:0.15},{id:'sc_fig',name:'アクションフィギュア',emoji:'🤺',rarity:'super-rare',cv:400,prob:0.05}]},
+  {id:'normal',name:'ノーマルガチャ',icon:'⚡',grad:'linear-gradient(135deg,#1e88e5,#0d47a1)',copy:'バランス◎ スタンダードなガチャ',cost:100,cost10:900,totalSlots:50000,tags:['スタンダード'],prizes:[{id:'nm_pin',name:'ピンバッジセット',emoji:'📌',rarity:'common',cv:130,prob:0.50},{id:'nm_tsh',name:'キャラTシャツ',emoji:'👕',rarity:'uncommon',cv:280,prob:0.28},{id:'nm_pos',name:'限定ポスター',emoji:'🖼️',rarity:'rare',cv:500,prob:0.17},{id:'nm_fig',name:'レアフィギュア',emoji:'🎎',rarity:'super-rare',cv:1200,prob:0.05}]},
+  {id:'anime',name:'アニメキャラガチャ',icon:'✨',grad:'linear-gradient(135deg,#ec407a,#880e4f)',copy:'人気アニメキャラのグッズが登場！',cost:150,cost10:1350,totalSlots:60000,tags:['アニメ'],prizes:[{id:'an_stk',name:'アニメステッカーセット',emoji:'🌸',rarity:'common',cv:180,prob:0.50},{id:'an_bdg',name:'キャラクターバッジ',emoji:'💮',rarity:'uncommon',cv:320,prob:0.28},{id:'an_key',name:'アニメキーホルダー',emoji:'🗝️',rarity:'rare',cv:600,prob:0.17},{id:'an_fig',name:'アニメフィギュア',emoji:'🎌',rarity:'super-rare',cv:1500,prob:0.05}]},
+  {id:'chara',name:'キャラクターグッズ',icon:'🎭',grad:'linear-gradient(135deg,#ab47bc,#4a148c)',copy:'キャラクター公式グッズが当たる！',cost:180,cost10:1620,totalSlots:45000,tags:['アニメ'],prizes:[{id:'ch_can',name:'缶バッジ',emoji:'🔵',rarity:'common',cv:220,prob:0.48},{id:'ch_tow',name:'キャラタオル',emoji:'🏳️',rarity:'uncommon',cv:400,prob:0.30},{id:'ch_art',name:'アートブック',emoji:'📚',rarity:'rare',cv:700,prob:0.17},{id:'ch_fig',name:'限定フィギュア',emoji:'🎭',rarity:'super-rare',cv:1800,prob:0.05}]},
+  {id:'pokemon',name:'ポケモンオリパ',icon:'⚡',grad:'linear-gradient(135deg,#ffee58,#f57f17)',copy:'ポケモンカード封入！超人気ガチャ！',cost:200,cost10:1800,totalSlots:30000,tags:['スタンダード','人気'],prizes:[{id:'pk_c',name:'ノーマルカード',emoji:'🃏',rarity:'common',cv:240,prob:0.45},{id:'pk_r',name:'レアカード',emoji:'✨',rarity:'uncommon',cv:500,prob:0.30},{id:'pk_sr',name:'SRカード',emoji:'💎',rarity:'rare',cv:1200,prob:0.20},{id:'pk_ur',name:'URカード',emoji:'🌟',rarity:'ultra-rare',cv:5000,prob:0.05}]},
+  {id:'weekly',name:'ウィークリースペシャル',icon:'📅',grad:'linear-gradient(135deg,#ff7043,#bf360c)',copy:'毎週更新！今週限りの特別ガチャ',cost:250,cost10:2250,totalSlots:25000,tags:['限定'],prizes:[{id:'wk_pkg',name:'スペシャルパッケージ',emoji:'📦',rarity:'common',cv:300,prob:0.45},{id:'wk_set',name:'限定グッズセット',emoji:'🎁',rarity:'uncommon',cv:600,prob:0.30},{id:'wk_col',name:'コレクターズアイテム',emoji:'🏅',rarity:'rare',cv:1300,prob:0.20},{id:'wk_sp',name:'週間スペシャル',emoji:'⭐',rarity:'super-rare',cv:2500,prob:0.05}]},
+  {id:'silver',name:'シルバーガチャ',icon:'🥈',grad:'linear-gradient(135deg,#78909c,#37474f)',copy:'高品質アイテム多数！シルバー限定排出',cost:300,cost10:2700,totalSlots:20000,tags:['高品質','人気'],prizes:[{id:'sv_acr',name:'アクリルスタンド',emoji:'🗿',rarity:'uncommon',cv:400,prob:0.45},{id:'sv_art',name:'アートプリント',emoji:'🎨',rarity:'rare',cv:700,prob:0.30},{id:'sv_fig',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:1800,prob:0.20},{id:'sv_ssr',name:'SSRカード',emoji:'✨',rarity:'ultra-rare',cv:3500,prob:0.05}]},
+  {id:'mystery',name:'ミステリーボックス',icon:'📦',grad:'linear-gradient(135deg,#546e7a,#263238)',copy:'何が入ってるかはお楽しみ！',cost:350,cost10:3150,totalSlots:18000,tags:['ミステリー'],prizes:[{id:'my_com',name:'コモンボックス',emoji:'📦',rarity:'common',cv:400,prob:0.40},{id:'my_unc',name:'アンコモンボックス',emoji:'🎁',rarity:'uncommon',cv:750,prob:0.30},{id:'my_rar',name:'レアボックス',emoji:'💼',rarity:'rare',cv:1500,prob:0.22},{id:'my_sp',name:'ミステリースペシャル',emoji:'🔮',rarity:'super-rare',cv:3000,prob:0.08}]},
+  {id:'figure',name:'フィギュアコレクション',icon:'🗿',grad:'linear-gradient(135deg,#8d6e63,#4e342e)',copy:'精巧なフィギュアのコレクション！',cost:400,cost10:3600,totalSlots:15000,tags:['高品質'],prizes:[{id:'fg_mini',name:'ミニフィギュア',emoji:'🧸',rarity:'uncommon',cv:500,prob:0.40},{id:'fg_std',name:'スタンダードフィギュア',emoji:'🗿',rarity:'rare',cv:1000,prob:0.35},{id:'fg_lim',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:2500,prob:0.20},{id:'fg_ur',name:'UR限定フィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'holiday',name:'ホリデースペシャル',icon:'🎄',grad:'linear-gradient(135deg,#ef5350,#b71c1c)',copy:'季節限定！ホリデーシーズン特別版',cost:450,cost10:4050,totalSlots:12000,tags:['限定','人気'],prizes:[{id:'hd_orn',name:'ホリデーオーナメント',emoji:'🎄',rarity:'uncommon',cv:600,prob:0.40},{id:'hd_set',name:'ホリデーグッズセット',emoji:'🎁',rarity:'rare',cv:1200,prob:0.35},{id:'hd_lim',name:'限定コレクション',emoji:'❄️',rarity:'super-rare',cv:3000,prob:0.20},{id:'hd_ur',name:'ホリデーURアイテム',emoji:'🌟',rarity:'ultra-rare',cv:7000,prob:0.05}]},
+  {id:'gold',name:'ゴールドガチャ',icon:'🥇',grad:'linear-gradient(135deg,#ffb300,#e65100)',copy:'1等は超プレミアム！夢を掴め！',cost:500,cost10:4500,totalSlots:10000,tags:['プレミアム','人気'],prizes:[{id:'gd_set',name:'プレミアムグッズセット',emoji:'🎁',rarity:'rare',cv:800,prob:0.40},{id:'gd_acr',name:'限定アクリルスタンド',emoji:'💎',rarity:'rare',cv:1300,prob:0.35},{id:'gd_art',name:'レアアートボード',emoji:'🖌️',rarity:'super-rare',cv:3000,prob:0.20},{id:'gd_ur',name:'URフィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'artlimit',name:'限定アートシリーズ',icon:'🎨',grad:'linear-gradient(135deg,#26a69a,#004d40)',copy:'アーティスト限定コラボシリーズ！',cost:600,cost10:5400,totalSlots:8000,tags:['限定'],prizes:[{id:'al_prt',name:'アートプリント',emoji:'🖼️',rarity:'rare',cv:900,prob:0.38},{id:'al_sig',name:'サイン入りポスター',emoji:'✍️',rarity:'rare',cv:1800,prob:0.32},{id:'al_lim',name:'限定アートボード',emoji:'🎨',rarity:'super-rare',cv:4000,prob:0.22},{id:'al_ur',name:'UR限定アートピース',emoji:'🏛️',rarity:'ultra-rare',cv:8000,prob:0.08}]},
+  {id:'superrare',name:'スーパーレアガチャ',icon:'💫',grad:'linear-gradient(135deg,#7e57c2,#311b92)',copy:'SR以上確定！超高確率ガチャ！',cost:700,cost10:6300,totalSlots:7000,tags:['プレミアム'],prizes:[{id:'sr_acr',name:'SRアクリルスタンド',emoji:'💫',rarity:'rare',cv:1000,prob:0.40},{id:'sr_fig',name:'SRフィギュア',emoji:'🌠',rarity:'super-rare',cv:2500,prob:0.35},{id:'sr_lim',name:'限定SRコレクション',emoji:'✨',rarity:'super-rare',cv:4000,prob:0.20},{id:'sr_ur',name:'UR超限定',emoji:'💎',rarity:'ultra-rare',cv:9000,prob:0.05}]},
+  {id:'legend',name:'レジェンドガチャ',icon:'🏆',grad:'linear-gradient(135deg,#ff8f00,#e65100)',copy:'伝説のアイテムが眠るガチャ！',cost:800,cost10:7200,totalSlots:6000,tags:['プレミアム','UR排出'],prizes:[{id:'lg_set',name:'レジェンドグッズセット',emoji:'🏅',rarity:'rare',cv:1200,prob:0.35},{id:'lg_fig',name:'レジェンドフィギュア',emoji:'🏆',rarity:'super-rare',cv:3000,prob:0.35},{id:'lg_lim',name:'限定レジェンドBOX',emoji:'📿',rarity:'super-rare',cv:5000,prob:0.20},{id:'lg_ur',name:'URレジェンド',emoji:'👑',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'master',name:'マスターコレクション',icon:'👑',grad:'linear-gradient(135deg,#5c6bc0,#1a237e)',copy:'マスター限定！至高のコレクション',cost:900,cost10:8100,totalSlots:5000,tags:['UR排出'],prizes:[{id:'mc_art',name:'マスターアートピース',emoji:'🖼️',rarity:'super-rare',cv:1500,prob:0.40},{id:'mc_fig',name:'マスターフィギュア',emoji:'🗽',rarity:'super-rare',cv:3500,prob:0.30},{id:'mc_lim',name:'限定マスターBOX',emoji:'🧿',rarity:'super-rare',cv:5500,prob:0.20},{id:'mc_ur',name:'URマスターコレクション',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.10}]},
+  {id:'premium',name:'プレミアムガチャ',icon:'💎',grad:'linear-gradient(135deg,#9c27b0,#4a148c)',copy:'最高峰ガチャ！URを掴み取れ！！',cost:1000,cost10:9000,totalSlots:5000,tags:['UR排出','限定'],prizes:[{id:'pm_box',name:'コレクターズボックス',emoji:'📦',rarity:'rare',cv:1500,prob:0.40},{id:'pm_dvd',name:'限定版DVD',emoji:'💿',rarity:'super-rare',cv:2800,prob:0.30},{id:'pm_art',name:'シグネチャーアート',emoji:'🖼️',rarity:'super-rare',cv:7000,prob:0.20},{id:'pm_ur',name:'URコレクション',emoji:'🌟',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'diamond',name:'ダイヤモンドガチャ',icon:'💠',grad:'linear-gradient(135deg,#00bcd4,#006064)',copy:'ダイヤ級の価値！最高峰コレクション',cost:1500,cost10:13500,totalSlots:3000,tags:['UR排出','限定'],prizes:[{id:'dm_fig',name:'ダイヤモンドフィギュア',emoji:'💠',rarity:'super-rare',cv:2500,prob:0.35},{id:'dm_art',name:'ダイヤモンドアート',emoji:'🔷',rarity:'super-rare',cv:5000,prob:0.35},{id:'dm_lim',name:'限定ダイヤモンドBOX',emoji:'💎',rarity:'ultra-rare',cv:10000,prob:0.20},{id:'dm_ur',name:'URダイヤモンド至宝',emoji:'🌟',rarity:'ultra-rare',cv:20000,prob:0.10}]},
+  {id:'grand',name:'グランドプレミアム',icon:'🌟',grad:'linear-gradient(135deg,#ffd700,#ff6f00)',copy:'頂点に君臨する最高峰ガチャ！',cost:2000,cost10:18000,totalSlots:1000,tags:['UR排出','限定','人気'],prizes:[{id:'gp_col',name:'グランドコレクション',emoji:'🌟',rarity:'super-rare',cv:4000,prob:0.30},{id:'gp_lim',name:'グランド限定BOX',emoji:'🎆',rarity:'super-rare',cv:8000,prob:0.30},{id:'gp_ur1',name:'URグランドフィギュア',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.25},{id:'gp_ur2',name:'URグランド至高',emoji:'💫',rarity:'ultra-rare',cv:25000,prob:0.15}]},
+];
+// Apply CMS overrides
+(function(){
+  try{const cm=JSON.parse(localStorage.getItem('gw_custom_machines'));if(cm&&cm.length){MACHINES.length=0;cm.forEach(m=>MACHINES.push(m));}}catch(e){}
+})();
+
+const RARITY_INFO={
+  'common':    {label:'コモン',      color:'#78909c',barColor:'#b0bec5'},
+  'uncommon':  {label:'アンコモン',  color:'#43a047',barColor:'#81c784'},
+  'rare':      {label:'レア',        color:'#1e88e5',barColor:'#64b5f6'},
+  'super-rare':{label:'スーパーレア',color:'#8e24aa',barColor:'#ce93d8'},
+  'ultra-rare':{label:'ウルトラレア',color:'#bf360c',barColor:'#ffab91'},
+};
+
+// ─── HELPERS ──────────────────────────────────────────
+function rbadge(r){
+  const info = RARITY_INFO[r]||RARITY_INFO['common'];
+  return `<span class="rbadge rb-${r}" style="color:${info.color}">${info.label}</span>`;
+}
+function fmt(n){ return Number(n).toLocaleString('ja-JP'); }
+
+// ─── GRADE CLASSIFIER ─────────────────────────────────
+function gradeOf(prizes){
+  // Sort prizes by rarity weight
+  const order = ['ultra-rare','super-rare','rare','uncommon','common'];
+  const sorted = [...prizes].sort((a,b)=>order.indexOf(a.rarity)-order.indexOf(b.rarity));
+  const grades = {g1:[],g2:[],g3:[],other:[]};
+  const used = new Set();
+  // 1等: ultra-rare (or if none: super-rare top)
+  sorted.filter(p=>p.rarity==='ultra-rare').forEach(p=>{grades.g1.push(p);used.add(p.id);});
+  if(!grades.g1.length){
+    const top = sorted.find(p=>p.rarity==='super-rare');
+    if(top){grades.g1.push(top);used.add(top.id);}
+  }
+  // 2等: super-rare (remaining)
+  sorted.filter(p=>p.rarity==='super-rare'&&!used.has(p.id)).forEach(p=>{grades.g2.push(p);used.add(p.id);});
+  if(!grades.g2.length&&!grades.g1.length){
+    const top = sorted.find(p=>p.rarity==='rare');
+    if(top){grades.g1.push(top);used.add(top.id);}
+  }
+  // 3等: rare
+  sorted.filter(p=>p.rarity==='rare'&&!used.has(p.id)).forEach(p=>{grades.g3.push(p);used.add(p.id);});
+  // その他: rest
+  sorted.filter(p=>!used.has(p.id)).forEach(p=>grades.other.push(p));
+  return grades;
+}
+
+// ─── PAGE ─────────────────────────────────────────────
+let currentMachine = null;
+let lastPrize = null;
+let lastSpinCount = 1;
+
+const Page = {
+  init(){
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    if(!id){ this.notFound(); return; }
+    // Apply CMS overrides again after MACHINES possibly updated
+    const m = MACHINES.find(x=>x.id===id);
+    if(!m){ this.notFound(); return; }
+    // Init slots
+    const s = (() => {
+      try{ return JSON.parse(localStorage.getItem(GW_KEY)); }catch(e){ return null; }
+    })();
+    if(s && s.slots && s.slots[id]==null){ s.slots[id]=m.totalSlots; localStorage.setItem(GW_KEY,JSON.stringify(s)); }
+    currentMachine = m;
+    document.title = m.name + ' — ガチャワールド';
+    document.getElementById('hdrTitle').textContent = m.name;
+    this.render(m);
+    this.updateCoins();
+    document.getElementById('floatBar').style.display='block';
+    this.updateButtons();
+  },
+  notFound(){
+    document.getElementById('main').innerHTML = `
+      <div class="not-found">
+        <div class="not-found-ico">🔍</div>
+        <div style="font-size:1rem;font-weight:700;margin-bottom:8px">商品が見つかりません</div>
+        <button onclick="location.href='index.html'" style="background:var(--green);color:white;border:none;border-radius:20px;padding:9px 22px;font-size:0.88rem;font-weight:700;cursor:pointer">トップに戻る</button>
+      </div>`;
+  },
+  render(m){
+    const rem = State.slots(m.id);
+    const pct = Math.max(2,(rem/m.totalSlots)*100);
+    const fillColor = pct>50?'#00a63c':pct>20?'#f0a000':'#e53935';
+    const tags = m.tags.map(t=>`<div class="htag">${t}</div>`).join('');
+    const hotCount = Math.floor(Math.random()*200)+15;
+    const grades = gradeOf(m.prizes||[]);
+    const maxProb = Math.max(...(m.prizes||[]).map(p=>p.prob));
+
+    const heroStyle = m.bannerImage
+      ? `background-image:url(${m.bannerImage})`
+      : `background:${m.grad||'linear-gradient(135deg,#1e88e5,#0d47a1)'}`;
+    document.getElementById('main').innerHTML = `
+      <!-- HERO -->
+      <div class="hero" style="${heroStyle}">
+        <div class="hero-overlay"></div>
+        ${!m.bannerImage ? `<div class="hero-bg-ico">${m.icon}</div>` : ''}
+        <div class="hero-tags">${tags}</div>
+        <div class="hero-hot">🔥 ${hotCount}人がチェック中</div>
+        <div class="hero-bottom">
+          <div class="hero-icon">${m.icon}</div>
+          <div class="hero-name">${m.name}</div>
+          <div class="hero-copy">${m.copy}</div>
+        </div>
+      </div>
+
+      <!-- INFO BAR -->
+      <div class="info-bar">
+        <div class="info-bar-top">
+          <div class="info-cost">🪙 ${fmt(m.cost)} <span>/ 1回</span></div>
+          <div style="font-size:0.76rem;color:var(--sub)">10連 🪙${fmt(m.cost10)}</div>
+        </div>
+        <div class="info-rem-label">
+          <span>残り枚数</span>
+          <span><strong>${fmt(rem)}</strong> / ${fmt(m.totalSlots)}</span>
+        </div>
+        <div class="info-rem-bar">
+          <div class="info-rem-fill" style="width:${pct}%;background:${fillColor}"></div>
+        </div>
+      </div>
+
+      <div class="page-wrap">
+        ${m.description ? this._descSection(m) : ''}
+        ${grades.g1.length ? this._gradeSection('1等',grades.g1,'grade-1',m) : ''}
+        ${grades.g2.length ? this._gradeSection('2等',grades.g2,'grade-2',m) : ''}
+        ${grades.g3.length ? this._gradeSection('3等',grades.g3,'grade-3',m) : ''}
+        ${grades.other.length ? this._gradeSection('その他',grades.other,'grade-other',m) : ''}
+        ${this._rateSection(m,maxProb)}
+        ${this._notesSection(m)}
+      </div>`;
+  },
+
+  _prizeIco(p){
+    if(p.image) return `<img src="${p.image}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;display:block;margin:0 auto">`;
+    return p.emoji;
+  },
+  _prizeIcoLarge(p){
+    if(p.image) return `<img src="${p.image}" style="width:180px;height:180px;object-fit:cover;border-radius:16px;display:block;margin:0 auto">`;
+    return p.emoji;
+  },
+  _itemStrip(p){
+    const items = (p.items||[]).filter(i=>i.image||i.name);
+    if(!items.length) return '';
+    return `<div class="item-strip">`+items.map(item=>`
+      <div class="item-thumb">
+        ${item.image
+          ? `<img class="item-thumb-img" src="${item.image}" alt="">`
+          : (p.image ? `<img class="item-thumb-img" src="${p.image}" alt="">` : `<div class="item-thumb-ph">${p.emoji}</div>`)}
+        ${item.name ? `<div class="item-thumb-name">${item.name}</div>` : ''}
+      </div>`).join('')+`</div>`;
+  },
+  _gradeSection(gradeLabel, prizes, gradeClass, m){
+    let body = '';
+    if(gradeLabel==='1等'){
+      body = prizes.map(p=>`
+        <div class="prize-1">
+          <div class="prize-1-ico">${this._prizeIcoLarge(p)}</div>
+          <div class="prize-1-info" style="flex:1;min-width:0">
+            ${rbadge(p.rarity)}
+            <div class="prize-1-name">${p.name}</div>
+            <div class="prize-1-cv">🪙 コイン換算 ${fmt(p.cv)}</div>
+            <div style="font-size:0.6rem;color:var(--dim);margin-top:3px;opacity:0.6">排出率 ${(p.prob*100).toFixed(2)}%</div>
+            ${this._itemStrip(p)}
+          </div>
+        </div>`).join('');
+    } else if(gradeLabel==='2等'){
+      body = `<div class="prize-grid-2">`+prizes.map(p=>`
+        <div class="prize-card-m">
+          <div class="prize-card-m-ico">${this._prizeIco(p)}</div>
+          ${rbadge(p.rarity)}
+          <div class="prize-card-m-name">${p.name}</div>
+          <div class="prize-card-m-cv">🪙 ${fmt(p.cv)}</div>
+          <div style="font-size:0.58rem;color:var(--dim);margin-top:2px;opacity:0.55">${(p.prob*100).toFixed(2)}%</div>
+          ${this._itemStrip(p)}
+        </div>`).join('')+`</div>`;
+    } else if(gradeLabel==='3等'){
+      body = `<div class="prize-grid-2">`+prizes.map(p=>`
+        <div class="prize-card-s">
+          <div class="prize-card-s-ico">${this._prizeIco(p)}</div>
+          ${rbadge(p.rarity)}
+          <div class="prize-card-s-name">${p.name}</div>
+          <div class="prize-card-s-cv">🪙 ${fmt(p.cv)}</div>
+          <div style="font-size:0.58rem;color:var(--dim);margin-top:2px;opacity:0.55">${(p.prob*100).toFixed(2)}%</div>
+          ${this._itemStrip(p)}
+        </div>`).join('')+`</div>`;
+    } else {
+      body = `<div class="prize-list">`+prizes.map(p=>`
+        <div class="prize-list-item" style="flex-wrap:wrap">
+          <div class="prize-list-ico">${this._prizeIco(p)}</div>
+          <div class="prize-list-info">
+            <div class="prize-list-name">${p.name}</div>
+            <div class="prize-list-cv">🪙 ${fmt(p.cv)}</div>
+            <div style="font-size:0.6rem;color:var(--dim);margin-top:1px;opacity:0.55">${(p.prob*100).toFixed(2)}%</div>
+          </div>
+          ${rbadge(p.rarity)}
+          ${(p.items||[]).filter(i=>i.image||i.name).length ? `<div style="width:100%">${this._itemStrip(p)}</div>` : ''}
+        </div>`).join('')+`</div>`;
+    }
+    const rarLabel = prizes.map(p=>(RARITY_INFO[p.rarity]||{}).label).filter(Boolean).join('・');
+    return `
+    <div class="sec">
+      <div class="sec-hd">
+        <div class="sec-grade ${gradeClass}">${gradeLabel}</div>
+        <div class="sec-hd-info">
+          <div class="sec-hd-title">${gradeLabel}景品</div>
+          <div class="sec-hd-sub">${rarLabel}</div>
+        </div>
+      </div>
+      <div class="sec-body">${body}</div>
+    </div>`;
+  },
+
+  _rateSection(m, maxProb){
+    const rows = [...(m.prizes||[])].sort((a,b)=>b.prob-a.prob).map(p=>{
+      const pct = Math.round(p.prob/maxProb*100);
+      const info = RARITY_INFO[p.rarity]||RARITY_INFO['common'];
+      return `<tr>
+        <td>${p.emoji} ${p.name}</td>
+        <td>${rbadge(p.rarity)}</td>
+        <td>
+          <div class="rate-bar-wrap">
+            <div class="rate-bar-track">
+              <div class="rate-bar-fill" style="width:${pct}%;background:${info.barColor}"></div>
+            </div>
+            <span style="font-size:0.75rem;color:var(--sub);white-space:nowrap;flex-shrink:0">${(p.prob*100).toFixed(1)}%</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+    return `
+    <div class="sec">
+      <div class="sec-hd">
+        <div class="sec-grade" style="background:#2196f3;font-size:0.7rem">確率</div>
+        <div class="sec-hd-info">
+          <div class="sec-hd-title">📊 排出確率</div>
+        </div>
+      </div>
+      <div class="sec-body" style="padding:0">
+        <div style="overflow-x:auto">
+          <table class="rate-table"><tbody>${rows}</tbody></table>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  _descSection(m){
+    return `
+    <div class="sec">
+      <div class="sec-hd">
+        <div class="sec-grade" style="background:#64748b;font-size:0.65rem">説明</div>
+        <div class="sec-hd-info"><div class="sec-hd-title">📝 商品説明</div></div>
+      </div>
+      <div class="sec-body">
+        <div style="font-size:0.83rem;color:var(--sub);line-height:1.75;white-space:pre-wrap">${m.description}</div>
+      </div>
+    </div>`;
+  },
+  _notesSection(m){
+    const defaultNotes = [
+      '本ガチャはデモ用です。実際の商品の売買は行っておりません。',
+      '獲得したアイテムはコインに交換できます。コインは他のガチャに使用できます。',
+      '排出確率は各景品の表記をご確認ください。',
+      '残り枚数が0になるとこのガチャは終了となります。',
+      '10連引きは1回あたり10%割引になります。',
+      'コインが不足している場合はガチャを引くことができません。',
+    ];
+    const notes = (m.notes && m.notes.length) ? m.notes : defaultNotes;
+    const items = notes.map(n=>`
+      <div class="note-item"><span class="note-dot">●</span><span>${n}</span></div>`).join('');
+    return `
+    <div class="sec">
+      <div class="sec-hd">
+        <div class="sec-grade" style="background:#f0a000;font-size:0.65rem">注意</div>
+        <div class="sec-hd-info"><div class="sec-hd-title">⚠️ ご注意事項</div></div>
+      </div>
+      <div class="sec-body">
+        <div class="notes-list">${items}</div>
+      </div>
+    </div>`;
+  },
+
+  updateCoins(){
+    const c = fmt(State.coins);
+    document.getElementById('hdrCoin').textContent  = '🪙 '+c;
+    document.getElementById('floatCoin').textContent = '🪙 '+c;
+  },
+  updateButtons(){
+    if(!currentMachine) return;
+    const m = currentMachine;
+    const rem = State.slots(m.id);
+    const noSlots = rem<=0;
+    document.getElementById('btnDraw1').disabled  = State.coins < m.cost   || noSlots;
+    document.getElementById('btnDraw10').disabled = State.coins < m.cost10 || noSlots;
+    if(noSlots){
+      document.getElementById('btnDraw1').textContent  = '売り切れ';
+      document.getElementById('btnDraw10').textContent = '売り切れ';
+    } else {
+      document.getElementById('btnDraw1').textContent  = '🎰 1回引く  🪙'+fmt(m.cost);
+      document.getElementById('btnDraw10').textContent = '⚡ 10連  🪙'+fmt(m.cost10);
+    }
+  },
+
+  _drawPrize(m){
+    const r = Math.random();
+    let acc = 0;
+    for(const p of m.prizes){
+      acc += p.prob;
+      if(r <= acc) return this._attachItem(p);
+    }
+    return this._attachItem(m.prizes[m.prizes.length-1]);
+  },
+  _attachItem(p){
+    const items = (p.items||[]);
+    if(!items.length) return p;
+    const item = items[Math.floor(Math.random()*items.length)];
+    return {...p, _item: item};
+  },
+
+  spin(count){
+    const m = currentMachine;
+    if(!m) return;
+    const cost = count===1 ? m.cost : m.cost10;
+    if(State.coins < cost){ toast('コインが不足しています'); return; }
+    if(State.slots(m.id)<=0){ toast('売り切れです'); return; }
+    State.coins -= cost;
+    const prize = this._drawPrize(m);
+    State.addItem(prize);
+    State.recordSpin(m.id, prize);
+    lastPrize = prize;
+    lastSpinCount = count;
+    this.showResult(prize);
+    this.updateCoins();
+    this.updateButtons();
+    // refresh rem bar
+    const rem = State.slots(m.id);
+    const pct = Math.max(2,(rem/m.totalSlots)*100);
+    const fillColor = pct>50?'#00a63c':pct>20?'#f0a000':'#e53935';
+    const fill = document.querySelector('.info-rem-fill');
+    const label = document.querySelector('.info-rem-label strong');
+    if(fill) fill.style.width = pct+'%', fill.style.background = fillColor;
+    if(label) label.textContent = fmt(rem);
+  },
+  spinAgain(){
+    this.closeResult();
+    setTimeout(()=>this.spin(lastSpinCount), 200);
+  },
+  exchLast(){
+    if(!lastPrize) return;
+    const gained = State.removeItem(lastPrize.id);
+    if(gained>0){
+      State.coins += gained;
+      this.updateCoins();
+      this.updateButtons();
+      toast('🪙 '+fmt(gained)+'コインに交換しました');
+    }
+    this.closeResult();
+  },
+  showResult(prize){
+    const info = RARITY_INFO[prize.rarity]||RARITY_INFO['common'];
+    const item = prize._item;
+    if(item && item.image){
+      document.getElementById('resIco').innerHTML = `<img class="res-item-img" src="${item.image}" alt="">`;
+    } else {
+      document.getElementById('resIco').textContent = prize.emoji;
+    }
+    document.getElementById('resBadge').innerHTML  = rbadge(prize.rarity);
+    document.getElementById('resName').textContent = (item && item.name) ? item.name : prize.name;
+    document.getElementById('resCv').textContent   = '🪙 コイン換算 '+fmt(prize.cv);
+    // UR glow
+    const card = document.querySelector('.res-sheet');
+    if(prize.rarity==='ultra-rare'){
+      card.style.background='linear-gradient(160deg,#fff8e1,#fff3e0)';
+    } else {
+      card.style.background='white';
+    }
+    document.getElementById('resOv').classList.add('open');
+  },
+  closeResult(){
+    document.getElementById('resOv').classList.remove('open');
+  },
+};
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// tap outside result sheet to close
+document.getElementById('resOv').addEventListener('click',function(e){
+  if(e.target===this) Page.closeResult();
+});
+
+Page.init();
+</script>
+</body>
+</html>

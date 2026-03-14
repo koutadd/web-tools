@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>無料Webサイト診断 | 問い合わせが来ない原因を3つに絞って教えます</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    /* ── Landing page sections ─────────────────────────────── */
+
+    body { background: #fff; }
+
+    /* ── Sticky Nav ── */
+    .lp-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .lp-nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin-inline: auto;
+      padding: 0.875rem 1.5rem;
+    }
+
+    .lp-nav__logo {
+      font-size: 1.0625rem;
+      font-weight: 800;
+      color: #111;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .lp-nav__logo:hover { color: #2563eb; }
+
+    .lp-nav__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+
+    .lp-nav__link {
+      font-size: 0.875rem;
+      color: #6b7280;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .lp-nav__link:hover { color: #111; }
+
+    .lp-nav__cta {
+      font-size: 0.875rem;
+      padding: 0.5rem 1.125rem;
+      border-radius: 8px;
+    }
+
+    /* ── Hero ── */
+    .lp-hero {
+      padding: 5rem 1.5rem 4.5rem;
+      background: linear-gradient(155deg, #f0f5ff 0%, #fff 55%);
+      overflow: hidden;
+    }
+
+    .lp-hero__inner {
+      max-width: 1100px;
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    .lp-hero__tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .lp-hero__tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #2563eb;
+      background: rgba(37,99,235,0.08);
+      border: 1px solid rgba(37,99,235,0.18);
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+    }
+
+    .lp-hero__h1 {
+      font-size: clamp(1.75rem, 3.5vw, 2.625rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.18;
+      color: #0f172a;
+      margin-bottom: 1.25rem;
+    }
+
+    .lp-hero__sub {
+      font-size: 1rem;
+      color: #374151;
+      line-height: 1.8;
+      margin-bottom: 2.125rem;
+    }
+
+    .lp-hero__cta {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.625rem;
+    }
+
+    .lp-hero__cta-btn {
+      font-size: 1rem;
+      padding: 0.875rem 2rem;
+      font-weight: 700;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.28);
+    }
+    .lp-hero__cta-btn:hover {
+      box-shadow: 0 6px 28px rgba(37,99,235,0.38);
+      transform: translateY(-1px);
+    }
+
+    .lp-hero__cta-note {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .lp-hero__trust {
+      display: flex;
+      gap: 1.375rem;
+      flex-wrap: wrap;
+    }
+
+    .lp-hero__trust-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #6b7280;
+    }
+    .lp-hero__trust-item svg { color: #2563eb; flex-shrink: 0; }
+
+    /* ── Hero preview animations ── */
+    @keyframes scan-line {
+      0%   { transform: translateY(-100%); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(500%); opacity: 0; }
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bar-grow {
+      from { width: 0%; }
+      to   { width: 72%; }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 2px 8px rgba(15,30,80,0.05), 0 12px 40px rgba(15,30,80,0.10); }
+      50%       { box-shadow: 0 2px 8px rgba(37,99,235,0.08), 0 12px 40px rgba(37,99,235,0.16), 0 0 0 4px rgba(37,99,235,0.06); }
+    }
+
+    .hero-preview__scan {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hero-preview__scan::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(37,99,235,0.3) 20%,
+        rgba(37,99,235,0.7) 50%,
+        rgba(37,99,235,0.3) 80%,
+        transparent 100%
+      );
+      box-shadow: 0 0 12px rgba(37,99,235,0.4);
+      animation: scan-line 1.4s ease-in-out 0.3s 1 forwards;
+      transform: translateY(-100%);
+    }
+
+    /* items start hidden */
+    .hero-preview__score-row,
+    .hero-preview__item {
+      opacity: 0;
+    }
+    .hero-preview__bar-fill {
+      width: 0%;
+    }
+
+    /* animated states */
+    .hero-preview__score-row.is-visible {
+      animation: fade-up 0.5s ease forwards;
+    }
+    .hero-preview__bar-fill.is-animated {
+      animation: bar-grow 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    .hero-preview__item.is-visible {
+      animation: fade-up 0.45s ease forwards;
+    }
+    .hero-preview__item--blurred.is-visible {
+      opacity: 0.35 !important;
+      filter: blur(3px) !important;
+    }
+
+    /* ── Hero preview card (right column) ── */
+    .hero-preview__card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      box-shadow:
+        0 2px 8px rgba(15,30,80,0.05),
+        0 12px 40px rgba(15,30,80,0.10),
+        0 40px 80px rgba(15,30,80,0.08);
+      overflow: hidden;
+    }
+
+    .hero-preview__topbar {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafafa;
+    }
+
+    .hero-preview__dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .hero-preview__dot:nth-child(1) { background: #f87171; }
+    .hero-preview__dot:nth-child(2) { background: #fbbf24; }
+    .hero-preview__dot:nth-child(3) { background: #34d399; }
+
+    .hero-preview__header {
+      padding: 1rem 1.25rem 0.875rem;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hero-preview__label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #2563eb;
+      background: rgba(37,99,235,0.08);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .hero-preview__date { font-size: 0.68rem; color: #9ca3af; }
+
+    .hero-preview__score-row {
+      padding: 1.25rem 1.25rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.125rem;
+    }
+
+    .hero-preview__score-num {
+      font-size: 2.875rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: #2563eb;
+      line-height: 1;
+    }
+    .hero-preview__score-denom {
+      font-size: 0.8rem; color: #9ca3af; font-weight: 600;
+    }
+    .hero-preview__score-right { flex: 1; }
+    .hero-preview__score-label {
+      font-size: 0.72rem; font-weight: 700; color: #374151; margin-bottom: 0.4rem;
+    }
+    .hero-preview__bar-track {
+      height: 5px; background: #e5e7eb; border-radius: 999px; overflow: hidden;
+    }
+    .hero-preview__bar-fill {
+      height: 100%; width: 72%; background: #2563eb; border-radius: 999px;
+    }
+
+    .hero-preview__items {
+      padding: 0 1.125rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .hero-preview__item {
+      display: flex;
+      gap: 0.625rem;
+      align-items: flex-start;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 10px;
+      padding: 0.75rem 0.875rem;
+    }
+
+    .hero-preview__item-rank {
+      flex-shrink: 0;
+      width: 1.375rem; height: 1.375rem;
+      background: #2563eb; color: #fff;
+      border-radius: 50%;
+      font-size: 0.62rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 0.05rem;
+    }
+
+    .hero-preview__item-title {
+      font-size: 0.72rem; font-weight: 700; color: #111; margin-bottom: 0.175rem;
+    }
+    .hero-preview__item-body {
+      font-size: 0.65rem; color: #6b7280; line-height: 1.55;
+    }
+
+    .hero-preview__item--blurred {
+      opacity: 0.35;
+      filter: blur(3px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .hero-preview__fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.96));
+      pointer-events: none;
+    }
+
+    /* ── Trust numbers bar ── */
+    .lp-trust-bar {
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 2rem 1.5rem;
+    }
+
+    .lp-trust-bar__inner {
+      max-width: 900px;
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .lp-trust-bar__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem 2.5rem;
+      gap: 0.25rem;
+    }
+
+    .lp-trust-bar__sep {
+      width: 1px; height: 40px;
+      background: #d1d5db; flex-shrink: 0;
+    }
+
+    .lp-trust-bar__num {
+      font-size: 1.875rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: #2563eb;
+      line-height: 1;
+    }
+
+    .lp-trust-bar__label {
+      font-size: 0.72rem; font-weight: 500; color: #6b7280;
+    }
+
+    /* ── Generic section layout ── */
+    .lp-section {
+      padding: 5.5rem 1.5rem;
+    }
+    .lp-section--alt { background: #f8faff; }
+
+    .lp-section__inner {
+      max-width: 1100px;
+      margin-inline: auto;
+    }
+
+    .lp-section__eyebrow {
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: #2563eb;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .lp-section__h2 {
+      font-size: clamp(1.375rem, 3vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      line-height: 1.25;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 0.875rem;
+    }
+
+    .lp-section__lead {
+      font-size: 0.9375rem;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.8;
+      max-width: 540px;
+      margin-inline: auto;
+      margin-bottom: 3.5rem;
+    }
+
+    /* ── Problems grid ── */
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      max-width: 740px;
+      margin-inline: auto;
+    }
+
+    .problem-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 1.375rem 1.375rem;
+      display: flex;
+      gap: 0.875rem;
+      align-items: flex-start;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s;
+    }
+    .problem-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .problem-card__icon {
+      flex-shrink: 0;
+      width: 2.25rem; height: 2.25rem;
+      border-radius: 10px;
+      background: rgba(37,99,235,0.08);
+      display: flex; align-items: center; justify-content: center;
+      color: #2563eb;
+    }
+
+    .problem-card__text {
+      font-size: 0.875rem; font-weight: 600;
+      color: #1f2937; line-height: 1.55;
+    }
+
+    /* ── Features grid ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+      transform: translateY(-2px);
+    }
+
+    .feature-card__num {
+      font-size: 0.62rem; font-weight: 800;
+      letter-spacing: 0.12em; color: #2563eb;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card__icon {
+      width: 2.75rem; height: 2.75rem;
+      background: rgba(37,99,235,0.08);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: #2563eb;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card__title {
+      font-size: 1rem; font-weight: 800;
+      color: #0f172a; letter-spacing: -0.02em;
+      margin-bottom: 0.5rem; line-height: 1.3;
+    }
+
+    .feature-card__body {
+      font-size: 0.85rem; color: #6b7280; line-height: 1.75;
+    }
+
+    /* ── Flow steps ── */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+      margin-top: 3rem;
+    }
+
+    .flow-grid::before {
+      content: '';
+      position: absolute;
+      top: 1.625rem;
+      left: calc(12.5% + 1rem);
+      right: calc(12.5% + 1rem);
+      height: 1px;
+      background: linear-gradient(to right, #d1d5db, #2563eb 50%, #d1d5db);
+      z-index: 0;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flow-step__num {
+      width: 3.25rem; height: 3.25rem;
+      background: #2563eb; color: #fff;
+      font-size: 1rem; font-weight: 900;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.125rem;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+    }
+
+    .flow-step__title {
+      font-size: 0.9375rem; font-weight: 800;
+      color: #0f172a; margin-bottom: 0.375rem;
+    }
+
+    .flow-step__note {
+      font-size: 0.775rem; color: #6b7280; line-height: 1.6;
+    }
+
+    .flow-step__badge {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700;
+      background: rgba(37,99,235,0.09);
+      color: #2563eb;
+      border-radius: 999px;
+      padding: 0.175rem 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ── Form section ── */
+    .lp-form-section {
+      padding: 5.5rem 1.5rem 6.5rem;
+      background: linear-gradient(180deg, #f0f5ff 0%, #fff 100%);
+    }
+
+    .lp-form-section__inner {
+      max-width: 1100px;
+      margin-inline: auto;
+    }
+
+    .lp-form-section__head {
+      text-align: center;
+      margin-bottom: 2.75rem;
+    }
+
+    .lp-form-section__eyebrow {
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: #2563eb;
+      margin-bottom: 0.75rem;
+    }
+
+    .lp-form-section__h2 {
+      font-size: clamp(1.375rem, 3vw, 1.875rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .lp-form-section__sub {
+      font-size: 0.875rem; color: #9ca3af;
+    }
+
+    /* ── Footer ── */
+    .lp-footer {
+      background: #0f172a;
+      color: #4b5563;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .lp-footer p { font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 940px) {
+      .lp-hero__inner {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .hero-preview__card { max-width: 480px; margin-inline: auto; }
+      .features-grid {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin-inline: auto;
+      }
+      .flow-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+      .flow-grid::before { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .lp-hero { padding: 3rem 1.25rem 2.75rem; }
+      .problems-grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+      .flow-grid { grid-template-columns: 1fr; }
+      .lp-trust-bar__item { padding: 0.5rem 1.25rem; }
+      .lp-trust-bar__sep { display: none; }
+      .lp-section { padding: 3.75rem 1.25rem; }
+      .lp-form-section { padding: 3.75rem 1.25rem 5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══════════════════════════════════════════════════ -->
+  <nav class="lp-nav">
+    <div class="lp-nav__inner">
+      <a href="../../" class="lp-nav__logo">Web Tools</a>
+      <div class="lp-nav__actions">
+        <a href="../../" class="lp-nav__link">ツール一覧</a>
+        <a href="#form" class="btn btn--primary lp-nav__cta">無料で診断する</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ HERO（ファーストビュー）═══════════════════════════════ -->
+  <section class="lp-hero">
+    <div class="lp-hero__inner">
+
+      <!-- 左：テキスト + CTA -->
+      <div class="lp-hero__text">
+        <div class="lp-hero__tags">
+          <span class="lp-hero__tag">構造・導線分析</span>
+          <span class="lp-hero__tag">信頼設計</span>
+          <span class="lp-hero__tag">CV改善</span>
+        </div>
+        <h1 class="lp-hero__h1">
+          サイトから<br>
+          問い合わせが来ない原因を、<br>
+          3つに絞って教えます。
+        </h1>
+        <p class="lp-hero__sub">
+          制作・改善の実務視点でサイトを診断。<br>
+          優先度の高い改善ポイントを3つに絞って、<br>
+          最短で成果につながる提案をお届けします。
+        </p>
+        <div class="lp-hero__cta">
+          <a href="#form" class="btn btn--primary lp-hero__cta-btn">無料で診断する →</a>
+          <span class="lp-hero__cta-note">完全無料・入力3分</span>
+        </div>
+        <div class="lp-hero__trust">
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            入力3分で完了
+          </span>
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            レポート24h以内
+          </span>
+          <span class="lp-hero__trust-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            売り込みなし
+          </span>
+        </div>
+      </div>
+
+      <!-- 右：レポートプレビューモック -->
+      <div class="hero-preview" id="heroPreview">
+        <div class="hero-preview__card">
+          <div class="hero-preview__scan"></div>
+          <!-- ブラウザ風トップバー -->
+          <div class="hero-preview__topbar">
+            <div class="hero-preview__dot"></div>
+            <div class="hero-preview__dot"></div>
+            <div class="hero-preview__dot"></div>
+          </div>
+          <!-- ヘッダー -->
+          <div class="hero-preview__header">
+            <span class="hero-preview__label">診断レポート</span>
+            <span class="hero-preview__date">2026年3月</span>
+          </div>
+          <!-- スコア -->
+          <div class="hero-preview__score-row">
+            <div>
+              <div class="hero-preview__score-num">72</div>
+              <div class="hero-preview__score-denom">/ 100</div>
+            </div>
+            <div class="hero-preview__score-right">
+              <div class="hero-preview__score-label">複数の改善が必要です</div>
+              <div class="hero-preview__bar-track">
+                <div class="hero-preview__bar-fill"></div>
+              </div>
+            </div>
+          </div>
+          <!-- 改善提案リスト -->
+          <div class="hero-preview__items">
+            <div class="hero-preview__item">
+              <div class="hero-preview__item-rank">1</div>
+              <div>
+                <div class="hero-preview__item-title">CTA導線を強化する</div>
+                <div class="hero-preview__item-body">ページ上部に明確な行動喚起が見当たらないか、視覚的に目立っていません。</div>
+              </div>
+            </div>
+            <div class="hero-preview__item hero-preview__item--blurred">
+              <div class="hero-preview__item-rank">2</div>
+              <div>
+                <div class="hero-preview__item-title">核心メッセージを明確にする</div>
+                <div class="hero-preview__item-body">トップページの価値提案が数秒以内に伝わっていない可能性があります。</div>
+              </div>
+            </div>
+            <div class="hero-preview__item hero-preview__item--blurred">
+              <div class="hero-preview__item-rank">3</div>
+              <div>
+                <div class="hero-preview__item-title">信頼性の証拠を加える</div>
+                <div class="hero-preview__item-body">お客様の声・実績・資格情報が不足しています。</div>
+              </div>
+            </div>
+            <div class="hero-preview__fade"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ TRUST BAR（セカンドビュー上部）══════════════════════ -->
+  <div class="lp-trust-bar">
+    <div class="lp-trust-bar__inner">
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">3<span style="font-size:1rem;font-weight:700">分</span></span>
+        <span class="lp-trust-bar__label">入力で完了</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">24<span style="font-size:1rem;font-weight:700">h</span></span>
+        <span class="lp-trust-bar__label">以内にレポート</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">3<span style="font-size:1rem;font-weight:700">つ</span></span>
+        <span class="lp-trust-bar__label">に絞った改善提案</span>
+      </div>
+      <div class="lp-trust-bar__sep"></div>
+      <div class="lp-trust-bar__item">
+        <span class="lp-trust-bar__num">¥<span style="font-size:1rem;font-weight:700">0</span></span>
+        <span class="lp-trust-bar__label">完全無料</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROBLEMS（セカンドビュー）══════════════════════════ -->
+  <section class="lp-section lp-section--alt">
+    <div class="lp-section__inner">
+      <p class="lp-section__eyebrow">こんな悩みありませんか？</p>
+      <h2 class="lp-section__h2">集客はできているのに、<br>成果につながらない</h2>
+      <p class="lp-section__lead">
+        アクセス数の問題ではなく、「構造・導線・信頼設計」に
+        原因があることがほとんどです。
+      </p>
+      <div class="problems-grid">
+        <div class="problem-card">
+          <div class="problem-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+          </div>
+          <p class="problem-card__text">アクセスはあるのに、問い合わせ・予約が全然来ない</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          </div>
+          <p class="problem-card__text">何を改善すればいいか、優先順位がわからない</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          </div>
+          <p class="problem-card__text">サイトを作ったが、思ったような成果が出ていない</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <p class="problem-card__text">リニューアルを検討中だが、どこから手をつけるべきか不明</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FEATURES（診断でわかること）══════════════════════════ -->
+  <section class="lp-section">
+    <div class="lp-section__inner">
+      <p class="lp-section__eyebrow">診断でわかること</p>
+      <h2 class="lp-section__h2">3つの視点で、成果を<br>妨げている原因を特定します</h2>
+      <p class="lp-section__lead">
+        業種・目的・課題に合わせてAIが実務視点で分析。
+        優先度の高い改善ポイントを具体的にお届けします。
+      </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-card__num">01</div>
+          <div class="feature-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <h3 class="feature-card__title">構造・導線の問題を特定</h3>
+          <p class="feature-card__body">訪問者が行動を起こせない構造上の問題を発見します。CTA配置・情報設計・ページ構成の課題を洗い出します。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__num">02</div>
+          <div class="feature-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <h3 class="feature-card__title">改善提案トップ3</h3>
+          <p class="feature-card__body">数ある課題の中から、目的への影響度をもとに優先度の高い3点に絞ってご提案。すぐに着手できる具体的な内容です。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__num">03</div>
+          <div class="feature-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <h3 class="feature-card__title">改善前後のイメージ</h3>
+          <p class="feature-card__body">各改善ポイントについて「現状」と「改善後」の状態を具体的に比較。変化の方向性が一目で理解できます。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FLOW（診断の流れ）══════════════════════════════════ -->
+  <section class="lp-section lp-section--alt">
+    <div class="lp-section__inner">
+      <p class="lp-section__eyebrow">診断の流れ</p>
+      <h2 class="lp-section__h2">最短3分で、<br>改善のロードマップが手に入る</h2>
+      <div class="flow-grid">
+        <div class="flow-step">
+          <div class="flow-step__num">1</div>
+          <div class="flow-step__title">フォームに入力</div>
+          <div class="flow-step__note">サイトURL・業種・目的などをご入力ください</div>
+          <span class="flow-step__badge">約3分</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step__num">2</div>
+          <div class="flow-step__title">AIが自動分析</div>
+          <div class="flow-step__note">サイト構造・メッセージ・導線を実務視点で分析</div>
+          <span class="flow-step__badge">自動</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step__num">3</div>
+          <div class="flow-step__title">レポートを受け取る</div>
+          <div class="flow-step__note">スコア・改善提案3つ・ビフォーアフターをご確認</div>
+          <span class="flow-step__badge">即時〜24h</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step__num">4</div>
+          <div class="flow-step__title">必要なら無料相談</div>
+          <div class="flow-step__note">実装まで一緒に進めたい方のみご相談ください</div>
+          <span class="flow-step__badge">完全任意</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FORM ══════════════════════════════════════════════════ -->
+  <section class="lp-form-section" id="form">
+    <div class="lp-form-section__inner">
+      <div class="lp-form-section__head">
+        <p class="lp-form-section__eyebrow">無料診断</p>
+        <h2 class="lp-form-section__h2">さっそく診断してみる</h2>
+        <p class="lp-form-section__sub">入力3分・完全無料・売り込みなし</p>
+      </div>
+
+      <div class="form-card-wrap">
+        <div class="form-card">
+          <form id="diagnosisForm" novalidate>
+            <div class="form-stack">
+
+              <div class="form-group">
+                <label for="shopName">会社名・店舗名<span class="required">*</span></label>
+                <input type="text" id="shopName" name="shopName" placeholder="例：サンプル商店" required>
+                <span class="field-error" id="shopNameError">会社名・店舗名を入力してください。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="siteUrl">サイトURL<span class="required">*</span></label>
+                <input type="url" id="siteUrl" name="siteUrl" placeholder="https://" required>
+                <span class="field-error" id="siteUrlError">有効なURLを入力してください。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="industry">業種<span class="required">*</span></label>
+                <select id="industry" name="industry" required>
+                  <option value="" disabled selected>選択してください</option>
+                  <option value="restaurant">飲食・カフェ</option>
+                  <option value="beauty">美容・ヘルスケア</option>
+                  <option value="medical">医療・クリニック</option>
+                  <option value="retail">小売・EC</option>
+                  <option value="service">士業・コンサルティング</option>
+                  <option value="education">教育・スクール</option>
+                  <option value="realestate">不動産</option>
+                  <option value="other">その他</option>
+                </select>
+                <span class="field-error" id="industryError">業種を選択してください。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="goal">サイトの目的<span class="required">*</span></label>
+                <select id="goal" name="goal" required>
+                  <option value="" disabled selected>選択してください</option>
+                  <option value="reservation">予約・申込を増やす</option>
+                  <option value="inquiry">問い合わせ・リードを増やす</option>
+                  <option value="recognition">ブランド認知・信頼性の向上</option>
+                </select>
+                <span class="field-error" id="goalError">目的を選択してください。</span>
+              </div>
+
+              <div class="form-group">
+                <p class="form-sub-label">現在の課題<span style="font-weight:400">（複数選択可）</span></p>
+                <div class="checkbox-group">
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="concerns" value="low_conversions">
+                    コンバージョンが低い
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="concerns" value="unclear_message">
+                    メッセージが伝わりにくい
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="concerns" value="weak_trust">
+                    信頼性のアピールが弱い
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="concerns" value="poor_design">
+                    デザインが古い・見づらい
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">メールアドレス<span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                <span class="field-error" id="emailError">有効なメールアドレスを入力してください。</span>
+              </div>
+
+              <div class="submit-area">
+                <button type="submit" class="btn btn--primary btn--full" id="submitBtn">
+                  無料で診断する
+                </button>
+                <p class="privacy-note">診断結果を見てから相談できます（売り込みしません）</p>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════ -->
+  <footer class="lp-footer">
+    <p>&copy; 2025 Web Tools. All rights reserved.</p>
+  </footer>
+
+  <script src="form.js"></script>
+  <script>
+    // ── Hero preview animation ───────────────────────────────
+    function runHeroAnimation() {
+      const scoreRow = document.querySelector('.hero-preview__score-row');
+      const barFill  = document.querySelector('.hero-preview__bar-fill');
+      const scoreNum = document.querySelector('.hero-preview__score-num');
+      const items    = document.querySelectorAll('.hero-preview__item');
+
+      // Phase 1: scan line plays via CSS (0.3s delay, 1.4s duration)
+      // Phase 2: score appears at ~1.0s
+      setTimeout(() => {
+        scoreRow.classList.add('is-visible');
+        // Animate bar
+        barFill.classList.add('is-animated');
+        // Count up score number
+        let current = 0;
+        const target = 72;
+        const step = target / (1200 / 16);
+        const counter = setInterval(() => {
+          current = Math.min(current + step, target);
+          scoreNum.textContent = Math.round(current);
+          if (current >= target) clearInterval(counter);
+        }, 16);
+      }, 1000);
+
+      // Phase 3: items appear one by one from ~1.6s
+      items.forEach((item, i) => {
+        setTimeout(() => {
+          item.classList.add('is-visible');
+        }, 1600 + i * 350);
+      });
+    }
+
+    // Trigger when hero enters viewport
+    const heroEl = document.getElementById('heroPreview');
+    if (heroEl && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          runHeroAnimation();
+          observer.disconnect();
+        }
+      }, { threshold: 0.3 });
+      observer.observe(heroEl);
+    } else {
+      // Fallback: run immediately
+      runHeroAnimation();
+    }
+  </script>
+</body>
+</html>

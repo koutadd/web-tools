@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>使い方 | 組織図エディタ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text-2: #718096;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7;
+    }
+
+    /* Header */
+    .header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem; height: 54px;
+      display: flex; align-items: center; gap: 1rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo { font-weight: 700; font-size: .95rem; color: var(--accent); text-decoration: none; }
+    .header-sep { color: var(--border); }
+    .header-title { font-weight: 600; font-size: .95rem; }
+    .header-btn {
+      margin-left: auto; background: var(--accent); color: #fff;
+      padding: .4rem 1rem; border-radius: 8px; font-size: .85rem;
+      font-weight: 600; text-decoration: none; transition: background .15s;
+    }
+    .header-btn:hover { background: #1d4ed8; }
+
+    /* Layout */
+    .layout { display: flex; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; gap: 2rem; }
+
+    /* Sidebar TOC */
+    .toc {
+      width: 220px; flex-shrink: 0;
+      position: sticky; top: 70px; align-self: flex-start;
+    }
+    .toc h2 { font-size: .72rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem; }
+    .toc ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+    .toc a {
+      display: block; padding: .4rem .75rem; border-radius: 7px;
+      font-size: .85rem; color: var(--text-2); text-decoration: none;
+      transition: all .12s;
+    }
+    .toc a:hover { background: var(--surface); color: var(--text); }
+    .toc a.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+    /* Main */
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1.75rem; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      border-radius: var(--radius); padding: 2.5rem 2rem; color: #fff;
+    }
+    .hero h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .5rem; }
+    .hero p { opacity: .85; font-size: .95rem; max-width: 480px; }
+
+    /* Section card */
+    .section {
+      background: var(--surface); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .section-header {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .section-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .section-header h2 { font-size: 1.05rem; font-weight: 700; }
+    .section-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* Step */
+    .step { display: flex; gap: 1rem; align-items: flex-start; }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--accent);
+      color: #fff; font-size: .78rem; font-weight: 700; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .step-body h3 { font-size: .92rem; font-weight: 700; margin-bottom: .25rem; }
+    .step-body p { font-size: .87rem; color: var(--text-2); }
+
+    /* Visual demo card */
+    .demo-area {
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem;
+    }
+    .demo-label { font-size: .72rem; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* Fake node card */
+    .fake-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+      padding: .875rem 1rem 1rem; display: inline-flex; flex-direction: column;
+      min-width: 160px; position: relative; box-shadow: var(--shadow);
+    }
+    .fake-card .color-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      border-radius: 12px 12px 0 0;
+    }
+    .fake-card .fn { font-weight: 700; font-size: .95rem; margin-top: .3rem; }
+    .fake-card .fr { font-size: .77rem; color: var(--text-2); margin-top: 2px; }
+    .fake-card .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: .5rem; }
+    .fake-card .tag {
+      font-size: .65rem; padding: 2px 7px; border-radius: 999px; font-weight: 500;
+    }
+    .fake-card .tbadge {
+      display: inline-flex; font-size: .68rem; padding: 2px 8px; border-radius: 999px;
+      background: #fef9c3; color: #854d0e; margin-top: .4rem; align-self: flex-start; font-weight: 500;
+    }
+
+    /* Drag zone diagram */
+    .drag-diagram {
+      position: relative; display: inline-flex; border-radius: 10px; overflow: hidden;
+      border: 2px solid var(--border); width: 100%; max-width: 360px;
+    }
+    .drag-zone {
+      flex: 1; padding: .75rem .5rem; text-align: center;
+      font-size: .78rem; font-weight: 600; display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+    }
+    .drag-zone span { font-size: .68rem; font-weight: 400; color: var(--text-2); }
+    .dz-left  { background: #eff6ff; color: var(--accent); border-right: 1px solid var(--border); }
+    .dz-center { background: #f0fdf4; color: #16a34a; border-right: 1px solid var(--border); }
+    .dz-right { background: #eff6ff; color: var(--accent); }
+
+    /* Tag drag diagram */
+    .tag-drag-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .td-tag {
+      padding: 4px 12px; border-radius: 999px; font-size: .82rem; font-weight: 500;
+      background: var(--accent-light); color: var(--accent); cursor: grab;
+    }
+    .td-tag.dragging { opacity: .35; }
+    .td-arrow { color: var(--text-2); font-size: .85rem; }
+
+    /* Kbd */
+    kbd {
+      display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1;
+      border-radius: 5px; padding: 1px 7px; font-size: .8rem; font-family: monospace;
+      color: var(--text);
+    }
+
+    /* Tip box */
+    .tip {
+      background: var(--accent-light); border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0; padding: .75rem 1rem;
+      font-size: .85rem; color: #1e40af;
+    }
+    .tip strong { font-weight: 700; }
+
+    /* Table */
+    .feat-table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+    .feat-table th {
+      text-align: left; padding: .6rem .875rem; background: #f8fafc;
+      font-weight: 600; font-size: .75rem; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--text-2); border-bottom: 1px solid var(--border);
+    }
+    .feat-table td { padding: .7rem .875rem; border-bottom: 1px solid #f1f5f9; }
+    .feat-table tr:last-child td { border-bottom: none; }
+    .feat-table .ok { color: #16a34a; font-weight: 700; }
+    .feat-table .no { color: #dc2626; font-weight: 700; }
+
+    /* URL share demo */
+    .url-demo {
+      background: #f8fafc; border: 1.5px solid var(--border); border-radius: 9px;
+      padding: .5rem .5rem .5rem .875rem;
+      display: flex; align-items: center; gap: .5rem; font-size: .8rem;
+      font-family: monospace; color: var(--text-2);
+    }
+    .url-demo .copy-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 3px 10px; font-size: .78rem; color: var(--text-2); cursor: default;
+      flex-shrink: 0; font-family: sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .toc { display: none; }
+      .layout { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Web Tools</a>
+  <span class="header-sep">/</span>
+  <a href="index.html" style="text-decoration:none;color:var(--text-2);font-size:.95rem;">組織図エディタ</a>
+  <span class="header-sep">/</span>
+  <span class="header-title">使い方</span>
+  <a href="index.html" class="header-btn">エディタを開く →</a>
+</header>
+
+<div class="layout">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>目次</h2>
+    <ul>
+      <li><a href="#basics" class="active">基本の使い方</a></li>
+      <li><a href="#edit">カードを編集する</a></li>
+      <li><a href="#drag">ドラッグで移動</a></li>
+      <li><a href="#tags">タグの並び替え</a></li>
+      <li><a href="#share">URLで共有</a></li>
+      <li><a href="#export">保存・書き出し</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1>組織図エディタ 使い方ガイド</h1>
+      <p>メンバーの追加から責任範囲の設定、ドラッグ&amp;ドロップによる構造変更まで、すべての操作を説明します。</p>
+    </div>
+
+    <!-- 1. 基本 -->
+    <div class="section" id="basics">
+      <div class="section-header">
+        <div class="section-icon" style="background:#eff6ff">🏗️</div>
+        <h2>基本の使い方</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>ノードを追加する</h3>
+            <p>画面右上の「ノード追加」ボタンで最初のカードを作成。カードにカーソルを合わせると表示される「+ 部下追加」で、配下のメンバーを追加できます。</p>
+          </div>
+        </div>
+
+        <div class="demo-area">
+          <div class="demo-label">カードの見た目</div>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+            <div class="fake-card" style="min-width:170px">
+              <div class="color-bar" style="background:#2563eb"></div>
+              <div class="fn">山田 太郎</div>
+              <div class="fr">CEO</div>
+              <div class="tags">
+                <span class="tag" style="background:#2563eb18;color:#2563eb">全社戦略</span>
+                <span class="tag" style="background:#2563eb18;color:#2563eb">対外折衝</span>
+              </div>
+              <div class="tbadge">1/2 タスク</div>
+            </div>
+            <div style="font-size:.82rem;color:var(--text-2);max-width:200px;line-height:1.8;padding-top:.5rem">
+              <b style="color:var(--text)">上部カラーバー</b> → ノードカラー<br>
+              <b style="color:var(--text)">タグ</b> → 責任範囲<br>
+              <b style="color:var(--text)">バッジ</b> → タスクの進捗
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>詳細を開く</h3>
+            <p>カードをクリックすると詳細モーダルが開きます。責任範囲・タスクの確認と編集ができます。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>ノードを削除する</h3>
+            <p>カードにカーソルを合わせると「削除」ボタンが表示されます。または詳細モーダル下部の「削除」からも可能です。<br><strong>注意：</strong>削除すると配下のメンバーもすべて削除されます。</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. 編集 -->
+    <div class="section" id="edit">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fdf4ff">✏️</div>
+        <h2>カードを編集する</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>カードをクリック → 「編集する」</h3>
+            <p>詳細モーダルの右下「編集する」ボタンで編集モードに入ります。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>名前・役職・カラーを変更</h3>
+            <p>名前と役職はテキストフィールドで変更。カラーは8色から選択できます。変更はリアルタイムでモーダル上部のヘッダーに反映されます。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>責任範囲を追加・削除</h3>
+            <p>テキストフィールドに入力して「追加」または <kbd>Enter</kbd> で追加。タグの「×」で削除。<br>タグはドラッグで優先順位を変更できます（後述）。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>タスクを追加・チェック</h3>
+            <p>タスクはチェックボックス付きのリストで管理。完了したものにチェックを入れると進捗バーとカードのバッジに反映されます。</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>💡 ヒント：</strong> 詳細モーダルの「タスク」は閲覧モードでもチェックを変更できます。編集モードに入らなくてもOKです。
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. ドラッグ -->
+    <div class="section" id="drag">
+      <div class="section-header">
+        <div class="section-icon" style="background:#f0fdf4">🖱️</div>
+        <h2>ドラッグ&amp;ドロップで移動</h2>
+      </div>
+      <div class="section-body">
+
+        <p style="font-size:.9rem;color:var(--text-2)">カードをドラッグして別のカードに重ねると、<strong style="color:var(--text)">重ねる位置</strong>によって動作が変わります。</p>
+
+        <div class="demo-area">
+          <div class="demo-label">ドロップ位置と動作</div>
+          <div class="drag-diagram">
+            <div class="drag-zone dz-left">
+              ← 左半分
+              <span>同じ階層の<br>左隣に配置</span>
+            </div>
+            <div class="drag-zone dz-center">
+              ● 中央
+              <span>その人の<br>部下にする</span>
+            </div>
+            <div class="drag-zone dz-right">
+              右半分 →
+              <span>同じ階層の<br>右隣に配置</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">①</div>
+          <div class="step-body">
+            <h3>部下の階層から外す</h3>
+            <p>部下として入っているカードをドラッグして、上司のカードの<strong>左か右半分</strong>にドロップすると、上司と同じ階層に並べ替えられます。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">②</div>
+          <div class="step-body">
+            <h3>部下として入れる</h3>
+            <p>カードを誰かの<strong>カード中央</strong>にドロップすると、そのメンバーの部下になります。</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>💡 ヒント：</strong> ドラッグ中は右下にヒントが表示されます。自分自身や自分の配下へのドロップは無視されます（ループ防止）。
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. タグ並び替え -->
+    <div class="section" id="tags">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fff7ed">🏷️</div>
+        <h2>責任範囲タグの優先順位を変える</h2>
+      </div>
+      <div class="section-body">
+
+        <p style="font-size:.9rem;color:var(--text-2)">責任範囲のタグはドラッグで並び順（＝優先順位）を変更できます。<strong style="color:var(--text)">左端が最優先</strong>の扱いです。</p>
+
+        <div class="demo-area">
+          <div class="demo-label">並び替えのイメージ</div>
+          <div class="tag-drag-row">
+            <span class="td-tag">全社戦略</span>
+            <span class="td-tag dragging">対外折衝</span>
+            <span class="td-tag">採用</span>
+            <span class="td-tag">予算管理</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--text-2);margin-top:.25rem">
+            「対外折衝」をドラッグして左端に移動 →
+            <span style="color:var(--accent);font-weight:600">対外折衝</span>・全社戦略・採用・予算管理
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>タグをドラッグ</h3>
+            <p>詳細モーダルのタグにカーソルを合わせると「掴む」カーソルに変わります。そのままドラッグしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>左か右にドロップ</h3>
+            <p>別のタグの<strong>左半分</strong>にドロップ → そのタグの左隣に挿入<br>別のタグの<strong>右半分</strong>にドロップ → そのタグの右隣に挿入</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>💡 ヒント：</strong> 閲覧モード・編集モードの両方でタグの並び替えができます。
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 5. URL共有 -->
+    <div class="section" id="share">
+      <div class="section-header">
+        <div class="section-icon" style="background:#f0fdf4">🔗</div>
+        <h2>URLで特定メンバーを共有する</h2>
+      </div>
+      <div class="section-body">
+
+        <p style="font-size:.9rem;color:var(--text-2)">カードをクリックすると、URLのハッシュが自動的にそのメンバーのIDに更新されます。そのURLを共有すると、開いた相手のブラウザで直接そのメンバーの詳細が開きます。</p>
+
+        <div class="demo-area">
+          <div class="demo-label">共有URL の例</div>
+          <div class="url-demo">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">https://your-site.vercel.app/tools/org-chart/index.html#n1abc2def</span>
+            <div class="copy-btn">コピー</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>カードをクリック</h3>
+            <p>詳細モーダルが開くと同時に、ブラウザのURLバーが更新されます。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>モーダル下部の「コピー」ボタン</h3>
+            <p>モーダル下部に表示されているURLをコピーして共有してください。</p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>💡 ヒント：</strong> <kbd>Escape</kbd> キーまたはモーダル外をクリックで閉じられます。
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 6. 保存・書き出し -->
+    <div class="section" id="export">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fefce8">💾</div>
+        <h2>保存・書き出し・読み込み</h2>
+      </div>
+      <div class="section-body">
+
+        <table class="feat-table">
+          <thead>
+            <tr><th>機能</th><th>説明</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>自動保存</strong></td>
+              <td>操作するたびにブラウザの LocalStorage に自動保存されます。ページを閉じても次回開いたとき復元されます。</td>
+            </tr>
+            <tr>
+              <td><strong>JSONを書き出し</strong></td>
+              <td>右上「書き出し」ボタンで <code>org-chart.json</code> としてダウンロード。バックアップや別の端末への移行に使えます。</td>
+            </tr>
+            <tr>
+              <td><strong>JSONを読み込み</strong></td>
+              <td>右上「読み込み」ボタンで書き出したJSONを読み込み。現在のデータは上書きされます。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tip">
+          <strong>⚠️ 注意：</strong> LocalStorage はブラウザのキャッシュです。ブラウザのデータを削除すると消えます。大切なデータは定期的に「書き出し」でバックアップしてください。
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Active TOC highlight on scroll
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('.toc a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.toc a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

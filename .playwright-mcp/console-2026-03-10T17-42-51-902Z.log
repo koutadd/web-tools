@@ -1,0 +1,7 @@
+[  768875ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/tools/gacha/admin.html:0
+[ 1230659ms] TypeError: Cannot read properties of null (reading 'src')
+    at Object.switchTab (http://localhost:4000/tools/gacha/admin.html:753:14)
+    at HTMLDivElement.onclick (http://localhost:4000/tools/gacha/admin.html:349:94)
+[ 1717797ms] TypeError: Cannot read properties of null (reading 'src')
+    at Object.switchTab (http://localhost:4000/tools/gacha/admin.html:753:14)
+    at HTMLDivElement.onclick (http://localhost:4000/tools/gacha/admin.html:349:94)

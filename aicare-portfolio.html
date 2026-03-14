@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイケアラボ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #f9f8f6;
+    --text:    #111;
+    --muted:   #999;
+    --border:  #dedad5;
+    --green:   #2a9d2a;
+    --yellow:  #c48a00;
+    --red:     #c0392b;
+    --purple:  #7b4fa6;
+    --pad:     56px;
+    --gap:     40px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Header ────────────────────────────────── */
+  .site-header {
+    padding: 60px var(--pad) 44px;
+    max-width: 1400px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .site-title {
+    font-size: clamp(2.2rem, 5vw, 4.2rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+  }
+  .site-title em { font-style: normal; font-weight: 300; }
+  .site-meta { font-size: 0.78rem; color: var(--muted); line-height: 1.8; text-align: right; }
+
+  /* ── Nav ─────────────────────────────────────── */
+  .site-nav {
+    max-width: 1400px; margin: 0 auto;
+    padding: 0 var(--pad) 20px;
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.78rem; color: var(--muted);
+    padding: 4px 10px; border-radius: 2px;
+    transition: color .15s; letter-spacing: .02em;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--text); font-weight: 700; }
+  .nav-sep { color: var(--border); margin: 0 4px; user-select: none; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+
+  .search-input {
+    background: none; border: none; border-bottom: 1px solid var(--border);
+    color: var(--text); font-size: 0.78rem;
+    padding: 3px 2px; outline: none; width: 140px; transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--text); }
+  .search-input::placeholder { color: var(--border); }
+
+  .live-tag {
+    font-size: 0.68rem; letter-spacing: .1em; color: var(--muted);
+    display: flex; align-items: center; gap: 5px; text-transform: uppercase;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .live-tag.on .live-dot { background: var(--green); animation: blink 2s infinite; }
+  .live-tag.on { color: var(--green); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .add-btn {
+    background: var(--text); color: var(--bg); border: none; cursor: pointer;
+    font-size: 0.72rem; letter-spacing: .06em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 2px; transition: opacity .15s;
+  }
+  .add-btn:hover { opacity: .75; }
+
+  /* ── Tag filter row ──────────────────────────── */
+  .tag-row {
+    max-width: 1400px; margin: 0 auto;
+    padding: 14px var(--pad) 0;
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+    min-height: 40px;
+  }
+  .tag-filter {
+    font-size: 0.68rem; letter-spacing: .04em; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 2px;
+    padding: 3px 10px; cursor: pointer; background: none; transition: all .15s;
+  }
+  .tag-filter:hover { color: var(--text); border-color: var(--text); }
+  .tag-filter.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .tag-row-label { font-size: 0.68rem; color: var(--border); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ── Genre filter row ────────────────────────── */
+  .genre-row {
+    max-width: 1400px; margin: 0 auto;
+    padding: 10px var(--pad) 0;
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  }
+  .genre-btn {
+    font-size: 0.72rem; letter-spacing: .03em; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 4px 13px; cursor: pointer; background: none; transition: all .15s;
+  }
+  .genre-btn:hover { color: var(--text); border-color: var(--text); }
+  .genre-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .genre-row-label { font-size: 0.68rem; color: var(--border); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ── Recommended star ────────────────────────── */
+  .work-star {
+    position: absolute; top: 9px; left: 9px; z-index: 3;
+    background: #f5a623; color: #fff;
+    font-size: 0.6rem; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 10px;
+    pointer-events: none;
+  }
+
+  /* ── Usage badges ────────────────────────────── */
+  .usage-tag {
+    font-size: 0.6rem; color: #7b4fa6; border: 1px solid #c9aee8;
+    padding: 1px 7px; border-radius: 3px; background: #f5f0fb;
+  }
+
+  /* ── Gallery ─────────────────────────────────── */
+  .works {
+    max-width: 1400px; margin: 0 auto;
+    padding: var(--gap) var(--pad) 100px;
+  }
+  .masonry { columns: 2; column-gap: var(--gap); }
+  @media (max-width: 700px) {
+    .masonry { columns: 1; }
+    :root { --pad: 24px; --gap: 24px; }
+  }
+
+  /* ── Work card ───────────────────────────────── */
+  .work { break-inside: avoid; margin-bottom: calc(var(--gap) * 1.8); }
+
+  .work-img-wrap {
+    position: relative; overflow: hidden; background: #e6e4e0;
+    cursor: pointer;
+  }
+
+  /* 自然なアスペクト比で表示、縦長すぎる場合は上部クロップ */
+  .work-img {
+    width: 100%; height: auto; display: block;
+    transition: opacity .3s;
+  }
+  .work-img.is-cropped {
+    max-height: 560px;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .work:hover .work-img { opacity: .88; }
+
+  .work-ph {
+    width: 100%; aspect-ratio: 16/10;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px; color: rgba(0,0,0,.2);
+    cursor: pointer;
+  }
+  .work-ph-icon { font-size: 2.8rem; }
+  .work-ph-label { font-size: 0.65rem; letter-spacing: .1em; text-transform: uppercase; }
+
+  .work-overlay {
+    position: absolute; inset: 0;
+    background: rgba(249,248,246,.75); backdrop-filter: blur(2px);
+    opacity: 0; transition: opacity .22s;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; flex-wrap: wrap; padding: 24px;
+  }
+  .work:hover .work-overlay { opacity: 1; }
+
+  .ov-btn {
+    display: inline-flex; align-items: center;
+    border: 1px solid #111; border-radius: 2px; color: #111; background: transparent;
+    font-size: 0.72rem; letter-spacing: .06em; padding: 8px 20px;
+    text-decoration: none; transition: background .15s, color .15s;
+    white-space: nowrap; text-transform: uppercase;
+  }
+  .ov-btn:hover { background: #111; color: var(--bg); }
+  .ov-btn.primary { background: #111; color: var(--bg); }
+  .ov-btn.primary:hover { background: #333; border-color: #333; }
+  .ov-detail-btn {
+    display: inline-flex; align-items: center;
+    border: 1px solid rgba(17,17,17,.4); border-radius: 2px;
+    color: #111; background: transparent;
+    font-size: 0.7rem; letter-spacing: .06em; padding: 8px 16px;
+    cursor: pointer; transition: background .15s, color .15s;
+    white-space: nowrap; text-transform: uppercase;
+  }
+  .ov-detail-btn:hover { background: rgba(17,17,17,.08); }
+
+  /* caption */
+  .work-caption {
+    padding: 10px 0 0;
+    display: flex; align-items: baseline;
+    justify-content: space-between; gap: 12px;
+  }
+  .work-caption-left { display: flex; align-items: baseline; gap: 10px; flex: 1; min-width: 0; }
+  .work-name {
+    font-size: 0.8rem; font-weight: 400; letter-spacing: .04em; text-transform: uppercase;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+  }
+  .work-name:hover { text-decoration: underline; }
+  .work-tags-inline { display: flex; gap: 4px; flex-wrap: wrap; }
+  .ctag {
+    font-size: 0.62rem; color: var(--muted); letter-spacing: .03em;
+    border: 1px solid var(--border); border-radius: 2px; padding: 1px 6px;
+    cursor: pointer; transition: all .12s; background: none;
+  }
+  .ctag:hover { color: var(--text); border-color: var(--text); }
+  .work-caption-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .work-label {
+    font-size: 0.68rem; color: var(--muted); letter-spacing: .04em; white-space: nowrap;
+  }
+  .work-label.active   { color: var(--green); }
+  .work-label.wip      { color: var(--yellow); }
+  .work-label.paused   { color: var(--red); }
+  .work-label.planning { color: var(--purple); }
+  .edit-btn {
+    background: none; border: none; cursor: pointer; color: var(--border);
+    font-size: 0.7rem; padding: 2px 4px; line-height: 1;
+    opacity: 0; transition: opacity .15s;
+  }
+  .work:hover .edit-btn { opacity: 1; }
+  .edit-btn:hover { color: var(--text); }
+
+  /* ── Footer ──────────────────────────────────── */
+  footer {
+    max-width: 1400px; margin: 0 auto;
+    padding: 28px var(--pad) 52px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  footer p { font-size: 0.72rem; color: var(--muted); letter-spacing: .02em; }
+
+  @keyframes imgflash {
+    0%   { outline: 2px solid var(--green); }
+    100% { outline: 2px solid transparent; }
+  }
+  .work.updated .work-img-wrap { animation: imgflash 1.8s ease-out forwards; }
+  .empty { padding: 80px 0; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+  /* ── Detail Drawer ───────────────────────────── */
+  .drawer-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,.3);
+    display: none; z-index: 900;
+  }
+  .drawer-bg.open { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(520px, 100vw);
+    background: #fff; overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    z-index: 901;
+    display: flex; flex-direction: column;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    position: sticky; top: 0; background: #fff; z-index: 1;
+  }
+  .drawer-title-wrap {}
+  .drawer-project-name {
+    font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 4px;
+  }
+  .drawer-status-label {
+    font-size: 0.7rem; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .drawer-status-label.active   { color: var(--green); }
+  .drawer-status-label.wip      { color: var(--yellow); }
+  .drawer-status-label.paused   { color: var(--red); }
+  .drawer-status-label.planning { color: var(--purple); }
+
+  .drawer-close {
+    background: none; border: none; cursor: pointer; font-size: 1.3rem;
+    color: var(--muted); padding: 0; line-height: 1; transition: color .15s; flex-shrink: 0;
+  }
+  .drawer-close:hover { color: var(--text); }
+
+  .drawer-body { padding: 24px 28px; flex: 1; }
+
+  .drawer-img {
+    width: 100%; display: block; margin-bottom: 24px; border: 1px solid var(--border);
+  }
+  /* クロップ済み画像はドロワーでも同様に表示 */
+  .drawer-img.is-cropped {
+    max-height: 400px;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .drawer-desc {
+    font-size: 0.85rem; color: #444; line-height: 1.7; margin-bottom: 20px;
+  }
+
+  .drawer-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 24px; }
+  .drawer-tag {
+    font-size: 0.68rem; color: var(--muted); letter-spacing: .04em;
+    border: 1px solid var(--border); border-radius: 2px; padding: 2px 8px;
+  }
+
+  .drawer-section-title {
+    font-size: 0.68rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .drawer-links { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .drawer-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid #111; border-radius: 2px; color: #111; background: transparent;
+    font-size: 0.72rem; letter-spacing: .06em; padding: 7px 16px;
+    text-decoration: none; transition: background .15s, color .15s; text-transform: uppercase;
+  }
+  .drawer-link:hover { background: #111; color: #fff; }
+  .drawer-link.primary { background: #111; color: #fff; }
+  .drawer-link.primary:hover { background: #333; }
+
+  /* Resources section */
+  .resources-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .resource-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 3px; text-decoration: none; color: inherit;
+    transition: border-color .15s;
+  }
+  .resource-item:hover { border-color: #aaa; }
+
+  /* type badge */
+  .res-type {
+    width: 28px; height: 28px; border-radius: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: .02em; color: #fff;
+  }
+  .res-type.sheets  { background: #0f9d58; }
+  .res-type.gdoc    { background: #4285f4; }
+  .res-type.gslides { background: #f4b400; }
+  .res-type.gdrive  { background: #4285f4; }
+  .res-type.notion  { background: #111; }
+  .res-type.github  { background: #333; }
+  .res-type.figma   { background: #a259ff; }
+  .res-type.pdf     { background: #ea4335; }
+  .res-type.link    { background: #888; }
+
+  .res-info { flex: 1; min-width: 0; }
+  .res-label { font-size: 0.78rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .res-url   { font-size: 0.65rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .res-open {
+    color: var(--muted); font-size: 0.75rem; text-decoration: none; flex-shrink: 0;
+    padding: 4px; transition: color .15s;
+  }
+  .res-open:hover { color: var(--text); }
+  .res-del {
+    background: none; border: none; cursor: pointer; color: var(--border);
+    font-size: 1rem; line-height: 1; padding: 0 2px; flex-shrink: 0; transition: color .15s;
+  }
+  .res-del:hover { color: var(--red); }
+
+  /* add row */
+  .resource-add-row {
+    display: flex; gap: 6px; align-items: stretch; margin-top: 4px; flex-wrap: wrap;
+  }
+  .resource-add-row input {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-size: 0.78rem; padding: 7px 10px; outline: none;
+    font-family: inherit; transition: border-color .2s;
+  }
+  .resource-add-row input:focus { border-color: var(--text); }
+  #r-label { width: 110px; flex-shrink: 0; }
+  #r-url   { flex: 1; min-width: 160px; }
+  .resource-add-btn {
+    background: var(--text); color: var(--bg); border: none; cursor: pointer;
+    font-size: 0.72rem; padding: 7px 13px; border-radius: 3px;
+    letter-spacing: .04em; transition: opacity .15s; white-space: nowrap;
+  }
+  .resource-add-btn:hover { opacity: .75; }
+
+  /* sheets import */
+  .sheets-import-row {
+    display: flex; gap: 6px; align-items: stretch; margin-top: 6px; flex-wrap: wrap;
+  }
+  #sheets-import-url {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text); font-size: 0.78rem; padding: 7px 10px; outline: none;
+    font-family: inherit; flex: 1; min-width: 160px; transition: border-color .2s;
+  }
+  #sheets-import-url:focus { border-color: #0f9d58; }
+  #sheets-import-btn {
+    background: #0f9d58; color: #fff; border: none; cursor: pointer;
+    font-size: 0.72rem; padding: 7px 13px; border-radius: 3px;
+    letter-spacing: .04em; transition: opacity .15s; white-space: nowrap;
+  }
+  #sheets-import-btn:hover { opacity: .85; }
+  #sheets-import-btn:disabled { opacity: .5; cursor: default; }
+
+  /* sheets preview list */
+  .sheets-preview {
+    margin-top: 8px; border: 1px solid #0f9d58; border-radius: 3px;
+    background: #f0fbf5; max-height: 200px; overflow-y: auto; display: none;
+  }
+  .sheets-preview-header {
+    padding: 8px 12px; font-size: 0.68rem; color: #0f9d58; letter-spacing: .06em;
+    text-transform: uppercase; border-bottom: 1px solid #c8f0db;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sheets-add-all {
+    background: #0f9d58; color: #fff; border: none; cursor: pointer;
+    font-size: 0.68rem; padding: 3px 10px; border-radius: 2px; letter-spacing: .04em;
+  }
+  .sheets-cell-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-bottom: 1px solid #d8f0e4; font-size: 0.75rem;
+  }
+  .sheets-cell-item:last-child { border-bottom: none; }
+  .sheets-cell-pos { color: #0f9d58; font-size: 0.65rem; width: 40px; flex-shrink: 0; }
+  .sheets-cell-url { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #333; }
+  .sheets-cell-add {
+    background: none; border: 1px solid #0f9d58; color: #0f9d58; cursor: pointer;
+    font-size: 0.65rem; padding: 2px 8px; border-radius: 2px; flex-shrink: 0;
+    transition: all .12s;
+  }
+  .sheets-cell-add:hover { background: #0f9d58; color: #fff; }
+
+  .drawer-edit-btn {
+    margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .btn-ghost {
+    background: none; border: 1px solid var(--border); cursor: pointer;
+    font-size: 0.72rem; color: var(--muted); padding: 8px 16px;
+    border-radius: 2px; letter-spacing: .04em; transition: all .15s;
+  }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Edit Modal ──────────────────────────────── */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 4px;
+    width: 100%; max-width: 580px; max-height: 90vh;
+    overflow-y: auto; padding: 36px 40px 32px; position: relative;
+  }
+  .modal-title {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-close {
+    background: none; border: none; cursor: pointer; font-size: 1.2rem;
+    color: var(--muted); padding: 0 4px; line-height: 1; transition: color .15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block; font-size: 0.7rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 3px; color: var(--text); font-size: 0.85rem;
+    padding: 8px 10px; outline: none; font-family: inherit; transition: border-color .2s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--text); }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  .tag-input-wrap {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px;
+    background: var(--bg); cursor: text; min-height: 40px;
+  }
+  .tag-input-wrap:focus-within { border-color: var(--text); }
+  .tag-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--text); color: var(--bg); font-size: 0.7rem; padding: 2px 8px; border-radius: 2px;
+  }
+  .tag-pill button { background: none; border: none; cursor: pointer; color: inherit; font-size: .9rem; line-height: 1; padding: 0; opacity: .7; }
+  .tag-pill button:hover { opacity: 1; }
+  .tag-text-input {
+    border: none !important; padding: 0 !important; background: transparent !important;
+    font-size: 0.78rem !important; min-width: 80px; flex: 1; outline: none !important; width: auto !important;
+  }
+  .links-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .link-row { display: flex; gap: 6px; align-items: center; }
+  .link-row input { flex: 1; }
+  .link-row input.label-in { flex: 0 0 90px; }
+  .link-primary-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 2px;
+    cursor: pointer; font-size: 0.65rem; padding: 5px 8px; color: var(--muted);
+    white-space: nowrap; transition: all .15s; flex-shrink: 0;
+  }
+  .link-primary-toggle.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .link-del-btn {
+    background: none; border: none; cursor: pointer; color: var(--muted);
+    font-size: 1rem; padding: 0 4px; line-height: 1; transition: color .15s; flex-shrink: 0;
+  }
+  .link-del-btn:hover { color: var(--red); }
+  .add-link-btn {
+    background: none; border: 1px dashed var(--border); border-radius: 2px;
+    cursor: pointer; font-size: 0.72rem; color: var(--muted); padding: 6px 12px;
+    transition: all .15s; width: 100%; letter-spacing: .04em;
+  }
+  .add-link-btn:hover { border-color: var(--text); color: var(--text); }
+  .modal-actions {
+    display: flex; gap: 10px; margin-top: 28px; padding-top: 20px;
+    border-top: 1px solid var(--border); align-items: center;
+  }
+  .btn-save {
+    background: var(--text); color: var(--bg); border: none; cursor: pointer;
+    font-size: 0.78rem; letter-spacing: .06em; text-transform: uppercase;
+    padding: 10px 24px; border-radius: 2px; transition: opacity .15s;
+  }
+  .btn-save:hover { opacity: .75; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--border); cursor: pointer;
+    font-size: 0.78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+    padding: 10px 20px; border-radius: 2px; transition: all .15s;
+  }
+  .btn-cancel:hover { border-color: var(--text); color: var(--text); }
+  .btn-delete {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 0.72rem; color: var(--muted); letter-spacing: .04em;
+    text-decoration: underline; transition: color .15s;
+  }
+  .btn-delete:hover { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1 class="site-title"><em>(</em>アイケアラボ<em>)</em></h1>
+  <div class="site-meta">制作物ダッシュボード<br>Web Design &amp; Development<br>Japan</div>
+</header>
+
+<nav class="site-nav">
+  <button class="nav-btn active" data-status="all">All Works</button>
+  <span class="nav-sep">|</span>
+  <button class="nav-btn" data-status="active">Active</button>
+  <button class="nav-btn" data-status="wip">WIP</button>
+  <button class="nav-btn" data-status="paused">Paused</button>
+  <button class="nav-btn" data-status="planning">Planning</button>
+  <span class="nav-sep">|</span>
+  <button class="nav-btn" id="rec-btn" data-status="rec">★ おすすめ</button>
+  <div class="nav-right">
+    <input class="search-input" type="text" id="search" placeholder="検索...">
+    <span class="live-tag" id="live"><span class="live-dot"></span>LIVE</span>
+    <button class="add-btn" id="add-btn">+ Add</button>
+  </div>
+</nav>
+
+<div class="genre-row" id="genre-row"></div>
+<div class="tag-row" id="tag-row"></div>
+
+<section class="works">
+  <div class="masonry" id="masonry"></div>
+</section>
+
+<footer>
+  <p id="count"></p>
+  <p>image/projects/&lt;slug&gt;.png を置くと自動反映</p>
+</footer>
+
+<!-- Detail Drawer -->
+<div class="drawer-bg" id="drawer-bg"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title-wrap">
+      <div class="drawer-project-name" id="d-name"></div>
+      <div class="drawer-status-label" id="d-status"></div>
+    </div>
+    <button class="drawer-close" id="drawer-close">×</button>
+  </div>
+  <div class="drawer-body">
+    <img id="d-img" class="drawer-img" alt="" onerror="this.style.display='none'">
+    <div class="drawer-desc" id="d-desc"></div>
+    <div class="drawer-tags" id="d-tags"></div>
+
+    <div class="drawer-section-title">Links</div>
+    <div class="drawer-links" id="d-links"></div>
+
+    <div class="drawer-section-title">データ・リソース</div>
+    <div class="resources-list" id="d-resources"></div>
+
+    <!-- URL追加 -->
+    <div class="resource-add-row">
+      <input id="r-label" type="text" placeholder="ラベル（省略可）">
+      <input id="r-url"   type="url"  placeholder="URL を貼り付け (PDF / Drive / Notion...)">
+      <button class="resource-add-btn" id="r-add-btn">追加</button>
+    </div>
+
+    <!-- Google Sheets から一括インポート -->
+    <div class="sheets-import-row">
+      <input id="sheets-import-url" type="url" placeholder="スプレッドシートのURLを貼り付けて一括取得">
+      <button id="sheets-import-btn">📊 Sheetsから取得</button>
+    </div>
+    <div class="sheets-preview" id="sheets-preview">
+      <div class="sheets-preview-header">
+        <span id="sheets-preview-count"></span>
+        <button class="sheets-add-all" id="sheets-add-all">すべて追加</button>
+      </div>
+      <div id="sheets-cells"></div>
+    </div>
+
+    <div class="drawer-edit-btn">
+      <button class="btn-ghost" id="d-edit-btn">編集</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" role="dialog">
+    <div class="modal-title">
+      <span id="modal-heading">Edit Work</span>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="field"><label>Name</label><input type="text" id="f-name" placeholder="Project Name"></div>
+      <div class="field"><label>Slug <span style="font-weight:400;text-transform:none;font-size:.65rem">(画像ファイル名)</span></label><input type="text" id="f-slug" placeholder="project-slug"></div>
+    </div>
+    <div class="field"><label>Description</label><textarea id="f-desc" placeholder="プロジェクトの説明"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="field"><label>Status</label>
+        <select id="f-status">
+          <option value="active">Active</option>
+          <option value="wip">WIP</option>
+          <option value="paused">Paused</option>
+          <option value="planning">Planning</option>
+        </select>
+      </div>
+      <div class="field"><label>Icon (emoji)</label><input type="text" id="f-icon" placeholder="🔬" maxlength="4"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="field"><label>ジャンル</label>
+        <select id="f-genre">
+          <option value="">— 未設定 —</option>
+          <option value="flyer">チラシ（チラシ / ポスター）</option>
+          <option value="sign">店舗サイン（看板 / カッティング / のぼり）</option>
+          <option value="card">名刺 / ツール（名刺 / 検査シート）</option>
+          <option value="brand">ブランド（ロゴ / クレド）</option>
+          <option value="web">Web（サイト / アプリ）</option>
+        </select>
+      </div>
+      <div class="field"><label>使用タイミング</label>
+        <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px">
+          <label style="font-weight:400;font-size:.8rem;display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0"><input type="checkbox" id="f-usage-open"> オープン</label>
+          <label style="font-weight:400;font-size:.8rem;display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0"><input type="checkbox" id="f-usage-normal"> 通常時</label>
+        </div>
+      </div>
+    </div>
+    <div class="field" style="padding-top:4px">
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:.8rem;font-weight:600">
+        <input type="checkbox" id="f-recommended"> ★ 個人的に一番おすすめ
+      </label>
+    </div>
+    <div class="field">
+      <label>Tags <span style="font-weight:400;text-transform:none;font-size:.65rem">(Enterで追加)</span></label>
+      <div class="tag-input-wrap" id="tag-input-wrap">
+        <input class="tag-text-input" id="tag-text" placeholder="タグを入力...">
+      </div>
+    </div>
+    <div class="field">
+      <label>Links</label>
+      <div class="links-list" id="links-list"></div>
+      <button class="add-link-btn" id="add-link-btn">+ リンクを追加</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" id="btn-save">Save</button>
+      <button class="btn-cancel" id="btn-cancel">Cancel</button>
+      <button class="btn-delete" id="btn-delete" style="display:none">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULTS = [
+  {
+    slug: 'gacha', name: 'Gacha World', icon: '🎰', status: 'active',
+    desc: 'ガチャサイト + CMS管理画面。レアリティ設定・キャラ管理・履歴を一元管理',
+    tags: ['game', 'cms', 'vanilla-js'],
+    links: [
+      { label: 'Site',  href: 'http://localhost:4000/tools/gacha/index.html', primary: true },
+      { label: 'Admin', href: 'http://localhost:4000/tools/gacha/admin.html', primary: false },
+      { label: 'Guide', href: 'http://localhost:4000/tools/gacha/howto.html', primary: false },
+    ],
+    resources: []
+  },
+  {
+    slug: 'website-check-board', name: 'Website Check Board', icon: '🗂', status: 'active',
+    desc: 'Webサイト修正確認ボード。誤字脱字・指摘事項をクライアントと共有管理',
+    tags: ['check', 'client', 'supabase', 'next.js'],
+    links: [
+      { label: 'Admin',  href: 'http://localhost:3000/board', primary: true },
+      { label: 'Client', href: 'http://localhost:3000/client?token=preview', primary: false },
+    ],
+    resources: []
+  },
+  {
+    slug: 'site-diagnosis', name: 'Site Diagnosis', icon: '🩺', status: 'active',
+    desc: 'URLを入力するだけでAIがWebサイトの改善点を診断。CVR改善レポートを自動生成',
+    tags: ['ai', 'claude', 'web-tool'],
+    links: [{ label: 'Open', href: 'http://localhost:5001/tools/site-diagnosis/index.html', primary: true }],
+    resources: []
+  },
+  {
+    slug: 'lp-research-engine', name: 'LP Research Engine', icon: '🔬', status: 'wip',
+    desc: 'LP分析・収集・研究ダッシュボード。競合LPを分析してインサイトを蓄積',
+    tags: ['research', 'lp', 'analytics'],
+    links: [{ label: 'Open', href: 'http://localhost:3000', primary: true }],
+    resources: []
+  },
+  {
+    slug: 'eyecare-monitor', name: 'EyeCare Monitor', icon: '👁', status: 'planning',
+    desc: 'YouTube・各種SNSのモニタリングプロジェクト。アイケアラボ関連の言及をリアルタイム監視',
+    tags: ['youtube', 'monitor', 'sns'],
+    links: [{ label: 'Open', href: 'http://localhost:3000', primary: true }],
+    resources: []
+  },
+];
+
+const STATUS_LABEL = { active: 'Active', wip: 'WIP', paused: 'Paused', planning: 'Planning' };
+const GENRE_LABEL = { flyer: 'チラシ', sign: '店舗サイン', card: '名刺/ツール', brand: 'ブランド', web: 'Web' };
+const CROP_RATIO = 1.9; // 縦横比がこの値を超えたらクロップ
+const imgTs = {};
+let PROJECTS = [];
+let currentStatus = 'all';
+let currentTag = '';
+let currentGenre = '';
+let showRecommended = false;
+
+function imgSrc(slug) {
+  const ts = imgTs[slug];
+  return `/image/projects/${slug}.png${ts ? '?t=' + ts : ''}`;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 画像ロード時に縦横比判定
+function onImgLoad(img) {
+  if (img.naturalHeight / img.naturalWidth > CROP_RATIO) {
+    img.classList.add('is-cropped');
+  }
+  img.style.display = 'block';
+  const ph = img.nextElementSibling;
+  if (ph && ph.classList.contains('work-ph')) ph.style.display = 'none';
+}
+
+// ── Render gallery ────────────────────────────────────────────────
+function workHtml(p) {
+  const overlays = (p.links||[]).map(l =>
+    `<a class="ov-btn${l.primary?' primary':''}" href="${esc(l.href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label)}</a>`
+  ).join('');
+  const tagsHtml = (p.tags||[]).map(t =>
+    `<button class="ctag" onclick="filterByTag('${esc(t)}');event.stopPropagation()">${esc(t)}</button>`
+  ).join('');
+  const usageHtml = (p.usage||[]).map(u => `<span class="usage-tag">${esc(u)}</span>`).join('');
+  const starHtml = p.recommended ? `<div class="work-star">★ おすすめ</div>` : '';
+
+  return `
+<div class="work" data-slug="${esc(p.slug)}" data-status="${esc(p.status)}"
+     data-name="${esc((p.name||'').toLowerCase())}" data-desc="${esc((p.desc||'').toLowerCase())}"
+     data-tags="${esc((p.tags||[]).join(' ').toLowerCase())}">
+  <div class="work-img-wrap" onclick="openDrawer('${esc(p.slug)}')">
+    ${starHtml}
+    <img class="work-img" src="${esc(imgSrc(p.slug))}" alt="${esc(p.name)}"
+         onload="onImgLoad(this)"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="work-ph" onclick="openDrawer('${esc(p.slug)}')">
+      <div class="work-ph-icon">${p.icon||'📁'}</div>
+      <div class="work-ph-label">${esc(p.slug)}.png</div>
+    </div>
+    <div class="work-overlay">
+      ${overlays}
+      <button class="ov-detail-btn" onclick="openDrawer('${esc(p.slug)}');event.stopPropagation()">詳細 →</button>
+    </div>
+  </div>
+  <div class="work-caption">
+    <div class="work-caption-left">
+      <div class="work-name" onclick="openDrawer('${esc(p.slug)}')">${esc(p.name)}</div>
+      <div class="work-tags-inline">${tagsHtml}${usageHtml}</div>
+    </div>
+    <div class="work-caption-right">
+      <div class="work-label ${esc(p.status)}">${STATUS_LABEL[p.status]||p.status}</div>
+      <button class="edit-btn" onclick="openEdit('${esc(p.slug)}');event.stopPropagation()">編集</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function render() {
+  const q = (document.getElementById('search').value||'').trim().toLowerCase();
+  const list = PROJECTS.filter(p => {
+    const okStatus = currentStatus === 'all' ||
+      (currentStatus === 'rec' ? !!p.recommended : p.status === currentStatus);
+    const okTag    = !currentTag || (p.tags||[]).includes(currentTag);
+    const okGenre  = !currentGenre || p.genre === currentGenre;
+    const okSearch = !q ||
+      (p.name||'').toLowerCase().includes(q) ||
+      (p.desc||'').toLowerCase().includes(q) ||
+      (p.tags||[]).some(t => t.toLowerCase().includes(q));
+    return okStatus && okTag && okGenre && okSearch;
+  });
+  const m = document.getElementById('masonry');
+  m.innerHTML = list.length ? list.map(workHtml).join('') : `<div class="empty">条件に一致する制作物が見つかりません</div>`;
+  document.getElementById('count').textContent = `${list.length} works`;
+  renderTagRow();
+  renderGenreRow();
+}
+
+function renderTagRow() {
+  const allTags = [...new Set(PROJECTS.flatMap(p => p.tags||[]))].sort();
+  const row = document.getElementById('tag-row');
+  if (!allTags.length) { row.innerHTML = ''; return; }
+  row.innerHTML = `<span class="tag-row-label">Tags</span>` +
+    allTags.map(t => `<button class="tag-filter${currentTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</button>`).join('');
+}
+
+function renderGenreRow() {
+  const genresUsed = [...new Set(PROJECTS.map(p => p.genre).filter(Boolean))];
+  const row = document.getElementById('genre-row');
+  if (!genresUsed.length) { row.innerHTML = ''; return; }
+  const allBtn = `<button class="genre-btn${!currentGenre?' active':''}" onclick="filterByGenre('')">すべて</button>`;
+  const btns = Object.entries(GENRE_LABEL)
+    .filter(([k]) => genresUsed.includes(k))
+    .map(([k, v]) => `<button class="genre-btn${currentGenre===k?' active':''}" onclick="filterByGenre('${k}')">${esc(v)}</button>`)
+    .join('');
+  row.innerHTML = `<span class="genre-row-label">ジャンル</span>${allBtn}${btns}`;
+}
+
+function filterByTag(tag) {
+  currentTag = currentTag === tag ? '' : tag;
+  render();
+}
+
+function filterByGenre(genre) {
+  currentGenre = currentGenre === genre ? '' : genre;
+  render();
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentStatus = btn.dataset.status;
+    render();
+  });
+});
+
+// ── API ───────────────────────────────────────────────────────────
+async function loadProjects() {
+  try {
+    const res = await fetch('/api/projects');
+    const data = await res.json();
+    PROJECTS = Array.isArray(data) && data.length > 0 ? data : DEFAULTS;
+    if (!Array.isArray(data) || !data.length) await saveProjects();
+  } catch { PROJECTS = DEFAULTS; }
+  render();
+}
+async function saveProjects() {
+  await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(PROJECTS),
+  });
+}
+
+// ── Drawer ────────────────────────────────────────────────────────
+let drawerSlug = null;
+
+function openDrawer(slug) {
+  const p = PROJECTS.find(x => x.slug === slug);
+  if (!p) return;
+  drawerSlug = slug;
+
+  document.getElementById('d-name').textContent   = p.name || '';
+  const sl = document.getElementById('d-status');
+  sl.textContent = STATUS_LABEL[p.status] || p.status;
+  sl.className = `drawer-status-label ${p.status}`;
+  document.getElementById('d-desc').textContent = p.desc || '';
+
+  // image
+  const dImg = document.getElementById('d-img');
+  dImg.className = 'drawer-img';
+  dImg.style.display = 'block';
+  dImg.src = imgSrc(slug);
+  dImg.onload = () => {
+    if (dImg.naturalHeight / dImg.naturalWidth > CROP_RATIO) dImg.classList.add('is-cropped');
+  };
+
+  // tags
+  document.getElementById('d-tags').innerHTML = (p.tags||[]).map(t => `<span class="drawer-tag">${esc(t)}</span>`).join('');
+
+  // links
+  document.getElementById('d-links').innerHTML = (p.links||[]).map(l =>
+    `<a class="drawer-link${l.primary?' primary':''}" href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`
+  ).join('');
+
+  renderDrawerResources(p);
+
+  document.getElementById('drawer-bg').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-bg').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  drawerSlug = null;
+}
+
+// ── Resource type detection ───────────────────────────────────────
+function getResType(href) {
+  if (/docs\.google\.com\/spreadsheets/i.test(href)) return 'sheets';
+  if (/docs\.google\.com\/document/i.test(href))     return 'gdoc';
+  if (/docs\.google\.com\/presentation/i.test(href)) return 'gslides';
+  if (/drive\.google\.com/i.test(href))              return 'gdrive';
+  if (/notion\.so/i.test(href))                      return 'notion';
+  if (/github\.com/i.test(href))                     return 'github';
+  if (/figma\.com/i.test(href))                      return 'figma';
+  if (/\.pdf(\?|#|$)/i.test(href))                   return 'pdf';
+  return 'link';
+}
+const RES_TYPE_LABEL = {
+  sheets: 'GS', gdoc: 'DOC', gslides: 'PPT', gdrive: 'DRV',
+  notion: 'N', github: 'GH', figma: 'FIG', pdf: 'PDF', link: '↗',
+};
+
+function renderDrawerResources(p) {
+  const resources = p.resources || [];
+  document.getElementById('d-resources').innerHTML = resources.length === 0
+    ? ''
+    : resources.map((r, i) => {
+        const type = getResType(r.href);
+        return `
+    <div class="resource-item">
+      <div class="res-type ${type}">${RES_TYPE_LABEL[type]}</div>
+      <div class="res-info">
+        <div class="res-label">${esc(r.label || r.href)}</div>
+        <div class="res-url">${esc(r.href)}</div>
+      </div>
+      <a class="res-open" href="${esc(r.href)}" target="_blank" rel="noopener" title="開く">↗</a>
+      <button class="res-del" onclick="removeResource(${i})" title="削除">×</button>
+    </div>`;
+      }).join('');
+  document.getElementById('r-label').value = '';
+  document.getElementById('r-url').value   = '';
+  // hide sheets preview
+  document.getElementById('sheets-preview').style.display = 'none';
+  document.getElementById('sheets-import-url').value = '';
+}
+
+async function removeResource(i) {
+  const p = PROJECTS.find(x => x.slug === drawerSlug);
+  if (!p) return;
+  if (!p.resources) p.resources = [];
+  p.resources.splice(i, 1);
+  await saveProjects();
+  renderDrawerResources(p);
+}
+
+document.getElementById('r-add-btn').addEventListener('click', async () => {
+  const label = document.getElementById('r-label').value.trim();
+  const href  = document.getElementById('r-url').value.trim();
+  if (!href) return;
+  const p = PROJECTS.find(x => x.slug === drawerSlug);
+  if (!p) return;
+  if (!p.resources) p.resources = [];
+  p.resources.push({ label: label || labelFromUrl(href), href });
+  await saveProjects();
+  renderDrawerResources(p);
+});
+document.getElementById('r-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('r-add-btn').click();
+});
+
+// URL からラベルを自動生成
+function labelFromUrl(href) {
+  try {
+    const host = new URL(href).hostname.replace('www.','');
+    const type = getResType(href);
+    const typeNames = { sheets:'Spreadsheet', gdoc:'Document', gslides:'Slides',
+                        gdrive:'Drive', notion:'Notion', github:'GitHub', figma:'Figma', pdf:'PDF' };
+    return typeNames[type] || host;
+  } catch { return href; }
+}
+
+// ── Google Sheets import ──────────────────────────────────────────
+let sheetsCells = [];
+
+document.getElementById('sheets-import-btn').addEventListener('click', async () => {
+  const url = document.getElementById('sheets-import-url').value.trim();
+  if (!url) return;
+  const btn = document.getElementById('sheets-import-btn');
+  btn.disabled = true; btn.textContent = '取得中...';
+  try {
+    const res = await fetch('/api/fetch-sheet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+    if (data.error) { alert(data.error); return; }
+    sheetsCells = data.cells || [];
+    const preview = document.getElementById('sheets-preview');
+    const cellsEl = document.getElementById('sheets-cells');
+    document.getElementById('sheets-preview-count').textContent = `${sheetsCells.length} 件のURLが見つかりました`;
+    cellsEl.innerHTML = sheetsCells.map((c, i) => `
+      <div class="sheets-cell-item">
+        <span class="sheets-cell-pos">R${c.row}C${c.col}</span>
+        <span class="sheets-cell-url" title="${esc(c.value)}">${esc(c.value)}</span>
+        <button class="sheets-cell-add" onclick="addSheetCell(${i})">追加</button>
+      </div>`).join('');
+    preview.style.display = sheetsCells.length ? 'block' : 'none';
+    if (!sheetsCells.length) alert('URLが含まれるセルが見つかりませんでした');
+  } catch (e) { alert('エラー: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '📊 Sheetsから取得'; }
+});
+
+async function addSheetCell(i) {
+  const c = sheetsCells[i];
+  if (!c) return;
+  const p = PROJECTS.find(x => x.slug === drawerSlug);
+  if (!p) return;
+  if (!p.resources) p.resources = [];
+  if (p.resources.find(r => r.href === c.value)) return; // skip duplicate
+  p.resources.push({ label: labelFromUrl(c.value), href: c.value });
+  await saveProjects();
+  renderDrawerResources(p);
+}
+
+document.getElementById('sheets-add-all').addEventListener('click', async () => {
+  const p = PROJECTS.find(x => x.slug === drawerSlug);
+  if (!p) return;
+  if (!p.resources) p.resources = [];
+  sheetsCells.forEach(c => {
+    if (!p.resources.find(r => r.href === c.value))
+      p.resources.push({ label: labelFromUrl(c.value), href: c.value });
+  });
+  await saveProjects();
+  renderDrawerResources(p);
+});
+
+document.getElementById('drawer-bg').addEventListener('click', closeDrawer);
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('d-edit-btn').addEventListener('click', () => {
+  closeDrawer();
+  openEdit(drawerSlug || '');
+});
+
+// ── Edit Modal ────────────────────────────────────────────────────
+let editingSlug = null;
+let modalTags   = [];
+let modalLinks  = [];
+
+function openAdd() {
+  editingSlug = null; modalTags = []; modalLinks = [];
+  document.getElementById('modal-heading').textContent = 'Add Work';
+  document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-slug').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-icon').value = '';
+  document.getElementById('f-status').value = 'active';
+  document.getElementById('f-genre').value = '';
+  document.getElementById('f-recommended').checked = false;
+  document.getElementById('f-usage-open').checked = false;
+  document.getElementById('f-usage-normal').checked = false;
+  renderModalTags(); renderModalLinks();
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+
+function openEdit(slug) {
+  const p = PROJECTS.find(x => x.slug === slug);
+  if (!p) return;
+  editingSlug = slug;
+  modalTags  = [...(p.tags||[])];
+  modalLinks = (p.links||[]).map(l => ({ ...l }));
+  document.getElementById('modal-heading').textContent = 'Edit Work';
+  document.getElementById('btn-delete').style.display = 'block';
+  document.getElementById('f-name').value   = p.name  || '';
+  document.getElementById('f-slug').value   = p.slug  || '';
+  document.getElementById('f-desc').value   = p.desc  || '';
+  document.getElementById('f-icon').value   = p.icon  || '';
+  document.getElementById('f-status').value = p.status || 'active';
+  document.getElementById('f-genre').value  = p.genre  || '';
+  document.getElementById('f-recommended').checked = !!p.recommended;
+  document.getElementById('f-usage-open').checked   = (p.usage||[]).includes('オープン');
+  document.getElementById('f-usage-normal').checked = (p.usage||[]).includes('通常時');
+  renderModalTags(); renderModalLinks();
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+
+document.getElementById('f-name').addEventListener('input', e => {
+  if (editingSlug) return;
+  document.getElementById('f-slug').value = e.target.value
+    .toLowerCase().replace(/[^\w\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,40);
+});
+
+function renderModalTags() {
+  const wrap = document.getElementById('tag-input-wrap');
+  const input = document.getElementById('tag-text');
+  wrap.innerHTML = '';
+  modalTags.forEach((t, i) => {
+    const pill = document.createElement('span');
+    pill.className = 'tag-pill';
+    pill.innerHTML = `${esc(t)}<button type="button" onclick="removeTag(${i})">×</button>`;
+    wrap.appendChild(pill);
+  });
+  wrap.appendChild(input); input.value = '';
+}
+function removeTag(i) { modalTags.splice(i,1); renderModalTags(); }
+
+document.getElementById('tag-text').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const v = e.target.value.trim().replace(/,/g,'');
+    if (v && !modalTags.includes(v)) { modalTags.push(v); renderModalTags(); }
+    else e.target.value = '';
+  }
+  if (e.key === 'Backspace' && !e.target.value && modalTags.length) { modalTags.pop(); renderModalTags(); }
+});
+document.getElementById('tag-input-wrap').addEventListener('click', () => document.getElementById('tag-text').focus());
+
+function renderModalLinks() {
+  document.getElementById('links-list').innerHTML = modalLinks.map((l,i) => `
+    <div class="link-row">
+      <input class="label-in" type="text" placeholder="Label" value="${esc(l.label||'')}" oninput="modalLinks[${i}].label=this.value">
+      <input type="text" placeholder="https://..." value="${esc(l.href||'')}" oninput="modalLinks[${i}].href=this.value">
+      <button class="link-primary-toggle${l.primary?' on':''}" type="button" onclick="togglePrimary(${i})">${l.primary?'Primary':'Default'}</button>
+      <button class="link-del-btn" type="button" onclick="removeLink(${i})">×</button>
+    </div>`).join('');
+}
+function togglePrimary(i) { modalLinks[i].primary=!modalLinks[i].primary; renderModalLinks(); }
+function removeLink(i)     { modalLinks.splice(i,1); renderModalLinks(); }
+document.getElementById('add-link-btn').addEventListener('click', () => { modalLinks.push({label:'',href:'',primary:false}); renderModalLinks(); });
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const name   = document.getElementById('f-name').value.trim();
+  const slug   = document.getElementById('f-slug').value.trim();
+  const desc   = document.getElementById('f-desc').value.trim();
+  const icon   = document.getElementById('f-icon').value.trim();
+  const status = document.getElementById('f-status').value;
+  const genre  = document.getElementById('f-genre').value;
+  const recommended = document.getElementById('f-recommended').checked;
+  const usage = [];
+  if (document.getElementById('f-usage-open').checked)   usage.push('オープン');
+  if (document.getElementById('f-usage-normal').checked) usage.push('通常時');
+  const tv = document.getElementById('tag-text').value.trim();
+  if (tv && !modalTags.includes(tv)) modalTags.push(tv);
+  if (!name || !slug) { alert('Name と Slug は必須です'); return; }
+  const existing = editingSlug ? PROJECTS.find(p=>p.slug===editingSlug) : null;
+  const proj = {
+    slug, name, icon: icon||'📁', status, desc,
+    genre: genre || undefined,
+    recommended: recommended || undefined,
+    usage: usage.length ? usage : undefined,
+    tags: [...modalTags], links: modalLinks.filter(l=>l.href),
+    resources: existing?.resources || [],
+  };
+  if (editingSlug) {
+    const idx = PROJECTS.findIndex(p=>p.slug===editingSlug);
+    if (idx !== -1) PROJECTS[idx] = proj;
+  } else {
+    if (PROJECTS.find(p=>p.slug===slug)) { alert('同じ Slug が既に存在します'); return; }
+    PROJECTS.push(proj);
+  }
+  await saveProjects(); closeModal(); render();
+});
+
+document.getElementById('btn-delete').addEventListener('click', async () => {
+  if (!confirm(`"${editingSlug}" を削除しますか？`)) return;
+  PROJECTS = PROJECTS.filter(p=>p.slug!==editingSlug);
+  await saveProjects(); closeModal(); render();
+});
+
+document.getElementById('btn-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-bg').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+document.getElementById('add-btn').addEventListener('click', openAdd);
+
+// ── SSE ──────────────────────────────────────────────────────────
+function connectSSE() {
+  const live = document.getElementById('live');
+  const es = new EventSource('/api/watch-images');
+  es.onopen = () => live.classList.add('on');
+  es.onmessage = e => {
+    try {
+      const { slug, ts } = JSON.parse(e.data);
+      imgTs[slug] = ts;
+      const work = document.querySelector(`.work[data-slug="${slug}"]`);
+      if (!work) return;
+      const img = work.querySelector('.work-img');
+      if (img) { img.src = imgSrc(slug); }
+      work.classList.remove('updated'); void work.offsetWidth;
+      work.classList.add('updated');
+      setTimeout(() => work.classList.remove('updated'), 2000);
+    } catch { /* ignore */ }
+  };
+  es.onerror = () => { live.classList.remove('on'); es.close(); setTimeout(connectSSE, 5000); };
+}
+
+loadProjects();
+connectSSE();
+</script>
+</body>
+</html>

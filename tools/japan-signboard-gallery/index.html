@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本の看板ギャラリー</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 48px 20px 20px;
+    }
+    header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    header p { color: #666; font-size: 0.9rem; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 20px 16px 12px;
+    }
+    .filter-btn {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #aaa;
+      cursor: pointer;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .filter-btn:hover { background: #252525; color: #fff; border-color: #444; }
+    .filter-btn.active { background: #fff; color: #111; border-color: #fff; font-weight: 600; }
+
+    .api-warning {
+      background: #1c0f00;
+      border: 1px solid #6b3300;
+      color: #ff9955;
+      padding: 14px 24px;
+      border-radius: 10px;
+      margin: 0 auto 16px;
+      max-width: 640px;
+      text-align: center;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .api-warning code {
+      background: #2a1a00;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .gallery {
+      columns: 280px 4;
+      column-gap: 10px;
+      padding: 10px 12px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .card {
+      break-inside: avoid;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      cursor: pointer;
+      background: #1a1a1a;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: scale(1.02); }
+    .card img { width: 100%; display: block; }
+
+    .skeleton-ph {
+      background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── 注目看板セクション ── */
+    .featured-section {
+      padding: 0 12px 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .featured-section h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #888;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 10px;
+    }
+    .featured-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #1a1a1a;
+      transition: transform 0.2s;
+      min-height: 200px;
+    }
+    .featured-card:hover { transform: scale(1.02); }
+    .featured-card img { width: 100%; display: block; }
+    .featured-card .card-overlay { opacity: 1; }
+    .featured-card .card-area { font-size: 1rem; }
+
+    .section-divider {
+      text-align: center;
+      padding: 8px 12px 16px;
+      color: #444;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .card-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      padding: 24px 12px 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .card:hover .card-overlay { opacity: 1; }
+    .card-area { font-size: 0.9rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    .card-city {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 10px;
+      margin-top: 5px;
+    }
+    .card-hint { font-size: 0.7rem; color: #aaa; margin-top: 4px; }
+
+    .bottom-bar {
+      text-align: center;
+      padding: 24px 20px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-bar { color: #555; font-size: 0.8rem; }
+
+    .load-more-btn {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #ccc;
+      cursor: pointer;
+      border-radius: 24px;
+      padding: 12px 40px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .load-more-btn:hover { background: #252525; color: #fff; border-color: #555; }
+    .load-more-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .empty { text-align: center; color: #444; padding: 60px 20px; font-size: 0.95rem; }
+
+    .cost-bar {
+      text-align: center;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      color: #3a3a3a;
+    }
+    .cost-bar span { color: #4a4; }
+
+    /* Loading state for a batch */
+    .batch-loading {
+      text-align: center;
+      color: #444;
+      font-size: 0.82rem;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗾 日本の看板ギャラリー</h1>
+  <p>Google Street View で巡る、日本全国の商業エリア</p>
+</header>
+
+<div class="filters" id="filters"></div>
+
+<div style="padding: 0 12px;">
+  <div id="api-warning" class="api-warning" style="display:none">
+    ⚠️ APIキーが設定されていません。<br>
+    <code>GOOGLE_MAPS_API_KEY=your-key PORT=5002 node server.js</code> で起動してください。
+  </div>
+</div>
+
+<!-- 注目の大看板 -->
+<div class="featured-section">
+  <h2>⭐ 注目の大看板</h2>
+  <div class="featured-grid" id="featured-grid"></div>
+</div>
+
+<div class="section-divider">▼ 全エリア ギャラリー ▼</div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="cost-bar" id="cost-bar">API使用: <span id="cost-count">0</span> 枚 / 推定 <span id="cost-usd">$0.000</span>（月$200無料枠内）</div>
+
+<div class="bottom-bar" id="bottom-bar">
+  <div class="status-bar" id="status"></div>
+  <button class="load-more-btn" id="load-more-btn">次の100枚を見る</button>
+</div>
+
+<script>
+// ── 注目の大看板（厳選10枚・即時表示） ──────────────────────────────────────
+// fov小さい=ズームイン、pitch正=上を向く
+const FEATURED = [
+  // 渋谷
+  { city: '東京', area: '渋谷109',                     lat: 35.6597,  lng: 139.6984,  heading: 185, pitch: 15, fov: 55 },
+  { city: '東京', area: '渋谷スクランブル大型ビジョン', lat: 35.6595,  lng: 139.7005,  heading: 272, pitch: 22, fov: 60 },
+  // 新宿
+  { city: '東京', area: '新宿アルタ前ビジョン',         lat: 35.6912,  lng: 139.7006,  heading: 178, pitch: 18, fov: 55 },
+  { city: '東京', area: '歌舞伎町入口アーチ看板',       lat: 35.6938,  lng: 139.7036,  heading:   0, pitch: 20, fov: 58 },
+  // 大阪・道頓堀
+  { city: '大阪', area: '道頓堀グリコサイン',           lat: 34.66865, lng: 135.50073, heading:   4, pitch: 18, fov: 55 },
+  { city: '大阪', area: '道頓堀かに道楽',               lat: 34.66874, lng: 135.50017, heading: 258, pitch: 14, fov: 58 },
+  { city: '大阪', area: '道頓堀くいだおれ太郎',         lat: 34.66916, lng: 135.50214, heading: 178, pitch: 10, fov: 62 },
+  { city: '大阪', area: '道頓堀えびす橋看板群',         lat: 34.66854, lng: 135.50093, heading:  90, pitch: 12, fov: 68 },
+  // 秋葉原
+  { city: '東京', area: '秋葉原ヨドバシカメラ前',       lat: 35.6985,  lng: 139.7728,  heading:  88, pitch:  8, fov: 60 },
+  { city: '東京', area: '秋葉原電気街口看板',           lat: 35.69874, lng: 139.77317, heading: 280, pitch: 12, fov: 58 },
+  // 浅草
+  { city: '東京', area: '浅草雷門',                     lat: 35.71132, lng: 139.79627, heading:   2, pitch:  8, fov: 58 },
+  // アメ横
+  { city: '東京', area: 'アメ横看板街',                 lat: 35.70889, lng: 139.77445, heading:   0, pitch: 14, fov: 62 },
+  // 新世界
+  { city: '大阪', area: '新世界ジャンジャン横丁',       lat: 34.65269, lng: 135.50626, heading: 180, pitch: 10, fov: 62 },
+  // 池袋
+  { city: '東京', area: '池袋西口看板群',               lat: 35.7295,  lng: 139.7109,  heading:  92, pitch: 16, fov: 60 },
+  // 原宿
+  { city: '東京', area: '原宿竹下通り入口',             lat: 35.6702,  lng: 139.7068,  heading:  88, pitch:  8, fov: 62 },
+  // 銀座
+  { city: '東京', area: '銀座四丁目交差点',             lat: 35.6720,  lng: 139.7652,  heading: 268, pitch: 12, fov: 60 },
+  // 札幌
+  { city: '札幌', area: 'すすきのニッカウヰスキー看板', lat: 43.05579, lng: 141.35428, heading: 355, pitch: 24, fov: 52 },
+  // 横浜
+  { city: '横浜', area: '横浜中華街善隣門',             lat: 35.44348, lng: 139.64214, heading: 272, pitch:  6, fov: 58 },
+  // 福岡
+  { city: '福岡', area: '天神交差点看板群',             lat: 33.5893,  lng: 130.3984,  heading:  92, pitch: 16, fov: 62 },
+  // 名古屋
+  { city: '名古屋', area: '大須商店街看板',             lat: 35.1567,  lng: 136.9010,  heading:  88, pitch: 12, fov: 65 },
+];
+
+// ── エリア定義（中心座標 + サンプリング半径） ────────────────────────────────
+const AREAS = [
+  { city: '大阪', area: '道頓堀',     lat: 34.6687,  lng: 135.5014, radius: 150 },
+  { city: '大阪', area: '新世界',     lat: 34.6524,  lng: 135.5065, radius: 150 },
+  { city: '大阪', area: '心斎橋',     lat: 34.6726,  lng: 135.5013, radius: 150 },
+  { city: '大阪', area: '天神橋筋',   lat: 34.6952,  lng: 135.5089, radius: 150 },
+  { city: '東京', area: '秋葉原',     lat: 35.6987,  lng: 139.7731, radius: 150 },
+  { city: '東京', area: '歌舞伎町',   lat: 35.6940,  lng: 139.7037, radius: 150 },
+  { city: '東京', area: '浅草仲見世', lat: 35.7122,  lng: 139.7963, radius: 120 },
+  { city: '東京', area: 'アメ横',     lat: 35.7089,  lng: 139.7745, radius: 120 },
+  { city: '東京', area: '竹下通り',   lat: 35.6702,  lng: 139.7068, radius: 100 },
+  { city: '東京', area: '池袋',       lat: 35.7295,  lng: 139.7109, radius: 150 },
+  { city: '東京', area: '渋谷',       lat: 35.6580,  lng: 139.7016, radius: 150 },
+  { city: '京都', area: '錦市場',     lat: 35.0042,  lng: 135.7651, radius: 120 },
+  { city: '京都', area: '祇園四条',   lat: 35.0037,  lng: 135.7752, radius: 150 },
+  { city: '京都', area: '河原町',     lat: 35.0033,  lng: 135.7691, radius: 120 },
+  { city: '札幌', area: 'すすきの',   lat: 43.0554,  lng: 141.3536, radius: 150 },
+  { city: '札幌', area: '狸小路',     lat: 43.0584,  lng: 141.3524, radius: 120 },
+  { city: '福岡', area: '中洲',       lat: 33.5904,  lng: 130.4013, radius: 120 },
+  { city: '福岡', area: '天神',       lat: 33.5893,  lng: 130.3984, radius: 150 },
+  { city: '名古屋', area: '大須',     lat: 35.1567,  lng: 136.9010, radius: 150 },
+  { city: '名古屋', area: '栄',       lat: 35.1680,  lng: 136.9095, radius: 150 },
+  { city: '横浜', area: '中華街',     lat: 35.4434,  lng: 139.6422, radius: 150 },
+  { city: '横浜', area: '伊勢佐木町', lat: 35.4417,  lng: 139.6364, radius: 120 },
+  { city: '沖縄', area: '国際通り',   lat: 26.2172,  lng: 127.6873, radius: 150 },
+];
+
+// ── OSM 都市エリア定義（Overpass クエリ用） ──────────────────────────────────
+const OSM_CITIES = [
+  { city: '東京',   bbox: '35.55,139.55,35.82,139.92' },
+  { city: '大阪',   bbox: '34.58,135.42,34.76,135.58' },
+  { city: '京都',   bbox: '34.95,135.68,35.06,135.80' },
+  { city: '名古屋', bbox: '35.08,136.82,35.26,136.98' },
+  { city: '福岡',   bbox: '33.52,130.32,33.65,130.50' },
+  { city: '札幌',   bbox: '42.98,141.28,43.15,141.45' },
+  { city: '横浜',   bbox: '35.38,139.57,35.49,139.70' },
+  { city: '沖縄',   bbox: '26.18,127.65,26.26,127.73' },
+  { city: '仙台',   bbox: '38.22,140.83,38.30,140.93' },
+  { city: '広島',   bbox: '34.36,132.43,34.42,132.48' },
+];
+
+// 方位文字列 → 角度
+const DIR_MAP = { N:0,NNE:22,NE:45,ENE:67,E:90,ESE:112,SE:135,SSE:157,S:180,SSW:202,SW:225,WSW:247,W:270,WNW:292,NW:315,NNW:337 };
+
+function parseDirection(tag) {
+  if (!tag) return null;
+  if (DIR_MAP[tag.toUpperCase()] !== undefined) return DIR_MAP[tag.toUpperCase()];
+  const n = parseInt(tag);
+  return isNaN(n) ? null : n;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// OSM要素 → ショット配列に変換
+function osmToShots(elements, city) {
+  const shots = [];
+  elements.forEach(el => {
+    const lat = el.lat ?? el.center?.lat;
+    const lng = el.lon ?? el.center?.lon;
+    if (!lat || !lng) return;
+    const tags   = el.tags || {};
+    const area   = tags['name'] || tags['name:ja'] || tags['operator'] || tags['advertising'] || '看板';
+    const dir    = parseDirection(tags['direction'] || tags['facing']);
+    // 方向が分かればその方向+反対、不明なら4方向
+    const headings = dir !== null ? [dir, (dir + 180) % 360] : [0, 90, 180, 270];
+    headings.forEach(h => shots.push({ city, area, lat, lng: lng, heading: h }));
+  });
+  return shots;
+}
+
+// ── Overpass APIから看板データ取得 ────────────────────────────────────────────
+async function fetchOSMBillboards() {
+  const bboxUnion = OSM_CITIES.map(c =>
+    `node["advertising"](${c.bbox});
+way["advertising"](${c.bbox});`
+  ).join('\n');
+
+  const query = `[out:json][timeout:60];
+(\n${bboxUnion}\n);
+out center;`;
+
+  const res = await fetch('/api/overpass', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  if (!res.ok) throw new Error(`Overpass error: ${res.status}`);
+  return res.json();
+}
+
+// 座標から都市名を推定
+function guessCityFromLatLng(lat, lng) {
+  for (const c of OSM_CITIES) {
+    const [s, w, n, e] = c.bbox.split(',').map(Number);
+    if (lat >= s && lat <= n && lng >= w && lng <= e) return c.city;
+  }
+  return '日本';
+}
+
+let allShots = []; // OSMロード後に設定
+
+// ── 都市カラー ────────────────────────────────────────────────────────────────
+const CITY_COLORS = {
+  '大阪':   { bg: 'rgba(255,107,53,0.25)',  text: '#ff8c66' },
+  '東京':   { bg: 'rgba(74,158,255,0.25)',  text: '#6db4ff' },
+  '京都':   { bg: 'rgba(182,110,255,0.25)', text: '#c89aff' },
+  '札幌':   { bg: 'rgba(0,201,177,0.25)',   text: '#00e5cd' },
+  '福岡':   { bg: 'rgba(255,184,0,0.25)',   text: '#ffd24d' },
+  '名古屋': { bg: 'rgba(255,75,126,0.25)',  text: '#ff7aab' },
+  '横浜':   { bg: 'rgba(50,215,75,0.25)',   text: '#5de87e' },
+  '沖縄':   { bg: 'rgba(255,159,10,0.25)',  text: '#ffc04d' },
+};
+
+// 画像サイズバリエーション
+const SIZES = [
+  '600x400', '400x550', '600x400', '500x360',
+  '400x500', '600x400', '450x600', '600x380',
+];
+
+// ── フィルター UI（OSMロード後に動的生成） ────────────────────────────────────
+const filtersEl = document.getElementById('filters');
+
+let activeCity    = 'all';
+let filteredShots = allShots;
+let currentPage   = 0;
+const PAGE_SIZE   = 100;
+
+// ── レンダリング ──────────────────────────────────────────────────────────────
+const gallery     = document.getElementById('gallery');
+const loadMoreBtn = document.getElementById('load-more-btn');
+const statusEl    = document.getElementById('status');
+const bottomBar   = document.getElementById('bottom-bar');
+
+// ── API使用量カウンター ────────────────────────────────────────────────────────
+let apiCallCount = 0;
+const PRICE_PER_IMG = 0.007;
+function incrementCost() {
+  apiCallCount++;
+  document.getElementById('cost-count').textContent = apiCallCount;
+  document.getElementById('cost-usd').textContent = '$' + (apiCallCount * PRICE_PER_IMG).toFixed(3);
+}
+
+// ── 並列ロードキュー（同時8枚まで） ─────────────────────────────────────────
+const CONCURRENCY = 8;
+let activeLoads = 0;
+const loadQueue = [];
+
+function enqueueLoad(img, src, onDone) {
+  loadQueue.push({ img, src, onDone });
+  drainQueue();
+}
+
+function drainQueue() {
+  while (activeLoads < CONCURRENCY && loadQueue.length > 0) {
+    const { img, src, onDone } = loadQueue.shift();
+    activeLoads++;
+    const finish = (type) => { activeLoads--; onDone(type); drainQueue(); };
+    img.onload  = () => { incrementCost(); finish('load'); };
+    img.onerror = () => finish('error');
+    img.src = src;
+  }
+}
+
+function renderNextPage() {
+  const start = currentPage * PAGE_SIZE;
+  const end   = start + PAGE_SIZE;
+  const batch = filteredShots.slice(start, end);
+
+  if (batch.length === 0) {
+    gallery.innerHTML = '<div class="empty">該当する写真がありません</div>';
+    bottomBar.style.display = 'none';
+    return;
+  }
+
+  loadMoreBtn.disabled = true;
+  loadMoreBtn.textContent = '読み込み中...';
+
+  let settled = 0;
+  const onSettled = () => {
+    settled++;
+    if (settled >= batch.length) {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.textContent = '次の100枚を見る';
+    }
+  };
+
+  batch.forEach((shot, i) => {
+    const sizeStr = SIZES[(start + i) % SIZES.length];
+    gallery.appendChild(createCard(shot, sizeStr, onSettled));
+  });
+
+  currentPage++;
+
+  const totalPool = filteredShots.length;
+  const fetched   = Math.min(end, totalPool);
+  statusEl.textContent = `${fetched.toLocaleString()} / ${totalPool.toLocaleString()} 座標（Street Viewのない場所は自動スキップ）`;
+
+  if (fetched >= totalPool) {
+    loadMoreBtn.style.display = 'none';
+  }
+}
+
+function createCard(shot, sizeStr, onSettled) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const [w, h] = sizeStr.split('x').map(Number);
+  const ratio  = h / w;
+
+  // スケルトン（画像の上に重ねる）
+  const skeleton = document.createElement('div');
+  skeleton.className = 'skeleton-ph';
+  skeleton.style.cssText = `position:absolute;inset:0;z-index:1;`;
+  card.style.cssText = `position:relative;min-height:${Math.round(200 * ratio)}px;`;
+  card.appendChild(skeleton);
+
+  const img = document.createElement('img');
+  img.alt   = `${shot.city} ${shot.area}`;
+  // lazy なし・display:none なし → ブラウザが即ロード開始
+  img.style.opacity = '0';
+  img.style.transition = 'opacity 0.3s';
+
+  const src = `/api/streetview?lat=${shot.lat}&lng=${shot.lng}&heading=${shot.heading}&pitch=10&fov=90&size=${sizeStr}&source=outdoor`;
+
+  enqueueLoad(img, src, (type) => {
+    if (type === 'load') {
+      skeleton.remove();
+      img.style.opacity = '1';
+      card.style.minHeight = '';
+    } else {
+      card.remove();
+    }
+    onSettled();
+  });
+
+  card.appendChild(img);
+
+  const cityColor = CITY_COLORS[shot.city] || { bg: 'rgba(255,255,255,0.15)', text: '#ccc' };
+  const overlay   = document.createElement('div');
+  overlay.className = 'card-overlay';
+  overlay.innerHTML = `
+    <div class="card-area">${shot.area}</div>
+    <span class="card-city" style="background:${cityColor.bg};color:${cityColor.text}">${shot.city}</span>
+    <div class="card-hint">クリックして Google Maps で見る</div>
+  `;
+  card.appendChild(overlay);
+
+  card.addEventListener('click', () => {
+    window.open(`https://www.google.com/maps/@${shot.lat},${shot.lng},3a,90y,${shot.heading}h,85t/data=!3m7!1e1`, '_blank');
+  });
+
+  return card;
+}
+
+loadMoreBtn.addEventListener('click', renderNextPage);
+
+// ── 注目看板を即時ロード ──────────────────────────────────────────────────────
+function loadFeatured() {
+  const grid = document.getElementById('featured-grid');
+  FEATURED.forEach(shot => {
+    const card = document.createElement('div');
+    card.className = 'featured-card card';
+    card.style.cssText = 'position:relative;min-height:220px;';
+
+    const skeleton = document.createElement('div');
+    skeleton.className = 'skeleton-ph';
+    skeleton.style.cssText = 'position:absolute;inset:0;z-index:1;';
+    card.appendChild(skeleton);
+
+    const img = document.createElement('img');
+    img.alt = `${shot.city} ${shot.area}`;
+    img.style.cssText = 'width:100%;display:block;opacity:0;transition:opacity 0.3s;';
+
+    img.onload = () => {
+      incrementCost();
+      skeleton.remove();
+      img.style.opacity = '1';
+      card.style.minHeight = '';
+    };
+    img.onerror = () => card.remove();
+
+    // 即時ロード（キューなし）
+    img.src = `/api/streetview?lat=${shot.lat}&lng=${shot.lng}&heading=${shot.heading}&pitch=${shot.pitch}&fov=${shot.fov}&size=800x530&source=outdoor`;
+    card.appendChild(img);
+
+    const cityColor = CITY_COLORS[shot.city] || { bg: 'rgba(255,255,255,0.15)', text: '#ccc' };
+    const overlay = document.createElement('div');
+    overlay.className = 'card-overlay';
+    overlay.style.opacity = '1';
+    overlay.innerHTML = `
+      <div class="card-area">${shot.area}</div>
+      <span class="card-city" style="background:${cityColor.bg};color:${cityColor.text}">${shot.city}</span>
+    `;
+    card.appendChild(overlay);
+
+    card.addEventListener('click', () => {
+      window.open(`https://www.google.com/maps/@${shot.lat},${shot.lng},3a,75y,${shot.heading}h,85t/data=!3m7!1e1`, '_blank');
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// ── APIキー確認 ───────────────────────────────────────────────────────────────
+fetch('/api/streetview?lat=34.6687&lng=135.5014&heading=0&size=1x1')
+  .then(res => { if (res.status === 500) document.getElementById('api-warning').style.display = 'block'; })
+  .catch(() => {});
+
+// ── 初回表示 ──────────────────────────────────────────────────────────────────
+loadFeatured(); // 注目看板は即時ロード
+
+// OSMデータを非同期取得してギャラリーを構築
+statusEl.textContent = '🔍 OpenStreetMapから看板データを取得中...';
+loadMoreBtn.disabled = true;
+loadMoreBtn.textContent = '取得中...';
+
+fetchOSMBillboards().then(data => {
+  const elements = data.elements || [];
+  // 都市ごとにグルーピングして shots 生成
+  const cityMap = {};
+  elements.forEach(el => {
+    const lat = el.lat ?? el.center?.lat;
+    const lng = el.lon ?? el.center?.lon;
+    if (!lat || !lng) return;
+    const city = guessCityFromLatLng(lat, lng);
+    if (!cityMap[city]) cityMap[city] = [];
+    cityMap[city].push(el);
+  });
+
+  let shots = [];
+  for (const [city, els] of Object.entries(cityMap)) {
+    shots = shots.concat(osmToShots(els, city));
+  }
+  allShots = shuffle(shots);
+  filteredShots = allShots;
+
+  // フィルターボタンを都市一覧で再構築
+  const detectedCities = ['all', ...Object.keys(cityMap)];
+  filtersEl.innerHTML = '';
+  detectedCities.forEach(city => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (city === 'all' ? ' active' : '');
+    btn.textContent = city === 'all' ? `🗾 全て (${allShots.length.toLocaleString()}枚)` : `${city} (${(cityMap[city]?.length * 2 || 0).toLocaleString()})`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCity    = city;
+      filteredShots = city === 'all' ? allShots : allShots.filter(s => s.city === city);
+      currentPage   = 0;
+      gallery.innerHTML = '';
+      bottomBar.style.display = '';
+      renderNextPage();
+    });
+    filtersEl.appendChild(btn);
+  });
+
+  statusEl.textContent = `OSMから看板 ${elements.length.toLocaleString()} 件取得 → ${allShots.length.toLocaleString()} ショット生成`;
+  loadMoreBtn.disabled = false;
+  loadMoreBtn.textContent = '次の100枚を見る';
+  renderNextPage();
+
+}).catch(err => {
+  statusEl.textContent = `⚠️ OSMデータ取得失敗: ${err.message}`;
+  loadMoreBtn.disabled = false;
+  loadMoreBtn.textContent = '次の100枚を見る';
+});
+</script>
+</body>
+</html>

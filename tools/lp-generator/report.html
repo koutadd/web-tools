@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP 解析レポート | Web Tools</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    /* ── Report layout ── */
+    .report-header {
+      padding: 2.5rem 0 2rem;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .report-header .container {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .report-meta h1 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+    .report-meta p { font-size: 0.875rem; color: var(--color-text-secondary); }
+    .report-date { font-size: 0.8rem; color: var(--color-text-secondary); white-space: nowrap; padding-top: 0.25rem; }
+    .report-url-badge {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      font-size: 0.78rem; color: var(--color-accent); background: var(--color-accent-light);
+      border-radius: 6px; padding: 0.25rem 0.625rem; margin-top: 0.375rem;
+      text-decoration: none; max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .report-url-badge:hover { text-decoration: underline; }
+
+    .report-body { max-width: 780px; margin-inline: auto; padding: 2.5rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    /* ── Section wrapper ── */
+    .report-section { display: flex; flex-direction: column; gap: 1rem; }
+    .section-label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--color-text-secondary); padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ── Screenshot ── */
+    .screenshot-wrap {
+      border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+      overflow: hidden; background: #f9fafb; box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .screenshot-wrap img { display: block; width: 100%; height: auto; }
+    .screenshot-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to bottom, transparent, rgba(249,250,251,0.95));
+      pointer-events: none;
+    }
+    .screenshot-expand-btn {
+      position: absolute; bottom: 0.75rem; right: 0.75rem;
+      font-size: 0.75rem; font-weight: 600; padding: 0.375rem 0.875rem; border-radius: 6px;
+      background: rgba(255,255,255,0.9); border: 1px solid var(--color-border);
+      cursor: pointer; color: var(--color-text);
+    }
+    .screenshot-expand-btn:hover { background: #fff; }
+    .screenshot-wrap.is-expanded .screenshot-overlay { display: none; }
+    .screenshot-wrap.is-expanded .screenshot-expand-btn { display: none; }
+
+    /* ── Analysis cards ── */
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .analysis-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 1.125rem 1.25rem; box-shadow: var(--shadow-sm);
+    }
+    .analysis-card__label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.375rem; }
+    .analysis-card__value { font-size: 0.9rem; font-weight: 600; color: var(--color-text); line-height: 1.5; }
+    .analysis-card--wide { grid-column: 1 / -1; }
+
+    /* Sections list */
+    .sections-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .section-tag {
+      font-size: 0.72rem; font-weight: 600; background: var(--color-accent-light);
+      color: var(--color-accent); border-radius: 4px; padding: 0.2rem 0.5rem;
+    }
+
+    /* ── Code block ── */
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1e293b; padding: 0.75rem 1.125rem; border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .code-filename { font-size: 0.78rem; font-weight: 600; color: #94a3b8; font-family: 'SF Mono', monospace; }
+    .code-actions { display: flex; gap: 0.5rem; }
+    .code-action-btn {
+      font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 5px;
+      cursor: pointer; border: none; transition: background 0.15s;
+    }
+    .code-action-btn--copy { background: #334155; color: #e2e8f0; }
+    .code-action-btn--copy:hover { background: #475569; }
+    .code-action-btn--copy.copied { background: #059669; color: #fff; }
+    .code-action-btn--dl { background: #2563eb; color: #fff; }
+    .code-action-btn--dl:hover { background: #1d4ed8; }
+
+    .code-body {
+      background: #0f172a; padding: 1.25rem 1.375rem;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      overflow-x: auto; max-height: 480px; overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.78rem; line-height: 1.7; color: #e2e8f0;
+      white-space: pre;
+    }
+    /* Syntax highlight tokens */
+    .tok-k  { color: #93c5fd; }
+    .tok-s  { color: #86efac; }
+    .tok-c  { color: #475569; }
+    .tok-f  { color: #fbbf24; }
+    .tok-t  { color: #f0abfc; }
+    .tok-j  { color: #f87171; }
+    .tok-a  { color: #67e8f9; }
+    .tok-n  { color: #fb923c; }
+
+    /* ── Loading / Error states ── */
+    .state-loading, .state-error {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 1rem; padding: 4rem 1.5rem; text-align: center;
+    }
+    .state-loading__spinner {
+      width: 40px; height: 40px; border: 3px solid var(--color-border);
+      border-top-color: var(--color-accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .state-loading__title { font-size: 1.125rem; font-weight: 700; color: var(--color-text); }
+    .state-loading__sub { font-size: 0.875rem; color: var(--color-text-secondary); }
+    .state-error__icon { font-size: 2.5rem; }
+    .state-error__title { font-size: 1.125rem; font-weight: 700; color: var(--color-text); }
+    .state-error__msg { font-size: 0.875rem; color: var(--color-text-secondary); }
+    .state-error__back { font-size: 0.875rem; }
+
+    @media (max-width: 600px) {
+      .analysis-grid { grid-template-columns: 1fr; }
+      .code-body { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="../../" class="logo">Web Tools</a>
+    </div>
+  </header>
+
+  <div class="report-header">
+    <div class="container">
+      <div class="report-meta">
+        <h1>LP 解析レポート</h1>
+        <p>Playwright でページを撮影し、Claude がコードを生成しました。</p>
+        <a class="report-url-badge" id="reportUrlLink" href="#" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span id="reportUrlText">読み込み中…</span>
+        </a>
+      </div>
+      <p class="report-date" id="reportDate"></p>
+    </div>
+  </div>
+
+  <main>
+    <!-- Loading state -->
+    <div id="stateLoading" class="state-loading">
+      <div class="state-loading__spinner"></div>
+      <p class="state-loading__title">レポートを読み込み中…</p>
+      <p class="state-loading__sub">しばらくお待ちください</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="stateError" class="state-error" style="display:none;">
+      <div class="state-error__icon">⚠️</div>
+      <p class="state-error__title">レポートの読み込みに失敗しました</p>
+      <p class="state-error__msg" id="errorMsg">IDが無効か、サーバーが再起動された可能性があります。</p>
+      <a href="index.html" class="btn btn--primary state-error__back">もう一度試す</a>
+    </div>
+
+    <!-- Report content -->
+    <div class="report-body" id="reportBody" style="display:none;">
+
+      <!-- 1. Screenshot -->
+      <section class="report-section">
+        <p class="section-label">スクリーンショット（解析時点）</p>
+        <div class="screenshot-wrap" id="screenshotWrap">
+          <img id="screenshotImg" src="" alt="LP スクリーンショット">
+          <div class="screenshot-overlay"></div>
+          <button class="screenshot-expand-btn" id="screenshotExpandBtn" onclick="expandScreenshot()">全体を表示</button>
+        </div>
+      </section>
+
+      <!-- 2. Analysis -->
+      <section class="report-section">
+        <p class="section-label">LP 構造分析</p>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <p class="analysis-card__label">LP の目的</p>
+            <p class="analysis-card__value" id="analysisSummary">—</p>
+          </div>
+          <div class="analysis-card">
+            <p class="analysis-card__label">ターゲットユーザー</p>
+            <p class="analysis-card__value" id="analysisTarget">—</p>
+          </div>
+          <div class="analysis-card">
+            <p class="analysis-card__label">メイン CTA</p>
+            <p class="analysis-card__value" id="analysisCta">—</p>
+          </div>
+          <div class="analysis-card">
+            <p class="analysis-card__label">カラー / トーン</p>
+            <p class="analysis-card__value" id="analysisColor">—</p>
+          </div>
+          <div class="analysis-card analysis-card--wide">
+            <p class="analysis-card__label">セクション構成</p>
+            <div class="sections-list" id="analysisSections"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Generated code -->
+      <section class="report-section">
+        <p class="section-label">生成された Next.js コード（page.tsx）</p>
+        <div>
+          <div class="code-header">
+            <span class="code-filename">app/page.tsx</span>
+            <div class="code-actions">
+              <button class="code-action-btn code-action-btn--copy" id="copyBtn" onclick="copyCode()">コピー</button>
+              <button class="code-action-btn code-action-btn--dl" onclick="downloadCode()">ダウンロード</button>
+            </div>
+          </div>
+          <div class="code-body" id="codeBody"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Web Tools. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('reportDate').textContent =
+      new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    let generatedCode = '';
+
+    // ── Syntax highlight (basic tokenizer) ───────────────────────
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function highlight(code) {
+      // Simple line-by-line highlighting
+      return esc(code)
+        // keywords
+        .replace(/\b(import|export|default|from|return|const|let|var|function|if|else|true|false|null|undefined|async|await|new|typeof|instanceof)\b/g, '<span class="tok-k">$1</span>')
+        // strings
+        .replace(/(&#39;[^&#]*&#39;|&quot;[^&]*&quot;|`[^`]*`)/g, '<span class="tok-s">$1</span>')
+        // JSX tags
+        .replace(/(&lt;\/?[A-Za-z][A-Za-z0-9]*)/g, '<span class="tok-j">$1</span>')
+        // className attr
+        .replace(/(className|href|src|alt|onClick|onChange|style)=/g, '<span class="tok-a">$1</span>=')
+        // comments
+        .replace(/(\/\/[^\n]*)/g, '<span class="tok-c">$1</span>')
+        // component names (capitalized identifiers)
+        .replace(/\b([A-Z][A-Za-z0-9]+)\b(?=\s*[({&lt;])/g, '<span class="tok-f">$1</span>');
+    }
+
+    // ── Screenshot expand ─────────────────────────────────────────
+    function expandScreenshot() {
+      document.getElementById('screenshotWrap').classList.add('is-expanded');
+    }
+
+    // ── Copy code ─────────────────────────────────────────────────
+    async function copyCode() {
+      try {
+        await navigator.clipboard.writeText(generatedCode);
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'コピー完了 ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 2500);
+      } catch {
+        alert('コピーに失敗しました。手動でコードを選択してコピーしてください。');
+      }
+    }
+
+    // ── Download code ─────────────────────────────────────────────
+    function downloadCode() {
+      const blob = new Blob([generatedCode], { type: 'text/plain; charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'page.tsx';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // ── Render report ─────────────────────────────────────────────
+    function renderReport(data) {
+      // URL badge
+      const urlEl = document.getElementById('reportUrlText');
+      const urlLink = document.getElementById('reportUrlLink');
+      urlEl.textContent = data.url ?? '—';
+      urlLink.href = data.url ?? '#';
+
+      // Screenshot
+      if (data.screenshot) {
+        document.getElementById('screenshotImg').src = `data:image/jpeg;base64,${data.screenshot}`;
+      } else {
+        document.getElementById('screenshotWrap').style.display = 'none';
+      }
+
+      // Analysis
+      const a = data.analysis ?? {};
+      document.getElementById('analysisSummary').textContent = a.summary ?? '—';
+      document.getElementById('analysisTarget').textContent  = a.targetAudience ?? '—';
+      document.getElementById('analysisCta').textContent     = a.mainCta ?? '—';
+      document.getElementById('analysisColor').textContent   = [a.colorScheme, a.tone].filter(Boolean).join(' / ') || '—';
+
+      const sectionsEl = document.getElementById('analysisSections');
+      if (Array.isArray(a.sections) && a.sections.length > 0) {
+        sectionsEl.innerHTML = a.sections.map(s => `<span class="section-tag">${esc(s)}</span>`).join('');
+      } else {
+        sectionsEl.textContent = '—';
+      }
+
+      // Code
+      generatedCode = data.nextjsCode ?? '// No code generated';
+      document.getElementById('codeBody').innerHTML = highlight(generatedCode);
+    }
+
+    // ── Load data ─────────────────────────────────────────────────
+    const id = new URLSearchParams(location.search).get('id');
+
+    async function loadReport() {
+      if (!id) {
+        document.getElementById('stateLoading').style.display = 'none';
+        document.getElementById('stateError').style.display = 'flex';
+        document.getElementById('errorMsg').textContent = 'レポートIDが見つかりません。';
+        return;
+      }
+
+      // Try session cache first
+      const cached = sessionStorage.getItem(`lp_result_${id}`);
+      if (cached) {
+        try {
+          renderReport(JSON.parse(cached));
+          document.getElementById('stateLoading').style.display = 'none';
+          document.getElementById('reportBody').style.display = 'flex';
+          return;
+        } catch { /* fallthrough to fetch */ }
+      }
+
+      // Fetch from server
+      try {
+        const res = await fetch(`/api/lp-analyze/${id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        sessionStorage.setItem(`lp_result_${id}`, JSON.stringify(data));
+        renderReport(data);
+        document.getElementById('stateLoading').style.display = 'none';
+        document.getElementById('reportBody').style.display = 'flex';
+      } catch (err) {
+        document.getElementById('stateLoading').style.display = 'none';
+        document.getElementById('stateError').style.display = 'flex';
+        document.getElementById('errorMsg').textContent = err.message;
+      }
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>

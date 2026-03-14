@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 — ガチャワールド</title>
+  <style>
+    :root {
+      --bg:#f2f2f7; --card:#ffffff; --hdr:#1c1c1e;
+      --green:#00a63c; --green-d:#007a2d;
+      --coin:#f0a000; --coin-bg:#fff8e1;
+      --red:#e53935; --blue:#1e88e5; --purple:#8e24aa;
+      --text:#1a1a1a; --sub:#666; --dim:#999;
+      --border:#e5e5ea; --shadow:0 2px 8px rgba(0,0,0,0.08); --r:12px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+      background:var(--bg);color:var(--text);min-height:100vh;
+    }
+
+    /* ── LOGIN ── */
+    #loginScreen{
+      display:flex;align-items:center;justify-content:center;
+      min-height:100vh;padding:20px;
+    }
+    .login-box{
+      background:white;border-radius:20px;padding:36px 28px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.12);width:100%;max-width:360px;
+    }
+    .login-logo{text-align:center;margin-bottom:24px;}
+    .login-logo-ico{font-size:3rem;display:block;margin-bottom:8px;}
+    .login-logo-title{font-size:1.2rem;font-weight:900;color:var(--text);}
+    .login-logo-sub{font-size:0.78rem;color:var(--dim);margin-top:4px;}
+    .login-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+    .login-label{font-size:0.76rem;font-weight:700;color:var(--sub);}
+    .login-input{
+      padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;
+      font-size:0.92rem;outline:none;font-family:inherit;
+      transition:border-color 0.15s;
+    }
+    .login-input:focus{border-color:var(--green);}
+    .login-btn{
+      width:100%;padding:12px;background:var(--green);color:white;
+      border:none;border-radius:12px;font-size:0.95rem;font-weight:700;
+      cursor:pointer;margin-top:8px;transition:opacity 0.15s;
+    }
+    .login-btn:hover{opacity:0.88;}
+    .login-err{font-size:0.75rem;color:var(--red);min-height:18px;margin-top:4px;text-align:center;}
+    .login-hint{font-size:0.72rem;color:var(--dim);text-align:center;margin-top:12px;}
+
+    /* ── HEADER ── */
+    #adminApp{display:none;}
+    .adm-hdr{
+      background:var(--hdr);color:white;padding:12px 16px;
+      display:flex;align-items:center;gap:10px;
+      position:sticky;top:0;z-index:100;
+    }
+    .adm-hdr-logo{font-size:0.95rem;font-weight:900;flex:1;}
+    .adm-hdr-logo span{color:var(--coin);}
+    .adm-hdr-user{font-size:0.75rem;color:rgba(255,255,255,0.6);}
+    .adm-logout{background:rgba(255,255,255,0.12);border:none;color:white;
+      padding:5px 10px;border-radius:8px;font-size:0.74rem;cursor:pointer;}
+
+    /* ── TABS ── */
+    .adm-tabs{
+      background:white;border-bottom:1px solid var(--border);
+      display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+      scrollbar-width:none;padding:0 8px;
+      position:sticky;top:49px;z-index:99;
+    }
+    .adm-tabs::-webkit-scrollbar{display:none;}
+    .adm-tab{
+      flex-shrink:0;padding:11px 14px;font-size:0.82rem;font-weight:600;
+      color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;
+      white-space:nowrap;transition:all 0.15s;
+    }
+    .adm-tab.active{color:var(--green);border-bottom-color:var(--green);}
+
+    /* ── CONTENT ── */
+    .adm-content{max-width:860px;margin:0 auto;padding:16px;}
+    .adm-section{display:none;}
+    .adm-section.active{display:block;}
+    .sec-title{font-size:1rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+    /* ── STAT CARDS ── */
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
+    @media(min-width:540px){.stat-grid{grid-template-columns:repeat(4,1fr);}}
+    .stat-card{background:white;border-radius:var(--r);padding:16px 14px;box-shadow:var(--shadow);text-align:center;}
+    .stat-ico{font-size:1.6rem;margin-bottom:6px;}
+    .stat-val{font-size:1.4rem;font-weight:900;color:var(--green);}
+    .stat-lbl{font-size:0.68rem;color:var(--dim);margin-top:3px;}
+
+    /* ── TABLE ── */
+    .tbl-wrap{background:white;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+    .tbl-hd{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .tbl-hd-title{font-size:0.88rem;font-weight:700;}
+    table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    thead th{background:#f8f8f8;padding:9px 10px;text-align:left;font-weight:700;
+      color:var(--sub);border-bottom:1px solid var(--border);}
+    tbody tr:hover{background:#fafafa;}
+    tbody td{padding:9px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+    tbody tr:last-child td{border-bottom:none;}
+    .tbl-empty{padding:32px 16px;text-align:center;color:var(--dim);font-size:0.83rem;}
+
+    /* ── BADGES ── */
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+    .badge-common{background:#eceff1;color:#546e7a;}
+    .badge-uncommon{background:#e8f5e9;color:#2e7d32;}
+    .badge-rare{background:#e3f2fd;color:#1565c0;}
+    .badge-sr{background:#f3e5f5;color:#6a1b9a;}
+    .badge-ur{background:#fff3e0;color:#bf360c;}
+    .badge-active{background:#e8f5e9;color:#2e7d32;}
+    .badge-inactive{background:#fee2e2;color:#c00;}
+
+    /* ── BUTTONS ── */
+    .btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:0.78rem;font-weight:700;transition:opacity 0.15s;}
+    .btn:hover{opacity:0.85;}
+    .btn-green{background:var(--green);color:white;}
+    .btn-gold{background:var(--coin);color:white;}
+    .btn-red{background:var(--red);color:white;}
+    .btn-gray{background:#f0f0f0;color:var(--text);}
+    .btn-blue{background:var(--blue);color:white;}
+    .btn-sm{padding:4px 10px;font-size:0.72rem;}
+    .btn-xs{padding:3px 8px;font-size:0.68rem;}
+
+    /* ── FORMS ── */
+    .form-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .form-input{
+      padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:0.83rem;outline:none;font-family:inherit;
+      transition:border-color 0.15s;
+    }
+    .form-input:focus{border-color:var(--green);}
+    .form-label-sm{font-size:0.74rem;color:var(--sub);font-weight:700;}
+
+    /* ── PROGRESS BAR ── */
+    .prog-wrap{height:6px;background:#e5e5ea;border-radius:3px;overflow:hidden;min-width:80px;}
+    .prog-fill{height:100%;border-radius:3px;transition:width 0.3s;}
+
+    /* ── HISTORY LIST ── */
+    .hist-list{display:flex;flex-direction:column;gap:8px;}
+    .hist-item{background:white;border-radius:10px;padding:10px 13px;box-shadow:var(--shadow);
+      display:flex;align-items:center;gap:10px;}
+    .hist-ico{font-size:1.4rem;flex-shrink:0;}
+    .hist-info{flex:1;min-width:0;}
+    .hist-name{font-size:0.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .hist-meta{font-size:0.7rem;color:var(--dim);margin-top:2px;}
+
+    /* ── NOTICE EDITOR ── */
+    .notice-card{background:white;border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:12px;}
+    .notice-fields{display:flex;flex-direction:column;gap:10px;}
+    .notice-textarea{
+      width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:0.83rem;font-family:inherit;resize:vertical;min-height:72px;outline:none;
+    }
+    .notice-textarea:focus{border-color:var(--green);}
+    .notice-existing{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+    .notice-item{background:#f8f8f8;border-radius:10px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;}
+    .notice-item-body{flex:1;min-width:0;}
+    .notice-item-title{font-size:0.84rem;font-weight:700;margin-bottom:3px;}
+    .notice-item-meta{font-size:0.69rem;color:var(--dim);}
+
+    /* ── MACHINE TOGGLE ── */
+    .toggle-switch{position:relative;display:inline-block;width:40px;height:22px;}
+    .toggle-switch input{display:none;}
+    .toggle-slider{
+      position:absolute;inset:0;background:#ccc;border-radius:22px;cursor:pointer;
+      transition:background 0.2s;
+    }
+    .toggle-slider::before{
+      content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;
+      background:white;border-radius:50%;transition:transform 0.2s;
+    }
+    input:checked + .toggle-slider{background:var(--green);}
+    input:checked + .toggle-slider::before{transform:translateX(18px);}
+
+    /* ── COIN GRANT MODAL ── */
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;
+      align-items:center;justify-content:center;}
+    .modal-ov.open{display:flex;}
+    .modal-box{background:white;border-radius:20px;padding:24px 22px;width:90%;max-width:340px;}
+    .modal-title{font-size:1rem;font-weight:800;margin-bottom:16px;text-align:center;}
+    .modal-body{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+    .modal-btns{display:flex;gap:8px;justify-content:center;}
+
+    /* ── CHART ── */
+    .chart-bar-wrap{display:flex;flex-direction:column;gap:8px;}
+    .chart-bar-row{display:flex;align-items:center;gap:10px;}
+    .chart-bar-label{font-size:0.74rem;color:var(--sub);width:130px;flex-shrink:0;text-align:right;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .chart-bar-track{flex:1;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;}
+    .chart-bar-fill{height:100%;border-radius:10px;display:flex;align-items:center;padding-left:8px;
+      font-size:0.68rem;color:white;font-weight:700;min-width:28px;}
+    .chart-bar-val{font-size:0.74rem;color:var(--sub);width:50px;text-align:right;flex-shrink:0;}
+
+    /* ── TOAST ── */
+    .adm-toast{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);
+      background:rgba(0,0,0,0.8);color:white;padding:9px 20px;border-radius:20px;
+      font-size:0.85rem;font-weight:600;z-index:400;transition:transform 0.3s;
+      pointer-events:none;white-space:nowrap;
+    }
+    .adm-toast.show{transform:translateX(-50%) translateY(0);}
+
+    /* ── ALERT CARDS ── */
+    .alert-section{margin-bottom:18px;}
+    .alert-section-title{font-size:0.78rem;font-weight:700;color:var(--sub);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+    .alert-grid{display:flex;flex-direction:column;gap:8px;}
+    .alert-card{
+      background:white;border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);
+      display:flex;align-items:center;gap:12px;border-left:4px solid var(--red);
+    }
+    .alert-card.warn{border-left-color:var(--coin);}
+    .alert-card-icon{font-size:1.5rem;flex-shrink:0;}
+    .alert-card-info{flex:1;min-width:0;}
+    .alert-card-name{font-size:0.84rem;font-weight:700;margin-bottom:3px;}
+    .alert-card-sub{font-size:0.7rem;color:var(--sub);}
+    .alert-pct{font-size:1.1rem;font-weight:900;flex-shrink:0;}
+    .alert-pct.red{color:var(--red);}
+    .alert-pct.gold{color:var(--coin);}
+
+    /* ── RANKING ── */
+    .rank-list{display:flex;flex-direction:column;gap:7px;}
+    .rank-item{
+      background:white;border-radius:12px;padding:11px 14px;box-shadow:var(--shadow);
+      display:flex;align-items:center;gap:10px;
+    }
+    .rank-num{font-size:1.1rem;font-weight:900;width:28px;text-align:center;flex-shrink:0;}
+    .rank-num.gold{color:#f0a000;}
+    .rank-num.silver{color:#9e9e9e;}
+    .rank-num.bronze{color:#cd7f32;}
+    .rank-info{flex:1;min-width:0;}
+    .rank-name{font-size:0.84rem;font-weight:700;margin-bottom:4px;}
+    .rank-bar-track{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;}
+    .rank-bar-fill{height:100%;border-radius:3px;background:var(--green);}
+    .rank-cnt{font-size:0.82rem;font-weight:700;color:var(--green);flex-shrink:0;}
+
+    /* ── USER SUMMARY CARDS ── */
+    .user-summary-grid{display:flex;flex-direction:column;gap:8px;}
+    .user-sum-card{
+      background:white;border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);
+      display:flex;align-items:center;gap:12px;
+    }
+    .user-sum-avatar{
+      width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green),#00c853);
+      display:flex;align-items:center;justify-content:center;font-size:1rem;color:white;
+      font-weight:900;flex-shrink:0;
+    }
+    .user-sum-info{flex:1;min-width:0;}
+    .user-sum-name{font-size:0.88rem;font-weight:800;margin-bottom:2px;}
+    .user-sum-meta{font-size:0.68rem;color:var(--dim);}
+    .user-sum-stats{display:flex;gap:12px;flex-shrink:0;}
+    .user-sum-stat{text-align:center;}
+    .user-sum-stat-val{font-size:0.88rem;font-weight:800;color:var(--text);}
+    .user-sum-stat-lbl{font-size:0.58rem;color:var(--dim);margin-top:1px;}
+    .badge-current{background:#e8f5e9;color:var(--green);padding:2px 7px;border-radius:8px;
+      font-size:0.62rem;font-weight:700;margin-left:6px;}
+
+    /* ── PLAYER CARDS ── */
+    .player-main-card{
+      background:white;border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);
+      border:1px solid var(--border);
+    }
+    .player-main-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+    .player-avatar-lg{
+      width:52px;height:52px;border-radius:50%;flex-shrink:0;
+      background:linear-gradient(135deg,#00c853,var(--green));
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.4rem;color:white;font-weight:900;
+    }
+    .player-main-info{flex:1;min-width:0;}
+    .player-main-name{font-size:1.05rem;font-weight:900;margin-bottom:3px;}
+    .player-main-meta{font-size:0.72rem;color:var(--dim);}
+    .player-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+    @media(max-width:380px){.player-kpi-grid{grid-template-columns:repeat(2,1fr);}}
+    .player-kpi{background:var(--bg);border-radius:10px;padding:10px 8px;text-align:center;}
+    .player-kpi-val{font-size:1.1rem;font-weight:900;}
+    .player-kpi-lbl{font-size:0.62rem;color:var(--dim);margin-top:2px;}
+    .player-card-grid{display:flex;flex-direction:column;gap:8px;}
+    .player-card{
+      background:white;border-radius:12px;padding:13px 14px;
+      box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;
+    }
+    .player-card-av{
+      width:40px;height:40px;border-radius:50%;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.1rem;color:white;font-weight:900;
+    }
+    .player-card-info{flex:1;min-width:0;}
+    .player-card-name{font-size:0.88rem;font-weight:800;margin-bottom:2px;}
+    .player-card-sub{font-size:0.68rem;color:var(--dim);}
+    .player-card-stats{display:flex;gap:10px;flex-shrink:0;}
+    .pcs{text-align:center;}
+    .pcs-val{font-size:0.84rem;font-weight:800;}
+    .pcs-lbl{font-size:0.58rem;color:var(--dim);}
+    .empty-state{
+      background:white;border-radius:16px;padding:40px 24px;
+      text-align:center;box-shadow:var(--shadow);
+    }
+    .empty-state-ico{font-size:3rem;margin-bottom:12px;}
+    .empty-state-title{font-size:0.95rem;font-weight:700;margin-bottom:8px;}
+    .empty-state-desc{font-size:0.78rem;color:var(--dim);line-height:1.7;}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:480px){
+      thead th:nth-child(4),tbody td:nth-child(4){display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="login-logo-ico">🛡️</span>
+      <div class="login-logo-title">ガチャワールド<span style="color:var(--coin)">★</span>管理</div>
+      <div class="login-logo-sub">Admin Dashboard</div>
+    </div>
+    <div class="login-field">
+      <label class="login-label">管理者パスワード</label>
+      <input class="login-input" type="password" id="adminPw" placeholder="パスワードを入力"
+             autocomplete="current-password" onkeydown="if(event.key==='Enter')Admin.login()">
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" onclick="Admin.login()">ログイン</button>
+    <div class="login-hint">デフォルトパスワード: <strong>admin1234</strong></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <!-- Header -->
+  <div class="adm-hdr">
+    <div class="adm-hdr-logo">ガチャワールド<span>★</span> 管理画面</div>
+    <div class="adm-hdr-user" id="admUserLabel"></div>
+    <a href="index.html" target="_blank" style="background:rgba(255,255,255,.12);color:white;padding:5px 10px;border-radius:8px;font-size:0.74rem;text-decoration:none;flex-shrink:0;">🎰 サイト</a>
+    <button class="adm-logout" onclick="Admin.logout()">ログアウト</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="adm-tabs">
+    <div class="adm-tab active" data-tab="dashboard" onclick="Admin.switchTab('dashboard',this)">📊 サマリー</div>
+    <div class="adm-tab" data-tab="users"     onclick="Admin.switchTab('users',this)">👤 ユーザー管理</div>
+    <div class="adm-tab" data-tab="machines"  onclick="Admin.switchTab('machines',this)">🎰 マシン管理</div>
+    <div class="adm-tab" data-tab="history"   onclick="Admin.switchTab('history',this)">📜 ガチャ履歴</div>
+    <div class="adm-tab" data-tab="notices"   onclick="Admin.switchTab('notices',this)">📣 お知らせ</div>
+    <div class="adm-tab" data-tab="settings"  onclick="Admin.switchTab('settings',this)">⚙️ 設定</div>
+    <div class="adm-tab" data-tab="editor"    onclick="Admin.switchTab('editor',this)">🛠️ ガチャ編集</div>
+  </div>
+
+  <div class="adm-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="adm-section active" id="sec-dashboard">
+      <div class="sec-title">📊 サマリー</div>
+
+      <!-- KPI -->
+      <div class="stat-grid" id="dashStats"></div>
+
+      <!-- 在庫アラート（30%以下のみ、該当時に表示） -->
+      <div class="alert-section" id="dashAlertSection" style="display:none">
+        <div class="alert-section-title">⚠️ 在庫アラート（補充推奨）</div>
+        <div class="alert-grid" id="dashAlerts"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:14px;">
+
+        <!-- 全マシン在庫一覧 -->
+        <div class="tbl-wrap">
+          <div class="tbl-hd">
+            <div class="tbl-hd-title">📦 全マシン在庫一覧</div>
+            <button class="btn btn-xs btn-gold" onclick="Admin.refillAllSlots()">全補充</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>マシン</th><th>残り枚数</th><th style="min-width:80px">残り率</th><th>操作</th></tr></thead>
+              <tbody id="dashStockTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 人気ランキング -->
+        <div>
+          <div class="alert-section-title" style="margin-bottom:8px">🔥 人気ランキング TOP5</div>
+          <div class="rank-list" id="dashHotMachines"></div>
+        </div>
+
+        <!-- ユーザー一覧 -->
+        <div>
+          <div class="alert-section-title" style="margin-bottom:8px">👥 登録ユーザー一覧</div>
+          <div class="user-summary-grid" id="dashUserList"></div>
+        </div>
+
+        <!-- UR排出 -->
+        <div class="tbl-wrap">
+          <div class="tbl-hd"><div class="tbl-hd-title">🌟 直近のUR排出</div></div>
+          <div id="dashUrList" style="padding:10px 12px;max-height:240px;overflow-y:auto;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="adm-section" id="sec-users">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div class="sec-title" style="margin-bottom:0">👤 プレイヤー管理</div>
+        <div style="display:flex;gap:7px;">
+          <button class="btn btn-sm btn-gray" onclick="Admin.refreshUsers()">🔄 更新</button>
+          <button class="btn btn-sm btn-blue" onclick="Admin.addDemoUsers()">🧪 テストデータ追加</button>
+        </div>
+      </div>
+
+      <!-- Current player main card -->
+      <div id="playerMainCard" style="margin-bottom:16px;"></div>
+
+      <!-- Registered users list -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="tbl-hd-title" id="userCountLabel">登録ユーザー一覧</div>
+      </div>
+      <div id="playerCardGrid" class="player-card-grid"></div>
+    </div>
+
+    <!-- ── MACHINES ── -->
+    <div class="adm-section" id="sec-machines">
+      <div class="sec-title">🎰 マシン管理</div>
+      <div class="tbl-wrap">
+        <div class="tbl-hd">
+          <div class="tbl-hd-title">全マシン一覧 (20台)</div>
+          <button class="btn btn-sm btn-gray" onclick="Admin.refreshMachines()">🔄 更新</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>マシン名</th>
+                <th>コスト</th>
+                <th>残り枚数</th>
+                <th style="min-width:100px">残り率</th>
+                <th>UR%</th>
+                <th>ON/OFF</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="machineTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY ── -->
+    <div class="adm-section" id="sec-history">
+      <div class="sec-title">📜 ガチャ履歴（直近100件）</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <select class="form-input" id="histFilterMachine" onchange="Admin.refreshHistory()">
+          <option value="">全マシン</option>
+        </select>
+        <select class="form-input" id="histFilterRarity" onchange="Admin.refreshHistory()">
+          <option value="">全レアリティ</option>
+          <option value="ultra-rare">ウルトラレア</option>
+          <option value="super-rare">スーパーレア</option>
+          <option value="rare">レア</option>
+          <option value="uncommon">アンコモン</option>
+          <option value="common">コモン</option>
+        </select>
+        <button class="btn btn-sm btn-gray" onclick="Admin.refreshHistory()">🔄 更新</button>
+        <button class="btn btn-sm btn-red" onclick="Admin.clearHistory()">🗑️ 履歴クリア</button>
+      </div>
+      <div id="histList" class="hist-list"></div>
+    </div>
+
+    <!-- ── NOTICES ── -->
+    <div class="adm-section" id="sec-notices">
+      <div class="sec-title">📣 お知らせ管理</div>
+      <div class="notice-card">
+        <div style="font-size:0.84rem;font-weight:700;margin-bottom:12px;">➕ 新規追加</div>
+        <div class="notice-fields">
+          <div>
+            <div class="form-label-sm" style="margin-bottom:4px;">タイトル</div>
+            <input class="form-input" style="width:100%" id="noticeTitle" placeholder="お知らせタイトル">
+          </div>
+          <div>
+            <div class="form-label-sm" style="margin-bottom:4px;">本文</div>
+            <textarea class="notice-textarea" id="noticeBody" placeholder="お知らせ内容..."></textarea>
+          </div>
+          <div class="form-row">
+            <div>
+              <div class="form-label-sm" style="margin-bottom:4px;">種別</div>
+              <select class="form-input" id="noticeType">
+                <option value="event">🎉 イベント</option>
+                <option value="info">ℹ️ インフォ</option>
+                <option value="update">🔄 アップデート</option>
+              </select>
+            </div>
+            <button class="btn btn-green" style="margin-top:auto" onclick="Admin.addNotice()">📣 追加</button>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-hd-title" style="margin-bottom:10px;">📋 既存お知らせ</div>
+      <div id="noticeList" class="notice-existing"></div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="adm-section" id="sec-settings">
+      <div class="sec-title">⚙️ 設定</div>
+
+      <div class="notice-card" style="margin-bottom:14px;">
+        <div style="font-size:0.88rem;font-weight:700;margin-bottom:14px;">🔑 管理者パスワード変更</div>
+        <div class="notice-fields">
+          <div>
+            <div class="form-label-sm" style="margin-bottom:4px;">現在のパスワード</div>
+            <input class="form-input" style="width:100%" type="password" id="pwCurrent" placeholder="現在のパスワード">
+          </div>
+          <div>
+            <div class="form-label-sm" style="margin-bottom:4px;">新しいパスワード（6文字以上）</div>
+            <input class="form-input" style="width:100%" type="password" id="pwNew" placeholder="新しいパスワード">
+          </div>
+          <div>
+            <div class="form-label-sm" style="margin-bottom:4px;">確認</div>
+            <input class="form-input" style="width:100%" type="password" id="pwConfirm" placeholder="再入力">
+          </div>
+          <button class="btn btn-green" style="width:fit-content" onclick="Admin.changePassword()">変更する</button>
+        </div>
+      </div>
+
+      <div class="notice-card" style="margin-bottom:14px;">
+        <div style="font-size:0.88rem;font-weight:700;margin-bottom:14px;">🎮 ゲームデータ操作</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <span style="font-size:0.83rem;">初期コイン（新規プレイヤー）</span>
+            <input class="form-input" style="width:90px" type="number" id="initCoins" value="1000">
+            <button class="btn btn-sm btn-blue" onclick="Admin.saveInitCoins()">保存</button>
+          </div>
+          <div class="form-row">
+            <span style="font-size:0.83rem;">全スロット補充（全マシン残り枚数をリセット）</span>
+            <button class="btn btn-sm btn-gold" onclick="Admin.refillAllSlots()">🔄 補充実行</button>
+          </div>
+          <div class="form-row">
+            <span style="font-size:0.83rem;">プレイヤーデータ初期化</span>
+            <button class="btn btn-sm btn-red" onclick="Admin.resetPlayerData()">⚠️ 初期化</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <div style="font-size:0.88rem;font-weight:700;margin-bottom:14px;">📦 ローカルストレージ情報</div>
+        <div id="lsInfo" style="font-size:0.78rem;color:var(--sub);line-height:1.9;font-family:monospace;"></div>
+      </div>
+    </div>
+
+    <!-- ── EDITOR ── -->
+    <div class="adm-section" id="sec-editor">
+      <div class="sec-title">🛠️ ガチャ編集</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px;">
+        <a href="internal.html" target="_blank" style="text-decoration:none;">
+          <div style="background:white;border-radius:14px;padding:20px 16px;box-shadow:var(--shadow);border:2px solid var(--border);transition:border-color .15s;cursor:pointer;" onmouseover="this.style.borderColor='#1e88e5'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:2rem;margin-bottom:10px;">🎰</div>
+            <div style="font-size:0.9rem;font-weight:800;margin-bottom:6px;">マシン・景品編集</div>
+            <div style="font-size:0.73rem;color:var(--sub);line-height:1.6;">ガチャマシンの名前・コスト・景品・排出確率を編集します</div>
+            <div style="margin-top:12px;font-size:0.75rem;font-weight:700;color:#1e88e5;">→ 内部管理画面で開く</div>
+          </div>
+        </a>
+        <a href="internal.html#coins" target="_blank" style="text-decoration:none;">
+          <div style="background:white;border-radius:14px;padding:20px 16px;box-shadow:var(--shadow);border:2px solid var(--border);transition:border-color .15s;cursor:pointer;" onmouseover="this.style.borderColor='var(--coin)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:2rem;margin-bottom:10px;">💰</div>
+            <div style="font-size:0.9rem;font-weight:800;margin-bottom:6px;">コインパッケージ</div>
+            <div style="font-size:0.73rem;color:var(--sub);line-height:1.6;">コインの販売パッケージ・価格・ボーナス設定を編集します</div>
+            <div style="margin-top:12px;font-size:0.75rem;font-weight:700;color:var(--coin);">→ 内部管理画面で開く</div>
+          </div>
+        </a>
+        <a href="internal.html#store" target="_blank" style="text-decoration:none;">
+          <div style="background:white;border-radius:14px;padding:20px 16px;box-shadow:var(--shadow);border:2px solid var(--border);transition:border-color .15s;cursor:pointer;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:2rem;margin-bottom:10px;">🛒</div>
+            <div style="font-size:0.9rem;font-weight:800;margin-bottom:6px;">ストアアイテム</div>
+            <div style="font-size:0.73rem;color:var(--sub);line-height:1.6;">ショップに表示するアイテム・価格・在庫を編集します</div>
+            <div style="margin-top:12px;font-size:0.75rem;font-weight:700;color:var(--green);">→ 内部管理画面で開く</div>
+          </div>
+        </a>
+      </div>
+      <div style="background:white;border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);font-size:0.8rem;color:var(--sub);line-height:1.8;">
+        <strong style="color:var(--text);">ℹ️ 編集パスワードについて</strong><br>
+        内部管理画面のパスワードは管理者パスワードとは別です。<br>
+        デフォルト: <code style="background:#f0f0f0;padding:1px 6px;border-radius:4px;font-family:monospace;">internal1234</code>
+      </div>
+    </div>
+
+  </div><!-- /adm-content -->
+</div><!-- /adminApp -->
+
+<!-- COIN GRANT MODAL -->
+<div class="modal-ov" id="coinModal">
+  <div class="modal-box">
+    <div class="modal-title">💰 コイン付与</div>
+    <div class="modal-body">
+      <div>
+        <div class="form-label-sm" style="margin-bottom:6px;">付与コイン数</div>
+        <input class="form-input" style="width:100%" type="number" id="coinAmt" value="500" min="1" max="999999">
+      </div>
+      <div id="coinModalNote" style="font-size:0.78rem;color:var(--sub);"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-green" onclick="Admin.executeCoinGrant()">付与する</button>
+      <button class="btn btn-gray" onclick="Admin.closeModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLOT RESET MODAL -->
+<div class="modal-ov" id="slotModal">
+  <div class="modal-box">
+    <div class="modal-title">🔄 スロット補充</div>
+    <div class="modal-body">
+      <div id="slotModalNote" style="font-size:0.83rem;"></div>
+      <div>
+        <div class="form-label-sm" style="margin-bottom:6px;">補充枚数</div>
+        <input class="form-input" style="width:100%" type="number" id="slotAmt" value="1000" min="1">
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="Admin.executeSlotRefill()">補充する</button>
+      <button class="btn btn-gray" onclick="Admin.closeSlotModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<div class="adm-toast" id="admToast"></div>
+
+<script>
+// ─── MACHINES DATA (sync with index.html) ─────────────
+const MACHINES=[
+  {id:'beginner',name:'ビギナーズラック',icon:'🍀',cost:30,cost10:270,totalSlots:99999,tags:['お手軽'],
+   prizes:[{id:'bg_stk',name:'ラッキーステッカー',emoji:'🏷️',rarity:'common',cv:45,prob:0.55},{id:'bg_bdg',name:'クローバーバッジ',emoji:'🍀',rarity:'uncommon',cv:80,prob:0.30},{id:'bg_key',name:'ラッキーチャーム',emoji:'🔮',rarity:'rare',cv:150,prob:0.12},{id:'bg_fig',name:'幸運のフィギュア',emoji:'🧸',rarity:'super-rare',cv:280,prob:0.03}]},
+  {id:'starter',name:'スターターガチャ',icon:'🎪',cost:50,cost10:450,totalSlots:99999,tags:['お手軽'],
+   prizes:[{id:'st_stk',name:'キャラステッカー',emoji:'🏷️',rarity:'common',cv:75,prob:0.50},{id:'st_bdg',name:'コレクションバッジ',emoji:'📛',rarity:'uncommon',cv:120,prob:0.30},{id:'st_key',name:'キーホルダー',emoji:'🔑',rarity:'rare',cv:200,prob:0.15},{id:'st_fig',name:'ミニフィギュア',emoji:'🧸',rarity:'super-rare',cv:350,prob:0.05}]},
+  {id:'second',name:'セカンドチャンス',icon:'🎯',cost:80,cost10:720,totalSlots:80000,tags:['お手軽'],
+   prizes:[{id:'sc_pin',name:'ピンバッジ',emoji:'📌',rarity:'common',cv:100,prob:0.50},{id:'sc_str',name:'ストラップ',emoji:'🔗',rarity:'uncommon',cv:160,prob:0.30},{id:'sc_bk',name:'ミニコミック',emoji:'📔',rarity:'rare',cv:250,prob:0.15},{id:'sc_fig',name:'アクションフィギュア',emoji:'🤺',rarity:'super-rare',cv:400,prob:0.05}]},
+  {id:'normal',name:'ノーマルガチャ',icon:'⚡',cost:100,cost10:900,totalSlots:50000,tags:['スタンダード'],
+   prizes:[{id:'nm_pin',name:'ピンバッジセット',emoji:'📌',rarity:'common',cv:130,prob:0.50},{id:'nm_tsh',name:'キャラTシャツ',emoji:'👕',rarity:'uncommon',cv:280,prob:0.28},{id:'nm_pos',name:'限定ポスター',emoji:'🖼️',rarity:'rare',cv:500,prob:0.17},{id:'nm_fig',name:'レアフィギュア',emoji:'🎎',rarity:'super-rare',cv:1200,prob:0.05}]},
+  {id:'anime',name:'アニメキャラガチャ',icon:'✨',cost:150,cost10:1350,totalSlots:60000,tags:['アニメ'],
+   prizes:[{id:'an_stk',name:'アニメステッカーセット',emoji:'🌸',rarity:'common',cv:180,prob:0.50},{id:'an_bdg',name:'キャラクターバッジ',emoji:'💮',rarity:'uncommon',cv:320,prob:0.28},{id:'an_key',name:'アニメキーホルダー',emoji:'🗝️',rarity:'rare',cv:600,prob:0.17},{id:'an_fig',name:'アニメフィギュア',emoji:'🎌',rarity:'super-rare',cv:1500,prob:0.05}]},
+  {id:'chara',name:'キャラクターグッズ',icon:'🎭',cost:180,cost10:1620,totalSlots:45000,tags:['アニメ'],
+   prizes:[{id:'ch_can',name:'缶バッジ',emoji:'🔵',rarity:'common',cv:220,prob:0.48},{id:'ch_tow',name:'キャラタオル',emoji:'🏳️',rarity:'uncommon',cv:400,prob:0.30},{id:'ch_art',name:'アートブック',emoji:'📚',rarity:'rare',cv:700,prob:0.17},{id:'ch_fig',name:'限定フィギュア',emoji:'🎭',rarity:'super-rare',cv:1800,prob:0.05}]},
+  {id:'pokemon',name:'ポケモンオリパ',icon:'⚡',cost:200,cost10:1800,totalSlots:30000,tags:['スタンダード','人気'],
+   prizes:[{id:'pk_c',name:'ノーマルカード',emoji:'🃏',rarity:'common',cv:240,prob:0.45},{id:'pk_r',name:'レアカード',emoji:'✨',rarity:'uncommon',cv:500,prob:0.30},{id:'pk_sr',name:'SRカード',emoji:'💎',rarity:'rare',cv:1200,prob:0.20},{id:'pk_ur',name:'URカード',emoji:'🌟',rarity:'ultra-rare',cv:5000,prob:0.05}]},
+  {id:'weekly',name:'ウィークリースペシャル',icon:'📅',cost:250,cost10:2250,totalSlots:25000,tags:['限定'],
+   prizes:[{id:'wk_pkg',name:'スペシャルパッケージ',emoji:'📦',rarity:'common',cv:300,prob:0.45},{id:'wk_set',name:'限定グッズセット',emoji:'🎁',rarity:'uncommon',cv:600,prob:0.30},{id:'wk_col',name:'コレクターズアイテム',emoji:'🏅',rarity:'rare',cv:1300,prob:0.20},{id:'wk_sp',name:'週間スペシャル',emoji:'⭐',rarity:'super-rare',cv:2500,prob:0.05}]},
+  {id:'silver',name:'シルバーガチャ',icon:'🥈',cost:300,cost10:2700,totalSlots:20000,tags:['高品質','人気'],
+   prizes:[{id:'sv_acr',name:'アクリルスタンド',emoji:'🗿',rarity:'uncommon',cv:400,prob:0.45},{id:'sv_art',name:'アートプリント',emoji:'🎨',rarity:'rare',cv:700,prob:0.30},{id:'sv_fig',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:1800,prob:0.20},{id:'sv_ssr',name:'SSRカード',emoji:'✨',rarity:'ultra-rare',cv:3500,prob:0.05}]},
+  {id:'mystery',name:'ミステリーボックス',icon:'📦',cost:350,cost10:3150,totalSlots:18000,tags:['ミステリー'],
+   prizes:[{id:'my_com',name:'コモンボックス',emoji:'📦',rarity:'common',cv:400,prob:0.40},{id:'my_unc',name:'アンコモンボックス',emoji:'🎁',rarity:'uncommon',cv:750,prob:0.30},{id:'my_rar',name:'レアボックス',emoji:'💼',rarity:'rare',cv:1500,prob:0.22},{id:'my_sp',name:'ミステリースペシャル',emoji:'🔮',rarity:'super-rare',cv:3000,prob:0.08}]},
+  {id:'figure',name:'フィギュアコレクション',icon:'🗿',cost:400,cost10:3600,totalSlots:15000,tags:['高品質'],
+   prizes:[{id:'fg_mini',name:'ミニフィギュア',emoji:'🧸',rarity:'uncommon',cv:500,prob:0.40},{id:'fg_std',name:'スタンダードフィギュア',emoji:'🗿',rarity:'rare',cv:1000,prob:0.35},{id:'fg_lim',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:2500,prob:0.20},{id:'fg_ur',name:'UR限定フィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'holiday',name:'ホリデースペシャル',icon:'🎄',cost:450,cost10:4050,totalSlots:12000,tags:['限定','人気'],
+   prizes:[{id:'hd_orn',name:'ホリデーオーナメント',emoji:'🎄',rarity:'uncommon',cv:600,prob:0.40},{id:'hd_set',name:'ホリデーグッズセット',emoji:'🎁',rarity:'rare',cv:1200,prob:0.35},{id:'hd_lim',name:'限定コレクション',emoji:'❄️',rarity:'super-rare',cv:3000,prob:0.20},{id:'hd_ur',name:'ホリデーURアイテム',emoji:'🌟',rarity:'ultra-rare',cv:7000,prob:0.05}]},
+  {id:'gold',name:'ゴールドガチャ',icon:'🥇',cost:500,cost10:4500,totalSlots:10000,tags:['プレミアム','人気'],
+   prizes:[{id:'gd_set',name:'プレミアムグッズセット',emoji:'🎁',rarity:'rare',cv:800,prob:0.40},{id:'gd_acr',name:'限定アクリルスタンド',emoji:'💎',rarity:'rare',cv:1300,prob:0.35},{id:'gd_art',name:'レアアートボード',emoji:'🖌️',rarity:'super-rare',cv:3000,prob:0.20},{id:'gd_ur',name:'URフィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'artlimit',name:'限定アートシリーズ',icon:'🎨',cost:600,cost10:5400,totalSlots:8000,tags:['限定'],
+   prizes:[{id:'al_prt',name:'アートプリント',emoji:'🖼️',rarity:'rare',cv:900,prob:0.38},{id:'al_sig',name:'サイン入りポスター',emoji:'✍️',rarity:'rare',cv:1800,prob:0.32},{id:'al_lim',name:'限定アートボード',emoji:'🎨',rarity:'super-rare',cv:4000,prob:0.22},{id:'al_ur',name:'UR限定アートピース',emoji:'🏛️',rarity:'ultra-rare',cv:8000,prob:0.08}]},
+  {id:'superrare',name:'スーパーレアガチャ',icon:'💫',cost:700,cost10:6300,totalSlots:7000,tags:['プレミアム'],
+   prizes:[{id:'sr_acr',name:'SRアクリルスタンド',emoji:'💫',rarity:'rare',cv:1000,prob:0.40},{id:'sr_fig',name:'SRフィギュア',emoji:'🌠',rarity:'super-rare',cv:2500,prob:0.35},{id:'sr_lim',name:'限定SRコレクション',emoji:'✨',rarity:'super-rare',cv:4000,prob:0.20},{id:'sr_ur',name:'UR超限定',emoji:'💎',rarity:'ultra-rare',cv:9000,prob:0.05}]},
+  {id:'legend',name:'レジェンドガチャ',icon:'🏆',cost:800,cost10:7200,totalSlots:6000,tags:['プレミアム','UR排出'],
+   prizes:[{id:'lg_set',name:'レジェンドグッズセット',emoji:'🏅',rarity:'rare',cv:1200,prob:0.35},{id:'lg_fig',name:'レジェンドフィギュア',emoji:'🏆',rarity:'super-rare',cv:3000,prob:0.35},{id:'lg_lim',name:'限定レジェンドBOX',emoji:'📿',rarity:'super-rare',cv:5000,prob:0.20},{id:'lg_ur',name:'URレジェンド',emoji:'👑',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'master',name:'マスターコレクション',icon:'👑',cost:900,cost10:8100,totalSlots:5000,tags:['UR排出'],
+   prizes:[{id:'mc_art',name:'マスターアートピース',emoji:'🖼️',rarity:'super-rare',cv:1500,prob:0.40},{id:'mc_fig',name:'マスターフィギュア',emoji:'🗽',rarity:'super-rare',cv:3500,prob:0.30},{id:'mc_lim',name:'限定マスターBOX',emoji:'🧿',rarity:'super-rare',cv:5500,prob:0.20},{id:'mc_ur',name:'URマスターコレクション',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.10}]},
+  {id:'premium',name:'プレミアムガチャ',icon:'💎',cost:1000,cost10:9000,totalSlots:5000,tags:['UR排出','限定'],
+   prizes:[{id:'pm_box',name:'コレクターズボックス',emoji:'📦',rarity:'rare',cv:1500,prob:0.40},{id:'pm_dvd',name:'限定版DVD',emoji:'💿',rarity:'super-rare',cv:2800,prob:0.30},{id:'pm_art',name:'シグネチャーアート',emoji:'🖼️',rarity:'super-rare',cv:7000,prob:0.20},{id:'pm_ur',name:'URコレクション',emoji:'🌟',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'diamond',name:'ダイヤモンドガチャ',icon:'💠',cost:1500,cost10:13500,totalSlots:3000,tags:['UR排出','限定'],
+   prizes:[{id:'dm_fig',name:'ダイヤモンドフィギュア',emoji:'💠',rarity:'super-rare',cv:2500,prob:0.35},{id:'dm_art',name:'ダイヤモンドアート',emoji:'🔷',rarity:'super-rare',cv:5000,prob:0.35},{id:'dm_lim',name:'限定ダイヤモンドBOX',emoji:'💎',rarity:'ultra-rare',cv:10000,prob:0.20},{id:'dm_ur',name:'URダイヤモンド至宝',emoji:'🌟',rarity:'ultra-rare',cv:20000,prob:0.10}]},
+  {id:'grand',name:'グランドプレミアム',icon:'🌟',cost:2000,cost10:18000,totalSlots:1000,tags:['UR排出','限定','人気'],
+   prizes:[{id:'gp_col',name:'グランドコレクション',emoji:'🌟',rarity:'super-rare',cv:4000,prob:0.30},{id:'gp_lim',name:'グランド限定BOX',emoji:'🎆',rarity:'super-rare',cv:8000,prob:0.30},{id:'gp_ur1',name:'URグランドフィギュア',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.25},{id:'gp_ur2',name:'URグランド至高',emoji:'💫',rarity:'ultra-rare',cv:25000,prob:0.15}]},
+];
+
+const R={
+  'common':    {label:'コモン',      color:'#78909c'},
+  'uncommon':  {label:'アンコモン',  color:'#43a047'},
+  'rare':      {label:'レア',        color:'#1e88e5'},
+  'super-rare':{label:'スーパーレア',color:'#8e24aa'},
+  'ultra-rare':{label:'ウルトラレア',color:'#bf360c'},
+};
+
+// ─── KEYS ─────────────────────────────────────────────
+const GW_KEY     = 'gachaWorld_v3';
+const USERS_KEY  = 'gw_users';
+const USER_KEY   = 'gw_user';
+const ADM_PW_KEY = 'gw_admin_pw';
+const ADM_NOTICE_KEY = 'gw_admin_notices';
+const ADM_MACHINE_OFF_KEY = 'gw_machine_off';
+const GW_USTATS_KEY = 'gw_ustats';
+const DEFAULT_PW = 'admin1234';
+
+// ─── HELPERS ──────────────────────────────────────────
+function gs(){ try{return JSON.parse(localStorage.getItem(GW_KEY)||'null');}catch(e){return null;} }
+function ss(data){ localStorage.setItem(GW_KEY, JSON.stringify(data)); }
+function getUsers(){ try{return JSON.parse(localStorage.getItem(USERS_KEY)||'[]');}catch(e){return[];} }
+function getNotices(){ try{return JSON.parse(localStorage.getItem(ADM_NOTICE_KEY)||'[]');}catch(e){return[];} }
+function getMachineOff(){ try{return JSON.parse(localStorage.getItem(ADM_MACHINE_OFF_KEY)||'[]');}catch(e){return[];} }
+function saveMachineOff(arr){ localStorage.setItem(ADM_MACHINE_OFF_KEY, JSON.stringify(arr)); }
+function getUserStats(){ try{return JSON.parse(localStorage.getItem(GW_USTATS_KEY)||'{}');}catch(e){return{};} }
+function rarityBadge(r){
+  const map={
+    'common':'badge-common','uncommon':'badge-uncommon',
+    'rare':'badge-rare','super-rare':'badge-sr','ultra-rare':'badge-ur'
+  };
+  return '<span class="badge '+(map[r]||'badge-common')+'">'+(R[r]?R[r].label:r)+'</span>';
+}
+function fmt(n){ return Number(n).toLocaleString('ja-JP'); }
+
+// ─── ADMIN ────────────────────────────────────────────
+let _grantTarget = null;
+let _slotTarget  = null;
+
+const Admin = {
+  login(){
+    const pw = document.getElementById('adminPw').value;
+    const stored = localStorage.getItem(ADM_PW_KEY) || DEFAULT_PW;
+    if(pw !== stored){
+      document.getElementById('loginErr').textContent = 'パスワードが違います';
+      return;
+    }
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    document.getElementById('admUserLabel').textContent = 'admin';
+    this.init();
+  },
+  logout(){
+    document.getElementById('loginScreen').style.display = '';
+    document.getElementById('adminApp').style.display = 'none';
+    document.getElementById('adminPw').value = '';
+    document.getElementById('loginErr').textContent = '';
+  },
+  init(){
+    this.populateHistoryFilter();
+    this.refreshDashboard();
+    this.refreshUsers();
+    this.refreshMachines();
+    this.refreshHistory();
+    this.refreshNotices();
+    this.refreshSettings();
+  },
+  switchTab(name, el){
+    document.querySelectorAll('.adm-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.adm-section').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('sec-'+name).classList.add('active');
+    if(name==='dashboard') this.refreshDashboard();
+    if(name==='users')     this.refreshUsers();
+    if(name==='machines')  this.refreshMachines();
+    if(name==='history')   this.refreshHistory();
+    if(name==='notices')   this.refreshNotices();
+    if(name==='settings')  this.refreshSettings();
+    if(name==='editor'){
+      const fr = document.getElementById('editorFrame');
+      if(!fr.src || fr.src==='about:blank' || fr.src==='') fr.src = fr.dataset.src;
+    }
+  },
+
+  // ── DASHBOARD ──
+  refreshDashboard(){
+    const state = gs() || {coins:0,inv:{},spins:0,urCount:0,history:[],slots:{}};
+    const users = getUsers();
+    const offList = getMachineOff();
+    const totalSlots = MACHINES.reduce((a,m)=>a+(state.slots[m.id]??m.totalSlots),0);
+    const totalSlotsMax = MACHINES.reduce((a,m)=>a+m.totalSlots,0);
+    const invCount = Object.values(state.inv||{}).reduce((a,i)=>a+i.qty,0);
+    const history = state.history||[];
+
+    // KPI
+    document.getElementById('dashStats').innerHTML = `
+      <div class="stat-card"><div class="stat-ico">👤</div><div class="stat-val">${users.length}</div><div class="stat-lbl">登録ユーザー数</div></div>
+      <div class="stat-card"><div class="stat-ico">🎰</div><div class="stat-val">${fmt(state.spins)}</div><div class="stat-lbl">総ガチャ回数</div></div>
+      <div class="stat-card"><div class="stat-ico">🌟</div><div class="stat-val">${fmt(state.urCount)}</div><div class="stat-lbl">UR排出数</div></div>
+      <div class="stat-card"><div class="stat-ico">💰</div><div class="stat-val">${fmt(state.coins)}</div><div class="stat-lbl">現在所持コイン</div></div>
+      <div class="stat-card"><div class="stat-ico">🎁</div><div class="stat-val">${fmt(invCount)}</div><div class="stat-lbl">インベントリ数</div></div>
+      <div class="stat-card"><div class="stat-ico">🎫</div><div class="stat-val">${fmt(history.length)}</div><div class="stat-lbl">履歴件数</div></div>
+      <div class="stat-card"><div class="stat-ico">🟢</div><div class="stat-val">${MACHINES.length-offList.length}</div><div class="stat-lbl">稼動マシン数</div></div>
+      <div class="stat-card"><div class="stat-ico">📦</div><div class="stat-val">${Math.round(totalSlots/totalSlotsMax*100)}%</div><div class="stat-lbl">残りスロット率</div></div>
+    `;
+
+    // 全マシン在庫テーブル
+    const allMachineRows = MACHINES.map(m=>{
+      const rem = state.slots[m.id]!=null ? state.slots[m.id] : m.totalSlots;
+      const pct = Math.min(100, Math.round(rem/m.totalSlots*100));
+      const barColor = pct>50?'var(--green)':pct>20?'var(--coin)':'var(--red)';
+      return `<tr>
+        <td style="white-space:nowrap">${m.icon} ${m.name}</td>
+        <td style="white-space:nowrap">${fmt(rem)} <span style="color:var(--dim);font-size:0.7rem">/ ${fmt(m.totalSlots)}</span></td>
+        <td>
+          <div class="prog-wrap" style="min-width:60px">
+            <div class="prog-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--dim);margin-top:1px">${pct}%</div>
+        </td>
+        <td><button class="btn btn-xs btn-gold" onclick="Admin.openSlotRefill('${m.id}')">補充</button></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('dashStockTable').innerHTML = allMachineRows;
+
+    // 在庫アラート (残り30%以下)
+    const lowMachines = MACHINES.map(m=>{
+      const rem = state.slots[m.id]!=null ? state.slots[m.id] : m.totalSlots;
+      const pct = rem/m.totalSlots;
+      return {m, rem, pct};
+    }).filter(x=>x.pct<=0.30).sort((a,b)=>a.pct-b.pct);
+
+    const alertSec = document.getElementById('dashAlertSection');
+    if(lowMachines.length===0){
+      alertSec.style.display='none';
+    } else {
+      alertSec.style.display='';
+      document.getElementById('dashAlerts').innerHTML = lowMachines.slice(0,6).map(({m,rem,pct})=>{
+        const p = Math.round(pct*100);
+        const isCrit = pct<=0.10;
+        return `<div class="alert-card${isCrit?'':' warn'}">
+          <div class="alert-card-icon">${m.icon}</div>
+          <div class="alert-card-info">
+            <div class="alert-card-name">${m.name}</div>
+            <div class="alert-card-sub">残り ${fmt(rem)} / ${fmt(m.totalSlots)} 枚</div>
+          </div>
+          <div class="alert-pct ${isCrit?'red':'gold'}">${p}%</div>
+          <button class="btn btn-xs btn-gold" onclick="Admin.openSlotRefill('${m.id}')">補充</button>
+        </div>`;
+      }).join('');
+    }
+
+    // 人気ランキング TOP5
+    const machineCounts = {};
+    history.forEach(h=>{ machineCounts[h.machine]=(machineCounts[h.machine]||0)+1; });
+    const rankSorted = Object.entries(machineCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxRank = rankSorted[0]?rankSorted[0][1]:1;
+    const rankColors = ['gold','silver','bronze','',''];
+    const rankNums = ['🥇','🥈','🥉','4','5'];
+    const hotHtml = rankSorted.length===0
+      ? '<div style="color:var(--dim);font-size:0.82rem;padding:8px 0;background:white;border-radius:12px;padding:16px;text-align:center;">まだガチャ履歴がありません</div>'
+      : rankSorted.map(([name,cnt],i)=>{
+          const machine = MACHINES.find(m=>m.name===name);
+          const icon = machine?machine.icon:'🎰';
+          const pct = Math.round(cnt/maxRank*100);
+          const barColor = i===0?'#f0a000':i===1?'#9e9e9e':i===2?'#cd7f32':'var(--green)';
+          return `<div class="rank-item">
+            <div class="rank-num ${rankColors[i]||''}">${rankNums[i]}</div>
+            <div class="rank-info">
+              <div class="rank-name">${icon} ${name}</div>
+              <div class="rank-bar-track">
+                <div class="rank-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+              </div>
+            </div>
+            <div class="rank-cnt">${fmt(cnt)}回</div>
+          </div>`;
+        }).join('');
+    document.getElementById('dashHotMachines').innerHTML = hotHtml;
+
+    // Recent UR list
+    const urItems = history.filter(h=>h.prize&&h.prize.rarity==='ultra-rare').slice(0,10);
+    const urHtml = urItems.length===0
+      ? '<div style="color:var(--dim);font-size:0.82rem;padding:8px 0;">UR排出履歴なし</div>'
+      : urItems.map(h=>`
+        <div class="hist-item">
+          <div class="hist-ico">${h.prize.emoji}</div>
+          <div class="hist-info">
+            <div class="hist-name">${h.prize.name}</div>
+            <div class="hist-meta">${h.machine} · ${h.time}</div>
+          </div>
+          ${rarityBadge(h.prize.rarity)}
+        </div>`).join('');
+    document.getElementById('dashUrList').innerHTML = urHtml;
+
+    // ユーザー一覧サマリー
+    const currentUser = JSON.parse(localStorage.getItem(USER_KEY)||'null');
+    const ustats = getUserStats();
+    const lastHistory = history[0];
+    const dashAvatarColors = [
+      'linear-gradient(135deg,#5c6bc0,#7e57c2)','linear-gradient(135deg,#e53935,#f57c00)',
+      'linear-gradient(135deg,#00897b,#00acc1)','linear-gradient(135deg,#f06292,#ba68c8)',
+      'linear-gradient(135deg,#43a047,#00c853)','linear-gradient(135deg,#fb8c00,#fdd835)',
+      'linear-gradient(135deg,#1e88e5,#00bcd4)',
+    ];
+    const userListHtml = users.length===0
+      ? '<div style="color:var(--dim);font-size:0.82rem;background:white;border-radius:12px;padding:16px;text-align:center;">登録ユーザーなし<br><span style="font-size:0.72rem">「👤 ユーザー管理」タブ→「🧪 テストデータ追加」で追加できます</span></div>'
+      : users.map((u,i)=>{
+          const isCurrent = currentUser && currentUser.username===u.username;
+          const stats = ustats[u.username]||{};
+          const initial = (u.username||'?')[0].toUpperCase();
+          const bgGrad = isCurrent ? 'linear-gradient(135deg,#00c853,var(--green))' : dashAvatarColors[i%dashAvatarColors.length];
+          const coinsVal = isCurrent ? state.coins : (stats.coins??null);
+          const spinsVal = isCurrent ? state.spins : (stats.spins??null);
+          const urVal    = isCurrent ? state.urCount : (stats.urCount??null);
+          const lastAct  = isCurrent&&lastHistory ? lastHistory.time : (stats.lastActivity||u.createdAt||'-');
+          const statsHtml = (coinsVal!=null)
+            ? `<div class="user-sum-stats">
+                <div class="user-sum-stat"><div class="user-sum-stat-val" style="color:var(--coin)">${fmt(coinsVal)}</div><div class="user-sum-stat-lbl">コイン</div></div>
+                <div class="user-sum-stat"><div class="user-sum-stat-val">${fmt(spinsVal||0)}</div><div class="user-sum-stat-lbl">スピン</div></div>
+                <div class="user-sum-stat"><div class="user-sum-stat-val" style="color:#bf360c">${fmt(urVal||0)}</div><div class="user-sum-stat-lbl">UR</div></div>
+               </div>` : '';
+          return `<div class="user-sum-card">
+            <div class="user-sum-avatar" style="background:${bgGrad}">${initial}</div>
+            <div class="user-sum-info">
+              <div class="user-sum-name">${u.username}${isCurrent?'<span class="badge-current">現在</span>':''}</div>
+              <div class="user-sum-meta">最終: ${lastAct}</div>
+            </div>
+            ${statsHtml}
+            <button class="btn btn-xs btn-red" onclick="Admin.deleteUser('${u.username}')">削除</button>
+          </div>`;
+        }).join('');
+    document.getElementById('dashUserList').innerHTML = userListHtml;
+  },
+
+  // ── USERS ──
+  refreshUsers(){
+    const users = getUsers();
+    const state = gs();
+    const currentUser = JSON.parse(localStorage.getItem(USER_KEY)||'null');
+    const ustats = getUserStats();
+
+    document.getElementById('userCountLabel').textContent = `登録ユーザー一覧（${users.length}名）`;
+
+    // Current player main card
+    const mainCard = document.getElementById('playerMainCard');
+    if(state || currentUser){
+      const name = currentUser ? currentUser.username : 'ゲストプレイヤー';
+      const initial = name[0].toUpperCase();
+      const invCount = Object.values(state?.inv||{}).reduce((a,i)=>a+i.qty,0);
+      const lastH = state?.history?.[0];
+      const lastAct = lastH ? lastH.time : 'まだガチャを回していません';
+      mainCard.innerHTML = `
+        <div class="player-main-card">
+          <div class="player-main-top">
+            <div class="player-avatar-lg">${initial}</div>
+            <div class="player-main-info">
+              <div class="player-main-name">${name} <span class="badge-current">現在のデバイス</span></div>
+              <div class="player-main-meta">最終プレイ: ${lastAct}</div>
+            </div>
+            <button class="btn btn-sm btn-green" onclick="Admin.openCoinGrant(null)" style="flex-shrink:0">💰 コイン付与</button>
+          </div>
+          <div class="player-kpi-grid">
+            <div class="player-kpi"><div class="player-kpi-val" style="color:var(--coin)">${fmt(state?.coins||0)}</div><div class="player-kpi-lbl">💰 コイン</div></div>
+            <div class="player-kpi"><div class="player-kpi-val">${fmt(state?.spins||0)}</div><div class="player-kpi-lbl">🎰 スピン数</div></div>
+            <div class="player-kpi"><div class="player-kpi-val" style="color:#bf360c">${fmt(state?.urCount||0)}</div><div class="player-kpi-lbl">🌟 UR獲得</div></div>
+            <div class="player-kpi"><div class="player-kpi-val">${invCount}</div><div class="player-kpi-lbl">🎁 アイテム</div></div>
+          </div>
+        </div>`;
+    } else {
+      mainCard.innerHTML = `
+        <div style="background:white;border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);font-size:0.83rem;color:var(--dim);text-align:center;">
+          📱 ゲームデータなし —
+          <a href="index.html" style="color:var(--green);font-weight:700">ガチャを起動</a>してプレイしてください
+        </div>`;
+    }
+
+    // Registered users grid
+    const grid = document.getElementById('playerCardGrid');
+    if(users.length === 0){
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-ico">👥</div>
+          <div class="empty-state-title">登録ユーザーはまだいません</div>
+          <div class="empty-state-desc">
+            <a href="index.html" style="color:var(--green);font-weight:700">ガチャゲーム</a> でユーザー登録すると<br>
+            ここにプレイヤー情報が表示されます。<br><br>
+            <span style="color:var(--sub)">「🧪 テストデータ追加」ボタンで<br>サンプルプレイヤーを作成できます。</span>
+          </div>
+        </div>`;
+    } else {
+      const avatarColors = [
+        'linear-gradient(135deg,#5c6bc0,#7e57c2)',
+        'linear-gradient(135deg,#e53935,#f57c00)',
+        'linear-gradient(135deg,#00897b,#00acc1)',
+        'linear-gradient(135deg,#f06292,#ba68c8)',
+        'linear-gradient(135deg,#43a047,#00c853)',
+        'linear-gradient(135deg,#fb8c00,#fdd835)',
+        'linear-gradient(135deg,#1e88e5,#00bcd4)',
+      ];
+      grid.innerHTML = users.map((u,i)=>{
+        const isCurrent = currentUser && currentUser.username === u.username;
+        const stats = ustats[u.username] || {};
+        const initial = (u.username||'?')[0].toUpperCase();
+        const bgGrad = isCurrent
+          ? 'linear-gradient(135deg,#00c853,var(--green))'
+          : avatarColors[i % avatarColors.length];
+        const coinsVal = isCurrent ? (state?.coins||0) : (stats.coins!=null ? stats.coins : null);
+        const spinsVal = isCurrent ? (state?.spins||0) : (stats.spins!=null ? stats.spins : null);
+        const urVal    = isCurrent ? (state?.urCount||0) : (stats.urCount!=null ? stats.urCount : null);
+        const lastAct  = isCurrent && state?.history?.[0]
+          ? state.history[0].time
+          : (stats.lastActivity || u.createdAt || '-');
+        const hasStats = isCurrent || coinsVal!=null;
+        return `<div class="player-card">
+          <div class="player-card-av" style="background:${bgGrad}">${initial}</div>
+          <div class="player-card-info">
+            <div class="player-card-name">${u.username}${isCurrent?'<span class="badge-current" style="margin-left:6px">現在</span>':''}</div>
+            <div class="player-card-sub">登録: ${u.createdAt||'-'} · 最終: ${lastAct}</div>
+          </div>
+          ${hasStats ? `<div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color:var(--coin)">${fmt(coinsVal||0)}</div><div class="pcs-lbl">コイン</div></div>
+            <div class="pcs"><div class="pcs-val">${fmt(spinsVal||0)}</div><div class="pcs-lbl">スピン</div></div>
+            <div class="pcs"><div class="pcs-val" style="color:#bf360c">${fmt(urVal||0)}</div><div class="pcs-lbl">UR</div></div>
+          </div>` : `<div style="font-size:0.7rem;color:var(--dim);flex-shrink:0">データなし</div>`}
+          <button class="btn btn-xs btn-red" onclick="Admin.deleteUser('${u.username}')">削除</button>
+        </div>`;
+      }).join('');
+    }
+  },
+  addDemoUsers(){
+    const existing = getUsers();
+    const demos = [
+      {username:'ゆうき',email:'yuuki@example.com',createdAt:'2025/12/01 10:00',
+       stats:{coins:2840,spins:47,urCount:2,invCount:28,lastActivity:'2025/12/15 18:22'}},
+      {username:'さくら',email:'sakura@example.com',createdAt:'2025/12/03 14:30',
+       stats:{coins:650,spins:12,urCount:0,invCount:8,lastActivity:'2025/12/10 11:05'}},
+      {username:'りょうた',email:'ryota@example.com',createdAt:'2025/12/05 09:00',
+       stats:{coins:5120,spins:98,urCount:5,invCount:61,lastActivity:'2025/12/14 22:47'}},
+      {username:'みなみ',email:'minami@example.com',createdAt:'2025/12/07 16:15',
+       stats:{coins:300,spins:5,urCount:0,invCount:3,lastActivity:'2025/12/08 16:20'}},
+      {username:'けんた',email:'kenta@example.com',createdAt:'2025/12/10 20:00',
+       stats:{coins:9900,spins:215,urCount:12,invCount:142,lastActivity:'2025/12/15 23:30'}},
+    ];
+    const existingNames = existing.map(u=>u.username);
+    const newUsers = demos.filter(d=>!existingNames.includes(d.username));
+    if(newUsers.length===0){ this.toast('⚠️ テストユーザーは既に追加済みです'); return; }
+    const allUsers = [...existing, ...newUsers.map(d=>({
+      username:d.username, email:d.email,
+      passwordHash:btoa('test1234'), createdAt:d.createdAt
+    }))];
+    localStorage.setItem(USERS_KEY, JSON.stringify(allUsers));
+    const ustats = getUserStats();
+    newUsers.forEach(d=>{ ustats[d.username]=d.stats; });
+    localStorage.setItem(GW_USTATS_KEY, JSON.stringify(ustats));
+    this.refreshUsers();
+    this.refreshDashboard();
+    this.toast(`✅ ${newUsers.length}名のテストプレイヤーを追加しました`);
+  },
+  deleteUser(username){
+    if(!confirm(`「${username}」を削除しますか？`)) return;
+    const users = getUsers().filter(u=>u.username!==username);
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    const cur = JSON.parse(localStorage.getItem(USER_KEY)||'null');
+    if(cur&&cur.username===username) localStorage.removeItem(USER_KEY);
+    // also remove per-user stats
+    const ustats = getUserStats();
+    delete ustats[username];
+    localStorage.setItem(GW_USTATS_KEY, JSON.stringify(ustats));
+    this.refreshUsers();
+    this.refreshDashboard();
+    this.toast('🗑️ ユーザーを削除しました');
+  },
+
+  // ── COIN GRANT ──
+  openCoinGrant(username){
+    _grantTarget = username;
+    document.getElementById('coinAmt').value = '500';
+    document.getElementById('coinModalNote').textContent =
+      username ? `対象: ${username}` : '対象: 現在のプレイヤーデータ（ローカル）';
+    document.getElementById('coinModal').classList.add('open');
+  },
+  closeModal(){
+    document.getElementById('coinModal').classList.remove('open');
+  },
+  executeCoinGrant(){
+    const amt = parseInt(document.getElementById('coinAmt').value)||0;
+    if(amt<=0){ this.toast('❌ 1以上の数値を入力'); return; }
+    const state = gs();
+    if(!state){ this.toast('❌ ゲームデータなし'); return; }
+    state.coins = (state.coins||0) + amt;
+    ss(state);
+    this.closeModal();
+    this.refreshUsers();
+    this.refreshDashboard();
+    this.toast(`💰 ${fmt(amt)} コイン付与しました（合計: ${fmt(state.coins)}）`);
+  },
+
+  // ── MACHINES ──
+  refreshMachines(){
+    const state = gs() || {slots:{}};
+    const offList = getMachineOff();
+    const tbody = document.getElementById('machineTable');
+    tbody.innerHTML = MACHINES.map(m=>{
+      const rem = state.slots[m.id]!=null ? state.slots[m.id] : m.totalSlots;
+      const pct = Math.min(100, Math.round(rem/m.totalSlots*100));
+      const barColor = pct>50?'var(--green)':pct>20?'var(--coin)':'var(--red)';
+      const isOff = offList.includes(m.id);
+      const urPrize = m.prizes.find(p=>p.rarity==='ultra-rare');
+      const urPct = urPrize ? (urPrize.prob*100).toFixed(0)+'%' : '-';
+      return `<tr>
+        <td><span style="margin-right:5px">${m.icon}</span>${m.name}</td>
+        <td>${fmt(m.cost)}</td>
+        <td>${fmt(rem)} / ${fmt(m.totalSlots)}</td>
+        <td>
+          <div class="prog-wrap" style="min-width:70px">
+            <div class="prog-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+          <div style="font-size:0.68rem;color:var(--dim);margin-top:2px">${pct}%</div>
+        </td>
+        <td><span style="color:#bf360c;font-weight:700">${urPct}</span></td>
+        <td>
+          <label class="toggle-switch">
+            <input type="checkbox" ${isOff?'':'checked'} onchange="Admin.toggleMachine('${m.id}',this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </td>
+        <td>
+          <button class="btn btn-xs btn-gold" onclick="Admin.openSlotRefill('${m.id}')">補充</button>
+        </td>
+      </tr>`;
+    }).join('');
+  },
+  toggleMachine(id, enabled){
+    let off = getMachineOff();
+    if(enabled) off = off.filter(x=>x!==id);
+    else if(!off.includes(id)) off.push(id);
+    saveMachineOff(off);
+    this.toast(enabled ? `✅ ${id} を有効化` : `⏸️ ${id} を無効化`);
+  },
+  openSlotRefill(id){
+    _slotTarget = id;
+    const m = MACHINES.find(x=>x.id===id);
+    const state = gs()||{slots:{}};
+    const rem = state.slots[id]!=null ? state.slots[id] : m.totalSlots;
+    document.getElementById('slotModalNote').innerHTML =
+      `<strong>${m.icon} ${m.name}</strong><br>現在残り: ${fmt(rem)} / ${fmt(m.totalSlots)}`;
+    document.getElementById('slotAmt').value = m.totalSlots - rem;
+    document.getElementById('slotModal').classList.add('open');
+  },
+  closeSlotModal(){
+    document.getElementById('slotModal').classList.remove('open');
+  },
+  executeSlotRefill(){
+    const amt = parseInt(document.getElementById('slotAmt').value)||0;
+    if(amt<=0){ this.toast('❌ 1以上を入力'); return; }
+    const state = gs();
+    if(!state){ this.toast('❌ ゲームデータなし'); return; }
+    const m = MACHINES.find(x=>x.id===_slotTarget);
+    const cur = state.slots[_slotTarget]!=null ? state.slots[_slotTarget] : m.totalSlots;
+    state.slots[_slotTarget] = Math.min(m.totalSlots, cur + amt);
+    ss(state);
+    this.closeSlotModal();
+    this.refreshMachines();
+    this.toast(`🔄 ${m.name} に ${fmt(amt)} 枚補充 → ${fmt(state.slots[_slotTarget])} 枚`);
+  },
+
+  // ── HISTORY ──
+  populateHistoryFilter(){
+    const sel = document.getElementById('histFilterMachine');
+    MACHINES.forEach(m=>{
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      opt.textContent = m.icon+' '+m.name;
+      sel.appendChild(opt);
+    });
+  },
+  refreshHistory(){
+    const state = gs();
+    if(!state||!state.history||state.history.length===0){
+      document.getElementById('histList').innerHTML =
+        '<div style="text-align:center;color:var(--dim);padding:32px;font-size:0.83rem;">ガチャ履歴なし</div>';
+      return;
+    }
+    const filterM = document.getElementById('histFilterMachine').value;
+    const filterR = document.getElementById('histFilterRarity').value;
+    let items = state.history;
+    if(filterM) items = items.filter(h=>h.machine===filterM);
+    if(filterR) items = items.filter(h=>h.prize&&h.prize.rarity===filterR);
+    if(items.length===0){
+      document.getElementById('histList').innerHTML =
+        '<div style="text-align:center;color:var(--dim);padding:32px;font-size:0.83rem;">該当履歴なし</div>';
+      return;
+    }
+    document.getElementById('histList').innerHTML = items.map(h=>`
+      <div class="hist-item">
+        <div class="hist-ico">${h.prize?h.prize.emoji:'🎁'}</div>
+        <div class="hist-info">
+          <div class="hist-name">${h.prize?h.prize.name:'不明'}</div>
+          <div class="hist-meta">${h.machine} · ${h.time}</div>
+        </div>
+        ${h.prize?rarityBadge(h.prize.rarity):''}
+      </div>`).join('');
+  },
+  clearHistory(){
+    if(!confirm('ガチャ履歴を全て削除しますか？')) return;
+    const state = gs();
+    if(state){ state.history=[]; ss(state); }
+    this.refreshHistory();
+    this.refreshDashboard();
+    this.toast('🗑️ 履歴をクリアしました');
+  },
+
+  // ── NOTICES ──
+  refreshNotices(){
+    const notices = getNotices();
+    const el = document.getElementById('noticeList');
+    if(notices.length===0){
+      el.innerHTML = '<div style="color:var(--dim);font-size:0.82rem;padding:8px 0;">お知らせなし</div>';
+      return;
+    }
+    const typeIcon = {event:'🎉',info:'ℹ️',update:'🔄'};
+    el.innerHTML = notices.map((n,i)=>`
+      <div class="notice-item">
+        <div style="font-size:1.3rem;flex-shrink:0">${typeIcon[n.type]||'📣'}</div>
+        <div class="notice-item-body">
+          <div class="notice-item-title">${n.title}</div>
+          <div style="font-size:0.78rem;color:var(--sub);margin:3px 0;line-height:1.5">${n.body}</div>
+          <div class="notice-item-meta">${n.date}</div>
+        </div>
+        <button class="btn btn-xs btn-red" style="flex-shrink:0" onclick="Admin.deleteNotice(${i})">削除</button>
+      </div>`).join('');
+  },
+  addNotice(){
+    const title = document.getElementById('noticeTitle').value.trim();
+    const body  = document.getElementById('noticeBody').value.trim();
+    const type  = document.getElementById('noticeType').value;
+    if(!title||!body){ this.toast('❌ タイトルと本文を入力'); return; }
+    const notices = getNotices();
+    notices.unshift({title,body,type,date:new Date().toLocaleDateString('ja-JP')});
+    localStorage.setItem(ADM_NOTICE_KEY, JSON.stringify(notices));
+    document.getElementById('noticeTitle').value='';
+    document.getElementById('noticeBody').value='';
+    this.refreshNotices();
+    this.toast('📣 お知らせを追加しました');
+  },
+  deleteNotice(i){
+    if(!confirm('このお知らせを削除しますか？')) return;
+    const notices = getNotices();
+    notices.splice(i,1);
+    localStorage.setItem(ADM_NOTICE_KEY, JSON.stringify(notices));
+    this.refreshNotices();
+    this.toast('🗑️ お知らせを削除しました');
+  },
+
+  // ── SETTINGS ──
+  refreshSettings(){
+    const keys = [GW_KEY, USERS_KEY, USER_KEY, ADM_NOTICE_KEY, ADM_MACHINE_OFF_KEY, ADM_PW_KEY, GW_USTATS_KEY];
+    const lsInfo = document.getElementById('lsInfo');
+    lsInfo.innerHTML = keys.map(k=>{
+      const v = localStorage.getItem(k);
+      const sz = v ? new Blob([v]).size : 0;
+      const exists = v!==null;
+      return `<div>${k}: <span style="color:${exists?'var(--green)':'var(--dim)'}">${exists?'✓ 存在':'✗ なし'}</span> ${exists?'('+fmt(sz)+' bytes)':''}</div>`;
+    }).join('');
+  },
+  changePassword(){
+    const cur  = document.getElementById('pwCurrent').value;
+    const nw   = document.getElementById('pwNew').value;
+    const conf = document.getElementById('pwConfirm').value;
+    const stored = localStorage.getItem(ADM_PW_KEY)||DEFAULT_PW;
+    if(cur!==stored){ this.toast('❌ 現在のパスワードが違います'); return; }
+    if(nw.length<6){ this.toast('❌ 6文字以上で入力'); return; }
+    if(nw!==conf){ this.toast('❌ 確認パスワードが一致しません'); return; }
+    localStorage.setItem(ADM_PW_KEY, nw);
+    document.getElementById('pwCurrent').value='';
+    document.getElementById('pwNew').value='';
+    document.getElementById('pwConfirm').value='';
+    this.toast('✅ パスワードを変更しました');
+  },
+  saveInitCoins(){
+    const v = parseInt(document.getElementById('initCoins').value)||1000;
+    localStorage.setItem('gw_init_coins', v);
+    this.toast(`✅ 初期コイン: ${fmt(v)} に設定`);
+  },
+  refillAllSlots(){
+    if(!confirm('全マシンのスロットをリセットしますか？')) return;
+    const state = gs();
+    if(!state){ this.toast('❌ ゲームデータなし'); return; }
+    MACHINES.forEach(m=>{ state.slots[m.id]=m.totalSlots; });
+    ss(state);
+    this.refreshMachines();
+    this.refreshDashboard();
+    this.toast('🔄 全マシンのスロットを補充しました');
+  },
+  resetPlayerData(){
+    if(!confirm('プレイヤーデータを初期化しますか？この操作は元に戻せません。')) return;
+    if(!confirm('本当によろしいですか？全データが消えます。')) return;
+    localStorage.removeItem(GW_KEY);
+    this.refreshDashboard();
+    this.refreshUsers();
+    this.refreshMachines();
+    this.refreshHistory();
+    this.refreshSettings();
+    this.toast('⚠️ プレイヤーデータを初期化しました');
+  },
+
+  // ── TOAST ──
+  toast(msg){
+    const t = document.getElementById('admToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 3000);
+  },
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+[     766ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/:27
+[     766ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/:27
+[     810ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[     810ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[     835ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0
+[     874ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[     874ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[     895ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/:0
+[     895ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/:0
+[     953ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[     953ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/7126-42db5ab30d8302dd.js:0
+[     968ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/1245-307f1e67194343ce.js:0
+[     968ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/1245-307f1e67194343ce.js:0
+[    1016ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/:0
+[    1016ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/:0
+[    1027ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    1027ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2800ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2800ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2847ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    2847ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/_next/static/chunks/59c6eb5a-9aecbc8db53e273b.js:0
+[    7215ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://japan-toreca.com/monitoring?o=4505153331396608&p=4505301664530432&r=us:0
+[   13821ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/:0
+[   13821ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/:0
+[   13845ms] [WARNING] Failed to decode downloaded font: https://japan-toreca.com/_next/static/media/9dcc3fcc5821ca9c-s.p.otf @ https://japan-toreca.com/:0
+[   13845ms] [WARNING] OTS parsing error: cmap: Out of order Unicode value (2F7B <= 9038) in mapping 1 of variation selector 0
+cmap: Failed to parse format 14 cmap subtable 2
+cmap: Failed to parse table @ https://japan-toreca.com/:0

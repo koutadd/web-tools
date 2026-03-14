@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ガチャワールド</title>
+  <style>
+    :root {
+      --bg:#f2f2f7; --card:#ffffff; --hdr:#ffffff;
+      --green:#00a63c; --green-d:#007a2d;
+      --coin:#f0a000; --coin-bg:#fff8e1;
+      --hot:#e53935; --text:#1a1a1a; --sub:#666; --dim:#999;
+      --border:#e5e5ea; --shadow:0 2px 8px rgba(0,0,0,0.08); --r:12px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+      background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;
+    }
+    /* HEADER */
+    .hdr{
+      background:var(--hdr);border-bottom:1px solid var(--border);
+      padding:8px 10px;display:flex;align-items:center;gap:6px;
+      position:sticky;top:0;z-index:100;
+    }
+    .hdr-logo{font-size:1rem;font-weight:800;color:var(--green);flex:1;white-space:nowrap;min-width:0;}
+    .hdr-logo span{color:var(--coin);}
+    .hdr-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+    .coin-badge{
+      display:flex;align-items:center;gap:3px;
+      background:var(--coin-bg);border:1.5px solid #f0c040;
+      border-radius:20px;padding:4px 8px;
+      font-size:0.78rem;font-weight:700;color:#a07000;
+      white-space:nowrap;cursor:pointer;
+    }
+    @keyframes coinBump{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+    .coin-bump{animation:coinBump 0.3s ease;}
+    .lang-btn{
+      background:none;border:1.5px solid var(--border);border-radius:14px;
+      padding:4px 7px;font-size:0.72rem;font-weight:700;cursor:pointer;
+      color:var(--sub);white-space:nowrap;
+    }
+    .auth-btn{border:none;border-radius:14px;padding:5px 9px;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+    .auth-login{background:#f0f0f0;color:var(--text);}
+    .auth-reg{background:var(--green);color:white;}
+    .auth-logout{background:#fee2e2;color:#c00;}
+    .user-chip{font-size:0.75rem;font-weight:700;color:var(--sub);white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis;}
+    /* SLIDE BANNER */
+    .banner-slider{position:relative;overflow:hidden;height:220px;background:#222;}
+    .slide-track{display:flex;height:100%;transition:transform 0.45s cubic-bezier(.4,0,.2,1);}
+    .slide{flex-shrink:0;width:100%;height:100%;position:relative;overflow:hidden;display:flex;align-items:center;}
+    .slide-inner{padding:20px 18px;z-index:1;flex:1;}
+    .slide-badge{display:inline-block;background:rgba(255,255,255,0.22);color:white;font-size:0.68rem;font-weight:700;padding:2px 9px;border-radius:12px;margin-bottom:7px;}
+    .slide-title{font-size:1.2rem;font-weight:900;color:white;line-height:1.3;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,0.3);}
+    .slide-sub{font-size:0.75rem;color:rgba(255,255,255,0.85);margin-bottom:10px;}
+    .slide-cta{background:white;border:none;border-radius:18px;padding:6px 16px;font-size:0.78rem;font-weight:800;cursor:pointer;color:#333;}
+    .slide-deco{position:absolute;right:12px;bottom:-10px;font-size:5rem;opacity:0.18;transform:rotate(-10deg);pointer-events:none;}
+    .slide-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
+    .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.45);cursor:pointer;transition:background 0.2s,transform 0.2s;}
+    .dot.active{background:white;transform:scale(1.2);}
+    .slide-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.28);color:white;border:none;border-radius:50%;width:30px;height:30px;font-size:1.1rem;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;}
+    .slide-prev{left:7px;} .slide-next{right:7px;}
+    /* CATEGORY TABS */
+    .cat-nav{
+      background:var(--hdr);border-bottom:1px solid var(--border);
+      display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+      scrollbar-width:none;position:sticky;top:49px;z-index:99;padding:0 8px;
+    }
+    .cat-nav::-webkit-scrollbar{display:none;}
+    .cat-tab{flex-shrink:0;padding:10px 13px;font-size:0.8rem;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all 0.15s;}
+    .cat-tab.active{color:var(--green);border-bottom-color:var(--green);}
+    /* FILTER BAR */
+    .filter-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;overflow-x:auto;scrollbar-width:none;background:var(--bg);}
+    .filter-bar::-webkit-scrollbar{display:none;}
+    .chip{flex-shrink:0;padding:5px 11px;border-radius:20px;font-size:0.74rem;font-weight:600;cursor:pointer;background:white;border:1.5px solid var(--border);color:var(--sub);transition:all 0.15s;}
+    .chip.active{background:var(--text);border-color:var(--text);color:white;}
+    .sort-sel{flex-shrink:0;margin-left:auto;padding:5px 8px;border-radius:8px;font-size:0.74rem;border:1.5px solid var(--border);background:white;color:var(--sub);cursor:pointer;}
+    /* STATS */
+    .stats-row{display:flex;gap:8px;padding:10px 10px 2px;overflow-x:auto;scrollbar-width:none;}
+    .stats-row::-webkit-scrollbar{display:none;}
+    .stat-pill{flex-shrink:0;background:white;border-radius:10px;padding:8px 14px;text-align:center;box-shadow:var(--shadow);}
+    .stat-val{font-size:1.1rem;font-weight:800;color:var(--green);}
+    .stat-lbl{font-size:0.68rem;color:var(--dim);}
+    /* CARD GRID */
+    .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 10px 10px;}
+    .gacha-card{background:var(--card);border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:transform 0.15s;position:relative;}
+    .gacha-card:active{transform:scale(0.97);}
+    .card-banner{position:relative;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:12px;}
+    .banner-bg{position:absolute;font-size:6rem;opacity:0.15;transform:rotate(-15deg) scale(1.3);right:-10px;bottom:-10px;line-height:1;}
+    .banner-icon{font-size:2.6rem;z-index:1;margin-bottom:6px;}
+    .banner-name{font-size:0.86rem;font-weight:800;color:white;text-align:center;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.4);}
+    .banner-copy{font-size:0.63rem;color:rgba(255,255,255,0.85);z-index:1;margin-top:3px;text-align:center;}
+    .hot-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border-radius:12px;padding:2px 7px;font-size:0.68rem;color:white;display:flex;align-items:center;gap:2px;}
+    .card-tags{padding:6px 8px 0;display:flex;flex-wrap:wrap;gap:3px;min-height:24px;}
+    .ctag{padding:2px 6px;border-radius:4px;font-size:0.62rem;font-weight:700;}
+    .card-body{padding:6px 8px 10px;}
+    .card-title{font-size:0.76rem;font-weight:700;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+    .card-cost{display:flex;align-items:center;gap:3px;color:#a07000;font-weight:800;font-size:0.83rem;}
+    .card-rem{font-size:0.65rem;color:var(--dim);}
+    .rem-bar{height:3px;background:#e5e5ea;border-radius:2px;overflow:hidden;margin-bottom:8px;}
+    .rem-fill{height:100%;background:var(--green);border-radius:2px;}
+    .btns-row{display:flex;gap:6px;}
+    .btn-draw{flex:1;padding:7px;background:var(--green);color:white;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:opacity 0.15s;}
+    .btn-draw:active{opacity:0.8;}
+    .btn-draw-10{flex:0 0 48px;padding:7px 0;background:#f0f0f0;color:var(--text);border:none;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;}
+    /* PAGES */
+    .page{display:none;padding:14px;max-width:640px;margin:0 auto;}
+    .page.active{display:block;}
+    .page-title{font-size:1rem;font-weight:800;margin-bottom:12px;}
+    /* SECTION BLOCKS */
+    .section-block{padding:14px 10px 6px;max-width:640px;margin:0 auto;}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .section-heading{font-size:0.95rem;font-weight:800;display:flex;align-items:center;gap:6px;}
+    .section-more{font-size:0.76rem;color:var(--green);font-weight:700;cursor:pointer;}
+    /* NEWS */
+    .news-list{display:flex;flex-direction:column;gap:7px;}
+    .news-item{background:white;border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-start;}
+    .news-ico{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .news-body{flex:1;}
+    .news-title{font-size:0.82rem;font-weight:700;margin-bottom:4px;line-height:1.4;}
+    .news-meta{display:flex;align-items:center;gap:6px;}
+    .news-date{font-size:0.68rem;color:var(--dim);}
+    .ntag{padding:2px 7px;border-radius:10px;font-size:0.63rem;font-weight:700;}
+    .ntag-event{background:#fff3e0;color:#e65100;}
+    .ntag-info{background:#e3f2fd;color:#1565c0;}
+    .ntag-update{background:#e8f5e9;color:#2e7d32;}
+    /* FAQ */
+    .faq-list{display:flex;flex-direction:column;gap:6px;}
+    .faq-item{background:white;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;font-size:0.84rem;font-weight:700;user-select:none;}
+    .faq-q-text{display:flex;align-items:center;gap:7px;}
+    .faq-icon{color:var(--green);font-weight:900;font-size:0.9rem;}
+    .faq-arrow{color:var(--dim);transition:transform 0.25s;font-size:0.85rem;flex-shrink:0;}
+    .faq-item.open .faq-arrow{transform:rotate(180deg);}
+    .faq-a{font-size:0.8rem;color:var(--sub);line-height:1.65;padding:0 14px;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;}
+    .faq-item.open .faq-a{max-height:200px;padding:0 14px 13px;}
+    /* ABOUT */
+    .about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+    .about-stat{background:white;border-radius:10px;padding:11px 8px;text-align:center;box-shadow:var(--shadow);}
+    .about-stat-val{font-size:1.1rem;font-weight:900;color:var(--green);}
+    .about-stat-lbl{font-size:0.65rem;color:var(--dim);margin-top:2px;}
+    .about-text{background:white;border-radius:10px;padding:14px;box-shadow:var(--shadow);font-size:0.8rem;color:var(--sub);line-height:1.7;}
+    .about-text h4{font-size:0.88rem;color:var(--text);margin-bottom:7px;font-weight:800;}
+    /* ACCOUNT PAGE */
+    .acct-hero{background:linear-gradient(135deg,var(--green),var(--green-d));border-radius:var(--r);padding:22px 16px 18px;text-align:center;color:white;margin-bottom:14px;}
+    .acct-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 10px;border:3px solid rgba(255,255,255,0.35);}
+    .acct-name{font-size:1.1rem;font-weight:900;margin-bottom:3px;}
+    .acct-sub{font-size:0.72rem;opacity:0.82;}
+    .acct-kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+    .acct-kpi-card{background:white;border-radius:var(--r);padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
+    .acct-kpi-val{font-size:1.45rem;font-weight:900;color:var(--green);}
+    .acct-kpi-lbl{font-size:0.68rem;color:var(--dim);margin-top:3px;}
+    .acct-kpi-card.ur .acct-kpi-val{color:#bf360c;}
+    .acct-kpi-card.coin .acct-kpi-val{color:#a07000;}
+    .acct-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+    .acct-btn{display:flex;align-items:center;gap:12px;background:white;border:none;border-radius:var(--r);padding:14px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow);text-align:left;width:100%;color:var(--text);}
+    .acct-btn-ico{font-size:1.25rem;flex-shrink:0;}
+    .acct-btn-arr{margin-left:auto;color:var(--dim);font-size:0.9rem;}
+    .acct-btn.danger{color:#c00;}
+    .acct-guest{background:white;border-radius:var(--r);padding:28px 20px;text-align:center;box-shadow:var(--shadow);margin-bottom:14px;}
+    .acct-guest-ico{font-size:3.2rem;margin-bottom:12px;}
+    .acct-guest-ttl{font-size:0.98rem;font-weight:800;margin-bottom:7px;}
+    .acct-guest-txt{font-size:0.8rem;color:var(--sub);margin-bottom:18px;line-height:1.7;}
+    .acct-guest-btns{display:flex;gap:10px;justify-content:center;}
+    /* INVENTORY */
+    .inv-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+    .inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .inv-card{background:white;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);}
+    .inv-icon{font-size:2rem;margin-bottom:5px;}
+    .inv-name{font-size:0.72rem;font-weight:600;margin-bottom:3px;line-height:1.2;}
+    .inv-qty{font-size:0.67rem;color:var(--dim);margin-bottom:4px;}
+    .inv-cv{font-size:0.7rem;color:#a07000;margin-bottom:6px;}
+    .btn-exch{width:100%;padding:4px;background:var(--coin-bg);border:1.5px solid #f0c040;border-radius:6px;font-size:0.68rem;font-weight:700;color:#a07000;cursor:pointer;}
+    .btn-exch-all{background:var(--coin);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;}
+    /* STORE */
+    .store-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .store-card{background:white;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+    .store-img{padding:20px 16px;text-align:center;font-size:2.8rem;}
+    .store-body{padding:8px 10px 12px;}
+    .store-name{font-size:0.82rem;font-weight:700;margin-bottom:3px;}
+    .store-desc{font-size:0.68rem;color:var(--dim);margin-bottom:8px;line-height:1.3;}
+    .store-foot{display:flex;align-items:center;justify-content:space-between;}
+    .store-price{font-size:0.85rem;font-weight:800;color:#a07000;}
+    .btn-store-buy{background:var(--green);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;}
+    .btn-store-buy:disabled{background:#ccc;cursor:not-allowed;}
+    /* ── NEW STORE ── */
+    .store-filter-wrap{background:white;border-bottom:1px solid var(--border);padding:0 12px;overflow:hidden;}
+    .store-filter-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none;}
+    .store-filter-tabs::-webkit-scrollbar{display:none;}
+    .sfil-tab{flex-shrink:0;padding:5px 16px;border-radius:20px;border:1.5px solid var(--border);
+      background:white;font-size:0.75rem;font-weight:700;cursor:pointer;color:#666;transition:all .15s;}
+    .sfil-tab.active{background:var(--green);color:white;border-color:var(--green);}
+    .store-grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;}
+    .store-card2{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);cursor:pointer;transition:transform .12s;}
+    .store-card2:active{transform:scale(0.97);}
+    .store-card2-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden;}
+    .store-card2-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .store-card2-ico{position:relative;z-index:2;}
+    .store-card2-body{padding:9px 10px 12px;}
+    .store-card2-name{font-size:0.82rem;font-weight:700;margin:4px 0 6px;line-height:1.3;}
+    .store-card2-foot{display:flex;align-items:center;justify-content:space-between;}
+    .store-card2-price{font-size:0.88rem;font-weight:800;color:#a07000;}
+    .store-card2-avail{font-size:0.63rem;font-weight:700;}
+    /* ── STORE DETAIL OVERLAY ── */
+    .store-detail-ov{display:none;position:fixed;inset:0;z-index:300;
+      background:rgba(0,0,0,0.65);align-items:flex-end;justify-content:center;}
+    .store-detail-ov.open{display:flex;}
+    .store-detail-sheet{background:white;border-radius:22px 22px 0 0;width:100%;max-width:480px;
+      max-height:90vh;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
+    .store-det-hero{height:220px;display:flex;align-items:center;justify-content:center;
+      font-size:6rem;position:relative;overflow:hidden;border-radius:22px 22px 0 0;}
+    .store-det-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .store-det-hero-ico{position:relative;z-index:2;filter:drop-shadow(0 4px 12px rgba(0,0,0,.2));}
+    .store-det-handle{width:36px;height:4px;background:rgba(255,255,255,.55);border-radius:2px;
+      position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;}
+    .store-det-body{padding:18px 18px 0;}
+    .store-det-name{font-size:1.1rem;font-weight:900;margin:8px 0 6px;line-height:1.3;}
+    .store-det-desc{font-size:0.83rem;color:#666;line-height:1.75;margin-bottom:16px;}
+    .store-det-price-row{display:flex;align-items:center;gap:12px;background:#fff8e1;
+      border:1.5px solid #f0c040;border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+    .store-det-price-val{font-size:1.2rem;font-weight:900;color:#a07000;}
+    .store-det-price-lbl{font-size:0.7rem;color:#a07000;}
+    .store-det-buy-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;
+      border-radius:14px;font-size:0.95rem;font-weight:800;cursor:pointer;
+      box-shadow:0 4px 14px rgba(0,166,60,.4);transition:opacity .15s;}
+    .store-det-buy-btn:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
+    .store-det-buy-btn:hover:not(:disabled){opacity:.88;}
+    /* HISTORY */
+    .hist-item{display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);margin-bottom:8px;}
+    .hist-ico{font-size:1.4rem;flex-shrink:0;}
+    .hist-info{flex:1;min-width:0;}
+    .hist-name{font-size:0.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .hist-meta{font-size:0.7rem;color:var(--dim);margin-top:2px;}
+    /* FOOTER */
+    .site-footer{background:#1c1c1e;color:#8e8e93;padding:22px 16px 16px;margin-top:10px;}
+    .footer-logo{font-size:1.05rem;font-weight:900;color:white;margin-bottom:3px;}
+    .footer-logo span{color:var(--coin);}
+    .footer-tagline{font-size:0.72rem;margin-bottom:14px;}
+    .footer-links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:14px;}
+    .footer-link{font-size:0.75rem;color:#8e8e93;cursor:pointer;}
+    .footer-link:hover{color:white;}
+    .footer-divider{border:none;border-top:1px solid #38383a;margin:10px 0;}
+    .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+    .footer-copy{font-size:0.7rem;}
+    .footer-badges{display:flex;gap:5px;}
+    .footer-badge{font-size:0.65rem;background:#38383a;color:#8e8e93;padding:2px 7px;border-radius:5px;}
+    /* BOTTOM NAV */
+    .bot-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);}
+    .bot-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;font-size:0.66rem;color:var(--dim);gap:2px;transition:color 0.15s;}
+    .bot-tab.active{color:var(--green);}
+    .bot-ico{font-size:1.35rem;}
+    /* QR FLOAT */
+    .qr-float{position:fixed;right:12px;bottom:88px;z-index:150;background:var(--green);color:white;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,166,60,0.45);cursor:pointer;font-size:1.25rem;transition:transform 0.15s;}
+    .qr-float:active{transform:scale(0.88);}
+    .store-dl-btns{display:flex;gap:8px;justify-content:center;margin-bottom:10px;}
+    .store-dl-btn{background:#111;color:white;border:none;border-radius:10px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;}
+    /* MODALS */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;justify-content:center;}
+    .overlay.open{display:flex;}
+    .overlay.center{align-items:center;}
+    .modal{background:white;border-radius:20px 20px 0 0;padding:20px 20px 32px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+    .modal.rounded{border-radius:20px;max-width:360px;padding-bottom:24px;}
+    .modal-handle{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 16px;}
+    .modal-title{font-size:1rem;font-weight:800;text-align:center;margin-bottom:16px;}
+    .modal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+    .btn{padding:10px 22px;border-radius:24px;border:none;cursor:pointer;font-weight:700;font-size:0.88rem;}
+    .btn-green{background:var(--green);color:white;}
+    .btn-gold{background:var(--coin);color:white;}
+    .btn-gray{background:#f0f0f0;color:var(--text);}
+    .btn-full{width:100%;}
+    /* SPIN */
+    .spin-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 0 8px;}
+    .spin-cap{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:#f0f0f0;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);transition:background 0.3s,box-shadow 0.3s;}
+    @keyframes spinIt{0%{transform:rotate(0) scale(1)}50%{transform:rotate(540deg) scale(1.2)}100%{transform:rotate(720deg) scale(1)}}
+    @keyframes popIt{0%,100%{transform:scale(1)}40%{transform:scale(1.3) rotate(-8deg)}70%{transform:scale(1.3) rotate(8deg)}}
+    .spin-cap.spinning{animation:spinIt 1.5s ease-in-out;}
+    .spin-cap.popping{animation:popIt 0.5s ease-in-out;}
+    .spin-status{color:var(--dim);font-size:0.9rem;}
+    .res-name{font-size:1.2rem;font-weight:800;text-align:center;margin-bottom:8px;}
+    .res-badge{display:inline-block;padding:3px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;margin-bottom:10px;}
+    .res-coin{color:#a07000;font-size:0.9rem;text-align:center;margin-bottom:14px;}
+    /* COIN PKGS */
+    .coin-pkgs{display:flex;flex-direction:column;gap:8px;margin:12px 0 16px;}
+    .coin-pkg{display:flex;align-items:center;justify-content:space-between;background:#f8f8f8;border-radius:12px;padding:12px 14px;cursor:pointer;border:1.5px solid var(--border);transition:border-color 0.15s;}
+    .coin-pkg:active{border-color:var(--coin);background:var(--coin-bg);}
+    .pkg-l{display:flex;align-items:center;gap:10px;}
+    .pkg-amt{font-weight:800;font-size:0.95rem;color:#a07000;}
+    .pkg-bonus{font-size:0.72rem;color:var(--green);font-weight:600;}
+    .pkg-price{font-size:0.85rem;color:var(--sub);font-weight:600;}
+    /* MULTI */
+    .multi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0;}
+    .multi-item{background:#f8f8f8;border-radius:8px;padding:8px 4px;text-align:center;border:1px solid var(--border);}
+    .multi-ico{font-size:1.4rem;}
+    .multi-rar{font-size:0.6rem;margin-top:2px;}
+    .multi-nm{font-size:0.6rem;color:var(--dim);margin-top:1px;line-height:1.2;}
+    .multi-sum{font-size:0.83rem;color:var(--sub);line-height:1.8;text-align:left;}
+    /* BUY */
+    .buy-wrap{text-align:center;padding:10px 0;}
+    .buy-ico{font-size:3.5rem;margin-bottom:10px;}
+    .buy-name{font-size:1rem;font-weight:800;margin-bottom:6px;}
+    .buy-desc{font-size:0.82rem;color:var(--dim);margin-bottom:12px;}
+    .buy-price{font-size:1.2rem;font-weight:800;color:#a07000;margin-bottom:16px;}
+    /* AUTH FORM */
+    .auth-form{display:flex;flex-direction:column;gap:10px;margin:10px 0;}
+    .form-field{display:flex;flex-direction:column;gap:4px;}
+    .form-label{font-size:0.76rem;font-weight:700;color:var(--sub);}
+    .form-input{padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:0.88rem;outline:none;transition:border-color 0.15s;font-family:inherit;width:100%;}
+    .form-input:focus{border-color:var(--green);}
+    .form-err{font-size:0.74rem;color:#e53935;min-height:16px;}
+    .form-switch{font-size:0.78rem;text-align:center;color:var(--sub);margin-top:6px;}
+    .form-switch a{color:var(--green);font-weight:700;cursor:pointer;}
+    /* RARITY */
+    .rb-common{background:#eceff1;color:#546e7a;}
+    .rb-uncommon{background:#e8f5e9;color:#2e7d32;}
+    .rb-rare{background:#e3f2fd;color:#1565c0;}
+    .rb-super-rare{background:#f3e5f5;color:#6a1b9a;}
+    .rb-ultra-rare{background:#fff3e0;color:#bf360c;}
+    /* EMPTY */
+    .empty{text-align:center;padding:40px 20px;color:var(--dim);grid-column:1/-1;}
+    .empty-ico{font-size:2.8rem;margin-bottom:10px;}
+    /* TOAST */
+    .toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(0,0,0,0.8);color:white;padding:9px 20px;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:400;transition:transform 0.3s;pointer-events:none;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    /* CONFETTI */
+    .conf-wrap{position:fixed;inset:0;pointer-events:none;z-index:350;overflow:hidden;}
+    .cp{position:absolute;animation:cpFall linear forwards;}
+    @keyframes cpFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+    /* ── EPIC GACHA ANIMATION ─────────────────────────────── */
+    .epic-ov{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(5,5,15,0);transition:background 0.4s;pointer-events:none;overflow:hidden;}
+    .epic-ov.show{background:rgba(5,5,15,0.97);pointer-events:all;}
+    /* Stars */
+    .epic-star{position:absolute;border-radius:50%;background:white;animation:twinkle linear infinite;pointer-events:none;}
+    @keyframes twinkle{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+    /* Orb section */
+    .epic-orb-sect{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0.5);transition:opacity 0.45s,transform 0.45s;}
+    .epic-orb-sect.show{opacity:1;transform:scale(1);}
+    .epic-orb-sect.explode{animation:orbExplode 0.45s forwards;}
+    @keyframes orbExplode{0%{transform:scale(1);opacity:1}60%{transform:scale(2);opacity:0.3}100%{transform:scale(0.2);opacity:0}}
+    /* Orb core */
+    .epic-orb{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.6rem;z-index:2;position:relative;background:radial-gradient(circle,#90caf9,#1e88e5);box-shadow:0 0 40px #64b5f6,0 0 80px #1e88e5;animation:orbFloat 1.1s ease-in-out infinite alternate;}
+    @keyframes orbFloat{0%{transform:translateY(-7px) scale(1);box-shadow:0 0 40px #64b5f6,0 0 80px #1e88e5;}100%{transform:translateY(7px) scale(1.08);box-shadow:0 0 70px #64b5f6,0 0 140px #1e88e5;}}
+    /* Rings */
+    .epic-ring{position:absolute;border-radius:50%;border-style:solid;animation:ringRot linear infinite;}
+    @keyframes ringRot{from{transform:rotateX(72deg) rotate(0)}to{transform:rotateX(72deg) rotate(360deg)}}
+    .epic-ring-1{width:128px;height:128px;border-width:2px;border-color:rgba(100,181,246,0.55);animation-duration:1.8s;}
+    .epic-ring-2{width:162px;height:162px;border-width:1.5px;border-color:rgba(156,39,176,0.45);animation-duration:2.8s;animation-direction:reverse;}
+    .epic-ring-3{width:196px;height:196px;border-width:1px;border-color:rgba(255,215,0,0.3);animation-duration:4s;}
+    /* Loading text */
+    .epic-load-txt{color:rgba(255,255,255,0.7);font-size:0.83rem;font-weight:800;letter-spacing:0.22em;margin-top:16px;animation:loadPulse 0.75s ease-in-out infinite alternate;}
+    @keyframes loadPulse{0%{opacity:0.35}100%{opacity:1}}
+    /* Result area */
+    .epic-result-area{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.4s;}
+    .epic-result-area.show{opacity:1;pointer-events:all;}
+    .epic-rarity-banner{font-size:0.95rem;font-weight:900;letter-spacing:0.18em;margin-bottom:10px;text-align:center;text-transform:uppercase;}
+    .epic-result-card{background:white;border-radius:24px;padding:26px 30px;text-align:center;max-width:296px;width:90%;transform:translateY(50px) scale(0.8);transition:transform 0.55s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+    .epic-result-area.show .epic-result-card{transform:translateY(0) scale(1);}
+    .epic-prize-icon{font-size:5rem;line-height:1;margin-bottom:8px;}
+    .epic-prize-name{font-size:1.12rem;font-weight:800;margin-bottom:8px;line-height:1.3;}
+    .epic-prize-badge{display:inline-block;padding:4px 16px;border-radius:20px;font-size:0.84rem;font-weight:700;margin-bottom:10px;}
+    .epic-prize-cv{font-size:0.86rem;color:#a07000;margin-bottom:18px;}
+    .epic-result-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+    /* Aurora (UR) */
+    .epic-aurora{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 0.8s;}
+    .epic-aurora.show{opacity:1;}
+    .aurora-b{position:absolute;left:-50%;width:200%;background:linear-gradient(180deg,transparent 0%,rgba(255,215,0,0.07) 50%,transparent 100%);animation:auroraSway ease-in-out infinite alternate;}
+    .aurora-b:nth-child(1){height:40%;top:5%;animation-duration:3.5s;}
+    .aurora-b:nth-child(2){height:35%;top:25%;background:linear-gradient(180deg,transparent,rgba(255,100,100,0.05),transparent);animation-duration:4.5s;animation-delay:-1.5s;}
+    .aurora-b:nth-child(3){height:45%;top:50%;background:linear-gradient(180deg,transparent,rgba(100,100,255,0.05),transparent);animation-duration:5.5s;animation-delay:-3s;}
+    @keyframes auroraSway{0%{transform:translateX(-12%) skewX(-4deg)}100%{transform:translateX(12%) skewX(4deg)}}
+    /* Screen flash */
+    .screen-flash{position:fixed;inset:0;z-index:490;pointer-events:none;opacity:0;}
+    @keyframes bigFlash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+    .screen-flash.fire{animation:bigFlash 0.75s ease-out forwards;}
+    /* Shake */
+    @keyframes epicShake{0%,100%{transform:translate(0,0)}18%{transform:translate(-11px,4px)}36%{transform:translate(11px,-4px)}54%{transform:translate(-8px,6px)}72%{transform:translate(8px,-3px)}90%{transform:translate(-4px,2px)}}
+    .epic-ov.shake{animation:epicShake 0.45s ease-in-out;}
+    /* Multi card flip */
+    .flip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:340px;width:92%;}
+    .flip-card{perspective:600px;height:86px;}
+    .flip-inner{position:relative;width:100%;height:100%;transition:transform 0.5s;transform-style:preserve-3d;}
+    .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+    .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid rgba(255,255,255,0.12);}
+    .flip-front{background:linear-gradient(135deg,#1a237e,#4a148c);font-size:1.7rem;}
+    .flip-back{background:white;transform:rotateY(180deg);font-size:1.5rem;gap:2px;padding:4px;}
+    .flip-back .fc-r{font-size:0.54rem;font-weight:700;padding:1px 5px;border-radius:5px;margin-top:2px;}
+    .flip-back .fc-n{font-size:0.48rem;color:#666;text-align:center;line-height:1.2;padding:0 2px;}
+    .flip-card.is-ur .flip-back{background:linear-gradient(135deg,#fff8e1,#fff3cd);box-shadow:0 0 18px #ffd70099;}
+    .flip-card.is-sr .flip-back{background:linear-gradient(135deg,#f3e5f5,#ede1f9);box-shadow:0 0 12px #8e24aa55;}
+    .flip-multi-sum{color:white;font-size:0.84rem;text-align:center;margin-top:10px;line-height:1.9;max-width:320px;}
+    .flip-multi-btns{display:flex;gap:8px;margin-top:12px;}
+
+    /* ── EXPLOSION EFFECTS ──────────────────────────────────── */
+    .shockwave-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:4px solid;transform:translate(-50%,-50%) scale(0.2);animation:shockExpand ease-out forwards;pointer-events:none;z-index:1;}
+    @keyframes shockExpand{0%{transform:translate(-50%,-50%) scale(0.2);opacity:1}100%{transform:translate(-50%,-50%) scale(8);opacity:0}}
+    .ray-wrap{position:absolute;top:50%;left:50%;pointer-events:none;z-index:1;}
+    .light-ray{position:absolute;top:0;left:0;border-radius:0 0 6px 6px;animation:rayBurst ease-out forwards;transform-origin:top center;}
+    @keyframes rayBurst{0%{height:0;opacity:0.95}35%{opacity:0.8}100%{height:52vh;opacity:0}}
+    .sparkle{position:absolute;pointer-events:none;animation:sparkleFly ease-out forwards;line-height:1;top:50%;left:50%;}
+    @keyframes sparkleFly{0%{transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}55%{opacity:0.9}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(1) rotate(var(--rot,0deg));opacity:0}}
+    @keyframes rainbowGlow{0%{box-shadow:0 0 50px #ff004499,0 0 100px #ff004433,0 8px 40px rgba(0,0,0,.4)}16%{box-shadow:0 0 50px #ff880099,0 0 100px #ff880033,0 8px 40px rgba(0,0,0,.4)}33%{box-shadow:0 0 50px #ffd70099,0 0 100px #ffd70033,0 8px 40px rgba(0,0,0,.4)}50%{box-shadow:0 0 50px #00ff8899,0 0 100px #00ff8833,0 8px 40px rgba(0,0,0,.4)}66%{box-shadow:0 0 50px #0088ff99,0 0 100px #0088ff33,0 8px 40px rgba(0,0,0,.4)}83%{box-shadow:0 0 50px #cc00ff99,0 0 100px #cc00ff33,0 8px 40px rgba(0,0,0,.4)}100%{box-shadow:0 0 50px #ff004499,0 0 100px #ff004433,0 8px 40px rgba(0,0,0,.4)}}
+    .rainbow-glow{animation:rainbowGlow 1.2s linear infinite!important;}
+    @keyframes orbPreExplode{0%,100%{transform:translateY(0) scale(1)}25%{transform:translateY(-5px) scale(1.1)}75%{transform:translateY(5px) scale(0.92)}}
+    @keyframes orbColorCycle{0%{box-shadow:0 0 60px #ff0,0 0 120px #ff0}25%{box-shadow:0 0 70px #f0f,0 0 140px #f0f}50%{box-shadow:0 0 80px #0ff,0 0 160px #0ff}75%{box-shadow:0 0 70px #ff8800,0 0 140px #ff8800}100%{box-shadow:0 0 60px #ff0,0 0 120px #ff0}}
+    .epic-orb.pre-explode{animation:orbPreExplode 0.09s linear infinite,orbColorCycle 0.3s linear infinite!important;}
+
+    @media(min-width:480px){
+      .card-grid{grid-template-columns:repeat(3,1fr);}
+      .inv-grid{grid-template-columns:repeat(4,1fr);}
+      .store-grid{grid-template-columns:repeat(3,1fr);}
+    }
+    /* DETAIL PAGE */
+    .detail-page{position:fixed;inset:0;background:var(--bg);z-index:180;transform:translateX(100%);transition:transform 0.32s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding-bottom:80px;}
+    .detail-page.open{transform:translateX(0);}
+    .detail-hdr{position:sticky;top:0;background:white;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:2;}
+    .detail-back{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text);padding:2px 6px;line-height:1;}
+    .detail-hdr-title{font-size:0.95rem;font-weight:800;flex:1;}
+    .detail-hot{font-size:0.75rem;font-weight:700;color:var(--hot);white-space:nowrap;}
+    .detail-banner{height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    .detail-banner-icon{font-size:4.5rem;z-index:1;margin-bottom:8px;}
+    .detail-banner-name{font-size:1.2rem;font-weight:900;color:white;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,0.4);}
+    .detail-banner-copy{font-size:0.78rem;color:rgba(255,255,255,0.85);z-index:1;margin-top:4px;text-align:center;padding:0 20px;}
+    .detail-banner-bg{position:absolute;font-size:10rem;opacity:0.12;transform:rotate(-15deg);right:-20px;bottom:-20px;line-height:1;pointer-events:none;}
+    .detail-badges{display:flex;flex-wrap:wrap;gap:5px;padding:10px 12px 4px;}
+    .detail-section{padding:8px 12px 4px;}
+    .detail-section-title{font-size:0.88rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+    .detail-price-card{background:white;border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;justify-content:space-around;margin-bottom:10px;}
+    .detail-price-item{text-align:center;}
+    .detail-price-label{font-size:0.65rem;color:var(--dim);margin-bottom:3px;}
+    .detail-price-val{font-size:1.05rem;font-weight:900;color:#a07000;}
+    .detail-slots-bar{background:white;border-radius:12px;padding:12px;box-shadow:var(--shadow);margin-bottom:8px;}
+    .detail-slots-label{display:flex;justify-content:space-between;font-size:0.76rem;margin-bottom:6px;}
+    .detail-slots-rem{font-weight:700;}
+    .detail-slots-track{height:6px;background:#e5e5ea;border-radius:3px;overflow:hidden;}
+    .detail-slots-fill{height:100%;background:var(--green);border-radius:3px;transition:width 0.3s;}
+    .detail-draw-btns{display:flex;gap:10px;padding:8px 12px 10px;}
+    .btn-detail-draw{flex:1;padding:14px;background:var(--green);color:white;border:none;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;transition:opacity 0.15s;}
+    .btn-detail-draw:active{opacity:0.8;}
+    .btn-detail-draw-10{flex:1;padding:14px;background:#f0a000;color:white;border:none;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;transition:opacity 0.15s;}
+    .btn-detail-draw-10:active{opacity:0.8;}
+    .prize-table{background:white;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+    .prize-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);}
+    .prize-row:last-child{border-bottom:none;}
+    .prize-emoji{font-size:1.4rem;flex-shrink:0;}
+    .prize-info{flex:1;min-width:0;}
+    .prize-name{font-size:0.82rem;font-weight:700;}
+    .prize-rar-badge{font-size:0.63rem;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0;}
+    .prize-prob{font-size:0.78rem;font-weight:700;color:var(--sub);flex-shrink:0;min-width:38px;text-align:right;}
+    .rate-chart{background:white;border-radius:12px;padding:14px;box-shadow:var(--shadow);}
+    .rate-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .rate-row:last-child{margin-bottom:0;}
+    .rate-label{font-size:0.7rem;font-weight:700;min-width:82px;flex-shrink:0;}
+    .rate-track{flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden;}
+    .rate-fill{height:100%;border-radius:4px;}
+    .rate-pct{font-size:0.72rem;font-weight:700;color:var(--sub);min-width:36px;text-align:right;}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">&#127920; ガチャ<span>ワールド</span></div>
+  <div class="hdr-right">
+    <a href="howto.html" style="font-size:0.75rem;font-weight:700;color:var(--sub);text-decoration:none;padding:4px 8px;border-radius:8px;white-space:nowrap;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background=''">❓ 遊び方</a>
+    <button class="lang-btn" onclick="I18N.cycle()">&#127760; <span id="langLabel">JP</span></button>
+    <div class="coin-badge" id="coinBadge" onclick="UI.openCoinShop()">&#129689; <span id="coinAmt">1,000</span></div>
+    <div id="authArea" style="display:flex;gap:4px;align-items:center">
+      <button class="auth-btn auth-login" onclick="Auth.openLogin()" data-i18n="login">ログイン</button>
+      <button class="auth-btn auth-reg"   onclick="Auth.openRegister()" data-i18n="register">会員登録</button>
+    </div>
+    <div id="userArea" style="display:none;align-items:center;gap:5px">
+      <span class="user-chip" id="userChip">&#128100;</span>
+      <button class="auth-btn auth-logout" onclick="Auth.logout()" data-i18n="logout">ログアウト</button>
+    </div>
+  </div>
+</header>
+
+<!-- BANNER + NAV WRAPPER -->
+<div id="gachaTopWrapper">
+  <div class="banner-slider">
+    <div class="slide-track" id="slideTrack">
+      <div class="slide" id="slide0" style="background:linear-gradient(135deg,#9c27b0,#4a148c)">
+        <div class="slide-inner">
+          <div class="slide-badge" id="slide0-badge">&#128293; 期間限定</div>
+          <div class="slide-title" id="slide0-title">プレミアムガチャ<br>UR確率2倍！</div>
+          <div class="slide-sub" id="slide0-sub">〜2026年3月末まで</div>
+          <button class="slide-cta" onclick="UI.switchPage('gacha');setCat('premium')">今すぐ引く →</button>
+        </div>
+        <div class="slide-deco">&#128142;</div>
+      </div>
+      <div class="slide" id="slide1" style="background:linear-gradient(135deg,#00a63c,#007a2d)">
+        <div class="slide-inner">
+          <div class="slide-badge" id="slide1-badge">&#127873; 新規特典</div>
+          <div class="slide-title" id="slide1-title">会員登録で<br>500コインプレゼント！</div>
+          <div class="slide-sub" id="slide1-sub">今すぐ無料で登録</div>
+          <button class="slide-cta" onclick="Auth.openRegister()">無料登録 →</button>
+        </div>
+        <div class="slide-deco">&#129689;</div>
+      </div>
+      <div class="slide" id="slide2" style="background:linear-gradient(135deg,#ffb300,#e65100)">
+        <div class="slide-inner">
+          <div class="slide-badge" id="slide2-badge">&#9889; イベント</div>
+          <div class="slide-title" id="slide2-title">週末スペシャル<br>10連割引実施中！</div>
+          <div class="slide-sub" id="slide2-sub">土日限定 特別価格</div>
+          <button class="slide-cta" onclick="UI.switchPage('gacha')">詳細を見る →</button>
+        </div>
+        <div class="slide-deco">&#127920;</div>
+      </div>
+      <div class="slide" id="slide3" style="background:linear-gradient(135deg,#1e88e5,#0d47a1)">
+        <div class="slide-inner">
+          <div class="slide-badge" id="slide3-badge">&#127942; ランキング</div>
+          <div class="slide-title" id="slide3-title">今月のUR<br>ゲットランキング公開！</div>
+          <div class="slide-sub" id="slide3-sub">あなたは何位？</div>
+          <button class="slide-cta" onclick="UI.showRanking()">ランキングへ →</button>
+        </div>
+        <div class="slide-deco">&#128081;</div>
+      </div>
+    </div>
+    <div class="slide-dots" id="slideDots">
+      <span class="dot active" onclick="Banner.goTo(0)"></span>
+      <span class="dot" onclick="Banner.goTo(1)"></span>
+      <span class="dot" onclick="Banner.goTo(2)"></span>
+      <span class="dot" onclick="Banner.goTo(3)"></span>
+    </div>
+    <button class="slide-arrow slide-prev" onclick="Banner.prev()">&#8249;</button>
+    <button class="slide-arrow slide-next" onclick="Banner.next()">&#8250;</button>
+  </div>
+
+  <nav class="cat-nav" id="catNav"></nav>
+  <div class="filter-bar">
+    <div class="chip active" onclick="setFilter('all',this)" data-i18n="filterAll">全て</div>
+    <div class="chip" onclick="setFilter('new',this)" data-i18n="filterNew">🆕 新着</div>
+    <div class="chip" onclick="setFilter('low',this)" data-i18n="filterLow">&#128176; お手軽</div>
+    <div class="chip" onclick="setFilter('high',this)" data-i18n="filterHigh">&#128142; 高額</div>
+    <div class="chip" onclick="setFilter('pop',this)" data-i18n="filterPop">&#128293; 人気</div>
+    <select class="sort-sel" onchange="setSort(this.value)">
+      <option value="">おすすめ順</option>
+      <option value="asc">コイン少ない順</option>
+      <option value="desc">コイン多い順</option>
+    </select>
+  </div>
+</div>
+
+<!-- GACHA PAGE -->
+<div id="page-gacha">
+  <div class="card-grid" id="cardGrid"></div>
+
+  <!-- NEWS -->
+  <div class="section-block">
+    <div class="section-head">
+      <div class="section-heading">&#128226; <span data-i18n="news">お知らせ</span></div>
+      <span class="section-more">すべて見る ›</span>
+    </div>
+    <div class="news-list">
+      <div class="news-item">
+        <div class="news-ico">&#128293;</div>
+        <div class="news-body">
+          <div class="news-title">プレミアムガチャ URレート2倍キャンペーン開催！</div>
+          <div class="news-meta"><span class="news-date">2026年3月8日</span><span class="ntag ntag-event">イベント</span></div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-ico">&#127873;</div>
+        <div class="news-body">
+          <div class="news-title">新規会員登録でコイン500枚プレゼント実施中</div>
+          <div class="news-meta"><span class="news-date">2026年3月1日</span><span class="ntag ntag-info">お知らせ</span></div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-ico">&#10024;</div>
+        <div class="news-body">
+          <div class="news-title">シルバーコレクションガチャ新規追加</div>
+          <div class="news-meta"><span class="news-date">2026年2月20日</span><span class="ntag ntag-update">更新</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-block">
+    <div class="section-head">
+      <div class="section-heading">&#10067; <span data-i18n="faq">よくある質問</span></div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <div class="faq-q-text"><span class="faq-icon">Q</span> ガチャはどうやって引くの？</div>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">ガチャカードをタップして「引く」ボタンを押すと1回ガチャが回ります。×10ボタンで10連ガチャ（1割引）も引けます。コインが必要です。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <div class="faq-q-text"><span class="faq-icon">Q</span> コインはどうやって手に入れるの？</div>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">画面上部のコインバッジをタップするとコインショップが開きます。アイテムをコインに交換することもできます。新規会員登録で500コインを無料プレゼント！</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <div class="faq-q-text"><span class="faq-icon">Q</span> 当たったアイテムはどこで確認できる？</div>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">下部ナビの「インベントリ」から確認できます。所持アイテムのコインへの交換もここから行えます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <div class="faq-q-text"><span class="faq-icon">Q</span> 交換所とは何ですか？</div>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">コインを使って特別なアイテムと直接交換できるショップです。下部ナビの「交換所」からアクセスできます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <div class="faq-q-text"><span class="faq-icon">Q</span> 会員登録のメリットは？</div>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">新規登録で500コインをプレゼント！今後のアップデートでランキング参加・特別イベント・限定ガチャへのアクセスも予定しています。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="section-block" style="padding-bottom:16px">
+    <div class="section-head">
+      <div class="section-heading">&#8505;&#65039; <span data-i18n="about">ガチャセンターについて</span></div>
+    </div>
+    <div class="about-stats">
+      <div class="about-stat"><div class="about-stat-val">12.4万</div><div class="about-stat-lbl">会員数</div></div>
+      <div class="about-stat"><div class="about-stat-val">350万</div><div class="about-stat-lbl">総ガチャ回数</div></div>
+      <div class="about-stat"><div class="about-stat-val">★5.0</div><div class="about-stat-lbl">ユーザー評価</div></div>
+    </div>
+    <div class="about-text">
+      <h4>ガチャワールドとは？</h4>
+      スマートフォン・PCどちらでも楽しめるオンラインデジタルガチャサービスです。スターターから超プレミアムまで5種類のガチャを用意。獲得アイテムはコインに交換したり、交換所で特別グッズと交換できます。
+    </div>
+  </div>
+</div>
+
+<!-- OTHER PAGES -->
+<div id="page-inventory" class="page">
+  <div class="inv-hdr">
+    <div class="page-title">&#127954; <span data-i18n="myItems">所持アイテム</span></div>
+    <button class="btn-exch-all" onclick="UI.exchangeAll()" data-i18n="exchAll">全て交換</button>
+  </div>
+  <div class="inv-grid" id="invGrid"></div>
+</div>
+
+<div id="page-store" class="page" style="padding:0">
+  <div class="page-title" style="padding:12px 14px 8px">&#127978; <span data-i18n="storeTitle">交換所</span></div>
+  <div class="store-filter-wrap">
+    <div class="store-filter-tabs" id="storeFilterTabs"></div>
+  </div>
+  <div class="store-grid2" id="storeGrid"></div>
+</div>
+
+<div id="page-history" class="page">
+  <div class="page-title">&#128220; <span data-i18n="histTitle">ガチャ履歴</span></div>
+  <div id="histList"></div>
+</div>
+
+<!-- ACCOUNT PAGE -->
+<div id="page-account" class="page">
+  <div id="acctHero" class="acct-hero"></div>
+  <div class="acct-kpi" id="acctKpi"></div>
+  <div class="acct-btns" id="acctBtns"></div>
+  <div id="acctGuest"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-logo">&#127920; ガチャ<span>ワールド</span></div>
+  <div class="footer-tagline">オンラインガチャセンター</div>
+  <div class="footer-links">
+    <span class="footer-link">利用規約</span>
+    <span class="footer-link">プライバシーポリシー</span>
+    <span class="footer-link">特定商取引法に基づく表示</span>
+    <span class="footer-link">お問い合わせ</span>
+    <span class="footer-link">運営者情報</span>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 ガチャワールド. All rights reserved.</div>
+    <div class="footer-badges">
+      <span class="footer-badge">&#128274; SSL</span>
+      <span class="footer-badge">&#128241; App対応</span>
+      <span class="footer-badge">18+</span>
+    </div>
+  </div>
+</footer>
+
+<!-- BOTTOM NAV -->
+<nav class="bot-nav">
+  <div class="bot-tab active" id="bot-gacha" onclick="UI.switchPage('gacha')">
+    <span class="bot-ico">&#127920;</span><span data-i18n="tabGacha">オリパ</span>
+  </div>
+  <div class="bot-tab" id="bot-rank" onclick="UI.showRanking()">
+    <span class="bot-ico">&#127942;</span><span data-i18n="tabRank">ランキング</span>
+  </div>
+  <div class="bot-tab" id="bot-inventory" onclick="UI.switchPage('inventory')">
+    <span class="bot-ico">&#127954;</span><span data-i18n="tabInv">インベントリ</span>
+  </div>
+  <div class="bot-tab" id="bot-store" onclick="UI.switchPage('store')">
+    <span class="bot-ico">&#127978;</span><span data-i18n="tabStore">交換所</span>
+  </div>
+  <div class="bot-tab" id="bot-account" onclick="UI.switchPage('account')">
+    <span class="bot-ico">&#128100;</span><span>マイページ</span>
+  </div>
+</nav>
+
+<!-- QR FLOAT -->
+<div class="qr-float" onclick="UI.open('m-qr')" title="アプリをダウンロード">&#128242;</div>
+
+<!-- MODALS -->
+<div class="overlay" id="m-coin">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">&#129689; コインショップ</div>
+    <p style="text-align:center;color:var(--dim);font-size:0.78rem;margin-bottom:6px">デモ用（課金なし）</p>
+    <div class="coin-pkgs" id="coinPkgs"></div>
+    <button class="btn btn-gray btn-full" onclick="UI.close('m-coin')">閉じる</button>
+  </div>
+</div>
+
+<div class="overlay center" id="m-spin">
+  <div class="modal rounded">
+    <div class="spin-wrap">
+      <div class="spin-cap" id="spinCap">&#10067;</div>
+      <div id="spinStat" class="spin-status">回転中...</div>
+      <div id="spinRes" style="display:none;text-align:center;width:100%">
+        <div class="res-name" id="resName"></div>
+        <span class="res-badge" id="resBadge"></span>
+        <div class="res-coin" id="resCoin"></div>
+        <div class="modal-btns">
+          <button class="btn btn-green" id="btnAgain" onclick="Gacha.spinAgain()">もう一度</button>
+          <button class="btn btn-gold"  id="btnExch"  onclick="Gacha.exchLast()">コイン交換</button>
+          <button class="btn btn-gray"  onclick="UI.close('m-spin')">閉じる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-multi">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="multiTitle">10連結果</div>
+    <div class="multi-grid" id="multiGrid"></div>
+    <div class="multi-sum" id="multiSum"></div>
+    <div class="modal-btns" style="margin-top:10px">
+      <button class="btn btn-gold" onclick="Gacha.exchMultiAll()">全てコイン交換</button>
+      <button class="btn btn-gray" onclick="UI.close('m-multi')" style="flex:1">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay center" id="m-buy" style="display:none">
+  <div class="modal rounded">
+    <div class="buy-wrap">
+      <div class="buy-ico"  id="buyIco"></div>
+      <div class="buy-name" id="buyName"></div>
+      <div class="buy-desc" id="buyDesc"></div>
+      <div class="buy-price">&#129689; <span id="buyCost"></span> コイン</div>
+      <div class="modal-btns">
+        <button class="btn btn-green" onclick="Store.confirmBuy()">交換する</button>
+        <button class="btn btn-gray"  onclick="UI.close('m-buy')">キャンセル</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STORE DETAIL OVERLAY -->
+<div class="store-detail-ov" id="storeDetailOv" onclick="Store.closeDetail(event)">
+  <div class="store-detail-sheet" id="storeDetailSheet"></div>
+</div>
+
+<div class="overlay" id="m-rank">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">&#127942; UR獲得ランキング</div>
+    <div id="rankList" style="margin-bottom:16px"></div>
+    <button class="btn btn-gray btn-full" onclick="UI.close('m-rank')">閉じる</button>
+  </div>
+</div>
+
+<div class="overlay center" id="m-login">
+  <div class="modal rounded">
+    <div class="modal-title">&#128273; <span data-i18n="login">ログイン</span></div>
+    <div class="auth-form">
+      <div class="form-field">
+        <label class="form-label">ユーザー名</label>
+        <input class="form-input" id="login-username" type="text" placeholder="ユーザー名" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label class="form-label">パスワード</label>
+        <input class="form-input" id="login-pass" type="password" placeholder="パスワード" autocomplete="current-password">
+      </div>
+      <div class="form-err" id="login-err"></div>
+      <button class="btn btn-green btn-full" onclick="Auth.login()" style="margin-top:4px">ログイン</button>
+      <div class="form-switch">アカウントをお持ちでない方は <a onclick="UI.close('m-login');Auth.openRegister()">会員登録</a></div>
+    </div>
+    <button class="btn btn-gray btn-full" onclick="UI.close('m-login')" style="margin-top:8px">閉じる</button>
+  </div>
+</div>
+
+<div class="overlay center" id="m-register">
+  <div class="modal rounded">
+    <div class="modal-title">&#127775; <span data-i18n="register">会員登録</span></div>
+    <p style="text-align:center;font-size:0.78rem;color:var(--green);font-weight:700;margin-bottom:10px">&#127873; 登録で500コインプレゼント！</p>
+    <div class="auth-form">
+      <div class="form-field">
+        <label class="form-label">ユーザー名</label>
+        <input class="form-input" id="reg-username" type="text" placeholder="半角英数字" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label class="form-label">メールアドレス</label>
+        <input class="form-input" id="reg-email" type="email" placeholder="example@mail.com" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label class="form-label">パスワード（6文字以上）</label>
+        <input class="form-input" id="reg-pass" type="password" placeholder="6文字以上" autocomplete="new-password">
+      </div>
+      <div class="form-err" id="reg-err"></div>
+      <button class="btn btn-green btn-full" onclick="Auth.register()" style="margin-top:4px">登録する</button>
+      <div class="form-switch">すでにアカウントをお持ちの方は <a onclick="UI.close('m-register');Auth.openLogin()">ログイン</a></div>
+    </div>
+    <button class="btn btn-gray btn-full" onclick="UI.close('m-register')" style="margin-top:8px">閉じる</button>
+  </div>
+</div>
+
+<div class="overlay center" id="m-qr">
+  <div class="modal rounded">
+    <div class="modal-title">&#128242; アプリをダウンロード</div>
+    <div style="text-align:center;padding:8px 0 4px">
+      <div style="font-size:5rem;margin-bottom:12px">&#128242;</div>
+      <div style="font-size:0.85rem;font-weight:800;margin-bottom:6px">ガチャワールド アプリ</div>
+      <div style="font-size:0.75rem;color:var(--dim);margin-bottom:14px">スマホでさらに快適にプレイ！<br>プッシュ通知でイベント情報もお届け</div>
+      <div class="store-dl-btns">
+        <div class="store-dl-btn">&#127822; App Store</div>
+        <div class="store-dl-btn">&#129302; Google Play</div>
+      </div>
+      <div style="font-size:0.72rem;color:var(--dim)">（近日公開予定）</div>
+    </div>
+    <button class="btn btn-gray btn-full" onclick="UI.close('m-qr')" style="margin-top:12px">閉じる</button>
+  </div>
+</div>
+
+<!-- EPIC GACHA ANIMATION OVERLAY -->
+<div id="epicAnim" class="epic-ov">
+  <div class="epic-aurora" id="epicAurora">
+    <div class="aurora-b"></div>
+    <div class="aurora-b"></div>
+    <div class="aurora-b"></div>
+  </div>
+  <!-- Orb phase -->
+  <div class="epic-orb-sect" id="epicOrbSect">
+    <div class="epic-ring epic-ring-1"></div>
+    <div class="epic-ring epic-ring-2"></div>
+    <div class="epic-ring epic-ring-3"></div>
+    <div class="epic-orb" id="epicOrbCore">&#10067;</div>
+  </div>
+  <div class="epic-load-txt" id="epicLoadTxt">OPENING...</div>
+  <!-- Single result -->
+  <div class="epic-result-area" id="epicResultArea">
+    <div class="epic-rarity-banner" id="epicRarityBanner"></div>
+    <div class="epic-result-card" id="epicResultCard">
+      <div class="epic-prize-icon" id="epicPrizeIcon"></div>
+      <div class="epic-prize-name" id="epicPrizeName"></div>
+      <span class="epic-prize-badge" id="epicPrizeBadge"></span>
+      <div class="epic-prize-cv" id="epicPrizeCv"></div>
+      <div class="epic-result-btns">
+        <button class="btn btn-green" id="epicBtnAgain" onclick="Gacha.spinAgain()">もう一度</button>
+        <button class="btn btn-gold"  id="epicBtnExch"  onclick="Gacha.exchLast()">コイン交換</button>
+        <button class="btn btn-gray"  onclick="EpicAnim.close()">閉じる</button>
+      </div>
+    </div>
+  </div>
+  <!-- Multi (10-pull) -->
+  <div class="flip-grid" id="flipGrid" style="display:none"></div>
+  <div class="flip-multi-sum" id="flipMultiSum" style="display:none"></div>
+  <div class="flip-multi-btns" id="flipMultiBtns" style="display:none">
+    <button class="btn btn-gold" onclick="Gacha.exchMultiAll()">全てコイン交換</button>
+    <button class="btn btn-gray" onclick="EpicAnim.close()">閉じる</button>
+  </div>
+</div>
+<div id="screenFlash" class="screen-flash"></div>
+
+<!-- DETAIL PAGE -->
+<div class="detail-page" id="detailPage">
+  <div class="detail-hdr">
+    <button class="detail-back" onclick="Detail.close()">&#8592;</button>
+    <div class="detail-hdr-title" id="detailTitle">ガチャ詳細</div>
+    <div id="detailHot" class="detail-hot"></div>
+  </div>
+  <div class="detail-banner" id="detailBanner">
+    <div class="detail-banner-bg" id="detailBannerBg"></div>
+    <div class="detail-banner-icon" id="detailBannerIcon"></div>
+    <div class="detail-banner-name" id="detailBannerName"></div>
+    <div class="detail-banner-copy" id="detailBannerCopy"></div>
+  </div>
+  <div class="detail-badges" id="detailBadges"></div>
+  <div class="detail-draw-btns">
+    <button class="btn-detail-draw" id="btnDetailDraw" onclick="Detail.draw()">&#127922; 引く</button>
+    <button class="btn-detail-draw-10" id="btnDetailDraw10" onclick="Detail.draw10()">&#9889; 10連</button>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">&#128176; 料金</div>
+    <div class="detail-price-card">
+      <div class="detail-price-item">
+        <div class="detail-price-label">1回</div>
+        <div class="detail-price-val" id="detailPrice1">-</div>
+      </div>
+      <div class="detail-price-item">
+        <div class="detail-price-label">10連</div>
+        <div class="detail-price-val" id="detailPrice10">-</div>
+      </div>
+    </div>
+    <div class="detail-slots-bar">
+      <div class="detail-slots-label">
+        <span>残り枚数</span>
+        <span class="detail-slots-rem" id="detailSlotsRem">-</span>
+      </div>
+      <div class="detail-slots-track">
+        <div class="detail-slots-fill" id="detailSlotsFill" style="width:100%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-section-title">&#127873; 景品一覧</div>
+    <div class="prize-table" id="prizeTable"></div>
+  </div>
+  <div class="detail-section" style="padding-bottom:16px">
+    <div class="detail-section-title">&#128202; 排出率</div>
+    <div class="rate-chart" id="rateChart"></div>
+  </div>
+</div>
+
+<div class="conf-wrap" id="confWrap"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── TRANSLATIONS ─────────────────────────────────────
+const T = {
+  ja:{pageTitle:'ガチャワールド',login:'ログイン',register:'会員登録',logout:'ログアウト',
+      tabGacha:'オリパ',tabRank:'ランキング',tabInv:'インベントリ',tabStore:'交換所',
+      filterAll:'全て',filterNew:'🆕 新着',filterLow:'💰 お手軽',filterHigh:'💎 高額',filterPop:'🔥 人気',
+      news:'お知らせ',faq:'よくある質問',about:'ガチャセンターについて',
+      myItems:'所持アイテム',exchAll:'全て交換',storeTitle:'交換所',histTitle:'ガチャ履歴'},
+  en:{pageTitle:'GachaWorld',login:'Login',register:'Sign Up',logout:'Logout',
+      tabGacha:'Gacha',tabRank:'Ranking',tabInv:'Inventory',tabStore:'Shop',
+      filterAll:'All',filterNew:'🆕 New',filterLow:'💰 Budget',filterHigh:'💎 Premium',filterPop:'🔥 Hot',
+      news:'News',faq:'FAQ',about:'About GachaCenter',
+      myItems:'My Items',exchAll:'Exchange All',storeTitle:'Shop',histTitle:'History'},
+  zh:{pageTitle:'扭蛋世界',login:'登录',register:'注册',logout:'退出',
+      tabGacha:'扭蛋',tabRank:'排行榜',tabInv:'背包',tabStore:'兑换',
+      filterAll:'全部',filterNew:'🆕 新品',filterLow:'💰 实惠',filterHigh:'💎 豪华',filterPop:'🔥 热门',
+      news:'公告',faq:'常见问题',about:'关于扭蛋中心',
+      myItems:'我的物品',exchAll:'全部兑换',storeTitle:'兑换商店',histTitle:'抽奖历史'},
+};
+let curLang = localStorage.getItem('gacha_lang') || 'ja';
+
+const I18N = {
+  t(k){ return (T[curLang]||T.ja)[k]||k; },
+  apply(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      el.textContent = this.t(el.dataset.i18n);
+    });
+    document.title = this.t('pageTitle');
+    document.getElementById('langLabel').textContent = {ja:'JP',en:'EN',zh:'中'}[curLang]||'JP';
+    document.documentElement.lang = curLang==='zh'?'zh-CN':curLang;
+  },
+  cycle(){
+    const ls=['ja','en','zh'];
+    curLang = ls[(ls.indexOf(curLang)+1)%ls.length];
+    localStorage.setItem('gacha_lang',curLang);
+    this.apply();
+  },
+};
+
+// ─── AUTH ─────────────────────────────────────────────
+const Auth = {
+  _users(){ try{return JSON.parse(localStorage.getItem('gw_users')||'[]');}catch(e){return[];} },
+  _save(u){ localStorage.setItem('gw_users',JSON.stringify(u)); },
+  _cur(){ try{return JSON.parse(localStorage.getItem('gw_user')||'null');}catch(e){return null;} },
+  _setCur(u){ u?localStorage.setItem('gw_user',JSON.stringify(u)):localStorage.removeItem('gw_user'); },
+  get currentUser(){ return this._cur(); },
+  init(){ this._updateHeader(); },
+  _updateHeader(){
+    const u=this._cur();
+    document.getElementById('authArea').style.display=u?'none':'flex';
+    document.getElementById('userArea').style.display=u?'flex':'none';
+    if(u) document.getElementById('userChip').textContent='👤 '+u.username;
+    const acct=document.getElementById('page-account');
+    if(acct&&acct.style.display!=='none')Render.account();
+  },
+  openLogin(){
+    document.getElementById('login-username').value='';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-err').textContent='';
+    UI.open('m-login');
+  },
+  openRegister(){
+    document.getElementById('reg-username').value='';
+    document.getElementById('reg-email').value='';
+    document.getElementById('reg-pass').value='';
+    document.getElementById('reg-err').textContent='';
+    UI.open('m-register');
+  },
+  register(){
+    const un=document.getElementById('reg-username').value.trim();
+    const em=document.getElementById('reg-email').value.trim();
+    const pw=document.getElementById('reg-pass').value;
+    const err=document.getElementById('reg-err');
+    if(!un||!em||!pw){err.textContent='全て入力してください';return;}
+    if(pw.length<6){err.textContent='パスワードは6文字以上';return;}
+    const users=this._users();
+    if(users.find(u=>u.username===un)){err.textContent='このユーザー名は既に使用されています';return;}
+    users.push({username:un,email:em,password:pw});
+    this._save(users);
+    this._setCur({username:un,email:em});
+    State.coins+=500; UI.updateCoins();
+    UI.close('m-register');
+    this._updateHeader();
+    UI.toast('🎉 登録完了！500コインプレゼント！');
+  },
+  login(){
+    const un=document.getElementById('login-username').value.trim();
+    const pw=document.getElementById('login-pass').value;
+    const err=document.getElementById('login-err');
+    const user=this._users().find(u=>u.username===un&&u.password===pw);
+    if(!user){err.textContent='ユーザー名またはパスワードが違います';return;}
+    this._setCur({username:user.username,email:user.email});
+    UI.close('m-login');
+    this._updateHeader();
+    UI.toast('✅ ログインしました！');
+  },
+  logout(){
+    this._setCur(null);
+    this._updateHeader();
+    UI.toast('👋 ログアウトしました');
+  },
+};
+
+// ─── BANNER ───────────────────────────────────────────
+const Banner = {
+  cur:0, total:4, timer:null,
+  init(){this.render();this.start();},
+  start(){this.timer=setInterval(()=>this.next(),4500);},
+  stop(){clearInterval(this.timer);},
+  goTo(i){this.cur=i;this.render();this.stop();this.start();},
+  next(){this.goTo((this.cur+1)%this.total);},
+  prev(){this.goTo((this.cur-1+this.total)%this.total);},
+  render(){
+    const t=document.getElementById('slideTrack');
+    if(t) t.style.transform=`translateX(-${this.cur*100}%)`;
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===this.cur));
+  },
+};
+
+// ─── GAME DATA ────────────────────────────────────────
+const MACHINES=[
+  {id:'beginner',name:'ビギナーズラック',icon:'🍀',
+   grad:'linear-gradient(135deg,#66bb6a,#2e7d32)',
+   copy:'初回限定！ラッキーな出会いを！',
+   cost:30,cost10:270,totalSlots:99999,tags:['お手軽'],
+   prizes:[
+     {id:'bg_stk',name:'ラッキーステッカー',emoji:'🏷️',rarity:'common',cv:45,prob:0.55},
+     {id:'bg_bdg',name:'クローバーバッジ',emoji:'🍀',rarity:'uncommon',cv:80,prob:0.30},
+     {id:'bg_key',name:'ラッキーチャーム',emoji:'🔮',rarity:'rare',cv:150,prob:0.12},
+     {id:'bg_fig',name:'幸運のフィギュア',emoji:'🧸',rarity:'super-rare',cv:280,prob:0.03},
+   ]},
+  {id:'starter',name:'スターターガチャ',icon:'🎪',
+   grad:'linear-gradient(135deg,#43a047,#1b5e20)',
+   copy:'まずはここから！誰でも引けるお手軽ガチャ',
+   cost:50,cost10:450,totalSlots:99999,tags:['お手軽'],
+   prizes:[
+     {id:'st_stk',name:'キャラステッカー',emoji:'🏷️',rarity:'common',cv:75,prob:0.50},
+     {id:'st_bdg',name:'コレクションバッジ',emoji:'📛',rarity:'uncommon',cv:120,prob:0.30},
+     {id:'st_key',name:'キーホルダー',emoji:'🔑',rarity:'rare',cv:200,prob:0.15},
+     {id:'st_fig',name:'ミニフィギュア',emoji:'🧸',rarity:'super-rare',cv:350,prob:0.05},
+   ]},
+  {id:'second',name:'セカンドチャンス',icon:'🎯',
+   grad:'linear-gradient(135deg,#26c6da,#006064)',
+   copy:'もう一度チャレンジ！お得な中級ガチャ',
+   cost:80,cost10:720,totalSlots:80000,tags:['お手軽'],
+   prizes:[
+     {id:'sc_pin',name:'ピンバッジ',emoji:'📌',rarity:'common',cv:100,prob:0.50},
+     {id:'sc_str',name:'ストラップ',emoji:'🔗',rarity:'uncommon',cv:160,prob:0.30},
+     {id:'sc_bk',name:'ミニコミック',emoji:'📔',rarity:'rare',cv:250,prob:0.15},
+     {id:'sc_fig',name:'アクションフィギュア',emoji:'🤺',rarity:'super-rare',cv:400,prob:0.05},
+   ]},
+  {id:'normal',name:'ノーマルガチャ',icon:'⚡',
+   grad:'linear-gradient(135deg,#1e88e5,#0d47a1)',
+   copy:'バランス◎ スタンダードなガチャ',
+   cost:100,cost10:900,totalSlots:50000,tags:['スタンダード'],
+   prizes:[
+     {id:'nm_pin',name:'ピンバッジセット',emoji:'📌',rarity:'common',cv:130,prob:0.50},
+     {id:'nm_tsh',name:'キャラTシャツ',emoji:'👕',rarity:'uncommon',cv:280,prob:0.28},
+     {id:'nm_pos',name:'限定ポスター',emoji:'🖼️',rarity:'rare',cv:500,prob:0.17},
+     {id:'nm_fig',name:'レアフィギュア',emoji:'🎎',rarity:'super-rare',cv:1200,prob:0.05},
+   ]},
+  {id:'anime',name:'アニメキャラガチャ',icon:'✨',
+   grad:'linear-gradient(135deg,#ec407a,#880e4f)',
+   copy:'人気アニメキャラのグッズが登場！',
+   cost:150,cost10:1350,totalSlots:60000,tags:['アニメ'],
+   prizes:[
+     {id:'an_stk',name:'アニメステッカーセット',emoji:'🌸',rarity:'common',cv:180,prob:0.50},
+     {id:'an_bdg',name:'キャラクターバッジ',emoji:'💮',rarity:'uncommon',cv:320,prob:0.28},
+     {id:'an_key',name:'アニメキーホルダー',emoji:'🗝️',rarity:'rare',cv:600,prob:0.17},
+     {id:'an_fig',name:'アニメフィギュア',emoji:'🎌',rarity:'super-rare',cv:1500,prob:0.05},
+   ]},
+  {id:'chara',name:'キャラクターグッズ',icon:'🎭',
+   grad:'linear-gradient(135deg,#ab47bc,#4a148c)',
+   copy:'キャラクター公式グッズが当たる！',
+   cost:180,cost10:1620,totalSlots:45000,tags:['アニメ'],
+   prizes:[
+     {id:'ch_can',name:'缶バッジ',emoji:'🔵',rarity:'common',cv:220,prob:0.48},
+     {id:'ch_tow',name:'キャラタオル',emoji:'🏳️',rarity:'uncommon',cv:400,prob:0.30},
+     {id:'ch_art',name:'アートブック',emoji:'📚',rarity:'rare',cv:700,prob:0.17},
+     {id:'ch_fig',name:'限定フィギュア',emoji:'🎭',rarity:'super-rare',cv:1800,prob:0.05},
+   ]},
+  {id:'pokemon',name:'ポケモンオリパ',icon:'⚡',
+   grad:'linear-gradient(135deg,#ffee58,#f57f17)',
+   copy:'ポケモンカード封入！超人気ガチャ！',
+   cost:200,cost10:1800,totalSlots:30000,tags:['スタンダード','人気'],
+   prizes:[
+     {id:'pk_c',name:'ノーマルカード',emoji:'🃏',rarity:'common',cv:240,prob:0.45},
+     {id:'pk_r',name:'レアカード',emoji:'✨',rarity:'uncommon',cv:500,prob:0.30},
+     {id:'pk_sr',name:'SRカード',emoji:'💎',rarity:'rare',cv:1200,prob:0.20},
+     {id:'pk_ur',name:'URカード',emoji:'🌟',rarity:'ultra-rare',cv:5000,prob:0.05},
+   ]},
+  {id:'weekly',name:'ウィークリースペシャル',icon:'📅',
+   grad:'linear-gradient(135deg,#ff7043,#bf360c)',
+   copy:'毎週更新！今週限りの特別ガチャ',
+   cost:250,cost10:2250,totalSlots:25000,tags:['限定'],
+   prizes:[
+     {id:'wk_pkg',name:'スペシャルパッケージ',emoji:'📦',rarity:'common',cv:300,prob:0.45},
+     {id:'wk_set',name:'限定グッズセット',emoji:'🎁',rarity:'uncommon',cv:600,prob:0.30},
+     {id:'wk_col',name:'コレクターズアイテム',emoji:'🏅',rarity:'rare',cv:1300,prob:0.20},
+     {id:'wk_sp',name:'週間スペシャル',emoji:'⭐',rarity:'super-rare',cv:2500,prob:0.05},
+   ]},
+  {id:'silver',name:'シルバーガチャ',icon:'🥈',
+   grad:'linear-gradient(135deg,#78909c,#37474f)',
+   copy:'高品質アイテム多数！シルバー限定排出',
+   cost:300,cost10:2700,totalSlots:20000,tags:['高品質','人気'],
+   prizes:[
+     {id:'sv_acr',name:'アクリルスタンド',emoji:'🗿',rarity:'uncommon',cv:400,prob:0.45},
+     {id:'sv_art',name:'アートプリント',emoji:'🎨',rarity:'rare',cv:700,prob:0.30},
+     {id:'sv_fig',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:1800,prob:0.20},
+     {id:'sv_ssr',name:'SSRカード',emoji:'✨',rarity:'ultra-rare',cv:3500,prob:0.05},
+   ]},
+  {id:'mystery',name:'ミステリーボックス',icon:'📦',
+   grad:'linear-gradient(135deg,#546e7a,#263238)',
+   copy:'何が入ってるかはお楽しみ！',
+   cost:350,cost10:3150,totalSlots:18000,tags:['ミステリー'],
+   prizes:[
+     {id:'my_com',name:'コモンボックス',emoji:'📦',rarity:'common',cv:400,prob:0.40},
+     {id:'my_unc',name:'アンコモンボックス',emoji:'🎁',rarity:'uncommon',cv:750,prob:0.30},
+     {id:'my_rar',name:'レアボックス',emoji:'💼',rarity:'rare',cv:1500,prob:0.22},
+     {id:'my_sp',name:'ミステリースペシャル',emoji:'🔮',rarity:'super-rare',cv:3000,prob:0.08},
+   ]},
+  {id:'figure',name:'フィギュアコレクション',icon:'🗿',
+   grad:'linear-gradient(135deg,#8d6e63,#4e342e)',
+   copy:'精巧なフィギュアのコレクション！',
+   cost:400,cost10:3600,totalSlots:15000,tags:['高品質'],
+   prizes:[
+     {id:'fg_mini',name:'ミニフィギュア',emoji:'🧸',rarity:'uncommon',cv:500,prob:0.40},
+     {id:'fg_std',name:'スタンダードフィギュア',emoji:'🗿',rarity:'rare',cv:1000,prob:0.35},
+     {id:'fg_lim',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:2500,prob:0.20},
+     {id:'fg_ur',name:'UR限定フィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05},
+   ]},
+  {id:'holiday',name:'ホリデースペシャル',icon:'🎄',
+   grad:'linear-gradient(135deg,#ef5350,#b71c1c)',
+   copy:'季節限定！ホリデーシーズン特別版',
+   cost:450,cost10:4050,totalSlots:12000,tags:['限定','人気'],
+   prizes:[
+     {id:'hd_orn',name:'ホリデーオーナメント',emoji:'🎄',rarity:'uncommon',cv:600,prob:0.40},
+     {id:'hd_set',name:'ホリデーグッズセット',emoji:'🎁',rarity:'rare',cv:1200,prob:0.35},
+     {id:'hd_lim',name:'限定コレクション',emoji:'❄️',rarity:'super-rare',cv:3000,prob:0.20},
+     {id:'hd_ur',name:'ホリデーURアイテム',emoji:'🌟',rarity:'ultra-rare',cv:7000,prob:0.05},
+   ]},
+  {id:'gold',name:'ゴールドガチャ',icon:'🥇',
+   grad:'linear-gradient(135deg,#ffb300,#e65100)',
+   copy:'1等は超プレミアム！夢を掴め！',
+   cost:500,cost10:4500,totalSlots:10000,tags:['プレミアム','人気'],
+   prizes:[
+     {id:'gd_set',name:'プレミアムグッズセット',emoji:'🎁',rarity:'rare',cv:800,prob:0.40},
+     {id:'gd_acr',name:'限定アクリルスタンド',emoji:'💎',rarity:'rare',cv:1300,prob:0.35},
+     {id:'gd_art',name:'レアアートボード',emoji:'🖌️',rarity:'super-rare',cv:3000,prob:0.20},
+     {id:'gd_ur',name:'URフィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05},
+   ]},
+  {id:'artlimit',name:'限定アートシリーズ',icon:'🎨',
+   grad:'linear-gradient(135deg,#26a69a,#004d40)',
+   copy:'アーティスト限定コラボシリーズ！',
+   cost:600,cost10:5400,totalSlots:8000,tags:['限定'],
+   prizes:[
+     {id:'al_prt',name:'アートプリント',emoji:'🖼️',rarity:'rare',cv:900,prob:0.38},
+     {id:'al_sig',name:'サイン入りポスター',emoji:'✍️',rarity:'rare',cv:1800,prob:0.32},
+     {id:'al_lim',name:'限定アートボード',emoji:'🎨',rarity:'super-rare',cv:4000,prob:0.22},
+     {id:'al_ur',name:'UR限定アートピース',emoji:'🏛️',rarity:'ultra-rare',cv:8000,prob:0.08},
+   ]},
+  {id:'superrare',name:'スーパーレアガチャ',icon:'💫',
+   grad:'linear-gradient(135deg,#7e57c2,#311b92)',
+   copy:'SR以上確定！超高確率ガチャ！',
+   cost:700,cost10:6300,totalSlots:7000,tags:['プレミアム'],
+   prizes:[
+     {id:'sr_acr',name:'SRアクリルスタンド',emoji:'💫',rarity:'rare',cv:1000,prob:0.40},
+     {id:'sr_fig',name:'SRフィギュア',emoji:'🌠',rarity:'super-rare',cv:2500,prob:0.35},
+     {id:'sr_lim',name:'限定SRコレクション',emoji:'✨',rarity:'super-rare',cv:4000,prob:0.20},
+     {id:'sr_ur',name:'UR超限定',emoji:'💎',rarity:'ultra-rare',cv:9000,prob:0.05},
+   ]},
+  {id:'legend',name:'レジェンドガチャ',icon:'🏆',
+   grad:'linear-gradient(135deg,#ff8f00,#e65100)',
+   copy:'伝説のアイテムが眠るガチャ！',
+   cost:800,cost10:7200,totalSlots:6000,tags:['プレミアム','UR排出'],
+   prizes:[
+     {id:'lg_set',name:'レジェンドグッズセット',emoji:'🏅',rarity:'rare',cv:1200,prob:0.35},
+     {id:'lg_fig',name:'レジェンドフィギュア',emoji:'🏆',rarity:'super-rare',cv:3000,prob:0.35},
+     {id:'lg_lim',name:'限定レジェンドBOX',emoji:'📿',rarity:'super-rare',cv:5000,prob:0.20},
+     {id:'lg_ur',name:'URレジェンド',emoji:'👑',rarity:'ultra-rare',cv:12000,prob:0.10},
+   ]},
+  {id:'master',name:'マスターコレクション',icon:'👑',
+   grad:'linear-gradient(135deg,#5c6bc0,#1a237e)',
+   copy:'マスター限定！至高のコレクション',
+   cost:900,cost10:8100,totalSlots:5000,tags:['UR排出'],
+   prizes:[
+     {id:'mc_art',name:'マスターアートピース',emoji:'🖼️',rarity:'super-rare',cv:1500,prob:0.40},
+     {id:'mc_fig',name:'マスターフィギュア',emoji:'🗽',rarity:'super-rare',cv:3500,prob:0.30},
+     {id:'mc_lim',name:'限定マスターBOX',emoji:'🧿',rarity:'super-rare',cv:5500,prob:0.20},
+     {id:'mc_ur',name:'URマスターコレクション',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.10},
+   ]},
+  {id:'premium',name:'プレミアムガチャ',icon:'💎',
+   grad:'linear-gradient(135deg,#9c27b0,#4a148c)',
+   copy:'最高峰ガチャ！URを掴み取れ！！',
+   cost:1000,cost10:9000,totalSlots:5000,tags:['UR排出','限定'],
+   prizes:[
+     {id:'pm_box',name:'コレクターズボックス',emoji:'📦',rarity:'rare',cv:1500,prob:0.40},
+     {id:'pm_dvd',name:'限定版DVD',emoji:'💿',rarity:'super-rare',cv:2800,prob:0.30},
+     {id:'pm_art',name:'シグネチャーアート',emoji:'🖼️',rarity:'super-rare',cv:7000,prob:0.20},
+     {id:'pm_ur',name:'URコレクション',emoji:'🌟',rarity:'ultra-rare',cv:12000,prob:0.10},
+   ]},
+  {id:'diamond',name:'ダイヤモンドガチャ',icon:'💠',
+   grad:'linear-gradient(135deg,#00bcd4,#006064)',
+   copy:'ダイヤ級の価値！最高峰コレクション',
+   cost:1500,cost10:13500,totalSlots:3000,tags:['UR排出','限定'],
+   prizes:[
+     {id:'dm_fig',name:'ダイヤモンドフィギュア',emoji:'💠',rarity:'super-rare',cv:2500,prob:0.35},
+     {id:'dm_art',name:'ダイヤモンドアート',emoji:'🔷',rarity:'super-rare',cv:5000,prob:0.35},
+     {id:'dm_lim',name:'限定ダイヤモンドBOX',emoji:'💎',rarity:'ultra-rare',cv:10000,prob:0.20},
+     {id:'dm_ur',name:'URダイヤモンド至宝',emoji:'🌟',rarity:'ultra-rare',cv:20000,prob:0.10},
+   ]},
+  {id:'grand',name:'グランドプレミアム',icon:'🌟',
+   grad:'linear-gradient(135deg,#ffd700,#ff6f00)',
+   copy:'頂点に君臨する最高峰ガチャ！',
+   cost:2000,cost10:18000,totalSlots:1000,tags:['UR排出','限定','人気'],
+   prizes:[
+     {id:'gp_col',name:'グランドコレクション',emoji:'🌟',rarity:'super-rare',cv:4000,prob:0.30},
+     {id:'gp_lim',name:'グランド限定BOX',emoji:'🎆',rarity:'super-rare',cv:8000,prob:0.30},
+     {id:'gp_ur1',name:'URグランドフィギュア',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.25},
+     {id:'gp_ur2',name:'URグランド至高',emoji:'💫',rarity:'ultra-rare',cv:25000,prob:0.15},
+   ]},
+];
+
+const COIN_PKGS=[
+  {coins:500,  price:'¥500',  bonus:0},
+  {coins:1200, price:'¥1,000',bonus:200},
+  {coins:3000, price:'¥2,000',bonus:1000},
+  {coins:6500, price:'¥4,000',bonus:2500},
+  {coins:15000,price:'¥8,000',bonus:7000},
+];
+
+const STORE_ITEMS=[
+  {id:'sh1',name:'ゲームアイテムパック',    emoji:'🎮',desc:'ゲーム内特別アイテム',            cost:500,  rarity:'common'},
+  {id:'sh2',name:'限定ステッカーパック',    emoji:'🏷️',desc:'12枚入り限定セット',              cost:800,  rarity:'uncommon'},
+  {id:'sh3',name:'プレミアムTシャツ',      emoji:'👕',desc:'高品質コットン限定品',            cost:2000, rarity:'uncommon'},
+  {id:'sh4',name:'レアフィギュア',          emoji:'🎎',desc:'精巧な限定フィギュア',            cost:3500, rarity:'rare'},
+  {id:'sh5',name:'限定版アートブック',      emoji:'📗',desc:'フルカラー200ページ限定版',       cost:5000, rarity:'rare'},
+  {id:'sh6',name:'コレクターズエディション',emoji:'📦',desc:'全グッズ詰め合わせセット',        cost:8000, rarity:'super-rare'},
+  {id:'sh7',name:'サイン入りポスター',      emoji:'🖊️',desc:'本物サイン入り限定ポスター',      cost:10000,rarity:'super-rare'},
+  {id:'sh8',name:'URメガコレクション',      emoji:'🌟',desc:'最高レアリティ究極コレクション',  cost:15000,rarity:'ultra-rare'},
+];
+
+// ─── APPLY INTERNAL CMS OVERRIDES ────────────────────
+(function(){
+  try{const cm=JSON.parse(localStorage.getItem('gw_custom_machines'));if(cm&&cm.length){MACHINES.length=0;cm.forEach(m=>MACHINES.push(m));}}catch(e){}
+  try{const cp=JSON.parse(localStorage.getItem('gw_custom_coin_pkgs'));if(cp&&cp.length){COIN_PKGS.length=0;cp.forEach(p=>COIN_PKGS.push(p));}}catch(e){}
+  try{const si=JSON.parse(localStorage.getItem('gw_custom_store_items'));if(si&&si.length){STORE_ITEMS.length=0;si.forEach(s=>STORE_ITEMS.push(s));}}catch(e){}
+  try{
+    const cb=JSON.parse(localStorage.getItem('gw_custom_banners'));
+    if(cb&&cb.length){
+      cb.forEach((b,i)=>{
+        const slide=document.getElementById('slide'+i);
+        if(!slide) return;
+        if(b.image) slide.style.background=`url(${b.image}) center/cover no-repeat`;
+        if(b.badge){const el=document.getElementById('slide'+i+'-badge');if(el)el.textContent=b.badge;}
+        if(b.title){const el=document.getElementById('slide'+i+'-title');if(el)el.innerHTML=b.title.replace(/\n/g,'<br>');}
+        if(b.sub){const el=document.getElementById('slide'+i+'-sub');if(el)el.textContent=b.sub;}
+      });
+    }
+  }catch(e){}
+})();
+
+const R={
+  'common':    {label:'コモン',      color:'#78909c'},
+  'uncommon':  {label:'アンコモン',  color:'#43a047'},
+  'rare':      {label:'レア',        color:'#1e88e5'},
+  'super-rare':{label:'スーパーレア',color:'#8e24aa'},
+  'ultra-rare':{label:'ウルトラレア',color:'#bf360c'},
+};
+
+const TAGS={
+  'お手軽':     'background:#4caf50;color:white',
+  'スタンダード':'background:#1e88e5;color:white',
+  '高品質':     'background:#78909c;color:white',
+  '人気':       'background:#e53935;color:white',
+  'プレミアム': 'background:#ff9800;color:white',
+  'UR排出':     'background:#9c27b0;color:white',
+  '限定':       'background:#f44336;color:white',
+  'アニメ':     'background:#ec407a;color:white',
+  'ミステリー': 'background:#546e7a;color:white',
+};
+
+const HOT={};
+MACHINES.forEach(m=>{HOT[m.id]=Math.floor(Math.random()*200)+15;});
+
+// ─── STATE ────────────────────────────────────────────
+const State=(()=>{
+  const KEY='gachaWorld_v3';
+  let s;
+  function load(){
+    try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
+    if(!s)s={coins:1000,inv:{},spins:0,urCount:0,history:[],slots:{}};
+    MACHINES.forEach(m=>{if(s.slots[m.id]==null)s.slots[m.id]=m.totalSlots;});
+  }
+  function save(){localStorage.setItem(KEY,JSON.stringify(s));}
+  load();
+  return{
+    get coins(){return s.coins;},
+    set coins(v){s.coins=v;save();},
+    get inv(){return s.inv;},
+    get spins(){return s.spins;},
+    get urCount(){return s.urCount;},
+    get history(){return s.history;},
+    slots(id){return s.slots[id]??0;},
+    addItem(item){
+      if(s.inv[item.id])s.inv[item.id].qty++;
+      else s.inv[item.id]={...item,qty:1};
+      save();
+    },
+    removeItem(id,qty=1){
+      if(!s.inv[id])return 0;
+      const cv=s.inv[id].cv;
+      const taken=Math.min(qty,s.inv[id].qty);
+      s.inv[id].qty-=taken;
+      if(s.inv[id].qty<=0)delete s.inv[id];
+      save();
+      return cv*taken;
+    },
+    recordSpin(mid,prize){
+      s.spins++;
+      if(prize.rarity==='ultra-rare')s.urCount++;
+      if(s.slots[mid]>0)s.slots[mid]--;
+      const m=MACHINES.find(x=>x.id===mid);
+      s.history.unshift({time:new Date().toLocaleString('ja-JP'),machine:m?m.name:mid,prize});
+      if(s.history.length>100)s.history.pop();
+      save();
+    },
+  };
+})();
+
+// ─── FILTER STATE ─────────────────────────────────────
+let curFilter='all',curSort='',curCat='all';
+
+function setFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  Render.gacha();
+}
+function setSort(v){curSort=v;Render.gacha();}
+function setCat(id){
+  curCat=id;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('ct-'+id);
+  if(el)el.classList.add('active');
+  Render.gacha();
+}
+function filtered(){
+  let ms=[...MACHINES];
+  if(curCat!=='all')ms=ms.filter(m=>m.id===curCat);
+  if(curFilter==='new')ms=ms.filter(m=>m.tags.some(t=>['限定','UR排出'].includes(t)));
+  if(curFilter==='low')ms=ms.filter(m=>m.cost<=100);
+  if(curFilter==='high')ms=ms.filter(m=>m.cost>=500);
+  if(curFilter==='pop')ms=ms.filter(m=>m.tags.includes('人気')||HOT[m.id]>100);
+  if(curSort==='asc')ms.sort((a,b)=>a.cost-b.cost);
+  if(curSort==='desc')ms.sort((a,b)=>b.cost-a.cost);
+  return ms;
+}
+
+// ─── UI ───────────────────────────────────────────────
+const UI={
+  switchPage(name){
+    ['gacha','inventory','store','history','account'].forEach(p=>{
+      const el=document.getElementById('page-'+p);
+      if(el){el.style.display='none';el.classList.remove('active');}
+    });
+    const wrapper=document.getElementById('gachaTopWrapper');
+    if(wrapper)wrapper.style.display=name==='gacha'?'':'none';
+    const pg=document.getElementById('page-'+name);
+    if(pg){pg.style.display='block';pg.classList.add('active');}
+    document.querySelectorAll('.bot-tab').forEach(t=>t.classList.remove('active'));
+    const bot=document.getElementById('bot-'+name);
+    if(bot)bot.classList.add('active');
+    if(name==='inventory')Render.inventory();
+    if(name==='store')Render.store();
+    if(name==='history')Render.history();
+    if(name==='gacha')Render.gacha();
+    if(name==='account')Render.account();
+  },
+  updateCoins(){
+    document.getElementById('coinAmt').textContent=State.coins.toLocaleString();
+    const b=document.getElementById('coinBadge');
+    b.classList.remove('coin-bump');void b.offsetWidth;b.classList.add('coin-bump');
+  },
+  updateStats(){
+    const acct=document.getElementById('page-account');
+    if(acct&&acct.style.display!=='none')Render.account();
+  },
+  open(id){document.getElementById(id).classList.add('open');},
+  close(id){document.getElementById(id).classList.remove('open');},
+  toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2800);
+  },
+  confetti(){
+    const w=document.getElementById('confWrap');
+    const c=['#ffd700','#ff6b6b','#4ecdc4','#45b7d1','#dda0dd','#96ceb4','#ff9800'];
+    for(let i=0;i<50;i++){
+      const el=document.createElement('div');el.className='cp';
+      const s=6+Math.random()*10;
+      el.style.cssText=`left:${Math.random()*100}%;background:${c[~~(Math.random()*c.length)]};width:${s}px;height:${s}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*.5}s`;
+      w.appendChild(el);setTimeout(()=>el.remove(),3500);
+    }
+  },
+  openCoinShop(){
+    document.getElementById('coinPkgs').innerHTML=COIN_PKGS.map((p,i)=>`
+      <div class="coin-pkg" onclick="_buyCoin(${i})">
+        <div class="pkg-l">
+          <span style="font-size:1.4rem">🪙</span>
+          <div>
+            <div class="pkg-amt">${p.coins.toLocaleString()} コイン</div>
+            ${p.bonus?`<div class="pkg-bonus">+${p.bonus.toLocaleString()} ボーナス!</div>`:'<div class="pkg-bonus">&nbsp;</div>'}
+          </div>
+        </div>
+        <div class="pkg-price">${p.price}</div>
+      </div>
+    `).join('');
+    UI.open('m-coin');
+  },
+  exchangeAll(){
+    const items=Object.values(State.inv);
+    if(!items.length){UI.toast('アイテムがありません');return;}
+    let total=0;
+    const ids=Object.keys(State.inv);
+    ids.forEach(id=>{const i=State.inv[id];total+=i.cv*i.qty;});
+    ids.forEach(id=>State.removeItem(id,999));
+    State.coins+=total;
+    UI.updateCoins();UI.updateStats();Render.inventory();
+    UI.toast(`🪙 ${total.toLocaleString()}コインに交換しました！`);
+  },
+  showRanking(){
+    document.querySelectorAll('.bot-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('bot-rank').classList.add('active');
+    const ur=State.history.filter(h=>h.prize.rarity==='ultra-rare');
+    const el=document.getElementById('rankList');
+    if(!ur.length){
+      el.innerHTML='<div class="empty"><div class="empty-ico">🏆</div><div>まだURが獲得されていません</div></div>';
+    }else{
+      el.innerHTML=ur.slice(0,10).map((h,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:1.2rem;width:28px;text-align:center">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</div>
+          <div style="font-size:1.4rem">${h.prize.emoji}</div>
+          <div style="flex:1">
+            <div style="font-size:0.85rem;font-weight:700">${h.prize.name}</div>
+            <div style="font-size:0.7rem;color:var(--dim)">${h.machine} · ${h.time}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    UI.open('m-rank');
+  },
+};
+window._buyCoin=function(i){
+  const p=COIN_PKGS[i];
+  State.coins+=p.coins;
+  UI.updateCoins();UI.close('m-coin');
+  UI.toast(`🪙 ${p.coins.toLocaleString()}コインを獲得！`);
+};
+
+// ─── RENDER ───────────────────────────────────────────
+const Render={
+  gacha(){
+    const ms=filtered();
+    const g=document.getElementById('cardGrid');
+    if(!ms.length){
+      g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-ico">🔍</div><div>該当するガチャがありません</div></div>';
+      UI.updateStats();return;
+    }
+    g.innerHTML=ms.map(m=>{
+      const rem=State.slots(m.id);
+      const pct=Math.max(4,(rem/m.totalSlots)*100);
+      const sorted=[...m.prizes].sort((a,b)=>{const o=['ultra-rare','super-rare','rare','uncommon','common'];return o.indexOf(a.rarity)-o.indexOf(b.rarity);});
+      const top=sorted[0]||m.prizes[0];
+      const tags=m.tags.map(t=>`<span class="ctag" style="${TAGS[t]||'background:#666;color:white'}">${t}</span>`).join('');
+      return `<div class="gacha-card" onclick="location.href='product.html?id=${m.id}'">
+        <div class="card-banner" style="background:${m.grad}">
+          <div class="banner-bg">${m.icon}</div>
+          <div class="banner-icon">${m.icon}</div>
+          <div class="banner-name">${m.name}</div>
+          <div class="banner-copy">${m.copy}</div>
+          <div class="hot-badge">🔥 ${HOT[m.id]}人</div>
+        </div>
+        <div class="card-tags">${tags}</div>
+        <div class="card-body">
+          <div class="card-title">1等: ${top.emoji} ${top.name}</div>
+          <div class="card-meta">
+            <div class="card-cost">🪙${m.cost.toLocaleString()}/1回</div>
+            <div class="card-rem">残り${rem.toLocaleString()}</div>
+          </div>
+          <div class="rem-bar"><div class="rem-fill" style="width:${pct}%"></div></div>
+          <div class="btns-row">
+            <button class="btn-draw" onclick="event.stopPropagation();location.href='product.html?id=${m.id}'">詳細・引く</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    UI.updateStats();
+  },
+  inventory(){
+    const g=document.getElementById('invGrid');
+    const items=Object.values(State.inv);
+    if(!items.length){
+      g.innerHTML='<div class="empty"><div class="empty-ico">🎒</div><div>アイテムがありません</div><div style="font-size:0.78rem;margin-top:6px">ガチャを引いてゲット！</div></div>';
+      return;
+    }
+    g.innerHTML=items.map(item=>`
+      <div class="inv-card">
+        <div class="inv-icon">${item.emoji}</div>
+        <div class="inv-name">${item.name}</div>
+        <div class="inv-qty">×${item.qty}</div>
+        <div class="inv-cv">🪙 ${item.cv.toLocaleString()}/個</div>
+        <button class="btn-exch" onclick="Gacha.exchItem('${item.id}')">コインに交換</button>
+      </div>
+    `).join('');
+  },
+  store(){
+    Store.initFilter();
+    Store._renderGrid('all');
+  },
+  history(){
+    const el=document.getElementById('histList');
+    if(!State.history.length){
+      el.innerHTML='<div class="empty"><div class="empty-ico">📜</div><div>履歴がありません</div></div>';return;
+    }
+    el.innerHTML=State.history.slice(0,60).map(h=>`
+      <div class="hist-item">
+        <div class="hist-ico">${h.prize.emoji}</div>
+        <div class="hist-info">
+          <div class="hist-name">${h.prize.name}</div>
+          <div class="hist-meta">${h.machine} · ${h.time}</div>
+        </div>
+        <span class="res-badge rb-${h.prize.rarity}" style="font-size:0.68rem;padding:2px 8px">${R[h.prize.rarity].label}</span>
+      </div>
+    `).join('');
+  },
+  account(){
+    const u=Auth.currentUser;
+    const totalItems=Object.values(State.inv).reduce((s,i)=>s+i.qty,0);
+    // hero
+    document.getElementById('acctHero').innerHTML=u
+      ?`<div class="acct-avatar">👤</div>
+        <div class="acct-name">${u.username}</div>
+        <div class="acct-sub">${u.email}</div>`
+      :`<div class="acct-avatar">👤</div>
+        <div class="acct-name">ゲスト</div>
+        <div class="acct-sub">ログインしてデータを保存しよう</div>`;
+    // kpi
+    document.getElementById('acctKpi').innerHTML=`
+      <div class="acct-kpi-card">
+        <div class="acct-kpi-val">${State.spins.toLocaleString()}</div>
+        <div class="acct-kpi-lbl">🎰 総ガチャ回数</div>
+      </div>
+      <div class="acct-kpi-card ur">
+        <div class="acct-kpi-val">${State.urCount.toLocaleString()}</div>
+        <div class="acct-kpi-lbl">🌟 UR獲得数</div>
+      </div>
+      <div class="acct-kpi-card">
+        <div class="acct-kpi-val">${totalItems.toLocaleString()}</div>
+        <div class="acct-kpi-lbl">🎁 所持アイテム</div>
+      </div>
+      <div class="acct-kpi-card coin">
+        <div class="acct-kpi-val">${State.coins.toLocaleString()}</div>
+        <div class="acct-kpi-lbl">🪙 所持コイン</div>
+      </div>`;
+    // buttons
+    document.getElementById('acctBtns').innerHTML=`
+      <button class="acct-btn" onclick="UI.switchPage('inventory')">
+        <span class="acct-btn-ico">🎁</span> 所持アイテム一覧 <span class="acct-btn-arr">›</span>
+      </button>
+      <button class="acct-btn" onclick="UI.switchPage('history')">
+        <span class="acct-btn-ico">📜</span> ガチャ履歴 <span class="acct-btn-arr">›</span>
+      </button>
+      ${u?`<button class="acct-btn danger" onclick="Auth.logout()">
+        <span class="acct-btn-ico">🚪</span> ログアウト <span class="acct-btn-arr">›</span>
+      </button>`:''}`;
+    // guest prompt
+    document.getElementById('acctGuest').innerHTML=u?'':
+      `<div class="acct-guest">
+        <div class="acct-guest-ico">🔑</div>
+        <div class="acct-guest-ttl">ログインしてもっと楽しもう！</div>
+        <div class="acct-guest-txt">会員登録で500コインプレゼント！<br>データを保存してどこからでもプレイできます。</div>
+        <div class="acct-guest-btns">
+          <button class="btn btn-green" onclick="Auth.openLogin()">ログイン</button>
+          <button class="btn btn-green" onclick="Auth.openRegister()">無料登録</button>
+        </div>
+      </div>`;
+  },
+};
+
+// ─── GACHA ────────────────────────────────────────────
+const Gacha=(()=>{
+  let curId=null,lastPrize=null,multiPrizes=[];
+  function w(prizes){
+    let r=Math.random(),c=0;
+    for(const p of prizes){c+=p.prob;if(r<c)return attachItem(p);}
+    return attachItem(prizes[prizes.length-1]);
+  }
+  function attachItem(p){
+    const items=p.items||[];
+    if(!items.length)return p;
+    return {...p,_item:items[Math.floor(Math.random()*items.length)]};
+  }
+  return{
+    spin(mid){
+      const m=MACHINES.find(x=>x.id===mid);if(!m)return;
+      if(State.coins<m.cost){UI.toast('💸 コインが足りません！');UI.openCoinShop();return;}
+      curId=mid;State.coins-=m.cost;UI.updateCoins();
+      EpicAnim.show();
+      const prize=w(m.prizes);lastPrize=prize;
+      setTimeout(()=>{
+        EpicAnim.reveal(prize,State.coins>=m.cost);
+        State.addItem(prize);State.recordSpin(mid,prize);
+        UI.updateStats();Render.gacha();Detail.refresh();
+        if(prize.rarity==='ultra-rare'||prize.rarity==='super-rare')UI.confetti();
+      },1500);
+    },
+    spinAgain(){if(curId)this.spin(curId);},
+    exchLast(){
+      if(!lastPrize)return;
+      const earned=State.removeItem(lastPrize.id,1);if(!earned)return;
+      State.coins+=earned;UI.updateCoins();UI.updateStats();
+      UI.toast(`🪙 ${earned.toLocaleString()}コイン獲得！`);
+      document.getElementById('epicBtnExch').disabled=true;
+      document.getElementById('epicBtnExch').style.opacity='0.4';
+    },
+    spinMulti(mid){
+      const m=MACHINES.find(x=>x.id===mid);if(!m)return;
+      if(State.coins<m.cost10){UI.toast(`💸 10連には🪙${m.cost10.toLocaleString()}必要！`);UI.openCoinShop();return;}
+      State.coins-=m.cost10;UI.updateCoins();
+      multiPrizes=Array.from({length:10},()=>w(m.prizes));
+      multiPrizes.forEach(p=>{State.addItem(p);State.recordSpin(mid,p);});
+      UI.updateStats();Render.gacha();Detail.refresh();
+      EpicAnim.showMulti(multiPrizes);
+    },
+    exchMultiAll(){
+      if(!multiPrizes.length)return;
+      let total=0;multiPrizes.forEach(p=>{total+=State.removeItem(p.id,1);});
+      if(total){State.coins+=total;UI.updateCoins();UI.updateStats();UI.toast(`🪙 ${total.toLocaleString()}コイン獲得！`);}
+      EpicAnim.close();multiPrizes=[];
+    },
+    exchItem(id){
+      const item=State.inv[id];if(!item)return;
+      const earned=State.removeItem(id,1);
+      State.coins+=earned;UI.updateCoins();UI.updateStats();Render.inventory();
+      UI.toast(`🪙 ${item.name}を${earned.toLocaleString()}コインに交換！`);
+    },
+  };
+})();
+
+// ─── STORE ────────────────────────────────────────────
+const Store=(()=>{
+  let pending=null;
+  let curFilter='all';
+  const BG={'common':'#f4f4f4','uncommon':'#e8f5e9','rare':'#e3f2fd','super-rare':'#f3e5f5','ultra-rare':'#fff8e1'};
+  const RARITY_TABS=[
+    {k:'all',   label:'すべて'},
+    {k:'ultra-rare', label:'⚡UR'},
+    {k:'super-rare', label:'✨SR'},
+    {k:'rare',       label:'💫レア'},
+    {k:'uncommon',   label:'アンコモン'},
+    {k:'common',     label:'コモン'},
+  ];
+  function rarBadge(r){
+    const info=R[r]||R['common'];
+    return `<span class="res-badge rb-${r}" style="font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-block">${info.label}</span>`;
+  }
+  return{
+    initFilter(){
+      const tabs=document.getElementById('storeFilterTabs');
+      if(tabs._init) return;
+      tabs._init=true;
+      tabs.innerHTML=RARITY_TABS.map((t,i)=>
+        `<button class="sfil-tab${i===0?' active':''}" onclick="Store.filter('${t.k}',this)">${t.label}</button>`
+      ).join('');
+    },
+    filter(rarity,el){
+      curFilter=rarity;
+      document.querySelectorAll('.sfil-tab').forEach(t=>t.classList.remove('active'));
+      if(el) el.classList.add('active');
+      this._renderGrid(rarity);
+    },
+    _renderGrid(rarity){
+      const items=rarity==='all'?STORE_ITEMS:STORE_ITEMS.filter(x=>x.rarity===rarity);
+      document.getElementById('storeGrid').innerHTML=items.length
+        ? items.map(item=>{
+            const canBuy=State.coins>=item.cost;
+            const bg=BG[item.rarity]||'#f4f4f4';
+            return `<div class="store-card2" onclick="Store.openDetail('${item.id}')">
+              <div class="store-card2-img" style="background:${bg}">
+                ${item.image?`<img src="${item.image}" alt=""><div class="store-card2-ico" style="display:none">${item.emoji}</div>`:`<div class="store-card2-ico">${item.emoji}</div>`}
+              </div>
+              <div class="store-card2-body">
+                ${rarBadge(item.rarity)}
+                <div class="store-card2-name">${item.name}</div>
+                <div class="store-card2-foot">
+                  <div class="store-card2-price">🪙 ${item.cost.toLocaleString()}</div>
+                  <div class="store-card2-avail" style="color:${canBuy?'var(--green)':'var(--red)'}">${canBuy?'交換可':'不足'}</div>
+                </div>
+              </div>
+            </div>`;
+          }).join('')
+        : '<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:#999;font-size:0.85rem">該当アイテムなし</div>';
+    },
+    openDetail(id){
+      const item=STORE_ITEMS.find(x=>x.id===id);if(!item)return;
+      pending=item;
+      const bg=BG[item.rarity]||'#f4f4f4';
+      const canBuy=State.coins>=item.cost;
+      document.getElementById('storeDetailSheet').innerHTML=`
+        <div class="store-det-hero" style="background:${bg}">
+          <div class="store-det-handle"></div>
+          ${item.image?`<img src="${item.image}" alt="">`:``}
+          <div class="store-det-hero-ico">${item.emoji}</div>
+        </div>
+        <div class="store-det-body">
+          ${rarBadge(item.rarity)}
+          <div class="store-det-name">${item.name}</div>
+          <div class="store-det-desc">${item.desc||'説明はありません'}</div>
+          <div class="store-det-price-row">
+            <div style="font-size:1.6rem">🪙</div>
+            <div>
+              <div class="store-det-price-lbl">必要コイン</div>
+              <div class="store-det-price-val">${item.cost.toLocaleString()}</div>
+            </div>
+            <div style="margin-left:auto;font-size:0.72rem;font-weight:700;color:${canBuy?'var(--green)':'var(--red)'}">
+              ${canBuy?'✓ 交換可能':'⚠️ コイン不足'}
+            </div>
+          </div>
+          <button class="store-det-buy-btn" ${canBuy?'':'disabled'} onclick="Store.confirmBuy()">
+            🛒 交換する
+          </button>
+          <div style="font-size:0.7rem;color:#999;text-align:center;padding:12px 0 4px">
+            所持コイン: 🪙 ${State.coins.toLocaleString()}
+          </div>
+        </div>`;
+      document.getElementById('storeDetailOv').classList.add('open');
+    },
+    closeDetail(e){
+      if(e&&e.target!==document.getElementById('storeDetailOv'))return;
+      document.getElementById('storeDetailOv').classList.remove('open');
+      pending=null;
+    },
+    confirmBuy(){
+      if(!pending)return;
+      if(State.coins<pending.cost){UI.toast('💸 コインが足りません！');return;}
+      State.coins-=pending.cost;
+      State.addItem({...pending,cv:Math.floor(pending.cost*.7)});
+      UI.updateCoins();UI.updateStats();
+      document.getElementById('storeDetailOv').classList.remove('open');
+      UI.toast(`🎉 ${pending.name}をゲット！`);UI.confetti();
+      this._renderGrid(curFilter);
+      pending=null;
+    },
+    // legacy openBuy kept for compatibility
+    openBuy(id){ this.openDetail(id); },
+  };
+})();
+
+// ── EPIC ANIMATION ─────────────────────────────────────
+const EpicAnim = {
+  _t: [],
+  _rarityColors: {
+    'ultra-rare':'#ffd700','super-rare':'#8e24aa',
+    'rare':'#1e88e5','uncommon':'#43a047','common':'#78909c'
+  },
+  _rarityLabels: {
+    'ultra-rare':'⚡ ULTRA RARE !!','super-rare':'✨ SUPER RARE !',
+    'rare':'💫 RARE !','uncommon':'🌟 UNCOMMON','common':'COMMON'
+  },
+  _reset() {
+    const el = document.getElementById('epicAnim');
+    el.classList.remove('shake');
+    document.getElementById('epicAurora').classList.remove('show');
+    document.getElementById('epicOrbSect').classList.remove('show','explode');
+    document.getElementById('epicOrbCore').className = 'epic-orb';
+    document.getElementById('epicOrbCore').textContent = '❓';
+    document.getElementById('epicLoadTxt').style.display = '';
+    document.getElementById('epicResultArea').classList.remove('show');
+    document.getElementById('epicResultCard').classList.remove('rainbow-glow');
+    document.getElementById('epicResultCard').style.boxShadow = '';
+    document.getElementById('flipGrid').style.display = 'none';
+    document.getElementById('flipMultiSum').style.display = 'none';
+    document.getElementById('flipMultiBtns').style.display = 'none';
+    el.querySelectorAll('.shockwave-ring,.ray-wrap,.sparkle,.epic-star').forEach(e=>e.remove());
+  },
+  _addStars() {
+    const el = document.getElementById('epicAnim');
+    for (let i = 0; i < 52; i++) {
+      const s = document.createElement('div');
+      s.className = 'epic-star';
+      const sz = 1 + Math.random() * 2.5;
+      s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${1.1+Math.random()*2.5}s;animation-delay:${Math.random()*2}s`;
+      el.appendChild(s);
+    }
+  },
+  _flash(color, dur) {
+    const f = document.getElementById('screenFlash');
+    f.style.background = color;
+    f.classList.remove('fire'); void f.offsetWidth; f.classList.add('fire');
+    this._t.push(setTimeout(() => f.classList.remove('fire'), dur||200));
+  },
+  _strobe(seq) {
+    seq.forEach((col, i) => this._t.push(setTimeout(() => this._flash(col, 130), i * 105)));
+  },
+  _shockwave(color, count, dur) {
+    const el = document.getElementById('epicAnim');
+    for (let i = 0; i < count; i++) {
+      const ring = document.createElement('div');
+      ring.className = 'shockwave-ring';
+      ring.style.cssText = `border-color:${color};width:70px;height:70px;margin:-35px 0 0 -35px;animation-duration:${dur||0.7}s;animation-delay:${i*0.13}s`;
+      el.appendChild(ring);
+      setTimeout(() => ring.remove(), (dur||0.7)*1000 + i*130 + 300);
+    }
+  },
+  _lightRays(color, count, dur) {
+    const el = document.getElementById('epicAnim');
+    const wrap = document.createElement('div');
+    wrap.className = 'ray-wrap';
+    const offset = Math.random() * 18;
+    for (let i = 0; i < count; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'light-ray';
+      const angle = (360 / count) * i + offset;
+      const w = 2 + Math.random() * 5;
+      ray.style.cssText = `transform:rotate(${angle}deg);background:${color};width:${w}px;margin-left:${(-w/2).toFixed(1)}px;animation-duration:${dur||0.88}s;animation-delay:${Math.random()*0.06}s`;
+      wrap.appendChild(ray);
+    }
+    el.appendChild(wrap);
+    setTimeout(() => wrap.remove(), (dur||0.88)*1000 + 300);
+  },
+  _sparkles(palette, count) {
+    const el = document.getElementById('epicAnim');
+    const glyphs = ['✦','✧','⋆','★','✸','✺','❋','✽','✼','⚡'];
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 42;
+      const tx = (Math.sin(ang) * dist).toFixed(1) + 'vw';
+      const ty = (Math.cos(ang) * dist).toFixed(1) + 'vh';
+      const rot = (Math.random()*720-360).toFixed(0);
+      const sz = (0.8 + Math.random() * 1.6).toFixed(2);
+      s.textContent = glyphs[~~(Math.random()*glyphs.length)];
+      s.style.cssText = `--tx:${tx};--ty:${ty};--rot:${rot}deg;color:${palette[~~(Math.random()*palette.length)]};font-size:${sz}rem;animation-duration:${(0.7+Math.random()*0.8).toFixed(2)}s;animation-delay:${(Math.random()*0.25).toFixed(2)}s`;
+      el.appendChild(s);
+      setTimeout(() => s.remove(), 2000);
+    }
+  },
+  _particles(rarity) {
+    const palettes = {
+      'ultra-rare': ['#ffd700','#ff8c00','#ff6b6b','#ffe082','#fff','#ffcc02','#f0f'],
+      'super-rare': ['#8e24aa','#ce93d8','#e040fb','#ab47bc','#fff'],
+      'rare':       ['#1e88e5','#64b5f6','#00bcd4','#80deea','#fff'],
+      'uncommon':   ['#43a047','#a5d6a7','#66bb6a','#c8e6c9'],
+      'common':     ['#90a4ae','#cfd8dc','#fff']
+    };
+    const counts = {'ultra-rare':90,'super-rare':55,'rare':35,'uncommon':18,'common':8};
+    const pal = palettes[rarity] || ['#fff'];
+    const n = counts[rarity] || 10;
+    const wrap = document.getElementById('confWrap');
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement('div');
+      el.className = 'cp';
+      const sz = 5 + Math.random() * 13;
+      el.style.cssText = `left:${15+Math.random()*70}%;background:${pal[~~(Math.random()*pal.length)]};width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*0.5}s`;
+      wrap.appendChild(el);
+      setTimeout(() => el.remove(), 3600);
+    }
+  },
+  show() {
+    this._t.forEach(clearTimeout); this._t = [];
+    this._reset();
+    document.getElementById('epicAnim').classList.add('show');
+    this._addStars();
+    this._t.push(setTimeout(() => document.getElementById('epicOrbSect').classList.add('show'), 80));
+  },
+  reveal(prize, canAgain) {
+    const rarity = prize.rarity;
+    const el = document.getElementById('epicAnim');
+    // Pre-explode shake (orb vibrates and color-cycles)
+    document.getElementById('epicOrbCore').classList.add('pre-explode');
+    this._t.push(setTimeout(() => {
+      // BANG — explosion moment
+      document.getElementById('epicOrbCore').classList.remove('pre-explode');
+      document.getElementById('epicOrbSect').classList.add('explode');
+      document.getElementById('epicLoadTxt').style.display = 'none';
+      if (rarity === 'ultra-rare') {
+        this._strobe(['white','#ffd700','white','#ff8c00','white','#ffd700','white','#ff00ff']);
+        this._shockwave('#ffd700', 4, 0.85);
+        this._lightRays('#ffd700', 20, 1.0);
+        this._t.push(setTimeout(() => this._lightRays('#ffffff', 16, 0.9), 130));
+        this._t.push(setTimeout(() => this._lightRays('#ff8c00', 12, 0.85), 260));
+        this._sparkles(['#ffd700','#ff8c00','#ff6b6b','#ffe082','#fff','#f0f'], 48);
+        el.classList.add('shake');
+        this._t.push(setTimeout(() => el.classList.remove('shake'), 480));
+        document.getElementById('epicAurora').classList.add('show');
+        this._particles('ultra-rare');
+      } else if (rarity === 'super-rare') {
+        this._strobe(['#9c27b0','white','#e040fb','white','#9c27b0','white']);
+        this._shockwave('#e040fb', 3, 0.75);
+        this._lightRays('#e040fb', 16, 0.95);
+        this._t.push(setTimeout(() => this._lightRays('#ce93d8', 12, 0.85), 140));
+        this._sparkles(['#9c27b0','#ce93d8','#e040fb','#fff','#ab47bc'], 30);
+        el.classList.add('shake');
+        this._t.push(setTimeout(() => el.classList.remove('shake'), 400));
+        this._particles('super-rare');
+      } else if (rarity === 'rare') {
+        this._strobe(['#1e88e5','white','#64b5f6','white']);
+        this._shockwave('#64b5f6', 2, 0.65);
+        this._lightRays('#2196f3', 14, 0.88);
+        this._t.push(setTimeout(() => this._lightRays('#00bcd4', 10, 0.8), 120));
+        this._sparkles(['#1e88e5','#64b5f6','#00bcd4','#80deea','#fff'], 18);
+        this._particles('rare');
+      } else if (rarity === 'uncommon') {
+        this._strobe(['#43a047','white']);
+        this._shockwave('#66bb6a', 2, 0.6);
+        this._lightRays('#43a047', 10, 0.78);
+        this._sparkles(['#43a047','#a5d6a7','#66bb6a','#fff'], 10);
+        this._particles('uncommon');
+      } else {
+        this._shockwave('#90a4ae', 1, 0.55);
+        this._lightRays('#78909c', 8, 0.7);
+        this._particles('common');
+      }
+    }, 280));
+    // Result card reveal
+    this._t.push(setTimeout(() => {
+      document.getElementById('epicRarityBanner').textContent = this._rarityLabels[rarity] || rarity;
+      document.getElementById('epicRarityBanner').style.color = this._rarityColors[rarity] || '#fff';
+      const item = prize._item;
+      const displayImg = (item && item.image) ? item.image : (prize.image || '');
+      if(displayImg){
+        document.getElementById('epicPrizeIcon').innerHTML = `<img src="${displayImg}" style="width:80px;height:80px;object-fit:cover;border-radius:14px;display:block">`;
+      } else {
+        document.getElementById('epicPrizeIcon').textContent = prize.emoji;
+      }
+      document.getElementById('epicPrizeName').textContent = (item && item.name) ? item.name : prize.name;
+      const badge = document.getElementById('epicPrizeBadge');
+      badge.textContent = R[rarity].label;
+      badge.className = 'epic-prize-badge rb-' + rarity;
+      document.getElementById('epicPrizeCv').textContent = '🪙 交換額: ' + prize.cv.toLocaleString() + 'コイン';
+      const card = document.getElementById('epicResultCard');
+      if (rarity === 'ultra-rare') {
+        card.classList.add('rainbow-glow');
+      } else {
+        const glows = {'super-rare':'0 0 40px #8e24aa99,0 0 80px #8e24aa44,0 8px 40px rgba(0,0,0,.4)','rare':'0 0 30px #1e88e599,0 0 60px #1e88e533,0 8px 40px rgba(0,0,0,.4)','uncommon':'0 0 22px #43a04788,0 8px 40px rgba(0,0,0,.4)','common':'0 8px 40px rgba(0,0,0,.4)'};
+        card.style.boxShadow = glows[rarity] || '0 8px 40px rgba(0,0,0,.4)';
+      }
+      document.getElementById('epicBtnAgain').disabled = !canAgain;
+      document.getElementById('epicBtnAgain').style.opacity = canAgain ? '1' : '0.4';
+      document.getElementById('epicBtnExch').disabled = false;
+      document.getElementById('epicBtnExch').style.opacity = '1';
+      document.getElementById('epicResultArea').classList.add('show');
+    }, 1050));
+  },
+  close() {
+    this._t.forEach(clearTimeout); this._t = [];
+    document.getElementById('epicAnim').classList.remove('show','shake');
+    this._reset();
+  },
+  showMulti(prizes) {
+    this._t.forEach(clearTimeout); this._t = [];
+    this._reset();
+    document.getElementById('epicAnim').classList.add('show');
+    this._addStars();
+    const grid = document.getElementById('flipGrid');
+    grid.style.display = 'grid';
+    grid.innerHTML = prizes.map((p, i) => {
+      const isUR = p.rarity === 'ultra-rare';
+      const isSR = p.rarity === 'super-rare';
+      const di = p._item;
+      const diImg = (di && di.image) ? di.image : (p.image || '');
+      const backIco = diImg
+        ? `<img src="${diImg}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 2px">`
+        : `<span>${p.emoji}</span>`;
+      const backName = (di && di.name) ? di.name : p.name;
+      return `<div class="flip-card${isUR?' is-ur':isSR?' is-sr':''}" id="fc${i}">` +
+        `<div class="flip-inner"><div class="flip-front">🎴</div>` +
+        `<div class="flip-back">${backIco}` +
+        `<span class="fc-r rb-${p.rarity}">${R[p.rarity].label}</span>` +
+        `<span class="fc-n">${backName}</span></div></div></div>`;
+    }).join('');
+    prizes.forEach((p, i) => {
+      this._t.push(setTimeout(() => {
+        document.getElementById('fc' + i).classList.add('flipped');
+        if (p.rarity === 'ultra-rare') {
+          this._t.push(setTimeout(() => {
+            this._strobe(['white','#ffd700','white','#ffd700','white']);
+            this._shockwave('#ffd700', 3, 0.75);
+            this._lightRays('#ffd700', 16, 0.9);
+            this._sparkles(['#ffd700','#ff8c00','#fff','#f0f'], 28);
+            const el = document.getElementById('epicAnim');
+            el.classList.add('shake');
+            this._t.push(setTimeout(() => el.classList.remove('shake'), 450));
+            this._particles('ultra-rare');
+          }, 240));
+        } else if (p.rarity === 'super-rare') {
+          this._t.push(setTimeout(() => {
+            this._strobe(['#9c27b0','white','#e040fb']);
+            this._shockwave('#e040fb', 2, 0.65);
+            this._lightRays('#e040fb', 12, 0.85);
+            this._sparkles(['#9c27b0','#ce93d8','#fff'], 16);
+            this._particles('super-rare');
+          }, 240));
+        } else if (p.rarity === 'rare') {
+          this._t.push(setTimeout(() => {
+            this._lightRays('#2196f3', 8, 0.75);
+            this._sparkles(['#1e88e5','#64b5f6','#fff'], 8);
+          }, 240));
+        }
+      }, 350 + i * 230));
+    });
+    const totalDelay = 350 + prizes.length * 230 + 450;
+    this._t.push(setTimeout(() => {
+      const ur = prizes.filter(p => p.rarity === 'ultra-rare').length;
+      const sr = prizes.filter(p => p.rarity === 'super-rare').length;
+      const tv = prizes.reduce((s, p) => s + p.cv, 0);
+      const sum = document.getElementById('flipMultiSum');
+      sum.innerHTML =
+        (ur ? `<span style="color:#ffd700;font-weight:900;font-size:1rem">⭐ UR ${ur}個獲得！！</span><br>` : '') +
+        (sr ? `<span style="color:#ce93d8;font-weight:700">✨ SR ${sr}個</span><br>` : '') +
+        `全交換額: 🪙 ${tv.toLocaleString()} コイン`;
+      sum.style.display = 'block';
+      document.getElementById('flipMultiBtns').style.display = 'flex';
+      if (ur > 0) { document.getElementById('epicAurora').classList.add('show'); this._particles('ultra-rare'); }
+    }, totalDelay));
+  },
+};
+
+// ─── DETAIL ───────────────────────────────────────────
+const Detail = {
+  curId: null,
+  open(mid) {
+    const m = MACHINES.find(x => x.id === mid);
+    if (!m) return;
+    this.curId = mid;
+    document.getElementById('detailTitle').textContent = m.name;
+    document.getElementById('detailBanner').style.background = m.grad;
+    document.getElementById('detailBannerBg').textContent = m.icon;
+    document.getElementById('detailBannerIcon').textContent = m.icon;
+    document.getElementById('detailBannerName').textContent = m.name;
+    document.getElementById('detailBannerCopy').textContent = m.copy;
+    document.getElementById('detailHot').textContent = '🔥 ' + HOT[mid] + '人がプレイ中';
+    // badges
+    document.getElementById('detailBadges').innerHTML = m.tags.map(t =>
+      `<span class="ctag" style="${TAGS[t]||'background:#666;color:white'}">${t}</span>`
+    ).join('');
+    // price
+    document.getElementById('detailPrice1').textContent = '🪙' + m.cost.toLocaleString();
+    document.getElementById('detailPrice10').textContent = '🪙' + m.cost10.toLocaleString();
+    // slots + buttons
+    this.refresh();
+    // prize table (highest rarity first)
+    const sorted = [...m.prizes].reverse();
+    document.getElementById('prizeTable').innerHTML = sorted.map(p =>
+      `<div class="prize-row">` +
+        `<div class="prize-emoji">${p.emoji}</div>` +
+        `<div class="prize-info"><div class="prize-name">${p.name}</div></div>` +
+        `<span class="prize-rar-badge rb-${p.rarity}">${R[p.rarity].label}</span>` +
+        `<div class="prize-prob">${(p.prob*100).toFixed(1)}%</div>` +
+      `</div>`
+    ).join('');
+    // rate chart grouped by rarity
+    const rarityMap = {};
+    m.prizes.forEach(p => { rarityMap[p.rarity] = (rarityMap[p.rarity]||0) + p.prob; });
+    const rarityOrder = ['ultra-rare','super-rare','rare','uncommon','common'];
+    document.getElementById('rateChart').innerHTML = rarityOrder
+      .filter(r => rarityMap[r])
+      .map(r => {
+        const pct = (rarityMap[r]*100).toFixed(1);
+        return `<div class="rate-row">` +
+          `<span class="rate-label rb-${r}" style="display:inline-block;padding:2px 6px;border-radius:4px;min-width:82px">${R[r].label}</span>` +
+          `<div class="rate-track"><div class="rate-fill" style="width:${pct}%;background:${R[r].color}"></div></div>` +
+          `<span class="rate-pct">${pct}%</span>` +
+        `</div>`;
+      }).join('');
+    document.getElementById('detailPage').classList.add('open');
+    document.getElementById('detailPage').scrollTop = 0;
+  },
+  refresh() {
+    if (!this.curId) return;
+    const m = MACHINES.find(x => x.id === this.curId);
+    if (!m) return;
+    const rem = State.slots(this.curId);
+    const pct = Math.max(2, (rem / m.totalSlots) * 100);
+    document.getElementById('detailSlotsRem').textContent = rem.toLocaleString() + '枚';
+    document.getElementById('detailSlotsFill').style.width = pct + '%';
+    const canDraw = State.coins >= m.cost;
+    const canDraw10 = State.coins >= m.cost10;
+    document.getElementById('btnDetailDraw').disabled = !canDraw;
+    document.getElementById('btnDetailDraw').style.opacity = canDraw ? '1' : '0.5';
+    document.getElementById('btnDetailDraw10').disabled = !canDraw10;
+    document.getElementById('btnDetailDraw10').style.opacity = canDraw10 ? '1' : '0.5';
+  },
+  close() {
+    document.getElementById('detailPage').classList.remove('open');
+    this.curId = null;
+  },
+  draw() {
+    if (!this.curId) return;
+    Gacha.spin(this.curId);
+  },
+  draw10() {
+    if (!this.curId) return;
+    Gacha.spinMulti(this.curId);
+  },
+};
+
+// ─── INIT ─────────────────────────────────────────────
+function initCatTabs(){
+  const nav=document.getElementById('catNav');
+  nav.innerHTML=
+    `<div class="cat-tab active" id="ct-all" onclick="setCat('all')">すべて</div>`+
+    MACHINES.map(m=>`<div class="cat-tab" id="ct-${m.id}" onclick="setCat('${m.id}')">${m.icon} ${m.name}</div>`).join('');
+}
+
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+initCatTabs();
+Banner.init();
+Auth.init();
+I18N.apply();
+document.getElementById('page-gacha').style.display='block';
+document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+Render.gacha();
+UI.updateCoins();
+</script>
+</body>
+</html>

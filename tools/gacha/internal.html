@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社内管理 — ガチャワールド</title>
+  <style>
+    :root{
+      --bg:#f0f4f8;--card:#fff;--hdr:#1e293b;--hdr2:#334155;
+      --green:#00a63c;--blue:#2563eb;--red:#dc2626;--orange:#ea580c;
+      --coin:#d97706;--border:#e2e8f0;--text:#1e293b;--sub:#64748b;--dim:#94a3b8;
+      --r:10px;--shadow:0 1px 6px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;
+      background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── LOGIN ── */
+    #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+    .lbox{background:white;border-radius:16px;padding:36px 28px;width:100%;max-width:360px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+    .lbox-logo{text-align:center;margin-bottom:24px;}
+    .lbox-ico{font-size:2.8rem;display:block;margin-bottom:8px;}
+    .lbox-title{font-size:1.1rem;font-weight:900;}
+    .lbox-sub{font-size:0.75rem;color:var(--dim);margin-top:4px;}
+    .lfield{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+    .llabel{font-size:0.74rem;font-weight:700;color:var(--sub);}
+    .linput{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:0.9rem;outline:none;font-family:inherit;transition:border-color .15s;}
+    .linput:focus{border-color:var(--blue);}
+    .lbtn{width:100%;padding:11px;background:var(--blue);color:white;border:none;
+      border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;margin-top:6px;}
+    .lerr{font-size:0.74rem;color:var(--red);min-height:18px;margin-top:4px;text-align:center;}
+    .lhint{font-size:0.7rem;color:var(--dim);text-align:center;margin-top:10px;}
+
+    /* ── APP ── */
+    #app{display:none;}
+    .hdr{background:var(--hdr);color:white;padding:10px 16px;
+      display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+    .hdr-logo{font-size:0.9rem;font-weight:900;flex:1;}
+    .hdr-logo em{color:#fbbf24;font-style:normal;}
+    .modified-dot{width:8px;height:8px;border-radius:50%;background:#fbbf24;
+      display:none;flex-shrink:0;}
+    .modified-dot.show{display:block;}
+    .hdr-btn{padding:6px 14px;border-radius:8px;border:none;cursor:pointer;
+      font-size:0.8rem;font-weight:700;transition:opacity .15s;}
+    .hdr-btn:hover{opacity:.85;}
+    .hdr-save{background:#22c55e;color:white;}
+    .hdr-reset{background:rgba(255,255,255,.12);color:white;}
+    .hdr-logout{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);}
+
+    /* ── TABS ── */
+    .tabs{background:var(--hdr2);display:flex;overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{flex-shrink:0;padding:10px 16px;font-size:0.8rem;font-weight:600;
+      color:rgba(255,255,255,.55);cursor:pointer;border-bottom:2.5px solid transparent;
+      white-space:nowrap;transition:all .15s;}
+    .tab.active{color:white;border-bottom-color:#fbbf24;}
+
+    /* ── CONTENT ── */
+    .content{max-width:960px;margin:0 auto;padding:16px;}
+    .section{display:none;}
+    .section.active{display:block;}
+
+    /* ── CARDS ── */
+    .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;}
+    .card-hd{padding:12px 14px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;
+      transition:background .1s;}
+    .card-hd:hover{background:#f8fafc;}
+    .card-hd-ico{font-size:1.4rem;flex-shrink:0;}
+    .card-hd-info{flex:1;min-width:0;}
+    .card-hd-name{font-size:0.88rem;font-weight:700;}
+    .card-hd-meta{font-size:0.7rem;color:var(--sub);margin-top:2px;}
+    .card-hd-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .expand-arrow{font-size:0.75rem;color:var(--dim);transition:transform .2s;}
+    .card.open .expand-arrow{transform:rotate(180deg);}
+    .card-body{display:none;padding:16px 14px;}
+    .card.open .card-body{display:block;}
+
+    /* ── FORM GRID ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    @media(max-width:520px){.form-grid{grid-template-columns:1fr;}}
+    .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+    @media(max-width:520px){.form-grid-3{grid-template-columns:1fr 1fr;}}
+    .field{display:flex;flex-direction:column;gap:4px;}
+    .field.full{grid-column:1/-1;}
+    .flabel{font-size:0.72rem;font-weight:700;color:var(--sub);}
+    .finput{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;
+      font-size:0.85rem;font-family:inherit;outline:none;transition:border-color .15s;width:100%;}
+    .finput:focus{border-color:var(--blue);}
+    .fselect{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;
+      font-size:0.85rem;font-family:inherit;outline:none;background:white;width:100%;}
+    .ftextarea{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;
+      font-size:0.85rem;font-family:inherit;outline:none;resize:vertical;min-height:56px;width:100%;}
+
+    /* ── TAGS CHECKBOXES ── */
+    .tag-checks{display:flex;flex-wrap:wrap;gap:6px;}
+    .tag-check{display:flex;align-items:center;gap:4px;font-size:0.75rem;
+      background:#f1f5f9;border-radius:6px;padding:4px 9px;cursor:pointer;}
+    .tag-check input{width:14px;height:14px;cursor:pointer;}
+
+    /* ── IMAGE UPLOAD ── */
+    .img-upload-area{border:2px dashed var(--border);border-radius:10px;
+      padding:16px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative;}
+    .img-upload-area:hover{border-color:var(--blue);}
+    .img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .img-preview{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;}
+    .img-preview.show{display:block;}
+    .img-hero-preview{width:100%;height:100px;border-radius:8px;margin-bottom:8px;background:#f0f0f0;
+      display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:0.8rem;
+      background-size:cover;background-position:center;overflow:hidden;}
+
+    /* ── PRIZE TABLE ── */
+    .prize-section{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .prize-section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .prize-section-title{font-size:0.84rem;font-weight:700;}
+    .prob-sum{font-size:0.74rem;font-weight:700;padding:3px 9px;border-radius:12px;}
+    .prob-ok{background:#dcfce7;color:#166534;}
+    .prob-ng{background:#fee2e2;color:#991b1b;}
+    .prize-tbl-wrap{overflow-x:auto;}
+    table.prize-tbl{width:100%;border-collapse:collapse;font-size:0.8rem;}
+    table.prize-tbl th{background:#f8fafc;padding:7px 8px;text-align:left;
+      font-weight:700;color:var(--sub);border-bottom:1px solid var(--border);white-space:nowrap;}
+    table.prize-tbl td{padding:5px 6px;border-bottom:1px solid #f0f4f8;vertical-align:middle;}
+    table.prize-tbl tr:last-child td{border-bottom:none;}
+    .ptbl-input{padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;
+      font-size:0.8rem;font-family:inherit;outline:none;transition:border-color .15s;}
+    .ptbl-input:focus{border-color:var(--blue);}
+    .ptbl-emoji{width:46px;}
+    .ptbl-name{width:100%;min-width:120px;}
+    .ptbl-cv{width:72px;}
+    .ptbl-prob{width:64px;}
+    .ptbl-sel{padding:5px 6px;border:1.5px solid var(--border);border-radius:6px;
+      font-size:0.8rem;font-family:inherit;background:white;}
+
+    /* ── PRIZE ITEMS (sub-products per prize) ── */
+    .prize-items-row>td{padding:0;}
+    .prize-items-wrap{padding:10px 14px 14px;background:#f4f7fb;}
+    .prize-items-hd{display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:8px;font-size:0.78rem;font-weight:700;color:var(--sub);}
+    .prize-item-entry{display:flex;align-items:center;gap:8px;
+      background:white;border:1px solid var(--border);border-radius:8px;
+      padding:8px 10px;margin-bottom:7px;}
+    .prize-item-entry:last-child{margin-bottom:0;}
+    .pi-img-btn{width:52px;height:52px;border-radius:8px;background:#f0f0f0;
+      border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;
+      font-size:1.3rem;cursor:pointer;flex-shrink:0;position:relative;overflow:hidden;}
+    .pi-img-btn img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:7px;}
+    .pi-img-file{display:none;}
+    .pi-name-input{flex:1;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;
+      font-size:0.8rem;font-family:inherit;outline:none;transition:border-color .15s;}
+    .pi-name-input:focus{border-color:var(--blue);}
+    .pi-count-badge{position:absolute;top:-4px;right:-4px;background:var(--blue);color:white;
+      border-radius:50%;font-size:0.58rem;width:15px;height:15px;
+      display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+    /* ── STORE ITEM UPLOAD ── */
+    .si-upload-area{
+      display:block;width:80px;height:80px;border-radius:10px;
+      border:2px dashed var(--border);background:#f8fafc;
+      cursor:pointer;position:relative;overflow:hidden;
+      transition:border-color .15s;
+    }
+    .si-upload-area:hover{border-color:var(--blue);}
+    .si-upload-preview{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;
+    }
+    .si-upload-placeholder{
+      position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:4px;
+    }
+    .si-upload-hint{font-size:0.58rem;color:var(--dim);text-align:center;line-height:1.3;}
+    .si-img-clear{
+      position:absolute;top:3px;right:3px;width:18px;height:18px;
+      background:rgba(0,0,0,.55);color:white;border:none;border-radius:50%;
+      font-size:0.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      line-height:1;padding:0;
+    }
+    .si-img-clear:hover{background:rgba(220,38,38,.85);}
+    /* ── BANNER EDITOR ── */
+    .bn-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:600px){.bn-cards{grid-template-columns:1fr;}}
+    .bn-card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+    .bn-preview{height:130px;position:relative;overflow:hidden;cursor:pointer;background:#888;}
+    .bn-preview img.bn-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .bn-upload-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.9);font-size:0.78rem;gap:4px;background:rgba(0,0,0,.38);opacity:0;transition:opacity .2s;pointer-events:none;}
+    .bn-preview:hover .bn-upload-overlay{opacity:1;}
+    .bn-no-img{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:0.8rem;gap:5px;}
+    .bn-clear{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:22px;height:22px;color:white;font-size:0.72rem;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;}
+    .bn-clear:hover{background:rgba(220,38,38,.85);}
+    .bn-body{padding:12px;display:flex;flex-direction:column;gap:7px;}
+    .bn-lbl{font-size:0.7rem;font-weight:700;color:var(--sub);}
+    .bn-inp{width:100%;padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:0.8rem;}
+    .bn-num{font-size:0.72rem;font-weight:700;color:white;background:rgba(0,0,0,.4);border-radius:12px;padding:1px 7px;position:absolute;top:6px;left:6px;z-index:2;}
+
+    /* ── SIMPLE TABLE (coin pkgs / store items) ── */
+    .simple-tbl-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+      overflow:hidden;margin-bottom:14px;}
+    .simple-tbl-hd{padding:11px 14px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;}
+    .simple-tbl-title{font-size:0.88rem;font-weight:700;}
+    table.stbl{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    table.stbl th{background:#f8fafc;padding:8px 10px;text-align:left;
+      font-weight:700;color:var(--sub);border-bottom:1px solid var(--border);}
+    table.stbl td{padding:7px 8px;border-bottom:1px solid #f0f4f8;vertical-align:middle;}
+    table.stbl tr:last-child td{border-bottom:none;}
+    .stbl-input{padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;
+      font-size:0.82rem;font-family:inherit;outline:none;width:100%;}
+    .stbl-input:focus{border-color:var(--blue);}
+    .stbl-sel{padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;
+      font-size:0.82rem;font-family:inherit;background:white;width:100%;}
+
+    /* ── BUTTONS ── */
+    .btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;
+      font-size:0.78rem;font-weight:700;transition:opacity .15s;}
+    .btn:hover{opacity:.85;}
+    .btn-blue{background:var(--blue);color:white;}
+    .btn-green{background:var(--green);color:white;}
+    .btn-red{background:var(--red);color:white;}
+    .btn-orange{background:var(--orange);color:white;}
+    .btn-gray{background:#f1f5f9;color:var(--text);}
+    .btn-sm{padding:4px 10px;font-size:0.73rem;}
+    .btn-xs{padding:3px 7px;font-size:0.69rem;}
+    .btn-icon{background:none;border:none;cursor:pointer;font-size:1.05rem;padding:2px 4px;}
+
+    /* ── BADGE ── */
+    .badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:0.68rem;font-weight:700;}
+    .badge-common{background:#f1f5f9;color:#475569;}
+    .badge-uncommon{background:#dcfce7;color:#166534;}
+    .badge-rare{background:#dbeafe;color:#1d4ed8;}
+    .badge-sr{background:#f3e8ff;color:#7e22ce;}
+    .badge-ur{background:#ffedd5;color:#9a3412;}
+
+    /* ── SECTION HEADER ── */
+    .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .sec-title{font-size:0.98rem;font-weight:800;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:rgba(15,23,42,.9);color:white;padding:9px 20px;border-radius:20px;
+      font-size:0.85rem;font-weight:600;z-index:500;transition:transform .3s;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+
+    /* ── MISC ── */
+    .info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;
+      padding:10px 13px;font-size:0.78rem;color:#1d4ed8;margin-bottom:14px;line-height:1.6;}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lbox">
+    <div class="lbox-logo">
+      <span class="lbox-ico">🏢</span>
+      <div class="lbox-title">社内管理システム</div>
+      <div class="lbox-sub">GachaWorld Internal CMS</div>
+    </div>
+    <div class="lfield">
+      <label class="llabel">パスワード</label>
+      <input class="linput" type="password" id="pw" placeholder="パスワードを入力"
+             onkeydown="if(event.key==='Enter')App.login()">
+    </div>
+    <div class="lerr" id="lerr"></div>
+    <button class="lbtn" onclick="App.login()">ログイン</button>
+    <div class="lhint">デフォルト: <strong>internal1234</strong></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-logo">🏢 社内管理 <em>★</em> ガチャワールド</div>
+    <div class="modified-dot" id="modDot" title="未保存の変更あり"></div>
+    <a href="index.html" target="_blank" class="hdr-btn" style="background:rgba(255,255,255,.12);color:white;text-decoration:none;">🎰 サイトを開く</a>
+    <a href="admin.html" target="_blank" class="hdr-btn" style="background:rgba(251,191,36,.2);color:#fbbf24;text-decoration:none;">🛡️ 管理画面</a>
+    <button class="hdr-btn hdr-reset" onclick="App.resetToDefault()">リセット</button>
+    <button class="hdr-btn hdr-save" onclick="App.save()">💾 保存して反映</button>
+    <button class="hdr-btn hdr-logout" onclick="App.logout()">退出</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="App.tab('machines',this)">🎰 マシン設定</div>
+    <div class="tab" onclick="App.tab('coins',this)">💰 料金プラン</div>
+    <div class="tab" onclick="App.tab('store',this)">🏪 交換所アイテム</div>
+    <div class="tab" onclick="App.tab('banner',this)">🖼️ バナー設定</div>
+  </div>
+  <div class="content">
+    <div class="info-box">
+      💡 変更後は右上の <strong>「保存して反映」</strong> を押してください。ガチャゲームを再読み込みすると変更が反映されます。
+    </div>
+
+    <!-- MACHINES -->
+    <div class="section active" id="sec-machines">
+      <div class="sec-hd">
+        <div class="sec-title">🎰 マシン設定（<span id="machineCount">0</span>台）</div>
+        <button class="btn btn-blue btn-sm" onclick="App.addMachine()">＋ マシン追加</button>
+      </div>
+      <div id="machineList"></div>
+    </div>
+
+    <!-- COINS -->
+    <div class="section" id="sec-coins">
+      <div class="simple-tbl-wrap">
+        <div class="simple-tbl-hd">
+          <div class="simple-tbl-title">💰 コインパッケージ設定</div>
+          <button class="btn btn-blue btn-sm" onclick="App.addCoinPkg()">＋ 追加</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="stbl">
+            <thead><tr>
+              <th>コイン数</th><th>ボーナス</th><th>価格表示</th><th>操作</th>
+            </tr></thead>
+            <tbody id="coinPkgTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER -->
+    <div class="section" id="sec-banner">
+      <div class="sec-hd">
+        <div class="sec-title">🖼️ トップバナー設定</div>
+      </div>
+      <div class="info-box" style="margin-bottom:14px">各スライドの背景画像・テキストを設定できます。画像未設定の場合はデフォルトのグラデーションが使われます。</div>
+      <div class="bn-cards" id="bannerCards"></div>
+    </div>
+
+    <!-- STORE -->
+    <div class="section" id="sec-store">
+      <div class="simple-tbl-wrap">
+        <div class="simple-tbl-hd">
+          <div class="simple-tbl-title">🏪 交換所アイテム</div>
+          <button class="btn btn-blue btn-sm" onclick="App.addStoreItem()">＋ 追加</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="stbl">
+            <thead><tr>
+              <th>画像</th><th>絵文字</th><th>名前</th><th>説明</th><th>コスト</th><th>レアリティ</th><th>操作</th>
+            </tr></thead>
+            <tbody id="storeTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONSTANTS ─────────────────────────────────────────
+const PW_KEY   = 'gw_internal_pw';
+const DEFAULT_PW = 'internal1234';
+
+const ALL_TAGS = ['お手軽','スタンダード','アニメ','高品質','人気','プレミアム','UR排出','限定','ミステリー'];
+const RARITIES = ['common','uncommon','rare','super-rare','ultra-rare'];
+const RARITY_LABELS = {
+  'common':'コモン','uncommon':'アンコモン','rare':'レア',
+  'super-rare':'スーパーレア','ultra-rare':'ウルトラレア'
+};
+
+const GRAD_PRESETS = [
+  {label:'グリーン',   val:'linear-gradient(135deg,#66bb6a,#2e7d32)'},
+  {label:'ブルー',     val:'linear-gradient(135deg,#1e88e5,#0d47a1)'},
+  {label:'パープル',   val:'linear-gradient(135deg,#ab47bc,#4a148c)'},
+  {label:'レッド',     val:'linear-gradient(135deg,#ef5350,#b71c1c)'},
+  {label:'オレンジ',   val:'linear-gradient(135deg,#ff7043,#bf360c)'},
+  {label:'ゴールド',   val:'linear-gradient(135deg,#ffb300,#e65100)'},
+  {label:'シアン',     val:'linear-gradient(135deg,#26c6da,#006064)'},
+  {label:'スレート',   val:'linear-gradient(135deg,#546e7a,#263238)'},
+  {label:'インディゴ', val:'linear-gradient(135deg,#5c6bc0,#1a237e)'},
+  {label:'ティール',   val:'linear-gradient(135deg,#26a69a,#004d40)'},
+  {label:'グランド',   val:'linear-gradient(135deg,#ffd700,#ff6f00)'},
+  {label:'ダイヤ',     val:'linear-gradient(135deg,#00bcd4,#006064)'},
+  {label:'カスタム',   val:'custom'},
+];
+
+// ─── DEFAULT DATA ───────────────────────────────────────
+const DEFAULT_MACHINES=[
+  {id:'beginner',name:'ビギナーズラック',icon:'🍀',grad:'linear-gradient(135deg,#66bb6a,#2e7d32)',copy:'初回限定！ラッキーな出会いを！',cost:30,cost10:270,totalSlots:99999,tags:['お手軽'],prizes:[{id:'bg_stk',name:'ラッキーステッカー',emoji:'🏷️',rarity:'common',cv:45,prob:0.55},{id:'bg_bdg',name:'クローバーバッジ',emoji:'🍀',rarity:'uncommon',cv:80,prob:0.30},{id:'bg_key',name:'ラッキーチャーム',emoji:'🔮',rarity:'rare',cv:150,prob:0.12},{id:'bg_fig',name:'幸運のフィギュア',emoji:'🧸',rarity:'super-rare',cv:280,prob:0.03}]},
+  {id:'starter',name:'スターターガチャ',icon:'🎪',grad:'linear-gradient(135deg,#43a047,#1b5e20)',copy:'まずはここから！誰でも引けるお手軽ガチャ',cost:50,cost10:450,totalSlots:99999,tags:['お手軽'],prizes:[{id:'st_stk',name:'キャラステッカー',emoji:'🏷️',rarity:'common',cv:75,prob:0.50},{id:'st_bdg',name:'コレクションバッジ',emoji:'📛',rarity:'uncommon',cv:120,prob:0.30},{id:'st_key',name:'キーホルダー',emoji:'🔑',rarity:'rare',cv:200,prob:0.15},{id:'st_fig',name:'ミニフィギュア',emoji:'🧸',rarity:'super-rare',cv:350,prob:0.05}]},
+  {id:'second',name:'セカンドチャンス',icon:'🎯',grad:'linear-gradient(135deg,#26c6da,#006064)',copy:'もう一度チャレンジ！お得な中級ガチャ',cost:80,cost10:720,totalSlots:80000,tags:['お手軽'],prizes:[{id:'sc_pin',name:'ピンバッジ',emoji:'📌',rarity:'common',cv:100,prob:0.50},{id:'sc_str',name:'ストラップ',emoji:'🔗',rarity:'uncommon',cv:160,prob:0.30},{id:'sc_bk',name:'ミニコミック',emoji:'📔',rarity:'rare',cv:250,prob:0.15},{id:'sc_fig',name:'アクションフィギュア',emoji:'🤺',rarity:'super-rare',cv:400,prob:0.05}]},
+  {id:'normal',name:'ノーマルガチャ',icon:'⚡',grad:'linear-gradient(135deg,#1e88e5,#0d47a1)',copy:'バランス◎ スタンダードなガチャ',cost:100,cost10:900,totalSlots:50000,tags:['スタンダード'],prizes:[{id:'nm_pin',name:'ピンバッジセット',emoji:'📌',rarity:'common',cv:130,prob:0.50},{id:'nm_tsh',name:'キャラTシャツ',emoji:'👕',rarity:'uncommon',cv:280,prob:0.28},{id:'nm_pos',name:'限定ポスター',emoji:'🖼️',rarity:'rare',cv:500,prob:0.17},{id:'nm_fig',name:'レアフィギュア',emoji:'🎎',rarity:'super-rare',cv:1200,prob:0.05}]},
+  {id:'anime',name:'アニメキャラガチャ',icon:'✨',grad:'linear-gradient(135deg,#ec407a,#880e4f)',copy:'人気アニメキャラのグッズが登場！',cost:150,cost10:1350,totalSlots:60000,tags:['アニメ'],prizes:[{id:'an_stk',name:'アニメステッカーセット',emoji:'🌸',rarity:'common',cv:180,prob:0.50},{id:'an_bdg',name:'キャラクターバッジ',emoji:'💮',rarity:'uncommon',cv:320,prob:0.28},{id:'an_key',name:'アニメキーホルダー',emoji:'🗝️',rarity:'rare',cv:600,prob:0.17},{id:'an_fig',name:'アニメフィギュア',emoji:'🎌',rarity:'super-rare',cv:1500,prob:0.05}]},
+  {id:'chara',name:'キャラクターグッズ',icon:'🎭',grad:'linear-gradient(135deg,#ab47bc,#4a148c)',copy:'キャラクター公式グッズが当たる！',cost:180,cost10:1620,totalSlots:45000,tags:['アニメ'],prizes:[{id:'ch_can',name:'缶バッジ',emoji:'🔵',rarity:'common',cv:220,prob:0.48},{id:'ch_tow',name:'キャラタオル',emoji:'🏳️',rarity:'uncommon',cv:400,prob:0.30},{id:'ch_art',name:'アートブック',emoji:'📚',rarity:'rare',cv:700,prob:0.17},{id:'ch_fig',name:'限定フィギュア',emoji:'🎭',rarity:'super-rare',cv:1800,prob:0.05}]},
+  {id:'pokemon',name:'ポケモンオリパ',icon:'⚡',grad:'linear-gradient(135deg,#ffee58,#f57f17)',copy:'ポケモンカード封入！超人気ガチャ！',cost:200,cost10:1800,totalSlots:30000,tags:['スタンダード','人気'],prizes:[{id:'pk_c',name:'ノーマルカード',emoji:'🃏',rarity:'common',cv:240,prob:0.45},{id:'pk_r',name:'レアカード',emoji:'✨',rarity:'uncommon',cv:500,prob:0.30},{id:'pk_sr',name:'SRカード',emoji:'💎',rarity:'rare',cv:1200,prob:0.20},{id:'pk_ur',name:'URカード',emoji:'🌟',rarity:'ultra-rare',cv:5000,prob:0.05}]},
+  {id:'weekly',name:'ウィークリースペシャル',icon:'📅',grad:'linear-gradient(135deg,#ff7043,#bf360c)',copy:'毎週更新！今週限りの特別ガチャ',cost:250,cost10:2250,totalSlots:25000,tags:['限定'],prizes:[{id:'wk_pkg',name:'スペシャルパッケージ',emoji:'📦',rarity:'common',cv:300,prob:0.45},{id:'wk_set',name:'限定グッズセット',emoji:'🎁',rarity:'uncommon',cv:600,prob:0.30},{id:'wk_col',name:'コレクターズアイテム',emoji:'🏅',rarity:'rare',cv:1300,prob:0.20},{id:'wk_sp',name:'週間スペシャル',emoji:'⭐',rarity:'super-rare',cv:2500,prob:0.05}]},
+  {id:'silver',name:'シルバーガチャ',icon:'🥈',grad:'linear-gradient(135deg,#78909c,#37474f)',copy:'高品質アイテム多数！シルバー限定排出',cost:300,cost10:2700,totalSlots:20000,tags:['高品質','人気'],prizes:[{id:'sv_acr',name:'アクリルスタンド',emoji:'🗿',rarity:'uncommon',cv:400,prob:0.45},{id:'sv_art',name:'アートプリント',emoji:'🎨',rarity:'rare',cv:700,prob:0.30},{id:'sv_fig',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:1800,prob:0.20},{id:'sv_ssr',name:'SSRカード',emoji:'✨',rarity:'ultra-rare',cv:3500,prob:0.05}]},
+  {id:'mystery',name:'ミステリーボックス',icon:'📦',grad:'linear-gradient(135deg,#546e7a,#263238)',copy:'何が入ってるかはお楽しみ！',cost:350,cost10:3150,totalSlots:18000,tags:['ミステリー'],prizes:[{id:'my_com',name:'コモンボックス',emoji:'📦',rarity:'common',cv:400,prob:0.40},{id:'my_unc',name:'アンコモンボックス',emoji:'🎁',rarity:'uncommon',cv:750,prob:0.30},{id:'my_rar',name:'レアボックス',emoji:'💼',rarity:'rare',cv:1500,prob:0.22},{id:'my_sp',name:'ミステリースペシャル',emoji:'🔮',rarity:'super-rare',cv:3000,prob:0.08}]},
+  {id:'figure',name:'フィギュアコレクション',icon:'🗿',grad:'linear-gradient(135deg,#8d6e63,#4e342e)',copy:'精巧なフィギュアのコレクション！',cost:400,cost10:3600,totalSlots:15000,tags:['高品質'],prizes:[{id:'fg_mini',name:'ミニフィギュア',emoji:'🧸',rarity:'uncommon',cv:500,prob:0.40},{id:'fg_std',name:'スタンダードフィギュア',emoji:'🗿',rarity:'rare',cv:1000,prob:0.35},{id:'fg_lim',name:'限定フィギュア',emoji:'🏆',rarity:'super-rare',cv:2500,prob:0.20},{id:'fg_ur',name:'UR限定フィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'holiday',name:'ホリデースペシャル',icon:'🎄',grad:'linear-gradient(135deg,#ef5350,#b71c1c)',copy:'季節限定！ホリデーシーズン特別版',cost:450,cost10:4050,totalSlots:12000,tags:['限定','人気'],prizes:[{id:'hd_orn',name:'ホリデーオーナメント',emoji:'🎄',rarity:'uncommon',cv:600,prob:0.40},{id:'hd_set',name:'ホリデーグッズセット',emoji:'🎁',rarity:'rare',cv:1200,prob:0.35},{id:'hd_lim',name:'限定コレクション',emoji:'❄️',rarity:'super-rare',cv:3000,prob:0.20},{id:'hd_ur',name:'ホリデーURアイテム',emoji:'🌟',rarity:'ultra-rare',cv:7000,prob:0.05}]},
+  {id:'gold',name:'ゴールドガチャ',icon:'🥇',grad:'linear-gradient(135deg,#ffb300,#e65100)',copy:'1等は超プレミアム！夢を掴め！',cost:500,cost10:4500,totalSlots:10000,tags:['プレミアム','人気'],prizes:[{id:'gd_set',name:'プレミアムグッズセット',emoji:'🎁',rarity:'rare',cv:800,prob:0.40},{id:'gd_acr',name:'限定アクリルスタンド',emoji:'💎',rarity:'rare',cv:1300,prob:0.35},{id:'gd_art',name:'レアアートボード',emoji:'🖌️',rarity:'super-rare',cv:3000,prob:0.20},{id:'gd_ur',name:'URフィギュア',emoji:'👑',rarity:'ultra-rare',cv:6000,prob:0.05}]},
+  {id:'artlimit',name:'限定アートシリーズ',icon:'🎨',grad:'linear-gradient(135deg,#26a69a,#004d40)',copy:'アーティスト限定コラボシリーズ！',cost:600,cost10:5400,totalSlots:8000,tags:['限定'],prizes:[{id:'al_prt',name:'アートプリント',emoji:'🖼️',rarity:'rare',cv:900,prob:0.38},{id:'al_sig',name:'サイン入りポスター',emoji:'✍️',rarity:'rare',cv:1800,prob:0.32},{id:'al_lim',name:'限定アートボード',emoji:'🎨',rarity:'super-rare',cv:4000,prob:0.22},{id:'al_ur',name:'UR限定アートピース',emoji:'🏛️',rarity:'ultra-rare',cv:8000,prob:0.08}]},
+  {id:'superrare',name:'スーパーレアガチャ',icon:'💫',grad:'linear-gradient(135deg,#7e57c2,#311b92)',copy:'SR以上確定！超高確率ガチャ！',cost:700,cost10:6300,totalSlots:7000,tags:['プレミアム'],prizes:[{id:'sr_acr',name:'SRアクリルスタンド',emoji:'💫',rarity:'rare',cv:1000,prob:0.40},{id:'sr_fig',name:'SRフィギュア',emoji:'🌠',rarity:'super-rare',cv:2500,prob:0.35},{id:'sr_lim',name:'限定SRコレクション',emoji:'✨',rarity:'super-rare',cv:4000,prob:0.20},{id:'sr_ur',name:'UR超限定',emoji:'💎',rarity:'ultra-rare',cv:9000,prob:0.05}]},
+  {id:'legend',name:'レジェンドガチャ',icon:'🏆',grad:'linear-gradient(135deg,#ff8f00,#e65100)',copy:'伝説のアイテムが眠るガチャ！',cost:800,cost10:7200,totalSlots:6000,tags:['プレミアム','UR排出'],prizes:[{id:'lg_set',name:'レジェンドグッズセット',emoji:'🏅',rarity:'rare',cv:1200,prob:0.35},{id:'lg_fig',name:'レジェンドフィギュア',emoji:'🏆',rarity:'super-rare',cv:3000,prob:0.35},{id:'lg_lim',name:'限定レジェンドBOX',emoji:'📿',rarity:'super-rare',cv:5000,prob:0.20},{id:'lg_ur',name:'URレジェンド',emoji:'👑',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'master',name:'マスターコレクション',icon:'👑',grad:'linear-gradient(135deg,#5c6bc0,#1a237e)',copy:'マスター限定！至高のコレクション',cost:900,cost10:8100,totalSlots:5000,tags:['UR排出'],prizes:[{id:'mc_art',name:'マスターアートピース',emoji:'🖼️',rarity:'super-rare',cv:1500,prob:0.40},{id:'mc_fig',name:'マスターフィギュア',emoji:'🗽',rarity:'super-rare',cv:3500,prob:0.30},{id:'mc_lim',name:'限定マスターBOX',emoji:'🧿',rarity:'super-rare',cv:5500,prob:0.20},{id:'mc_ur',name:'URマスターコレクション',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.10}]},
+  {id:'premium',name:'プレミアムガチャ',icon:'💎',grad:'linear-gradient(135deg,#9c27b0,#4a148c)',copy:'最高峰ガチャ！URを掴み取れ！！',cost:1000,cost10:9000,totalSlots:5000,tags:['UR排出','限定'],prizes:[{id:'pm_box',name:'コレクターズボックス',emoji:'📦',rarity:'rare',cv:1500,prob:0.40},{id:'pm_dvd',name:'限定版DVD',emoji:'💿',rarity:'super-rare',cv:2800,prob:0.30},{id:'pm_art',name:'シグネチャーアート',emoji:'🖼️',rarity:'super-rare',cv:7000,prob:0.20},{id:'pm_ur',name:'URコレクション',emoji:'🌟',rarity:'ultra-rare',cv:12000,prob:0.10}]},
+  {id:'diamond',name:'ダイヤモンドガチャ',icon:'💠',grad:'linear-gradient(135deg,#00bcd4,#006064)',copy:'ダイヤ級の価値！最高峰コレクション',cost:1500,cost10:13500,totalSlots:3000,tags:['UR排出','限定'],prizes:[{id:'dm_fig',name:'ダイヤモンドフィギュア',emoji:'💠',rarity:'super-rare',cv:2500,prob:0.35},{id:'dm_art',name:'ダイヤモンドアート',emoji:'🔷',rarity:'super-rare',cv:5000,prob:0.35},{id:'dm_lim',name:'限定ダイヤモンドBOX',emoji:'💎',rarity:'ultra-rare',cv:10000,prob:0.20},{id:'dm_ur',name:'URダイヤモンド至宝',emoji:'🌟',rarity:'ultra-rare',cv:20000,prob:0.10}]},
+  {id:'grand',name:'グランドプレミアム',icon:'🌟',grad:'linear-gradient(135deg,#ffd700,#ff6f00)',copy:'頂点に君臨する最高峰ガチャ！',cost:2000,cost10:18000,totalSlots:1000,tags:['UR排出','限定','人気'],prizes:[{id:'gp_col',name:'グランドコレクション',emoji:'🌟',rarity:'super-rare',cv:4000,prob:0.30},{id:'gp_lim',name:'グランド限定BOX',emoji:'🎆',rarity:'super-rare',cv:8000,prob:0.30},{id:'gp_ur1',name:'URグランドフィギュア',emoji:'👑',rarity:'ultra-rare',cv:15000,prob:0.25},{id:'gp_ur2',name:'URグランド至高',emoji:'💫',rarity:'ultra-rare',cv:25000,prob:0.15}]},
+];
+const DEFAULT_COIN_PKGS=[
+  {coins:500,  price:'¥500',  bonus:0},
+  {coins:1200, price:'¥1,000',bonus:200},
+  {coins:3000, price:'¥2,000',bonus:1000},
+  {coins:6500, price:'¥4,000',bonus:2500},
+  {coins:15000,price:'¥8,000',bonus:7000},
+];
+const DEFAULT_STORE_ITEMS=[
+  {id:'sh1',name:'ゲームアイテムパック',   emoji:'🎮',desc:'ゲーム内特別アイテム',           cost:500,  rarity:'common'},
+  {id:'sh2',name:'限定ステッカーパック',   emoji:'🏷️',desc:'12枚入り限定セット',             cost:800,  rarity:'uncommon'},
+  {id:'sh3',name:'プレミアムTシャツ',     emoji:'👕',desc:'高品質コットン限定品',           cost:2000, rarity:'uncommon'},
+  {id:'sh4',name:'レアフィギュア',         emoji:'🎎',desc:'精巧な限定フィギュア',           cost:3500, rarity:'rare'},
+  {id:'sh5',name:'限定版アートブック',     emoji:'📗',desc:'フルカラー200ページ限定版',      cost:5000, rarity:'rare'},
+  {id:'sh6',name:'コレクターズエディション',emoji:'📦',desc:'全グッズ詰め合わせセット',       cost:8000, rarity:'super-rare'},
+  {id:'sh7',name:'サイン入りポスター',     emoji:'🖊️',desc:'本物サイン入り限定ポスター',     cost:10000,rarity:'super-rare'},
+  {id:'sh8',name:'URメガコレクション',     emoji:'🌟',desc:'最高レアリティ究極コレクション', cost:15000,rarity:'ultra-rare'},
+];
+
+// ─── STORAGE KEYS ───────────────────────────────────────
+const KEY_M  = 'gw_custom_machines';
+const KEY_CP = 'gw_custom_coin_pkgs';
+const KEY_SI = 'gw_custom_store_items';
+const KEY_BN = 'gw_custom_banners';
+
+const DEFAULT_BANNERS = [
+  {badge:'🔥 期間限定', title:'プレミアムガチャ\nUR確率2倍！',       sub:'〜2026年3月末まで',       grad:'linear-gradient(135deg,#9c27b0,#4a148c)', image:''},
+  {badge:'🎁 新規特典', title:'会員登録で\n500コインプレゼント！', sub:'今すぐ無料で登録',         grad:'linear-gradient(135deg,#00a63c,#007a2d)', image:''},
+  {badge:'⚡ イベント', title:'週末スペシャル\n10連割引実施中！',     sub:'土日限定 特別価格',       grad:'linear-gradient(135deg,#ffb300,#e65100)', image:''},
+  {badge:'🏆 ランキング',title:'今月のUR\nゲットランキング公開！',   sub:'あなたは何位？',           grad:'linear-gradient(135deg,#1e88e5,#0d47a1)', image:''},
+];
+
+// ─── WORKING STATE ──────────────────────────────────────
+function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+let Data = { machines:[], coinPkgs:[], storeItems:[], banners:[] };
+let _imgStore = {}; // mid → base64 or url (in-memory during edit session)
+let modified = false;
+
+function markModified(){
+  modified = true;
+  document.getElementById('modDot').classList.add('show');
+}
+function clearModified(){
+  modified = false;
+  document.getElementById('modDot').classList.remove('show');
+}
+
+function uid(){ return Math.random().toString(36).slice(2,8); }
+
+// ─── APP ────────────────────────────────────────────────
+const App = {
+  login(){
+    const pw = document.getElementById('pw').value;
+    const stored = localStorage.getItem(PW_KEY) || DEFAULT_PW;
+    if(pw !== stored){ document.getElementById('lerr').textContent='パスワードが違います'; return; }
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    this._load();
+    this._renderAll();
+  },
+  logout(){
+    document.getElementById('loginScreen').style.display='';
+    document.getElementById('app').style.display='none';
+    document.getElementById('pw').value='';
+    document.getElementById('lerr').textContent='';
+  },
+  _load(){
+    try { Data.machines   = JSON.parse(localStorage.getItem(KEY_M)  || 'null') || deepClone(DEFAULT_MACHINES); } catch(e){ Data.machines=deepClone(DEFAULT_MACHINES); }
+    try { Data.coinPkgs   = JSON.parse(localStorage.getItem(KEY_CP) || 'null') || deepClone(DEFAULT_COIN_PKGS); } catch(e){ Data.coinPkgs=deepClone(DEFAULT_COIN_PKGS); }
+    try { Data.storeItems = JSON.parse(localStorage.getItem(KEY_SI) || 'null') || deepClone(DEFAULT_STORE_ITEMS); } catch(e){ Data.storeItems=deepClone(DEFAULT_STORE_ITEMS); }
+    try { Data.banners    = JSON.parse(localStorage.getItem(KEY_BN) || 'null') || deepClone(DEFAULT_BANNERS); } catch(e){ Data.banners=deepClone(DEFAULT_BANNERS); }
+    // restore bannerImage into in-memory store
+    _imgStore = {};
+    Data.machines.forEach(m=>{ if(m.bannerImage) _imgStore[m.id] = m.bannerImage; });
+    clearModified();
+  },
+  save(){
+    // collect all live form values before saving
+    this._collectAllForms();
+    localStorage.setItem(KEY_M,  JSON.stringify(Data.machines));
+    localStorage.setItem(KEY_CP, JSON.stringify(Data.coinPkgs));
+    localStorage.setItem(KEY_SI, JSON.stringify(Data.storeItems));
+    localStorage.setItem(KEY_BN, JSON.stringify(Data.banners));
+    clearModified();
+    toast('✅ 保存しました！ゲームを再読み込みすると反映されます');
+  },
+  resetToDefault(){
+    if(!confirm('全設定をデフォルトに戻しますか？')) return;
+    localStorage.removeItem(KEY_M);
+    localStorage.removeItem(KEY_CP);
+    localStorage.removeItem(KEY_SI);
+    localStorage.removeItem(KEY_BN);
+    this._load();
+    this._renderAll();
+    toast('🔄 デフォルトにリセットしました');
+  },
+  tab(name, el){
+    this._collectAllForms();
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('sec-'+name).classList.add('active');
+  },
+  _renderAll(){
+    this._renderMachines();
+    this._renderCoinPkgs();
+    this._renderStoreItems();
+    this._renderBanners();
+  },
+
+  // ── collect all open form inputs into Data ──
+  _collectAllForms(){
+    // machines
+    document.querySelectorAll('.card[data-mid]').forEach(card=>{
+      const mid = card.dataset.mid;
+      const m = Data.machines.find(x=>x.id===mid);
+      if(!m) return;
+      const g = s=>{ const el=card.querySelector('[data-f="'+s+'"]'); return el?el.value:undefined; };
+      if(g('name'))       m.name      = g('name');
+      if(g('icon'))       m.icon      = g('icon');
+      if(g('copy'))       m.copy      = g('copy');
+      if(g('cost'))       m.cost      = parseInt(g('cost'))||m.cost;
+      if(g('cost10'))     m.cost10    = parseInt(g('cost10'))||m.cost10;
+      if(g('totalSlots')) m.totalSlots= parseInt(g('totalSlots'))||m.totalSlots;
+      // banner image: use in-memory store (set by file upload) or URL input
+      const urlInput = card.querySelector('[data-f="bannerUrl"]');
+      if(urlInput){
+        const urlVal = urlInput.value.trim();
+        // prefer in-memory base64 if present, else URL field
+        m.bannerImage = (_imgStore[m.id] !== undefined ? _imgStore[m.id] : urlVal) || '';
+      }
+      // description
+      const descEl = card.querySelector('[data-f="description"]');
+      if(descEl) m.description = descEl.value.trim();
+      // notes
+      const notesEl = card.querySelector('[data-f="notes"]');
+      if(notesEl) m.notes = notesEl.value.split('\n').map(s=>s.trim()).filter(Boolean);
+      // tags
+      m.tags = [];
+      card.querySelectorAll('.tag-chk:checked').forEach(cb=>m.tags.push(cb.value));
+      // prizes
+      m.prizes = [];
+      card.querySelectorAll('.prize-row').forEach(row=>{
+        const pEmoji = row.querySelector('.p-emoji')?.value.trim();
+        const pName  = row.querySelector('.p-name')?.value.trim();
+        const pRar   = row.querySelector('.p-rarity')?.value;
+        const pCv    = parseFloat(row.querySelector('.p-cv')?.value)||0;
+        const pProb  = parseFloat(row.querySelector('.p-prob')?.value)||0;
+        const pId    = row.dataset.pid;
+        // collect prize-level image
+        const pImgEl = row.querySelector('.p-img-file');
+        const pImgBtn = pImgEl ? pImgEl.closest('.pi-img-btn') : null;
+        const pImgTag = pImgBtn ? pImgBtn.querySelector('img') : null;
+        const pImage = pImgTag ? pImgTag.src : '';
+        // collect sub-items from items row
+        const items = [];
+        const itemsRow = row.nextElementSibling;
+        if(itemsRow && itemsRow.classList.contains('prize-items-row')){
+          itemsRow.querySelectorAll('.prize-item-entry').forEach(entry=>{
+            const name  = entry.querySelector('.pi-name-input')?.value.trim()||'';
+            const imgEl = entry.querySelector('.pi-img-btn img');
+            const image = imgEl ? imgEl.src : '';
+            items.push({id:entry.dataset.iid||uid(), name, image});
+          });
+        }
+        if(pName) m.prizes.push({id:pId||uid(),name:pName,emoji:pEmoji||'🎁',image:pImage,rarity:pRar,cv:pCv,prob:pProb,items});
+      });
+    });
+    // coin pkgs
+    Data.coinPkgs = [];
+    document.querySelectorAll('#coinPkgTable tr').forEach(row=>{
+      const coins = parseInt(row.querySelector('.cp-coins')?.value)||0;
+      const bonus = parseInt(row.querySelector('.cp-bonus')?.value)||0;
+      const price = row.querySelector('.cp-price')?.value||'';
+      if(coins>0) Data.coinPkgs.push({coins,bonus,price});
+    });
+    // store items
+    Data.storeItems = [];
+    document.querySelectorAll('#storeTable tr').forEach(row=>{
+      const name  = row.querySelector('.si-name')?.value.trim();
+      const emoji = row.querySelector('.si-emoji')?.value.trim();
+      const desc  = row.querySelector('.si-desc')?.value.trim();
+      const cost  = parseInt(row.querySelector('.si-cost')?.value)||0;
+      const rar   = row.querySelector('.si-rarity')?.value;
+      const id    = row.dataset.sid;
+      const imgEl = row.querySelector('.si-upload-preview');
+      const image = imgEl ? imgEl.src : '';
+      if(name) Data.storeItems.push({id:id||uid(),name,emoji:emoji||'🎁',image,desc:desc||'',cost,rarity:rar});
+    });
+    // banners
+    document.querySelectorAll('.bn-card').forEach((card,i)=>{
+      if(!Data.banners[i]) return;
+      const badge = card.querySelector('.bn-badge-inp')?.value.trim();
+      const title = card.querySelector('.bn-title-inp')?.value;
+      const sub   = card.querySelector('.bn-sub-inp')?.value.trim();
+      if(badge !== undefined) Data.banners[i].badge = badge;
+      if(title !== undefined) Data.banners[i].title = title;
+      if(sub   !== undefined) Data.banners[i].sub   = sub;
+      // image is updated in place via handleBannerImg
+    });
+  },
+
+  // ── MACHINES ──
+  _renderMachines(){
+    document.getElementById('machineCount').textContent = Data.machines.length;
+    const list = document.getElementById('machineList');
+    list.innerHTML = Data.machines.map((m,i)=>this._machineCard(m,i)).join('');
+  },
+  _machineCard(m, i){
+    const tagChecks = ALL_TAGS.map(t=>`
+      <label class="tag-check">
+        <input type="checkbox" class="tag-chk" value="${t}" ${m.tags.includes(t)?'checked':''}>
+        ${t}
+      </label>`).join('');
+    const prizesHtml = (m.prizes||[]).map(p=>this._prizeRow(p)).join('');
+    const probSum = (m.prizes||[]).reduce((a,p)=>a+p.prob,0);
+    const probOk  = Math.abs(probSum-1)<0.001;
+    return `
+    <div class="card" data-mid="${m.id}">
+      <div class="card-hd" onclick="App.toggleCard(this)">
+        <div class="card-hd-ico" style="${m.bannerImage?'background-image:url('+m.bannerImage+');background-size:cover;background-position:center':'background:#e2e8f0'};border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:${m.bannerImage?'0':'1.3'}rem">${m.bannerImage?'':m.icon}</div>
+        <div class="card-hd-info">
+          <div class="card-hd-name">${m.name}</div>
+          <div class="card-hd-meta">💰 ${m.cost}コイン · 10連 ${m.cost10} · 残り ${m.totalSlots.toLocaleString()}枚 · 景品${m.prizes?m.prizes.length:0}種</div>
+        </div>
+        <div class="card-hd-right">
+          <button class="btn btn-xs btn-red" onclick="event.stopPropagation();App.deleteMachine('${m.id}')">削除</button>
+          <span class="expand-arrow">▼</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field">
+            <label class="flabel">マシン名</label>
+            <input class="finput" data-f="name" value="${esc(m.name)}" oninput="markModified()">
+          </div>
+          <div class="field">
+            <label class="flabel">アイコン（絵文字）</label>
+            <input class="finput" data-f="icon" value="${esc(m.icon)}" oninput="markModified();App.updateCardIco(this)">
+          </div>
+          <div class="field full">
+            <label class="flabel">キャッチコピー</label>
+            <input class="finput" data-f="copy" value="${esc(m.copy)}" oninput="markModified()">
+          </div>
+        </div>
+        <div class="form-grid-3">
+          <div class="field">
+            <label class="flabel">1回コスト（コイン）</label>
+            <input class="finput" type="number" data-f="cost" value="${m.cost}" oninput="markModified()">
+          </div>
+          <div class="field">
+            <label class="flabel">10連コスト</label>
+            <input class="finput" type="number" data-f="cost10" value="${m.cost10}" oninput="markModified()">
+          </div>
+          <div class="field">
+            <label class="flabel">総スロット数</label>
+            <input class="finput" type="number" data-f="totalSlots" value="${m.totalSlots}" oninput="markModified()">
+          </div>
+        </div>
+        <!-- BANNER IMAGE -->
+        <div class="field" style="margin-bottom:14px">
+          <label class="flabel">🖼️ トップバナー画像</label>
+          <div class="img-hero-preview" id="ihp-${m.id}"
+            style="${m.bannerImage?'background-image:url('+m.bannerImage+');':''}">
+            ${m.bannerImage?'':'画像なし（グラデーションを使用）'}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+            <div class="img-upload-area" style="flex:1;min-width:180px;padding:10px">
+              <div style="font-size:0.78rem;color:var(--sub)">📁 ファイルを選択</div>
+              <div style="font-size:0.68rem;color:var(--dim);margin-top:3px">JPG/PNG/WebP</div>
+              <input type="file" accept="image/*" onchange="App.onImageFile(this,'${m.id}')">
+            </div>
+            <button class="btn btn-sm btn-red" style="flex-shrink:0;align-self:center"
+              onclick="App.clearImage('${m.id}')">🗑️ 削除</button>
+          </div>
+          <input class="finput" data-f="bannerUrl" value="${esc(m.bannerImage||'')}"
+            placeholder="または画像URLを直接入力（https://...）"
+            oninput="App.onImageUrl(this,'${m.id}');markModified()">
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label class="flabel">タグ</label>
+          <div class="tag-checks">${tagChecks}</div>
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="field" style="margin-bottom:14px">
+          <label class="flabel">📝 商品説明文（任意）</label>
+          <textarea class="ftextarea" data-f="description" rows="3"
+            oninput="markModified()">${esc(m.description||'')}</textarea>
+        </div>
+        <!-- CUSTOM NOTES -->
+        <div class="field" style="margin-bottom:14px">
+          <label class="flabel">⚠️ 注意事項（1行1項目）</label>
+          <textarea class="ftextarea" data-f="notes" rows="5"
+            placeholder="例：&#10;発送は1〜2週間かかります&#10;返品・交換はお断りしています"
+            oninput="markModified()">${(m.notes||[]).join('\n')}</textarea>
+          <div style="font-size:0.68rem;color:var(--dim);margin-top:3px">空欄の場合はデフォルト文言が使用されます</div>
+        </div>
+
+        <!-- PRIZES -->
+        <div class="prize-section">
+          <div class="prize-section-hd">
+            <div class="prize-section-title">🎁 景品設定</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="prob-sum ${probOk?'prob-ok':'prob-ng'}" id="psum-${m.id}">合計 ${probSum.toFixed(3)}</span>
+              <button class="btn btn-sm btn-blue" onclick="App.addPrize('${m.id}')">＋ 追加</button>
+            </div>
+          </div>
+          <div class="prize-tbl-wrap">
+            <table class="prize-tbl">
+              <thead><tr>
+                <th>画像</th><th>絵文字</th><th>景品名</th><th>レアリティ</th>
+                <th>コイン価値</th><th>確率(0〜1)</th><th></th>
+              </tr></thead>
+              <tbody class="prize-body" data-mid="${m.id}">${prizesHtml}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  _prizeRow(p){
+    const rarOpts = RARITIES.map(r=>`<option value="${r}" ${p.rarity===r?'selected':''}>${RARITY_LABELS[r]}</option>`).join('');
+    const pid = p.id||uid();
+    const items = p.items||[];
+    const itemsHtml = items.map(item=>this._itemEntry(item)).join('');
+    const itemCount = items.length;
+    const hasImg = !!(p.image);
+    return `
+    <tr class="prize-row" data-pid="${pid}">
+      <td>
+        <label class="pi-img-btn" style="width:42px;height:42px;font-size:1rem" title="景品画像をクリックで変更">
+          ${hasImg?`<img src="${p.image}" alt="">`:'🖼️'}
+          <input type="file" accept="image/*" class="pi-img-file p-img-file" onchange="App.handlePrizeImg(this)">
+        </label>
+      </td>
+      <td><input class="ptbl-input ptbl-emoji p-emoji" value="${esc(p.emoji)}" maxlength="4" oninput="markModified()"></td>
+      <td><input class="ptbl-input ptbl-name p-name" value="${esc(p.name)}" oninput="markModified()"></td>
+      <td><select class="ptbl-sel p-rarity" onchange="markModified()">${rarOpts}</select></td>
+      <td><input class="ptbl-input ptbl-cv p-cv" type="number" value="${p.cv}" oninput="markModified()"></td>
+      <td><input class="ptbl-input ptbl-prob p-prob" type="number" step="0.01" min="0" max="1" value="${p.prob}" oninput="App.updateProbSum(this)"></td>
+      <td style="white-space:nowrap">
+        <button class="btn-icon" onclick="App.togglePrizeItems(this)" title="商品管理" style="position:relative">
+          📦${itemCount?`<span class="pi-count-badge">${itemCount}</span>`:''}
+        </button>
+        <button class="btn-icon" onclick="App.removePrize(this)" title="削除">🗑️</button>
+      </td>
+    </tr>
+    <tr class="prize-items-row" style="display:none" data-pid="${pid}">
+      <td colspan="7">
+        <div class="prize-items-wrap">
+          <div class="prize-items-hd">
+            <span>📸 商品一覧 <span style="color:var(--dim);font-weight:400">（この景品に含まれる実際の商品）</span></span>
+            <button class="btn btn-xs btn-blue" onclick="App.addPrizeItem(this)">＋ 商品追加</button>
+          </div>
+          <div class="prize-items-list">${itemsHtml}</div>
+          ${!itemCount?`<div class="pi-empty-msg" style="text-align:center;padding:10px;color:var(--dim);font-size:0.76rem">商品がありません。「＋ 商品追加」で追加してください。</div>`:''}
+        </div>
+      </td>
+    </tr>`;
+  },
+  _itemEntry(item){
+    const iid = item.id||uid();
+    const hasImg = !!(item.image);
+    return `<div class="prize-item-entry" data-iid="${iid}">
+      <label class="pi-img-btn" title="クリックして画像を変更">
+        ${hasImg?`<img src="${item.image}" alt="">`:'📷'}
+        <input type="file" accept="image/*" class="pi-img-file" onchange="App.handlePrizeItemImg(this)">
+      </label>
+      <input class="pi-name-input" value="${esc(item.name||'')}" placeholder="商品名を入力" oninput="markModified()">
+      <button class="btn-icon" onclick="App.removePrizeItem(this)" title="削除">🗑️</button>
+    </div>`;
+  },
+  toggleCard(hd){
+    hd.parentElement.classList.toggle('open');
+  },
+  updateCardIco(input){
+    const card = input.closest('.card');
+    const icoEl = card.querySelector('.card-hd-ico');
+    if(icoEl) icoEl.textContent = input.value;
+  },
+  onImageFile(input, mid){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 2*1024*1024){ alert('画像は2MB以下にしてください'); return; }
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const dataUrl = e.target.result;
+      _imgStore[mid] = dataUrl;
+      this._updateImgPreview(mid, dataUrl);
+      markModified();
+    };
+    reader.readAsDataURL(file);
+  },
+  onImageUrl(input, mid){
+    const url = input.value.trim();
+    if(url) _imgStore[mid] = url;
+    this._updateImgPreview(mid, url||null);
+  },
+  clearImage(mid){
+    _imgStore[mid] = '';
+    this._updateImgPreview(mid, null);
+    const card = document.querySelector('.card[data-mid="'+mid+'"]');
+    if(card){
+      const urlInput = card.querySelector('[data-f="bannerUrl"]');
+      if(urlInput) urlInput.value = '';
+    }
+    markModified();
+  },
+  _updateImgPreview(mid, src){
+    const el = document.getElementById('ihp-'+mid);
+    if(!el) return;
+    if(src){
+      el.style.backgroundImage = 'url('+src+')';
+      el.textContent = '';
+    } else {
+      el.style.backgroundImage = '';
+      el.textContent = '画像なし（グラデーションを使用）';
+    }
+  },
+  updateProbSum(input){
+    const body = input.closest('tbody');
+    const mid  = body.dataset.mid;
+    const sum  = Array.from(body.querySelectorAll('.p-prob')).reduce((a,el)=>a+parseFloat(el.value||0),0);
+    const ok   = Math.abs(sum-1)<0.001;
+    const el   = document.getElementById('psum-'+mid);
+    if(el){ el.textContent='合計 '+sum.toFixed(3); el.className='prob-sum '+(ok?'prob-ok':'prob-ng'); }
+    markModified();
+  },
+  addPrize(mid){
+    const body = document.querySelector('.prize-body[data-mid="'+mid+'"]');
+    if(!body) return;
+    const tmp = document.createElement('tbody');
+    tmp.innerHTML = this._prizeRow({id:uid(),name:'新景品',emoji:'🎁',rarity:'common',cv:100,prob:0,items:[]});
+    // append both the prize row and the items row
+    [...tmp.querySelectorAll('tr')].forEach(r=>body.appendChild(r));
+    markModified();
+  },
+  removePrize(btn){
+    const row = btn.closest('tr');
+    const body = row.closest('tbody');
+    const mid  = body.dataset.mid;
+    // also remove the items sub-row
+    const itemsRow = row.nextElementSibling;
+    if(itemsRow && itemsRow.classList.contains('prize-items-row')) itemsRow.remove();
+    row.remove();
+    // re-calculate sum
+    const sum  = Array.from(body.querySelectorAll('.p-prob')).reduce((a,el)=>a+parseFloat(el.value||0),0);
+    const ok   = Math.abs(sum-1)<0.001;
+    const el   = document.getElementById('psum-'+mid);
+    if(el){ el.textContent='合計 '+sum.toFixed(3); el.className='prob-sum '+(ok?'prob-ok':'prob-ng'); }
+    markModified();
+  },
+  togglePrizeItems(btn){
+    const row = btn.closest('tr');
+    const itemsRow = row.nextElementSibling;
+    if(itemsRow && itemsRow.classList.contains('prize-items-row')){
+      itemsRow.style.display = itemsRow.style.display==='none' ? '' : 'none';
+    }
+  },
+  addPrizeItem(btn){
+    const wrap = btn.closest('.prize-items-wrap');
+    const list = wrap.querySelector('.prize-items-list');
+    const emptyMsg = wrap.querySelector('.pi-empty-msg');
+    if(emptyMsg) emptyMsg.remove();
+    const tmp = document.createElement('div');
+    tmp.innerHTML = this._itemEntry({id:uid(),name:'',image:''});
+    list.appendChild(tmp.firstElementChild);
+    this._refreshItemCount(btn);
+    markModified();
+  },
+  removePrizeItem(btn){
+    btn.closest('.prize-item-entry').remove();
+    this._refreshItemCount(btn);
+    markModified();
+  },
+  _refreshItemCount(el){
+    const itemsRow = el.closest('.prize-items-row');
+    if(!itemsRow) return;
+    const prizeRow = itemsRow.previousElementSibling;
+    if(!prizeRow) return;
+    const count = itemsRow.querySelectorAll('.prize-item-entry').length;
+    const toggleBtn = prizeRow.querySelector('button[title="商品管理"]');
+    if(!toggleBtn) return;
+    let badge = toggleBtn.querySelector('.pi-count-badge');
+    if(count > 0){
+      if(!badge){ badge=document.createElement('span'); badge.className='pi-count-badge'; toggleBtn.appendChild(badge); }
+      badge.textContent = count;
+    } else {
+      if(badge) badge.remove();
+    }
+  },
+  handlePrizeImg(input){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 2*1024*1024){ alert('画像は2MB以下にしてください'); return; }
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const btn = input.closest('.pi-img-btn');
+      btn.innerHTML = `<img src="${e.target.result}" alt=""><input type="file" accept="image/*" class="pi-img-file p-img-file" onchange="App.handlePrizeImg(this)">`;
+      markModified();
+    };
+    reader.readAsDataURL(file);
+  },
+  handlePrizeItemImg(input){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 2*1024*1024){ alert('画像は2MB以下にしてください'); return; }
+    const entry = input.closest('.prize-item-entry');
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const btn = entry.querySelector('.pi-img-btn');
+      // replace emoji text with image
+      btn.innerHTML = `<img src="${e.target.result}" alt=""><input type="file" accept="image/*" class="pi-img-file" onchange="App.handlePrizeItemImg(this)">`;
+      markModified();
+    };
+    reader.readAsDataURL(file);
+  },
+  addMachine(){
+    this._collectAllForms();
+    const newM = {
+      id:'m_'+uid(), name:'新しいマシン', icon:'⭐',
+      bannerImage:'', description:'', notes:[],
+      copy:'新しいガチャ登場！', cost:100, cost10:900,
+      totalSlots:10000, tags:[],
+      prizes:[
+        {id:'p_'+uid(),name:'コモン景品',emoji:'🎁',rarity:'common',cv:100,prob:0.60},
+        {id:'p_'+uid(),name:'レア景品',  emoji:'✨',rarity:'rare',  cv:500,prob:0.35},
+        {id:'p_'+uid(),name:'UR景品',    emoji:'👑',rarity:'ultra-rare',cv:2000,prob:0.05},
+      ]
+    };
+    Data.machines.push(newM);
+    this._renderMachines();
+    // open the new card
+    const cards = document.querySelectorAll('.card[data-mid]');
+    const last  = cards[cards.length-1];
+    if(last){ last.classList.add('open'); last.scrollIntoView({behavior:'smooth',block:'start'}); }
+    markModified();
+  },
+  deleteMachine(id){
+    if(!confirm('このマシンを削除しますか？')) return;
+    this._collectAllForms();
+    Data.machines = Data.machines.filter(m=>m.id!==id);
+    this._renderMachines();
+    markModified();
+  },
+
+  // ── COIN PKGS ──
+  _renderCoinPkgs(){
+    document.getElementById('coinPkgTable').innerHTML =
+      Data.coinPkgs.map((p,i)=>this._coinPkgRow(p,i)).join('');
+  },
+  _coinPkgRow(p,i){
+    return `<tr data-cpi="${i}">
+      <td><input class="stbl-input cp-coins" type="number" value="${p.coins}" oninput="markModified()" style="width:90px"></td>
+      <td><input class="stbl-input cp-bonus" type="number" value="${p.bonus}" oninput="markModified()" style="width:80px"></td>
+      <td><input class="stbl-input cp-price" value="${esc(p.price)}" oninput="markModified()" placeholder="¥1,000" style="width:100px"></td>
+      <td><button class="btn btn-xs btn-red" onclick="App.removeCoinPkg(this)">削除</button></td>
+    </tr>`;
+  },
+  addCoinPkg(){
+    Data.coinPkgs.push({coins:1000,bonus:0,price:'¥1,000'});
+    this._renderCoinPkgs();
+    markModified();
+  },
+  removeCoinPkg(btn){
+    btn.closest('tr').remove();
+    markModified();
+  },
+
+  // ── STORE ITEMS ──
+  _renderStoreItems(){
+    document.getElementById('storeTable').innerHTML =
+      Data.storeItems.map((s,i)=>this._storeRow(s,i)).join('');
+  },
+  _storeRow(s,i){
+    const rarOpts = RARITIES.map(r=>`<option value="${r}" ${s.rarity===r?'selected':''}>${RARITY_LABELS[r]}</option>`).join('');
+    const hasImg = !!(s.image);
+    return `<tr data-sid="${s.id||uid()}">
+      <td style="width:90px">
+        <label class="si-upload-area">
+          ${hasImg
+            ? `<img src="${s.image}" class="si-upload-preview" alt="">`
+            : `<div class="si-upload-placeholder"><span style="font-size:1.8rem;line-height:1">${s.emoji||'📷'}</span><span class="si-upload-hint">クリックして<br>画像を選択</span></div>`
+          }
+          <input type="file" accept="image/*" class="pi-img-file si-img-file" onchange="App.handleStoreItemImg(this)">
+          ${hasImg?`<button class="si-img-clear" onclick="event.preventDefault();event.stopPropagation();App.clearStoreItemImg(this)">✕</button>`:''}
+        </label>
+      </td>
+      <td><input class="stbl-input si-emoji" value="${esc(s.emoji)}" maxlength="4" oninput="markModified()" style="width:50px"></td>
+      <td><input class="stbl-input si-name"  value="${esc(s.name)}"  oninput="markModified()" style="min-width:130px"></td>
+      <td><input class="stbl-input si-desc"  value="${esc(s.desc)}"  oninput="markModified()" style="min-width:150px"></td>
+      <td><input class="stbl-input si-cost"  type="number" value="${s.cost}" oninput="markModified()" style="width:80px"></td>
+      <td><select class="stbl-sel si-rarity" onchange="markModified()">${rarOpts}</select></td>
+      <td><button class="btn btn-xs btn-red" onclick="App.removeStoreItem(this)">削除</button></td>
+    </tr>`;
+  },
+  handleStoreItemImgUrl(urlInput){
+    const url = urlInput.value.trim();
+    const btn = urlInput.closest('td').querySelector('.pi-img-btn');
+    if(url){
+      btn.innerHTML = `<img src="${url}" alt="" onerror="this.style.display='none'"><input type="file" accept="image/*" class="pi-img-file si-img-file" onchange="App.handleStoreItemImg(this)">`;
+    } else {
+      const emoji = urlInput.closest('tr').querySelector('.si-emoji')?.value || '📷';
+      btn.innerHTML = `${emoji}<input type="file" accept="image/*" class="pi-img-file si-img-file" onchange="App.handleStoreItemImg(this)">`;
+    }
+    markModified();
+  },
+  clearStoreItemImg(btn){
+    const area = btn.closest('.si-upload-area');
+    const emoji = btn.closest('tr').querySelector('.si-emoji')?.value || '📷';
+    area.innerHTML = `
+      <div class="si-upload-placeholder">
+        <span style="font-size:1.8rem;line-height:1">${emoji}</span>
+        <span class="si-upload-hint">クリックして<br>画像を選択</span>
+      </div>
+      <input type="file" accept="image/*" class="pi-img-file si-img-file" onchange="App.handleStoreItemImg(this)">
+    `;
+    markModified();
+  },
+  handleStoreItemImg(input){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 2*1024*1024){ alert('画像は2MB以下にしてください'); return; }
+    const row = input.closest('tr');
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const area = input.closest('.si-upload-area');
+      area.innerHTML = `
+        <img src="${e.target.result}" class="si-upload-preview" alt="">
+        <input type="file" accept="image/*" class="pi-img-file si-img-file" onchange="App.handleStoreItemImg(this)">
+        <button class="si-img-clear" onclick="event.preventDefault();event.stopPropagation();App.clearStoreItemImg(this)">✕</button>
+      `;
+      markModified();
+    };
+    reader.readAsDataURL(file);
+  },
+  // ── BANNERS ──
+  _renderBanners(){
+    const wrap = document.getElementById('bannerCards');
+    if(!wrap) return;
+    wrap.innerHTML = Data.banners.map((b,i)=>this._bannerCard(b,i)).join('');
+  },
+  _bannerCard(b,i){
+    const hasImg = b.image && b.image.length > 0;
+    const bgStyle = hasImg ? `background-image:url(${b.image});background-size:cover;background-position:center;` : `background:${b.grad||'#555'};`;
+    return `<div class="bn-card">
+      <label class="bn-preview" style="${bgStyle}">
+        <span class="bn-num">スライド ${i+1}</span>
+        ${hasImg ? `<img src="${b.image}" class="bn-img" alt="">` : `<div class="bn-no-img">📷<span>クリックして画像をアップロード</span></div>`}
+        <div class="bn-upload-overlay">📷 画像を変更</div>
+        ${hasImg ? `<button class="bn-clear" onclick="event.preventDefault();event.stopPropagation();App.clearBannerImg(${i})">✕</button>` : ''}
+        <input type="file" accept="image/*" style="display:none" onchange="App.handleBannerImg(this,${i})">
+      </label>
+      <div class="bn-body">
+        <div class="bn-lbl">バッジ</div>
+        <input class="bn-inp bn-badge-inp" value="${esc(b.badge||'')}" placeholder="例: 🔥 期間限定" oninput="markModified()">
+        <div class="bn-lbl">タイトル（改行可）</div>
+        <textarea class="bn-inp bn-title-inp" rows="2" style="resize:vertical" oninput="markModified()">${esc(b.title||'')}</textarea>
+        <div class="bn-lbl">サブテキスト</div>
+        <input class="bn-inp bn-sub-inp" value="${esc(b.sub||'')}" placeholder="例: 〜3月末まで" oninput="markModified()">
+      </div>
+    </div>`;
+  },
+  handleBannerImg(input, idx){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 3*1024*1024){ alert('画像は3MB以下にしてください'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      Data.banners[idx].image = e.target.result;
+      markModified();
+      this._renderBanners();
+    };
+    reader.readAsDataURL(file);
+  },
+  clearBannerImg(idx){
+    Data.banners[idx].image = '';
+    markModified();
+    this._renderBanners();
+  },
+  addStoreItem(){
+    Data.storeItems.push({id:'si_'+uid(),name:'新アイテム',emoji:'🎁',image:'',desc:'説明文',cost:1000,rarity:'common'});
+    this._renderStoreItems();
+    markModified();
+  },
+  removeStoreItem(btn){
+    btn.closest('tr').remove();
+    markModified();
+  },
+};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+</body>
+</html>

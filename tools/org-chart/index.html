@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>組織図エディタ | Web Tools</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --border: #dde3ed;
+      --text: #1a202c;
+      --text-2: #718096;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --danger: #e53e3e;
+      --success: #38a169;
+      --radius: 14px;
+      --shadow: 0 2px 14px rgba(0,0,0,0.09);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.16);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', 'Segoe UI', sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .header-logo { font-weight: 700; font-size: .95rem; color: var(--accent); text-decoration: none; }
+    .header-sep { color: var(--border); }
+    .header-title { font-weight: 600; font-size: .95rem; }
+    .header-actions { margin-left: auto; display: flex; gap: .5rem; align-items: center; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .42rem .9rem; border-radius: 8px; font-size: .85rem;
+      font-weight: 500; cursor: pointer; border: none; transition: all .15s;
+      white-space: nowrap; font-family: inherit;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #f7fafc; }
+    .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #fed7d7; }
+    .btn-danger:hover { background: #ffe4e4; }
+    .btn-ghost { background: transparent; color: var(--text-2); padding: .3rem .5rem; }
+    .btn-ghost:hover { background: #f1f5f9; color: var(--text); }
+    .btn-sm { padding: .3rem .7rem; font-size: .78rem; }
+
+    /* ── Canvas ── */
+    .canvas {
+      flex: 1; overflow: auto; padding: 2.5rem 2rem;
+      display: flex; align-items: flex-start; justify-content: center;
+    }
+    .tree-wrap { min-width: 200px; padding-bottom: 4rem; }
+
+    /* ── Tree ── */
+    .tree-row { display: flex; flex-direction: column; align-items: center; }
+    .tree-children { display: flex; align-items: flex-start; position: relative; }
+    .tree-child { display: flex; flex-direction: column; align-items: center; padding: 0 18px; position: relative; }
+
+    /* Horizontal connector line (positioned by JS) */
+    .tree-h-line {
+      position: absolute; top: 0; height: 2px;
+      background: #c4cfe0; pointer-events: none;
+    }
+
+    /* Vertical connectors */
+    .conn-down { width: 2px; height: 30px; background: #c4cfe0; }
+    .conn-up   { width: 2px; height: 30px; background: #c4cfe0; }
+
+    /* ── Node Card ── */
+    .node-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 1rem 1.1rem 1.1rem;
+      min-width: 160px;
+      max-width: 210px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color .18s, box-shadow .18s, transform .15s;
+      user-select: none;
+    }
+    .node-card:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+      transform: translateY(-2px);
+      border-color: #b8c8e0;
+      z-index: 2;
+    }
+
+    /* Color bar on top */
+    .node-color-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .node-content { padding-top: .35rem; }
+    .node-name { font-weight: 700; font-size: .97rem; line-height: 1.35; }
+    .node-role { font-size: .78rem; color: var(--text-2); margin-top: 3px; }
+
+    .node-badges {
+      display: flex; gap: .3rem; flex-wrap: wrap; margin-top: .55rem;
+    }
+    .badge {
+      font-size: .68rem; padding: 2px 8px; border-radius: 999px;
+      background: #f1f5f9; color: #64748b; font-weight: 500;
+    }
+    .badge.task { background: #fef9c3; color: #854d0e; }
+    .badge.task-done { background: #dcfce7; color: #166534; }
+
+    /* 責任範囲タグ（カード内） */
+    .node-resp-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: .5rem; }
+    .node-resp-tag {
+      font-size: .65rem; padding: 2px 7px; border-radius: 999px; font-weight: 500;
+      opacity: .85;
+    }
+
+    /* Hover action bar */
+    .node-hover-bar {
+      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 5px; z-index: 20; pointer-events: none;
+    }
+    .node-card:hover .node-hover-bar { display: flex; pointer-events: auto; }
+    .node-hover-bar .hbtn {
+      padding: 4px 10px; font-size: .72rem; font-weight: 500;
+      border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-2);
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+      cursor: pointer; white-space: nowrap;
+      font-family: inherit; transition: all .12s;
+    }
+    .node-hover-bar .hbtn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .node-hover-bar .hbtn.del:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 20, 30, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 580px;
+      max-height: 85vh;
+      display: flex; flex-direction: column;
+      transform: translateY(16px) scale(.97);
+      transition: transform .22s cubic-bezier(.16,1,.3,1), opacity .2s;
+      opacity: 0;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+
+    /* Modal hero */
+    .modal-hero {
+      border-radius: 18px 18px 0 0;
+      padding: 1.75rem 1.75rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-hero-bg {
+      position: absolute; inset: 0; opacity: .08;
+    }
+    .modal-hero-content { position: relative; z-index: 1; }
+    .modal-name {
+      font-size: 1.5rem; font-weight: 800; line-height: 1.2;
+    }
+    .modal-role {
+      font-size: .9rem; margin-top: .25rem; opacity: .7;
+    }
+    .modal-hero-close {
+      position: absolute; top: 1rem; right: 1rem; z-index: 2;
+      background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: inherit; transition: background .15s;
+    }
+    .modal-hero-close:hover { background: rgba(255,255,255,0.4); }
+
+    /* Modal body */
+    .modal-body { flex: 1; overflow-y: auto; padding: 1.5rem 1.75rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .modal-section h3 {
+      font-size: .7rem; font-weight: 700; color: var(--text-2);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem;
+    }
+
+    /* View: tags */
+    .resp-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .resp-tag {
+      background: var(--accent-light); color: var(--accent);
+      border-radius: 999px; padding: 4px 12px; font-size: .82rem; font-weight: 500;
+    }
+    .empty-hint { font-size: .85rem; color: var(--text-2); }
+
+    /* View: tasks */
+    .task-progress-bar { background: var(--border); border-radius: 999px; height: 7px; margin-bottom: 1rem; }
+    .task-progress-fill { height: 100%; border-radius: 999px; background: var(--success); transition: width .3s; }
+    .task-progress-label { font-size: .78rem; color: var(--text-2); margin-bottom: .5rem; }
+
+    .view-task-list { display: flex; flex-direction: column; gap: .4rem; }
+    .view-task {
+      display: flex; align-items: center; gap: .65rem;
+      padding: .55rem .75rem; border-radius: 9px;
+      background: #f8fafc; border: 1px solid var(--border);
+    }
+    .view-task input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; }
+    .view-task-text { flex: 1; font-size: .88rem; }
+    .view-task.done .view-task-text { text-decoration: line-through; color: var(--text-2); }
+
+    /* Modal footer */
+    .modal-footer {
+      padding: 1.1rem 1.75rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: .6rem; justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    /* ── Edit Modal ── */
+    .form-group { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .85rem; }
+    .form-label { font-size: .78rem; font-weight: 600; color: var(--text-2); }
+    .form-input {
+      padding: .55rem .8rem; border: 1.5px solid var(--border); border-radius: 9px;
+      font-size: .9rem; font-family: inherit; color: var(--text);
+      transition: border-color .15s, box-shadow .15s; background: #fafbfd;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.1); background: #fff; }
+
+    .color-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .color-dot {
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: border-color .12s, transform .1s;
+    }
+    .color-dot:hover { transform: scale(1.12); }
+    .color-dot.active { border-color: var(--text); }
+
+    /* Responsibility edit */
+    .edit-tag-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .6rem; }
+    .edit-tag {
+      display: inline-flex; align-items: center; gap: .3rem;
+      background: var(--accent-light); color: var(--accent);
+      border-radius: 999px; padding: 4px 10px; font-size: .8rem; font-weight: 500;
+    }
+    .edit-tag-del { cursor: pointer; background: none; border: none; color: var(--accent); font-size: 1rem; padding: 0; line-height: 1; opacity: .6; }
+    .edit-tag-del:hover { opacity: 1; }
+    .add-row { display: flex; gap: .5rem; }
+    .add-row .form-input { flex: 1; padding: .4rem .7rem; font-size: .84rem; }
+
+    /* Task edit */
+    .edit-task-list { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .6rem; }
+    .edit-task {
+      display: flex; align-items: center; gap: .5rem;
+      background: #f8fafc; border-radius: 9px; padding: .5rem .7rem;
+      border: 1px solid var(--border);
+    }
+    .edit-task input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; }
+    .edit-task-text {
+      flex: 1; font-size: .86rem; border: none; background: none;
+      font-family: inherit; color: var(--text);
+    }
+    .edit-task-text:focus { outline: none; }
+    .edit-task.done .edit-task-text { text-decoration: line-through; color: var(--text-2); }
+    .edit-task-del { background: none; border: none; cursor: pointer; color: var(--text-2); font-size: 1rem; opacity: .4; padding: 0 2px; }
+    .edit-task-del:hover { opacity: 1; color: var(--danger); }
+
+    /* ── Drag & Drop ── */
+    .node-card[draggable] { cursor: grab; }
+    .node-card[draggable]:active { cursor: grabbing; }
+    .node-card.dragging { opacity: .3; pointer-events: none; }
+
+    /* 中央 → 部下にする */
+    .node-card.drop-child {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.25) !important;
+      background: var(--accent-light) !important;
+    }
+    /* 左半分 → 同階層の左隣に */
+    .node-card.drop-before {
+      border-color: transparent !important;
+      box-shadow: -5px 0 0 0 var(--accent), 0 2px 14px rgba(0,0,0,.09) !important;
+    }
+    /* 右半分 → 同階層の右隣に */
+    .node-card.drop-after {
+      border-color: transparent !important;
+      box-shadow: 5px 0 0 0 var(--accent), 0 2px 14px rgba(0,0,0,.09) !important;
+    }
+
+    /* ドラッグ中のヒント */
+    .drag-hint {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: #1a202c; color: #fff;
+      padding: .5rem 1rem; border-radius: 8px; font-size: .8rem;
+      opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 500;
+      line-height: 1.7;
+    }
+    .drag-hint.show { opacity: 1; }
+
+    /* ── Tag drag reorder ── */
+    .resp-tag[draggable], .edit-tag[draggable] { cursor: grab; user-select: none; transition: opacity .15s, box-shadow .1s; }
+    .resp-tag.tag-dragging, .edit-tag.tag-dragging { opacity: .3; }
+    .resp-tag.tag-drop-before, .edit-tag.tag-drop-before { box-shadow: -3px 0 0 0 var(--accent); }
+    .resp-tag.tag-drop-after,  .edit-tag.tag-drop-after  { box-shadow:  3px 0 0 0 var(--accent); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; padding: 4rem 2rem; text-align: center; color: var(--text-2);
+      min-height: 320px;
+    }
+    .empty-state svg { opacity: .25; }
+    .empty-state p { font-size: .95rem; max-width: 280px; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(6px);
+      background: #1a202c; color: #fff; padding: .55rem 1.2rem;
+      border-radius: 9px; font-size: .875rem; opacity: 0;
+      transition: opacity .2s, transform .2s; pointer-events: none; z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Web Tools</a>
+  <span class="header-sep">/</span>
+  <span class="header-title">組織図エディタ</span>
+  <div class="header-actions">
+    <button class="btn btn-secondary" id="btnImport">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      読み込み
+    </button>
+    <button class="btn btn-secondary" id="btnExport">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      書き出し
+    </button>
+    <button class="btn btn-primary" id="btnAddRoot">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      ノード追加
+    </button>
+  </div>
+</header>
+
+<main class="canvas">
+  <div class="tree-wrap" id="treeWrap"></div>
+</main>
+
+<!-- ── Detail Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-hero" id="modalHero">
+      <div class="modal-hero-bg" id="modalHeroBg"></div>
+      <div class="modal-hero-content">
+        <div class="modal-name" id="modalName"></div>
+        <div class="modal-role" id="modalRole"></div>
+      </div>
+      <button class="modal-hero-close" id="btnCloseModal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="drag-hint" id="dragHint">
+  ← 左半分に重ねる → 同じ階層の左隣へ<br>
+  → 右半分に重ねる → 同じ階層の右隣へ<br>
+  ● 中央に重ねる　 → 部下にする
+</div>
+<input type="file" id="fileInput" accept=".json" style="display:none">
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  State & constants
+// ─────────────────────────────────────────────────────────
+const STORAGE_KEY = 'org-chart-v2';
+const COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#854d0e','#475569'];
+
+let state = { nodes: {}, rootId: null };
+let modalNodeId = null;
+let editMode = false;
+
+function uid()  { return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function tuid() { return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ─────────────────────────────────────────────────────────
+//  Node CRUD
+// ─────────────────────────────────────────────────────────
+function createNode(name='新しいメンバー', title='役職未設定', parentId=null) {
+  const id = uid();
+  state.nodes[id] = { id, name, title,
+    color: COLORS[Object.keys(state.nodes).length % COLORS.length],
+    responsibilities: [], tasks: [], parentId, childIds: [] };
+  return id;
+}
+
+function addChildTo(parentId) {
+  const id = createNode();
+  state.nodes[parentId].childIds.push(id);
+  save(); render();
+  openModal(id, true); // open in edit mode for immediate naming
+}
+
+function addRootNode() {
+  if (state.rootId && state.nodes[state.rootId]) {
+    addChildTo(state.rootId); return;
+  }
+  const id = createNode('代表取締役', 'CEO');
+  state.rootId = id;
+  save(); render();
+  openModal(id, true);
+}
+
+function deleteNode(id) {
+  const node = state.nodes[id];
+  if (!node) return;
+  [...node.childIds].forEach(cid => deleteNode(cid));
+  if (node.parentId && state.nodes[node.parentId]) {
+    state.nodes[node.parentId].childIds = state.nodes[node.parentId].childIds.filter(c => c !== id);
+  }
+  if (state.rootId === id) state.rootId = null;
+  delete state.nodes[id];
+  if (modalNodeId === id) closeModal();
+  save(); render();
+  toast('削除しました');
+}
+
+function updateNode(id, data) {
+  Object.assign(state.nodes[id], data);
+  save(); render();
+}
+
+// ─────────────────────────────────────────────────────────
+//  Tree render
+// ─────────────────────────────────────────────────────────
+function render() {
+  const wrap = document.getElementById('treeWrap');
+  if (!state.rootId || !state.nodes[state.rootId]) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="8.5" y="14" width="7" height="7" rx="1.5"/>
+          <path d="M6.5 10v4h11v-4"/><line x1="12" y1="10" x2="12" y2="14"/>
+        </svg>
+        <p>「ノード追加」から組織図を作りましょう</p>
+        <button class="btn btn-primary" onclick="addRootNode()">+ ルートノードを追加</button>
+      </div>`;
+    return;
+  }
+  wrap.innerHTML = buildNodeHTML(state.rootId);
+  attachNodeEvents();
+  requestAnimationFrame(positionHLines);
+}
+
+function positionHLines() {
+  document.querySelectorAll('.tree-children').forEach(row => {
+    const line = row.querySelector(':scope > .tree-h-line');
+    const children = [...row.querySelectorAll(':scope > .tree-child')];
+    if (!line) return;
+    if (children.length < 2) { line.style.display = 'none'; return; }
+    const rowRect = row.getBoundingClientRect();
+    const firstRect = children[0].getBoundingClientRect();
+    const lastRect  = children[children.length - 1].getBoundingClientRect();
+    const left  = firstRect.left  + firstRect.width  / 2 - rowRect.left;
+    const right = lastRect.left   + lastRect.width   / 2 - rowRect.left;
+    line.style.left    = left + 'px';
+    line.style.width   = (right - left) + 'px';
+    line.style.display = 'block';
+  });
+}
+
+function buildNodeHTML(id) {
+  const n = state.nodes[id];
+  if (!n) return '';
+  const taskDone = n.tasks.filter(t => t.done).length;
+  const taskTotal = n.tasks.length;
+
+  const taskBadge = taskTotal
+    ? `<span class="badge ${taskDone === taskTotal ? 'task-done' : 'task'}">${taskDone}/${taskTotal} タスク</span>`
+    : '';
+
+  const respTagsHTML = n.responsibilities.length
+    ? `<div class="node-resp-tags">${
+        n.responsibilities.map(r =>
+          `<span class="node-resp-tag" style="background:${n.color}18;color:${n.color}">${esc(r)}</span>`
+        ).join('')
+      }</div>`
+    : '';
+
+  const cardHTML = `
+    <div class="node-card" data-id="${n.id}" draggable="true">
+      <div class="node-color-bar" style="background:${n.color}"></div>
+      <div class="node-content">
+        <div class="node-name">${esc(n.name)}</div>
+        ${n.title ? `<div class="node-role">${esc(n.title)}</div>` : ''}
+        ${respTagsHTML}
+        ${taskBadge ? `<div class="node-badges" style="margin-top:.4rem">${taskBadge}</div>` : ''}
+      </div>
+      <div class="node-hover-bar">
+        <button class="hbtn" data-add-child="${n.id}">+ 部下追加</button>
+        <button class="hbtn del" data-delete="${n.id}">削除</button>
+      </div>
+    </div>`;
+
+  if (!n.childIds.length) return `<div class="tree-row">${cardHTML}</div>`;
+
+  const single = n.childIds.length === 1;
+  const childrenHTML = n.childIds.map(cid => `
+    <div class="tree-child">
+      <div class="conn-up"></div>
+      ${buildNodeHTML(cid)}
+    </div>`).join('');
+
+  return `
+    <div class="tree-row">
+      ${cardHTML}
+      <div class="conn-down"></div>
+      <div class="tree-children">
+        <div class="tree-h-line"></div>
+        ${childrenHTML}
+      </div>
+    </div>`;
+}
+
+let dragId = null;
+let dropMode = null; // 'child' | 'before' | 'after'
+
+function isDescendant(ancestorId, targetId) {
+  const children = state.nodes[ancestorId]?.childIds || [];
+  return children.some(cid => cid === targetId || isDescendant(cid, targetId));
+}
+
+function clearDropClasses() {
+  document.querySelectorAll('.node-card').forEach(c =>
+    c.classList.remove('drop-child', 'drop-before', 'drop-after'));
+}
+
+// mode: 'child' | 'before' | 'after'
+function moveNode(draggedId, targetId, mode) {
+  if (draggedId === targetId) return;
+  if (isDescendant(draggedId, targetId)) return;
+
+  const node = state.nodes[draggedId];
+  const targetNode = state.nodes[targetId];
+
+  // Remove from current parent
+  const oldParentId = node.parentId;
+  if (oldParentId && state.nodes[oldParentId]) {
+    state.nodes[oldParentId].childIds = state.nodes[oldParentId].childIds.filter(c => c !== draggedId);
+  }
+
+  if (mode === 'child') {
+    // Become a child of target
+    targetNode.childIds.push(draggedId);
+    node.parentId = targetId;
+  } else {
+    // Become a sibling of target (before or after)
+    const parentId = targetNode.parentId;
+    if (!parentId) {
+      // target is root → fall back to child
+      targetNode.childIds.push(draggedId);
+      node.parentId = targetId;
+    } else {
+      const parent = state.nodes[parentId];
+      const idx = parent.childIds.indexOf(targetId);
+      const insertAt = mode === 'before' ? idx : idx + 1;
+      parent.childIds.splice(insertAt, 0, draggedId);
+      node.parentId = parentId;
+    }
+  }
+
+  save(); render();
+  toast(`「${node.name}」を移動しました`);
+}
+
+// ─────────────────────────────────────────────────────────
+//  Tag drag reorder (shared)
+// ─────────────────────────────────────────────────────────
+function attachTagDragEvents(container, arr, onReorder) {
+  let dragIdx = null;
+  const clearTagClasses = () =>
+    container.querySelectorAll('[data-tag-idx]').forEach(t =>
+      t.classList.remove('tag-dragging', 'tag-drop-before', 'tag-drop-after'));
+
+  container.querySelectorAll('[data-tag-idx]').forEach(tag => {
+    const idx = parseInt(tag.dataset.tagIdx);
+
+    tag.addEventListener('dragstart', e => {
+      dragIdx = idx;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => tag.classList.add('tag-dragging'), 0);
+    });
+    tag.addEventListener('dragend', () => { dragIdx = null; clearTagClasses(); });
+
+    tag.addEventListener('dragover', e => {
+      if (dragIdx === null || dragIdx === idx) return;
+      e.preventDefault(); e.stopPropagation();
+      clearTagClasses();
+      const xPct = (e.clientX - tag.getBoundingClientRect().left) / tag.getBoundingClientRect().width;
+      tag.classList.add(xPct < 0.5 ? 'tag-drop-before' : 'tag-drop-after');
+    });
+    tag.addEventListener('dragleave', e => {
+      if (!tag.contains(e.relatedTarget)) tag.classList.remove('tag-drop-before', 'tag-drop-after');
+    });
+    tag.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation();
+      if (dragIdx === null || dragIdx === idx) return;
+      const xPct = (e.clientX - tag.getBoundingClientRect().left) / tag.getBoundingClientRect().width;
+      const insertBefore = xPct < 0.5;
+
+      const draggedItem = arr[dragIdx];
+      const targetItem  = arr[idx];
+      arr.splice(dragIdx, 1);
+      const newTargetIdx = arr.indexOf(targetItem);
+      arr.splice(insertBefore ? newTargetIdx : newTargetIdx + 1, 0, draggedItem);
+
+      clearTagClasses();
+      onReorder([...arr]);
+    });
+  });
+}
+
+function attachNodeEvents() {
+  const hint = document.getElementById('dragHint');
+
+  document.querySelectorAll('.node-card').forEach(card => {
+    const id = card.dataset.id;
+
+    card.addEventListener('click', e => {
+      if (e.target.closest('.node-hover-bar')) return;
+      openModal(id, false);
+    });
+
+    card.addEventListener('dragstart', e => {
+      dragId = id;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => { card.classList.add('dragging'); hint.classList.add('show'); }, 0);
+    });
+
+    card.addEventListener('dragend', () => {
+      dragId = null; dropMode = null;
+      hint.classList.remove('show');
+      document.querySelectorAll('.node-card').forEach(c =>
+        c.classList.remove('dragging', 'drop-child', 'drop-before', 'drop-after'));
+    });
+
+    card.addEventListener('dragover', e => {
+      if (!dragId || dragId === id || isDescendant(dragId, id)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+
+      // 左40% → 同階層の左隣、右40% → 同階層の右隣、中央20% → 部下
+      const rect = card.getBoundingClientRect();
+      const xPct = (e.clientX - rect.left) / rect.width;
+      const newMode = xPct < 0.4 ? 'before' : xPct > 0.6 ? 'after' : 'child';
+
+      if (newMode !== dropMode) {
+        dropMode = newMode;
+        clearDropClasses();
+        card.classList.add(`drop-${newMode}`);
+      }
+    });
+
+    card.addEventListener('dragleave', e => {
+      if (!e.relatedTarget || !card.contains(e.relatedTarget)) {
+        card.classList.remove('drop-child', 'drop-before', 'drop-after');
+        dropMode = null;
+      }
+    });
+
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      const mode = dropMode || 'child';
+      clearDropClasses();
+      if (dragId && dragId !== id) moveNode(dragId, id, mode);
+    });
+  });
+
+  document.querySelectorAll('[data-add-child]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); addChildTo(btn.dataset.addChild); });
+  });
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const n = state.nodes[btn.dataset.delete];
+      if (confirm(`「${n?.name}」を削除しますか？\n（配下のメンバーも全て削除されます）`)) deleteNode(btn.dataset.delete);
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+//  Modal
+// ─────────────────────────────────────────────────────────
+function openModal(id, startEdit=false) {
+  if (!state.nodes[id]) return;
+  modalNodeId = id;
+  editMode = startEdit;
+  renderModal();
+  document.getElementById('modalOverlay').classList.add('open');
+  history.replaceState(null, '', '#' + id);
+}
+
+function closeModal() {
+  modalNodeId = null;
+  editMode = false;
+  document.getElementById('modalOverlay').classList.remove('open');
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+function renderModal() {
+  const n = state.nodes[modalNodeId];
+  if (!n) return;
+
+  // Hero
+  const hero = document.getElementById('modalHero');
+  const heroBg = document.getElementById('modalHeroBg');
+  hero.style.background = `linear-gradient(135deg, ${n.color}22 0%, ${n.color}44 100%)`;
+  hero.style.color = n.color;
+  heroBg.style.background = n.color;
+  document.getElementById('modalName').textContent = n.name;
+  document.getElementById('modalRole').textContent = n.title || '役職未設定';
+
+  if (editMode) {
+    renderEditMode(n);
+  } else {
+    renderViewMode(n);
+  }
+}
+
+// ── View mode ──
+function renderViewMode(n) {
+  const taskDone = n.tasks.filter(t => t.done).length;
+  const taskTotal = n.tasks.length;
+  const pct = taskTotal ? Math.round((taskDone/taskTotal)*100) : 0;
+
+  const respHTML = n.responsibilities.length
+    ? n.responsibilities.map((r,i) => `<span class="resp-tag" draggable="true" data-tag-idx="${i}" title="ドラッグで優先順位を変更">${esc(r)}</span>`).join('')
+    : `<span class="empty-hint">責任範囲は設定されていません</span>`;
+
+  const tasksHTML = n.tasks.length
+    ? n.tasks.map((t,i) => `
+        <div class="view-task ${t.done?'done':''}" data-vtask="${i}">
+          <input type="checkbox" ${t.done?'checked':''} data-vtcheck="${i}">
+          <span class="view-task-text">${esc(t.text)}</span>
+        </div>`).join('')
+    : `<span class="empty-hint">タスクはありません</span>`;
+
+  const progressHTML = taskTotal ? `
+    <div class="task-progress-label">${taskDone}/${taskTotal} 完了 (${pct}%)</div>
+    <div class="task-progress-bar"><div class="task-progress-fill" style="width:${pct}%"></div></div>
+  ` : '';
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-section">
+      <h3>責任範囲</h3>
+      <div class="resp-tags">${respHTML}</div>
+    </div>
+    <div class="modal-section">
+      <h3>タスク</h3>
+      ${progressHTML}
+      <div class="view-task-list">${tasksHTML}</div>
+    </div>
+  `;
+
+  document.getElementById('modalFooter').innerHTML = `
+    <div style="display:flex;align-items:center;gap:.5rem;width:100%;margin-bottom:.75rem;background:#f8fafc;border:1.5px solid var(--border);border-radius:9px;padding:.4rem .5rem .4rem .8rem;">
+      <svg width="13" height="13" style="flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <input id="urlDisplay" type="text" readonly value="${location.href}"
+        style="flex:1;border:none;background:none;font-size:.78rem;color:var(--text-2);font-family:monospace;min-width:0;outline:none;cursor:text;">
+      <button class="btn btn-secondary btn-sm" id="mBtnCopyUrl" style="flex-shrink:0">コピー</button>
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:space-between;width:100%">
+      <button class="btn btn-danger" id="mBtnDelete">削除</button>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-secondary" id="mBtnAddChild">+ 部下を追加</button>
+        <button class="btn btn-primary" id="mBtnEdit">編集する</button>
+      </div>
+    </div>
+  `;
+
+  // Tag drag reorder (view mode)
+  if (n.responsibilities.length > 1) {
+    const respContainer = document.querySelector('.resp-tags');
+    const respArr = [...n.responsibilities];
+    attachTagDragEvents(respContainer, respArr, (newOrder) => {
+      updateNode(n.id, { responsibilities: newOrder });
+    });
+  }
+
+  // Task checkbox events (view mode)
+  document.querySelectorAll('[data-vtcheck]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const i = parseInt(chk.dataset.vtcheck);
+      n.tasks[i].done = chk.checked;
+      updateNode(n.id, { tasks: [...n.tasks] });
+      renderModal();
+    });
+  });
+
+  document.getElementById('urlDisplay').addEventListener('click', e => e.target.select());
+  document.getElementById('mBtnCopyUrl').addEventListener('click', () => {
+    navigator.clipboard.writeText(location.href).then(() => toast('URLをコピーしました'));
+  });
+  document.getElementById('mBtnEdit').addEventListener('click', () => { editMode = true; renderModal(); });
+  document.getElementById('mBtnDelete').addEventListener('click', () => {
+    if (confirm(`「${n.name}」を削除しますか？\n（配下のメンバーも全て削除されます）`)) deleteNode(n.id);
+  });
+  document.getElementById('mBtnAddChild').addEventListener('click', () => { closeModal(); addChildTo(n.id); });
+}
+
+// ── Edit mode ──
+function renderEditMode(n) {
+  const colorDotsHTML = COLORS.map(c =>
+    `<div class="color-dot ${n.color===c?'active':''}" style="background:${c}" data-color="${c}"></div>`
+  ).join('');
+
+  const tagsHTML = n.responsibilities.map((r,i) =>
+    `<span class="edit-tag">${esc(r)}<button class="edit-tag-del" data-ridx="${i}">×</button></span>`
+  ).join('');
+
+  const tasksHTML = n.tasks.map((t,i) =>
+    `<div class="edit-task ${t.done?'done':''}">
+      <input type="checkbox" ${t.done?'checked':''} data-etchk="${i}">
+      <input class="edit-task-text" type="text" value="${esc(t.text)}" data-ettxt="${i}" placeholder="タスク内容">
+      <button class="edit-task-del" data-etdel="${i}">×</button>
+    </div>`
+  ).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div>
+      <div class="form-group">
+        <label class="form-label">名前</label>
+        <input class="form-input" id="eInpName" type="text" value="${esc(n.name)}" placeholder="山田 太郎">
+      </div>
+      <div class="form-group">
+        <label class="form-label">役職</label>
+        <input class="form-input" id="eInpTitle" type="text" value="${esc(n.title)}" placeholder="マネージャー">
+      </div>
+      <div class="form-group">
+        <label class="form-label">カラー</label>
+        <div class="color-row">${colorDotsHTML}</div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>責任範囲</h3>
+      <div class="edit-tag-list" id="eTagList">${tagsHTML || ''}</div>
+      <div class="add-row">
+        <input class="form-input" id="eInpResp" type="text" placeholder="例：予算管理・採用・品質管理">
+        <button class="btn btn-primary btn-sm" id="eBtnAddResp">追加</button>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>タスク</h3>
+      <div class="edit-task-list" id="eTaskList">${tasksHTML || ''}</div>
+      <div class="add-row">
+        <input class="form-input" id="eInpTask" type="text" placeholder="新しいタスクを入力">
+        <button class="btn btn-primary btn-sm" id="eBtnAddTask">追加</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-ghost" id="mBtnCancel">キャンセル</button>
+    <button class="btn btn-primary" id="mBtnSave">保存する</button>
+  `;
+
+  // Local draft
+  const draft = { name: n.name, title: n.title, color: n.color,
+    responsibilities: [...n.responsibilities], tasks: n.tasks.map(t=>({...t})) };
+
+  const $ = id => document.getElementById(id);
+
+  $('eInpName').addEventListener('input', e => { draft.name = e.target.value; updateHero(draft); });
+  $('eInpTitle').addEventListener('input', e => { draft.title = e.target.value; updateHero(draft); });
+
+  document.querySelectorAll('.color-dot').forEach(d => {
+    d.addEventListener('click', () => {
+      draft.color = d.dataset.color;
+      document.querySelectorAll('.color-dot').forEach(x => x.classList.toggle('active', x.dataset.color===draft.color));
+      updateHero(draft);
+    });
+  });
+
+  // Responsibilities
+  function refreshTags() {
+    const list = $('eTagList');
+    list.innerHTML = draft.responsibilities.map((r,i) =>
+      `<span class="edit-tag" draggable="true" data-tag-idx="${i}" title="ドラッグで優先順位を変更">${esc(r)}<button class="edit-tag-del" data-ridx="${i}">×</button></span>`
+    ).join('');
+    list.querySelectorAll('[data-ridx]').forEach(btn => {
+      btn.addEventListener('click', () => { draft.responsibilities.splice(parseInt(btn.dataset.ridx),1); refreshTags(); });
+    });
+    if (draft.responsibilities.length > 1) {
+      attachTagDragEvents(list, draft.responsibilities, (newOrder) => {
+        draft.responsibilities = newOrder; refreshTags();
+      });
+    }
+  }
+  refreshTags();
+  $('eBtnAddResp').addEventListener('click', () => {
+    const v = $('eInpResp').value.trim(); if (!v) return;
+    draft.responsibilities.push(v); $('eInpResp').value = ''; refreshTags();
+  });
+  $('eInpResp').addEventListener('keydown', e => { if(e.key==='Enter') $('eBtnAddResp').click(); });
+
+  // Tasks
+  function refreshTasks() {
+    $('eTaskList').innerHTML = draft.tasks.map((t,i) =>
+      `<div class="edit-task ${t.done?'done':''}">
+        <input type="checkbox" ${t.done?'checked':''} data-etchk="${i}">
+        <input class="edit-task-text" type="text" value="${esc(t.text)}" data-ettxt="${i}" placeholder="タスク内容">
+        <button class="edit-task-del" data-etdel="${i}">×</button>
+      </div>`
+    ).join('');
+    $('eTaskList').querySelectorAll('[data-etchk]').forEach(chk => {
+      chk.addEventListener('change', () => { draft.tasks[parseInt(chk.dataset.etchk)].done = chk.checked; refreshTasks(); });
+    });
+    $('eTaskList').querySelectorAll('[data-ettxt]').forEach(inp => {
+      inp.addEventListener('change', () => { draft.tasks[parseInt(inp.dataset.ettxt)].text = inp.value; });
+    });
+    $('eTaskList').querySelectorAll('[data-etdel]').forEach(btn => {
+      btn.addEventListener('click', () => { draft.tasks.splice(parseInt(btn.dataset.etdel),1); refreshTasks(); });
+    });
+  }
+  refreshTasks();
+  $('eBtnAddTask').addEventListener('click', () => {
+    const v = $('eInpTask').value.trim(); if (!v) return;
+    draft.tasks.push({ id: tuid(), text: v, done: false });
+    $('eInpTask').value = ''; refreshTasks();
+  });
+  $('eInpTask').addEventListener('keydown', e => { if(e.key==='Enter') $('eBtnAddTask').click(); });
+
+  // Save / Cancel
+  $('mBtnSave').addEventListener('click', () => {
+    updateNode(n.id, { name: draft.name, title: draft.title, color: draft.color,
+      responsibilities: draft.responsibilities, tasks: draft.tasks });
+    editMode = false; renderModal(); toast('保存しました');
+  });
+  $('mBtnCancel').addEventListener('click', () => { editMode = false; renderModal(); });
+}
+
+function updateHero(draft) {
+  const hero = document.getElementById('modalHero');
+  hero.style.background = `linear-gradient(135deg, ${draft.color}22 0%, ${draft.color}44 100%)`;
+  hero.style.color = draft.color;
+  document.getElementById('modalHeroBg').style.background = draft.color;
+  document.getElementById('modalName').textContent = draft.name;
+  document.getElementById('modalRole').textContent = draft.title || '役職未設定';
+}
+
+// ─────────────────────────────────────────────────────────
+//  Persistence
+// ─────────────────────────────────────────────────────────
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes: state.nodes, rootId: state.rootId })); } catch(e){}
+}
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) { const p = JSON.parse(d); state.nodes = p.nodes||{}; state.rootId = p.rootId||null; }
+  } catch(e){}
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify({ nodes: state.nodes, rootId: state.rootId }, null, 2)], { type:'application/json' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'org-chart.json' });
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('JSONを書き出しました');
+}
+function importJSON(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      if (p.nodes && p.rootId) { state.nodes = p.nodes; state.rootId = p.rootId; save(); render(); closeModal(); toast('読み込みました'); }
+      else throw new Error();
+    } catch { toast('JSONの形式が正しくありません'); }
+  };
+  reader.readAsText(file);
+}
+
+// ─────────────────────────────────────────────────────────
+//  Utility
+// ─────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ─────────────────────────────────────────────────────────
+//  Boot
+// ─────────────────────────────────────────────────────────
+document.getElementById('btnAddRoot').addEventListener('click', addRootNode);
+document.getElementById('btnExport').addEventListener('click', exportJSON);
+document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change', e => { if(e.target.files[0]) importJSON(e.target.files[0]); });
+document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+load();
+
+if (!state.rootId || !Object.keys(state.nodes).length) {
+  // Sample org chart
+  const ceoId = createNode('山田 太郎', 'CEO');
+  state.rootId = ceoId;
+  state.nodes[ceoId].responsibilities = ['全社戦略', '対外折衝', '投資判断'];
+  state.nodes[ceoId].tasks = [
+    { id: tuid(), text: '四半期レビュー資料作成', done: true },
+    { id: tuid(), text: '取締役会プレゼン準備', done: false }
+  ];
+  state.nodes[ceoId].color = '#2563eb';
+
+  const ctoId = createNode('鈴木 一郎', 'CTO', ceoId);
+  state.nodes[ceoId].childIds.push(ctoId);
+  state.nodes[ctoId].responsibilities = ['技術戦略', 'エンジニア採用', 'アーキテクチャ設計'];
+  state.nodes[ctoId].tasks = [
+    { id: tuid(), text: 'システム移行計画策定', done: false },
+    { id: tuid(), text: 'コードレビュープロセス整備', done: true }
+  ];
+  state.nodes[ctoId].color = '#7c3aed';
+
+  const cmoId = createNode('佐藤 花子', 'CMO', ceoId);
+  state.nodes[ceoId].childIds.push(cmoId);
+  state.nodes[cmoId].responsibilities = ['マーケティング戦略', 'ブランド管理', 'SNS運用'];
+  state.nodes[cmoId].tasks = [{ id: tuid(), text: 'Q2キャンペーン企画', done: false }];
+  state.nodes[cmoId].color = '#db2777';
+
+  const cfoId = createNode('中村 誠', 'CFO', ceoId);
+  state.nodes[ceoId].childIds.push(cfoId);
+  state.nodes[cfoId].responsibilities = ['財務戦略', '予算管理', '資金調達'];
+  state.nodes[cfoId].color = '#ea580c';
+
+  const eng1Id = createNode('田中 健二', 'シニアエンジニア', ctoId);
+  state.nodes[ctoId].childIds.push(eng1Id);
+  state.nodes[eng1Id].responsibilities = ['バックエンド開発', 'DB設計'];
+  state.nodes[eng1Id].color = '#0891b2';
+
+  const eng2Id = createNode('伊藤 美咲', 'フロントエンドエンジニア', ctoId);
+  state.nodes[ctoId].childIds.push(eng2Id);
+  state.nodes[eng2Id].responsibilities = ['UI実装', 'パフォーマンス改善'];
+  state.nodes[eng2Id].color = '#16a34a';
+
+  save();
+}
+
+render();
+
+// Open modal from URL hash on load
+if (location.hash) {
+  const hashId = location.hash.slice(1);
+  if (state.nodes[hashId]) openModal(hashId, false);
+}
+
+// Handle browser back/forward
+window.addEventListener('popstate', () => {
+  if (location.hash) {
+    const hashId = location.hash.slice(1);
+    if (state.nodes[hashId]) openModal(hashId, false);
+  } else {
+    closeModal();
+  }
+});
+</script>
+</body>
+</html>

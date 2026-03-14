@@ -1,0 +1,13 @@
+.vercel
+node_modules
+data/
+*.jsonl
+lp-research-engine/
+fants-clone/
+fants-lp/
+screenshots/
+html/
+
+eyecare-monitor/
+website-check-board/
+.claude/
