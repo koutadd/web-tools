@@ -345,6 +345,8 @@
   .drawer-link:hover { background: #111; color: #fff; }
   .drawer-link.primary { background: #111; color: #fff; }
   .drawer-link.primary:hover { background: #333; }
+  .copy-link-btn { background: #f0f0f8; color: #1a1a2e; border: 1px solid #ccd; cursor: pointer; font-family: inherit; }
+  .copy-link-btn:hover { background: #e0e0f0; }
 
   /* Resources section */
   .resources-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -1922,6 +1924,17 @@ function openDrawer(slug) {
   document.getElementById('drawer').classList.add('open');
 }
 
+function copyPdfLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copy-pdf-btn');
+    if (!btn) return;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(() => { btn.innerHTML = '🔗 リンクをコピー'; }, 2000);
+  }).catch(() => {
+    prompt('URLをコピーしてください', url);
+  });
+}
+
 function closeDrawer() {
   document.getElementById('drawer-bg').classList.remove('open');
   document.getElementById('drawer').classList.remove('open');
@@ -2998,7 +3011,8 @@ function openPdfDetail(itemId) {
 
   // PDF リンク
   document.getElementById('d-links').innerHTML = item.pdf_url
-    ? `<a class="drawer-link primary" href="${esc(item.pdf_url)}" target="_blank" rel="noopener">PDF を開く</a>`
+    ? `<a class="drawer-link primary" href="${esc(item.pdf_url)}" target="_blank" rel="noopener">PDF を開く</a>
+       <button class="drawer-link copy-link-btn" onclick="copyPdfLink('${esc(item.pdf_url)}')" id="copy-pdf-btn">🔗 リンクをコピー</button>`
     : '<span style="color:var(--muted);font-size:.8rem">PDFなし</span>';
 
   document.getElementById('d-resources').innerHTML = '';
