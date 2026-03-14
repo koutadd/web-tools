@@ -2146,7 +2146,7 @@ function connectSSE() {
 // ============================================================
 
 // ★ GAS Web App の URL を設定してください（デプロイ後のexec URL）
-const GAS_API_URL  = 'https://script.google.com/macros/s/AKfycbxUCriKCKqi1WWbzdWS4ZXpq5TWGQOLPGQ0oURFyjIg-DnHrSNylrOn6PE3Aq92jbPBrA/exec';
+const GAS_API_URL  = '/api/gas-proxy';
 const GAS_CACHE_MS = 5 * 60 * 1000; // キャッシュ有効期間: 5分
 
 let gasItems     = [];  // 全PDFデータ
@@ -2198,9 +2198,12 @@ async function loadGasData(forceRefresh = false) {
   try {
     const res  = await fetch(`${GAS_API_URL}?status=active`, { cache: 'no-store' });
     const json = await res.json();
-    if (!json.ok) throw new Error(json.error || 'APIエラー');
-
-    gasItems     = (json.data || []).filter(d => d.sync_status === 'ok');
+    if (Array.isArray(json)) {
+      gasItems = json;
+    } else {
+      if (!json.ok) throw new Error(json.error || 'APIエラー');
+      gasItems = (json.data || []).filter(d => d.sync_status === 'ok');
+    }
     gasFetchedAt = Date.now();
 
     // sessionStorage に保存
