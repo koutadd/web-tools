@@ -1051,14 +1051,63 @@
 
   /* SP トップヘッダー: PC では非表示 */
   #sp-top-header { display: none; }
-  .howto-btn {
-    font-size: 0.72rem; font-weight: 600;
-    color: var(--primary, #1a1a2e); background: #f0f0f8;
-    border: 1px solid #ccd; border-radius: 6px;
-    padding: 4px 10px; text-decoration: none;
-    transition: background .15s;
+  /* ── ハンバーガーメニュー ─── */
+  .hamburger-btn {
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; gap: 4px;
+    width: 36px; height: 36px;
+    background: none; border: none; cursor: pointer; padding: 4px;
+    border-radius: 6px; transition: background .15s; flex-shrink: 0;
   }
-  .howto-btn:hover { background: #e0e0f0; }
+  .hamburger-btn:hover { background: #eee; }
+  .hamburger-btn span {
+    display: block; width: 20px; height: 2px;
+    background: var(--text, #1a1a2e); border-radius: 2px;
+    transition: all .2s;
+  }
+  .menu-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.35);
+    z-index: 1200; opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .menu-overlay.open { opacity: 1; pointer-events: all; }
+  .menu-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 240px; background: #fff;
+    box-shadow: -4px 0 20px rgba(0,0,0,.12);
+    z-index: 1201; transform: translateX(100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+    padding: 0;
+  }
+  .menu-overlay.open .menu-panel { transform: translateX(0); }
+  .menu-panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid #eee;
+  }
+  .menu-panel-head strong { font-size: 0.9rem; font-weight: 700; }
+  .menu-close-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 1.2rem; line-height: 1; color: #666; padding: 4px;
+    border-radius: 4px;
+  }
+  .menu-close-btn:hover { background: #eee; }
+  .menu-section-label {
+    font-size: 0.68rem; font-weight: 700; color: #999;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: 14px 16px 6px;
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; font-size: 0.9rem; font-weight: 600;
+    color: #1a1a2e; text-decoration: none;
+    cursor: pointer; background: none; border: none; width: 100%; text-align: left;
+    transition: background .12s;
+  }
+  .menu-item:hover { background: #f5f5fa; }
+  .menu-item .menu-icon { font-size: 1rem; width: 22px; text-align: center; }
+  .menu-item .menu-arrow { margin-left: auto; font-size: 0.8rem; color: #aaa; }
+  .menu-sep { height: 1px; background: #eee; margin: 8px 0; }
 
   /* ============================================================
      SP レスポンシブ (ギャラリー・依頼管理)
@@ -1194,12 +1243,12 @@
 
 <div id="sp-top-header">
   <span class="sp-logo">アイケアラボ</span>
-  <a href="aicare-howto.html" class="howto-btn" target="_blank">使い方</a>
+  <button class="hamburger-btn" onclick="toggleMenu()" aria-label="メニュー"><span></span><span></span><span></span></button>
 </div>
 <header class="site-header">
   <h1 class="site-title">アイケアラボ</h1>
   <div class="site-meta">制作物ダッシュボード<br>Web Design &amp; Development<br>Japan</div>
-  <a href="aicare-howto.html" class="howto-btn" target="_blank">使い方</a>
+  <button class="hamburger-btn" onclick="toggleMenu()" aria-label="メニュー"><span></span><span></span><span></span></button>
 </header>
 
 <nav class="site-nav">
@@ -1211,6 +1260,34 @@
     <span class="live-tag" id="live"><span class="live-dot"></span>LIVE</span>
   </div>
 </nav>
+
+<!-- ハンバーガーメニュー -->
+<div class="menu-overlay" id="menu-overlay" onclick="closeMenu()">
+  <div class="menu-panel" onclick="event.stopPropagation()">
+    <div class="menu-panel-head">
+      <strong>メニュー</strong>
+      <button class="menu-close-btn" onclick="closeMenu()">✕</button>
+    </div>
+    <div class="menu-section-label">タブ切替</div>
+    <button class="menu-item" onclick="switchTab('pdf');closeMenu()">
+      <span class="menu-icon">🖼</span>制作物一覧
+    </button>
+    <button class="menu-item" onclick="switchTab('req');closeMenu()">
+      <span class="menu-icon">📋</span>依頼管理
+    </button>
+    <button class="menu-item" onclick="switchTab('maker');closeMenu()">
+      <span class="menu-icon">👷</span>製作者管理
+    </button>
+    <div class="menu-sep"></div>
+    <div class="menu-section-label">使い方ガイド</div>
+    <a class="menu-item" href="aicare-howto-gallery.html" target="_blank">
+      <span class="menu-icon">📖</span>制作物一覧の見方<span class="menu-arrow">↗</span>
+    </a>
+    <a class="menu-item" href="aicare-howto-req.html" target="_blank">
+      <span class="menu-icon">📖</span>依頼管理の使い方<span class="menu-arrow">↗</span>
+    </a>
+  </div>
+</div>
 
 <!-- Sticky Nav -->
 <div class="sticky-nav" id="sticky-nav">
@@ -3706,6 +3783,14 @@ function renderMakerTable() {
     }
   }, 400);
 })();
+
+function toggleMenu() {
+  document.getElementById('menu-overlay').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('menu-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 </script>
 </body>
 </html>
