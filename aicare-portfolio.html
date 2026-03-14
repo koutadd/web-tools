@@ -670,6 +670,13 @@
     background: #fff; border: 2px solid rgba(255,255,255,.8); border-radius: 12px;
     padding: 16px; cursor: pointer; transition: box-shadow .15s;
     overflow: hidden; min-width: 0; box-sizing: border-box;
+    position: relative;
+  }
+  .req-new-badge {
+    position: absolute; top: 8px; right: 10px;
+    background: #e53935; color: #fff; font-size: 0.62rem;
+    font-weight: 800; padding: 2px 7px; border-radius: 10px;
+    letter-spacing: .04em; pointer-events: none;
   }
   .req-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
   .req-card[data-status] { border-color: rgba(255,255,255,.7); }
@@ -1262,7 +1269,7 @@
   <div class="req-drawer-body">
     <!-- 全情報 -->
     <details class="req-info-section" open>
-      <summary>📋 シート情報</summary>
+      <summary>📋 シート情報 <button class="req-edit-toggle" id="rq-edit-btn" onclick="toggleReqEdit(event)">編集</button></summary>
       <table class="req-info-table" id="rq-info-table"></table>
     </details>
     <!-- メモ -->
@@ -2498,7 +2505,17 @@ function reqCardHtml(d) {
   const log    = reqLogs[d.row_id];
   const lastMsg = log && log.length ? esc(log[log.length-1].comment) : '';
   const lastComment = lastMsg ? `<div class="req-card-comment">💬 ${lastMsg}</div>` : '';
+  // NEW バッジ: 依頼日から5日以内
+  const reqDateRaw = String(d['依頼日'] || '').trim();
+  let newBadge = '';
+  if (reqDateRaw) {
+    const reqMs = new Date(reqDateRaw.replace(/\//g, '-')).getTime();
+    if (!isNaN(reqMs) && (Date.now() - reqMs) <= 5 * 86400000) {
+      newBadge = '<span class="req-new-badge">NEW</span>';
+    }
+  }
   return `<div class="req-card" data-status="${esc(colL)}" onclick="openReqDrawer('${esc(d.row_id)}')">
+    ${newBadge}
     <div class="req-card-title">${title}</div>
     <div class="req-card-store"><span class="req-row-id">#${esc(d.row_id)}</span>${store}</div>
     ${deadlineEl}
@@ -2593,19 +2610,7 @@ async function openReqDrawer(rowId) {
   updateDrawerArchiveBtn(colL);
 
   // 全情報テーブル（A〜T列を全20列確実に表示）
-  const table = document.getElementById('rq-info-table');
-  const rows = COL_TITLES.map((label) => {
-    const raw = String(item[label] !== undefined ? item[label] : '').trim();
-    if (!raw) return '';
-    const vs = DATE_COLS.has(label) ? fmtDate(raw) : raw;
-    const isDeadline = label === '納期';
-    const val = raw.startsWith('http')
-      ? `<a href="${esc(raw)}" target="_blank" rel="noopener" style="color:#1a5fbe;word-break:break-all">${esc(raw)}</a>`
-      : esc(vs);
-    const bold = isDeadline ? ' style="font-weight:700;color:#111"' : '';
-    return `<tr><td${bold}>${esc(label)}</td><td${bold}>${val}</td></tr>`;
-  }).join('');
-  table.innerHTML = rows || '<tr><td colspan="2" style="color:var(--muted);text-align:center">データなし</td></tr>';
+  renderReqInfoView();
 
   // メモ復元
   const memo = localStorage.getItem(`reqMemo_${rowId}`) || '';
@@ -2658,23 +2663,25 @@ function renderChat(rowId) {
 
 async function sendComment() {
   const input = document.getElementById('req-chat-input');
+  const btn = document.querySelector('.req-chat-send');
   const comment = input.value.trim();
   if (!comment || !currentReqId) return;
-  input.value = '';
-
+  if (btn) { btn.disabled = true; btn.textContent = '送信中'; }
   try {
     await fetch(GAS_API_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment, author: '' }),
     });
-    // 楽観的UI更新
+    input.value = '';
     if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
     reqLogs[currentReqId].push({ row_id: currentReqId, comment, author: '', timestamp: new Date().toISOString() });
     renderChat(currentReqId);
     renderReqCards();
   } catch(e) {
     alert('送信エラー: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '送信'; }
   }
 }
 
@@ -2895,6 +2902,223 @@ closeDrawer = function() {
   history.replaceState(null, '', location.pathname);
 };
 
+
+
+
+// ── シート情報 表示 / 編集モード ────────────────────────────────
+let reqEditMode = false;
+
+function renderReqInfoView() {
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (!item) return;
+  const table = document.getElementById('rq-info-table');
+  table.classList.remove('edit-mode');
+  const rows = COL_TITLES.map((label) => {
+    const raw = String(item[label] !== undefined ? item[label] : '').trim();
+    if (!raw) return '';
+    const vs = DATE_COLS.has(label) ? fmtDate(raw) : raw;
+    const isDeadline = label === '納期';
+    const val = raw.startsWith('http')
+      ? `<a href="${esc(raw)}" target="_blank" rel="noopener" style="color:#1a5fbe;word-break:break-all">${esc(raw)}</a>`
+      : esc(vs);
+    const bold = isDeadline ? ' style="font-weight:700;color:#111"' : '';
+    return `<tr><td${bold}>${esc(label)}</td><td${bold}>${val}</td></tr>`;
+  }).join('');
+  table.innerHTML = rows || '<tr><td colspan="2" style="color:var(--muted);text-align:center">データなし</td></tr>';
+}
+
+function toggleReqEdit(event) {
+  event.preventDefault(); event.stopPropagation();
+  reqEditMode = !reqEditMode;
+  const btn = document.getElementById('rq-edit-btn');
+  if (reqEditMode) {
+    btn.textContent = 'キャンセル'; btn.classList.add('is-editing');
+    renderReqInfoEdit();
+  } else {
+    btn.textContent = '編集'; btn.classList.remove('is-editing');
+    renderReqInfoView();
+  }
+}
+
+function renderReqInfoEdit() {
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (!item) return;
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const table = document.getElementById('rq-info-table');
+  table.classList.add('edit-mode');
+
+  const TEXTAREA_COLS = new Set(['依頼内容','店舗情報','掲載したい情報 / 特記事項']);
+
+  const rows = COL_TITLES.map((label) => {
+    const raw = String(item[label] !== undefined ? item[label] : '').trim();
+    let input;
+    if (TEXTAREA_COLS.has(label)) {
+      input = `<textarea name="${esc(label)}">${esc(raw)}</textarea>`;
+    } else if (label === 'ステータス') {
+      const opts = REQ_STATUS_LIST.map(s => `<option value="${esc(s)}"${s===raw?' selected':''}>${esc(s)}</option>`).join('');
+      input = `<select name="${esc(label)}">${opts}</select>`;
+    } else if (label === '優先度（緊急／通常）') {
+      input = `<select name="${esc(label)}">
+        <option value="通常"${raw==='通常'?' selected':''}>通常</option>
+        <option value="緊急"${raw==='緊急'?' selected':''}>緊急</option>
+      </select>`;
+    } else if (label === '製作者') {
+      const opts = ['<option value="">未定</option>',
+        ...makers.map(m => `<option value="${esc(m)}"${m===raw?' selected':''}>${esc(m)}</option>`)
+      ].join('');
+      input = `<select name="${esc(label)}">${opts}</select>`;
+    } else if (DATE_COLS.has(label)) {
+      const dateVal = raw.replace(/\./g, '-').replace(/\//g, '-').slice(0,10);
+      input = `<input type="date" name="${esc(label)}" value="${dateVal}">`;
+    } else if (label === '制作完了データ(googleドライブURL)') {
+      input = `<input type="url" name="${esc(label)}" value="${esc(raw)}" placeholder="https://...">`;
+    } else {
+      input = `<input type="text" name="${esc(label)}" value="${esc(raw)}">`;
+    }
+    return `<tr><td>${esc(label)}</td><td>${input}</td></tr>`;
+  }).join('');
+
+  table.innerHTML = rows + `<tr><td colspan="2"><div class="rq-info-save-row">
+    <button class="arc-btn arc-btn-ghost" style="flex:1" onclick="toggleReqEdit(event)">キャンセル</button>
+    <button class="arc-btn arc-btn-primary" style="flex:2" id="rq-save-btn" onclick="saveReqFields()">💾 保存する</button>
+  </div></td></tr>`;
+}
+
+async function saveReqFields() {
+  const table = document.getElementById('rq-info-table');
+  const saveBtn = document.getElementById('rq-save-btn');
+  const fields = {};
+  table.querySelectorAll('[name]').forEach(el => { fields[el.name] = el.value; });
+
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '保存中…'; }
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateFields', rowId: currentReqId, fields }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (json.error) throw new Error(json.error);
+  } catch(e) {
+    alert('保存エラー: ' + e.message);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 保存する'; }
+    return;
+  }
+
+  // ローカルデータ更新
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (item) {
+    Object.assign(item, fields);
+    item.title      = item['制作物'] || item['店舗'];
+    item.store_name = item['店舗'];
+    item.col_k      = item['優先度（緊急／通常）'];
+    item.col_l      = item['ステータス'];
+    item.drive_url  = item['制作完了データ(googleドライブURL)'];
+  }
+  reqEditMode = false;
+  const btn = document.getElementById('rq-edit-btn');
+  if (btn) { btn.textContent = '編集'; btn.classList.remove('is-editing'); }
+  renderReqInfoView();
+  renderReqCards();
+}
+
+// ── 新規依頼作成モーダル ────────────────────────────────────────────
+function openNewReqModal() {
+  // 製作者ドロップダウンを最新データで更新
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const sel = document.getElementById('nrm-maker');
+  sel.innerHTML = '<option value="">未定</option>' + makers.map(m => `<option>${esc(m)}</option>`).join('');
+  // 依頼日を今日に設定
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('nrm-reqdate').value = today;
+  // フォームリセット
+  ['nrm-store','nrm-title-input','nrm-content','nrm-requester','nrm-deadline','nrm-firstdate','nrm-size','nrm-fmt','nrm-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('nrm-priority').value = '通常';
+  document.getElementById('nrm-msg').textContent = '';
+  document.getElementById('nrm-submit-btn').disabled = false;
+  document.getElementById('new-req-overlay').classList.add('show');
+}
+
+function closeNewReqModal() {
+  document.getElementById('new-req-overlay').classList.remove('show');
+}
+
+async function submitNewReq() {
+  const store = document.getElementById('nrm-store').value.trim();
+  const title = document.getElementById('nrm-title-input').value.trim();
+  if (!store || !title) {
+    document.getElementById('nrm-msg').textContent = '店舗と制作物は必須です。';
+    return;
+  }
+  const btn = document.getElementById('nrm-submit-btn');
+  btn.disabled = true;
+  document.getElementById('nrm-msg').textContent = '送信中…';
+  const fields = {
+    '店舗':   store,
+    '制作物': title,
+    '依頼内容': document.getElementById('nrm-content').value.trim(),
+    '依頼者':  document.getElementById('nrm-requester').value.trim(),
+    '製作者':  document.getElementById('nrm-maker').value,
+    '依頼日':  document.getElementById('nrm-reqdate').value,
+    '納期':    document.getElementById('nrm-deadline').value,
+    '初稿納品希望日': document.getElementById('nrm-firstdate').value,
+    '優先度':  document.getElementById('nrm-priority').value,
+    'サイズ':  document.getElementById('nrm-size').value.trim(),
+    '納品時のFMT': document.getElementById('nrm-fmt').value.trim(),
+    '掲載したい情報/特記事項': document.getElementById('nrm-note').value.trim(),
+    'ステータス': '未着手',
+  };
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createRequest', fields }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (json.ok) {
+      // ローカルに即追加して再描画
+      const newItem = {
+        row_id: json.rowId || String(reqItems.length + 2),
+        title: fields['制作物'],
+        store_name: fields['店舗'],
+        col_k: fields['優先度'],
+        col_l: '未着手',
+        '制作物': fields['制作物'],
+        '店舗': fields['店舗'],
+        '依頼内容': fields['依頼内容'],
+        '依頼者': fields['依頼者'],
+        '製作者': fields['製作者'],
+        '依頼日': fields['依頼日'],
+        '納期': fields['納期'],
+        '初稿納品希望日': fields['初稿納品希望日'],
+        '優先度': fields['優先度'],
+        'ステータス': '未着手',
+        'サイズ': fields['サイズ'],
+        '納品時のFMT': fields['納品時のFMT'],
+        '掲載したい情報/特記事項': fields['掲載したい情報/特記事項'],
+      };
+      reqItems.unshift(newItem);
+      renderReqCards();
+      closeNewReqModal();
+    } else {
+      document.getElementById('nrm-msg').textContent = 'エラー: ' + (json.error || '不明なエラー');
+      btn.disabled = false;
+    }
+  } catch(e) {
+    document.getElementById('nrm-msg').textContent = 'エラー: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+// new-req-overlay のオーバーレイクリックで閉じる
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('new-req-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeNewReqModal();
+  });
+});
 
 // ── 格納ボタン / Archive Modal ────────────────────────────────────
 let arcRowId = '';
