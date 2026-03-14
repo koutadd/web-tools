@@ -7,36 +7,76 @@
 //
 // First run: npx playwright install chromium
 
-import http from 'node:http';
-import fs   from 'node:fs';
-import path from 'node:path';
+import http  from 'node:http';
+import https from 'node:https';
+import fs    from 'node:fs';
+import path  from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const client    = new Anthropic(); // reads ANTHROPIC_API_KEY from env
 
+// ── Simple password auth ──────────────────────────────────────────
+const AUTH_PASSWORD = process.env.AUTH_PASSWORD || '';
+// token = base64(password) — stateless, no DB needed
+const AUTH_TOKEN = AUTH_PASSWORD
+  ? Buffer.from('aicare:' + AUTH_PASSWORD).toString('base64')
+  : '';
+
+function parseCookies(str = '') {
+  return Object.fromEntries(
+    str.split(';').map(c => {
+      const i = c.indexOf('=');
+      return i < 0 ? [c.trim(), ''] : [c.slice(0, i).trim(), c.slice(i + 1).trim()];
+    })
+  );
+}
+
+function isAuth(req) {
+  if (!AUTH_PASSWORD) return true;
+  return parseCookies(req.headers.cookie).auth_token === AUTH_TOKEN;
+}
+
+const LOGIN_HTML = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>アイケアラボ — ログイン</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#f0f5ff;font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif}
+.card{background:#fff;border-radius:18px;padding:44px 40px;width:340px;
+  box-shadow:0 6px 32px rgba(0,0,0,.12)}
+h1{font-size:1.25rem;font-weight:800;margin-bottom:28px;color:#1a1a2e;letter-spacing:.02em}
+label{font-size:0.78rem;font-weight:600;color:#555;display:block;margin-bottom:6px}
+input{width:100%;padding:11px 14px;border:1.5px solid #ccc;border-radius:9px;
+  font-size:1rem;margin-bottom:22px;transition:border-color .15s}
+input:focus{outline:none;border-color:#1a4fa8}
+button{width:100%;padding:13px;background:#1a4fa8;color:#fff;border:none;
+  border-radius:9px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.04em}
+button:hover{background:#153d85}
+.err{color:#e53935;font-size:0.8rem;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>アイケアラボ</h1>
+  <form method="POST" action="/login">
+    <label>パスワード</label>
+    <input type="password" name="password" autofocus placeholder="パスワードを入力">
+    <button type="submit">ログイン</button>
+    __ERR__
+  </form>
+</div>
+</body>
+</html>`;
+
 // ── In-memory stores ─────────────────────────────────────────────
 const store   = new Map();  // site-diagnosis results
 const lpStore = new Map();  // lp-analyze results
-
-// ── Projects data store ───────────────────────────────────────────
-const dataDir      = path.join(__dirname, 'data');
-const projectsFile = path.join(dataDir, 'projects.json');
-fs.mkdirSync(dataDir, { recursive: true });
-
-// ── Image watch (SSE for dashboard) ──────────────────────────────
-const imageWatchClients = new Set();
-const imgWatchDir = path.join(__dirname, 'image', 'projects');
-fs.mkdirSync(imgWatchDir, { recursive: true });
-fs.watch(imgWatchDir, (eventType, filename) => {
-  if (!filename || !/\.(png|jpe?g|webp|gif)$/i.test(filename)) return;
-  const slug    = filename.replace(/\.[^.]+$/, '');
-  const payload = JSON.stringify({ slug, filename, ts: Date.now() });
-  for (const client of imageWatchClients) {
-    try { client.write(`data: ${payload}\n\n`); } catch { /* ignore */ }
-  }
-});
 
 // ── Label maps (site-diagnosis) ──────────────────────────────────
 const INDUSTRY = {
@@ -309,6 +349,61 @@ function serveFile(req, res) {
 
 // ── HTTP server ──────────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
+  const urlPath = req.url.split('?')[0];
+
+  // ── Auth: /login GET (ログインページ表示) ──────────────────────
+  if (req.method === 'GET' && urlPath === '/login') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(LOGIN_HTML.replace('__ERR__', ''));
+    return;
+  }
+
+  // ── Auth: /login POST (パスワード検証) ────────────────────────
+  if (req.method === 'POST' && urlPath === '/login') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      const params = new URLSearchParams(body);
+      const pw = params.get('password') || '';
+      if (AUTH_PASSWORD && pw === AUTH_PASSWORD) {
+        const isSecure = req.headers['x-forwarded-proto'] === 'https';
+        const cookieFlags = `auth_token=${AUTH_TOKEN}; HttpOnly; SameSite=Strict; Path=/${isSecure ? '; Secure' : ''}`;
+        // リダイレクト先: 元のページ or aicare-portfolio.html
+        const redirectTo = params.get('next') || '/aicare-portfolio.html';
+        res.writeHead(302, { 'Set-Cookie': cookieFlags, Location: redirectTo });
+        res.end();
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(LOGIN_HTML.replace('__ERR__', '<div class="err">パスワードが違います</div>'));
+      }
+    });
+    return;
+  }
+
+  // ── Auth: /logout ─────────────────────────────────────────────
+  if (urlPath === '/logout') {
+    res.writeHead(302, {
+      'Set-Cookie': 'auth_token=; Max-Age=0; Path=/',
+      Location: '/login',
+    });
+    res.end();
+    return;
+  }
+
+  // ── Auth guard: 未認証は /login へリダイレクト ────────────────
+  if (AUTH_PASSWORD && !isAuth(req)) {
+    // API は 401 を返す
+    if (urlPath.startsWith('/api/')) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized' }));
+      return;
+    }
+    // 静的ファイル・ページは /login へ
+    const next = encodeURIComponent(req.url);
+    res.writeHead(302, { Location: `/login?next=${next}` });
+    res.end();
+    return;
+  }
 
   // ── Site diagnosis ─────────────────────────────────────────────
   if (req.method === 'POST' && req.url === '/api/diagnosis') {
@@ -385,102 +480,65 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ── Google Sheets CSV fetch ────────────────────────────────────
-  if (req.method === 'POST' && req.url === '/api/fetch-sheet') {
-    let body = '';
-    req.on('data', c => { body += c; });
-    req.on('end', async () => {
-      try {
-        const { url } = JSON.parse(body);
-        const match = url.match(/spreadsheets\/d\/([^/]+)/);
-        if (!match) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: '有効なスプレッドシートURLではありません' }));
-          return;
-        }
-        const id = match[1];
-        const gidMatch = url.match(/[#&?]gid=(\d+)/);
-        const gid = gidMatch ? `&gid=${gidMatch[1]}` : '';
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv${gid}`;
-        const r = await fetch(csvUrl, { signal: AbortSignal.timeout(12000) });
-        if (!r.ok) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: `シートを取得できませんでした (${r.status})。「リンクを知っている全員が閲覧可」に設定してください。` }));
-          return;
-        }
-        const csv = await r.text();
-        // Simple CSV parse — extract all cells that look like URLs
-        const cells = [];
-        csv.split('\n').forEach((line, rowIdx) => {
-          // handle quoted fields
-          const fields = [];
-          let cur = '', inQ = false;
-          for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            if (ch === '"') { inQ = !inQ; }
-            else if (ch === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
-            else { cur += ch; }
-          }
-          fields.push(cur.trim());
-          fields.forEach((val, colIdx) => {
-            const v = val.replace(/^"|"$/g, '').trim();
-            if (/^https?:\/\//i.test(v)) cells.push({ row: rowIdx + 1, col: colIdx + 1, value: v });
-          });
+  // ── GAS proxy ──────────────────────────────────────────────────
+  if (req.url.startsWith('/api/gas-proxy')) {
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzdTSBlUR7RAkYvjLi6SQb9aFvfPvCW0dNIGqmul7-HYn2TXlS9dL0Z__pU1ZcooBjZfQ/exec';
+    const urlObj = new URL(req.url, 'http://localhost');
+    const qs = urlObj.search; // e.g. ?mode=requests
+    try {
+      if (req.method === 'GET') {
+        const r = await fetch(GAS_URL + qs, { redirect: 'follow', signal: AbortSignal.timeout(20000) });
+        const text = await r.text();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(text);
+      } else if (req.method === 'POST') {
+        let body = '';
+        req.on('data', c => { body += c; });
+        await new Promise(resolve => req.on('end', resolve));
+        const r = await fetch(GAS_URL, {
+          method: 'POST', redirect: 'follow',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          signal: AbortSignal.timeout(20000),
         });
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ cells }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
+        res.end(await r.text().catch(() => '{"ok":true}'));
       }
-    });
-    return;
-  }
-
-  // ── Projects CRUD ──────────────────────────────────────────────
-  if (req.method === 'GET' && req.url === '/api/projects') {
-    try {
-      const data = fs.existsSync(projectsFile) ? fs.readFileSync(projectsFile, 'utf8') : '[]';
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(data);
-    } catch (err) {
-      res.writeHead(500); res.end('[]');
+    } catch (e) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
     }
     return;
   }
 
-  if (req.method === 'POST' && req.url === '/api/projects') {
+  // ── Slack Webhook proxy ────────────────────────────────────────
+  if (req.method === 'POST' && req.url === '/api/slack-send') {
     let body = '';
-    req.on('data', chunk => { body += chunk; });
+    req.on('data', c => body += c);
     req.on('end', () => {
       try {
-        JSON.parse(body); // validate JSON
-        fs.writeFileSync(projectsFile, body, 'utf8');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end('{"ok":true}');
-      } catch (err) {
-        res.writeHead(400); res.end(JSON.stringify({ error: err.message }));
-      }
-    });
-    return;
-  }
-
-  // ── Dashboard image watch SSE ───────────────────────────────────
-  if (req.method === 'GET' && req.url === '/api/watch-images') {
-    res.writeHead(200, {
-      'Content-Type':  'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection':    'keep-alive',
-      'Access-Control-Allow-Origin': '*',
-    });
-    res.write(': connected\n\n');
-    imageWatchClients.add(res);
-    const ping = setInterval(() => {
-      try { res.write(': ping\n\n'); } catch { clearInterval(ping); }
-    }, 25000);
-    req.on('close', () => {
-      imageWatchClients.delete(res);
-      clearInterval(ping);
+        const { webhookUrl, text } = JSON.parse(body);
+        if (!webhookUrl || !text) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing params' })); return; }
+        const wUrl = new URL(webhookUrl);
+        const payload = JSON.stringify({ text });
+        const options = {
+          hostname: wUrl.hostname, path: wUrl.pathname + wUrl.search,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+        };
+        const https = require('https');
+        const pr = https.request(options, sr => {
+          let d = '';
+          sr.on('data', c => d += c);
+          sr.on('end', () => {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            res.end(JSON.stringify({ ok: sr.statusCode === 200, status: sr.statusCode, body: d }));
+          });
+        });
+        pr.on('error', e => { res.writeHead(500); res.end(JSON.stringify({ error: e.message })); });
+        pr.write(payload);
+        pr.end();
+      } catch(e) { res.writeHead(500); res.end(JSON.stringify({ error: e.message })); }
     });
     return;
   }

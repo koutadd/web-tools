@@ -25,20 +25,9 @@
     color: var(--text);
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
     min-height: 100vh;
+    transition: background .4s ease;
   }
 
-  /* ── Header ────────────────────────────────── */
-  .site-header {
-    padding: 60px var(--pad) 44px;
-    max-width: 1400px; margin: 0 auto;
-    display: flex; justify-content: space-between; align-items: flex-end;
-    gap: 24px; flex-wrap: wrap;
-  }
-  .site-title {
-    font-size: clamp(2.2rem, 5vw, 4.2rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
-  }
-  .site-title em { font-style: normal; font-weight: 300; }
   .site-meta { font-size: 0.78rem; color: var(--muted); line-height: 1.8; text-align: right; }
 
   /* ── Nav ─────────────────────────────────────── */
@@ -51,11 +40,34 @@
   .nav-btn {
     background: none; border: none; cursor: pointer;
     font-size: 0.78rem; color: var(--muted);
-    padding: 4px 10px; border-radius: 2px;
-    transition: color .15s; letter-spacing: .02em;
+    padding: 5px 18px; border-radius: 20px;
+    transition: all .15s; letter-spacing: .03em; font-weight: 600;
   }
-  .nav-btn:hover { color: var(--text); }
+  .nav-btn:hover { color: var(--text); background: #eee; }
   .nav-btn.active { color: var(--text); font-weight: 700; }
+  /* 制作物一覧: 濃い青 */
+  #nav-pdf {
+    background: #1a4fa8; color: #fff !important;
+    padding: 5px 40px;
+  }
+  #nav-pdf:hover { background: #153d85; }
+  #nav-pdf.active { background: #153d85; }
+  /* 依頼管理: オレンジ */
+  .nav-btn-req {
+    margin-left: auto; background: #c45c00; color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+  }
+  .nav-btn-req:hover { background: #a34d00; }
+  .nav-btn-req.active { background: #a34d00; }
+
+  /* タブ別背景色 */
+  body.tab-pdf { background: #f0f5ff; }
+  body.tab-req { background: #fff5ee; }
+
+  /* 制作物総数 */
+  .nav-stats { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .nav-stat-item { font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+  .nav-stat-item strong { color: var(--text); font-weight: 700; }
   .nav-sep { color: var(--border); margin: 0 4px; user-select: none; }
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 
@@ -258,7 +270,7 @@
   .drawer-bg.open { display: block; }
   .drawer {
     position: fixed; top: 0; right: 0; bottom: 0;
-    width: min(520px, 100vw);
+    width: min(680px, 100vw);
     background: #fff; overflow-y: auto;
     transform: translateX(100%);
     transition: transform .3s cubic-bezier(.4,0,.2,1);
@@ -295,6 +307,10 @@
 
   .drawer-img {
     width: 100%; display: block; margin-bottom: 24px; border: 1px solid var(--border);
+  }
+  .drawer-pdf-iframe {
+    width: 100%; height: 70vh; display: block; margin-bottom: 24px;
+    border: 1px solid var(--border); border-radius: 3px;
   }
   /* クロップ済み画像はドロワーでも同様に表示 */
   .drawer-img.is-cropped {
@@ -541,42 +557,952 @@
     text-decoration: underline; transition: color .15s;
   }
   .btn-delete:hover { color: var(--red); }
+
+  /* ── PDF Gallery (GAS連携) ───────────────────────────────── */
+  .pdf-filter-bar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 14px var(--pad) 0;
+  }
+  .pdf-filter-row {
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px;
+  }
+  .pdf-filter-label {
+    font-size: 0.68rem; color: var(--border); letter-spacing: .06em; text-transform: uppercase;
+  }
+  .pdf-filter-btn {
+    font-size: 0.72rem; letter-spacing: .03em; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 4px 13px; cursor: pointer; background: none; transition: all .15s;
+  }
+  .pdf-filter-btn:hover { color: var(--text); border-color: var(--text); }
+  .pdf-filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .pdf-work { break-inside: avoid; margin-bottom: calc(var(--gap) * 1.8); }
+  .pdf-thumb {
+    position: relative; width: 100%; aspect-ratio: 3/4;
+    background: #e6e4e0; overflow: hidden; cursor: pointer;
+  }
+  .pdf-thumb img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s; }
+  .pdf-work:hover .pdf-thumb img { opacity: .88; }
+  .pdf-thumb-ph {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; font-size: 2.8rem; color: rgba(0,0,0,.2);
+  }
+  .pdf-thumb-ph span { font-size: 0.65rem; letter-spacing: .1em; text-transform: uppercase; }
+  .pdf-thumb-overlay {
+    position: absolute; inset: 0;
+    background: rgba(249,248,246,.75); backdrop-filter: blur(2px);
+    opacity: 0; transition: opacity .22s;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; flex-wrap: wrap; padding: 24px;
+  }
+  .pdf-work:hover .pdf-thumb-overlay { opacity: 1; }
+
+  .pdf-card-caption { padding: 10px 0 0; }
+  .pdf-card-title {
+    font-size: 0.8rem; font-weight: 400; letter-spacing: .04em; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-num {
+    display: inline-block; margin-right: 5px;
+    font-size: 0.65rem; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .pdf-card-title:hover { text-decoration: underline; }
+  .pdf-card-meta { font-size: 0.68rem; color: var(--muted); margin: 3px 0 5px; }
+  .pdf-card-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .pdf-card-tag {
+    font-size: 0.6rem; border: 1px solid transparent;
+    padding: 2px 8px; border-radius: 10px; cursor: pointer; background: none;
+    transition: opacity .12s; font-weight: 600; letter-spacing: .02em;
+  }
+  .pdf-card-tag:hover { opacity: .75; }
+  .pdf-card-tag.store { color: #555; border-color: #ddd; background: #f5f5f5; font-weight: 400; }
+  /* ジャンル別カラー */
+  .pdf-card-tag[data-genre="チラシ"]       { color: #c45c00; border-color: #f5c28a; background: #fff5eb; }
+  .pdf-card-tag[data-genre="店舗サイン"]   { color: #6b3fa0; border-color: #c9b3e8; background: #f6f0fc; }
+  .pdf-card-tag[data-genre="名刺・ツール"] { color: #197a6a; border-color: #98d5cb; background: #edfaf7; }
+  .pdf-card-tag[data-genre="ブランド"]     { color: #b5365a; border-color: #f0b0c0; background: #fdf0f4; }
+  .pdf-card-tag[data-genre="Web"]          { color: #1a5fbe; border-color: #a8c4f0; background: #eef4fd; }
+  .pdf-card-tag[data-genre="その他"]       { color: #666;    border-color: #ccc;    background: #f8f8f8; }
+
+  /* ジャンル編集ボタン */
+  .genre-edit-btn {
+    font-size: 0.58rem; padding: 2px 6px; border-radius: 10px; cursor: pointer;
+    border: 1px dashed #ccc; background: none; color: #aaa; transition: all .12s;
+    line-height: 1.4;
+  }
+  .genre-edit-btn:hover { border-color: #888; color: #555; }
+
+  /* ジャンル選択ピッカー */
+  .genre-picker {
+    position: absolute; z-index: 200; background: #fff;
+    border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    padding: 6px; display: flex; flex-direction: column; gap: 3px; min-width: 130px;
+  }
+  .genre-picker button {
+    text-align: left; padding: 5px 10px; border: none; border-radius: 7px;
+    cursor: pointer; background: none; font-size: 0.75rem; color: var(--text);
+    transition: background .1s;
+  }
+  .genre-picker button:hover { background: #f0f0f0; }
+  .genre-picker .picker-reset { color: #aaa; font-style: italic; }
+  .pdf-card-tags { position: relative; }
+
+  /* 検索ボックス */
+  .pdf-search-wrap { padding: 10px var(--pad) 0; max-width: 1400px; margin: 0 auto; display: flex; justify-content: flex-end; }
+  .pdf-search-input {
+    width: 100%; max-width: 380px; padding: 7px 14px 7px 36px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat;
+    font-size: 0.8rem; color: var(--text); outline: none; box-sizing: border-box;
+  }
+  .pdf-search-input:focus { border-color: var(--text); }
+
+  .pdf-loading { padding: 80px 0; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+  /* ── 依頼管理 ───────────────────────────────────────────── */
+  .req-cards {
+    max-width: 1400px; margin: 0 auto; padding: 16px var(--pad);
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;
+  }
+  .req-card {
+    background: #fff; border: 2px solid rgba(255,255,255,.8); border-radius: 12px;
+    padding: 16px; cursor: pointer; transition: box-shadow .15s;
+    overflow: hidden; min-width: 0; box-sizing: border-box;
+    position: relative;
+  }
+  .req-new-badge {
+    position: absolute; top: 8px; right: 10px;
+    background: #e53935; color: #fff; font-size: 0.62rem;
+    font-weight: 800; padding: 2px 7px; border-radius: 10px;
+    letter-spacing: .04em; pointer-events: none;
+  }
+  .req-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+  .req-card[data-status] { border-color: rgba(255,255,255,.7); }
+  .req-card-title {
+    font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; line-height: 1.5;
+    word-break: break-word; overflow-wrap: break-word; white-space: normal;
+  }
+  .req-card-store {
+    font-size: 0.7rem; color: rgba(0,0,0,.5); margin-bottom: 6px;
+    word-break: break-word; overflow-wrap: break-word; white-space: normal;
+  }
+  .req-card-deadline { font-size: 0.68rem; font-weight: 600; color: rgba(0,0,0,.55); margin-bottom: 8px; }
+  .req-card-tags  { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+  .req-tag {
+    display: inline-block; font-size: 0.63rem; font-weight: 600;
+    padding: 2px 9px; border-radius: 10px;
+    background: #ececec; color: #555;
+  }
+  /* L列ステータス別タグ色 */
+  .req-tag[data-status="未着手"]        { background: #e53935; color: #fff; }
+  .req-tag[data-status="進行中"]        { background: #29b6d4; color: #fff; }
+  .req-tag[data-status="保留"]          { background: #bdbdbd; color: #555; }
+  .req-tag[data-status="データ送付完了"] { background: #8e24aa; color: #fff; }
+  .req-tag[data-status="完了"]          { background: #333;    color: #fff; }
+  .req-tag[data-status="差し戻し"]      { background: #fff176; color: #555; }
+  .req-tag[data-status="承認待ち"]      { background: #43a047; color: #fff; }
+  .req-tag[data-status="確認待ち"]      { background: #e57373; color: #fff; }
+  .req-card-comment { font-size: 0.72rem; color: rgba(0,0,0,.5); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.1); word-break: break-word; overflow-wrap: break-word; }
+  .req-tag-archived { display: inline-block; font-size: 0.63rem; font-weight: 700; padding: 2px 9px; border-radius: 10px; background: #1a4fa8; color: #fff; }
+  .req-card-folder-link { display: inline-block; margin-top: 7px; font-size: 0.72rem; font-weight: 600; color: #1a4fa8; text-decoration: none; padding: 3px 10px; border: 1px solid #b3c8f0; border-radius: 6px; background: #f0f5ff; }
+  .req-card-folder-link:hover { background: #ddeaff; }
+
+  /* ステータス別カード背景色 */
+  .req-card[data-status="未着手"]        { background: #ffd6d6; border-color: #f5b3b3; }
+  .req-card[data-status="進行中"]        { background: #d0f0f8; border-color: #9dd8ea; }
+  .req-card[data-status="保留"]          { background: #ebebeb; border-color: #d0d0d0; }
+  .req-card[data-status="データ送付完了"] { background: #e8d5f5; border-color: #c9a8ea; }
+  .req-card[data-status="完了"]          { background: #d0d0d0; border-color: #b0b0b0; }
+  .req-card[data-status="差し戻し"]      { background: #fffbd0; border-color: #e8e087; }
+  .req-card[data-status="承認待ち"]      { background: #d4f5d4; border-color: #9dd89d; }
+  .req-card[data-status="確認待ち"]      { background: #ffe0ea; border-color: #f5aac0; }
+
+  /* 完了表示トグルボタン */
+  .show-completed-btn {
+    font-size: 0.72rem; padding: 4px 14px; border-radius: 14px;
+    border: 1px solid var(--border); background: none; cursor: pointer;
+    color: var(--muted); transition: all .15s;
+  }
+  .show-completed-btn.on { background: #333; color: #fff; border-color: #333; }
+
+  /* 依頼ドロワー */
+  .req-drawer-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid rgba(0,0,0,.1);
+    margin-bottom: 0; flex-shrink: 0;
+    transition: background .3s ease;
+  }
+  .req-drawer-title  { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
+  .req-drawer-meta   { font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; }
+  .req-drawer-body   { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 16px 24px 8px; }
+
+  /* ステータスバッジ（ヘッダー内） */
+  .rq-status-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .rq-badge {
+    font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px;
+    letter-spacing: .03em;
+  }
+  .rq-badge-k { background: rgba(0,0,0,.12); color: #222; }
+
+  /* ステータス別ヘッダー背景 */
+  .rq-status--未着手    { background: #ffd6d6; }
+  .rq-status--進行中    { background: #d0f0f8; }
+  .rq-status--保留      { background: #ebebeb; }
+  .rq-status--データ送付完了 { background: #e8d5f5; }
+  .rq-status--完了      { background: #d0d0d0; }
+  .rq-status--差し戻し  { background: #fffbd0; }
+  .rq-status--承認待ち  { background: #d4f5d4; }
+  .rq-status--確認待ち  { background: #ffe0ea; }
+
+  /* ステータス別バッジ色 */
+  .rq-badge--未着手    { background: #e53935; color: #fff; }
+  .rq-badge--進行中    { background: #29b6d4; color: #fff; }
+  .rq-badge--保留      { background: #bdbdbd; color: #555; }
+  .rq-badge--データ送付完了 { background: #8e24aa; color: #fff; }
+  .rq-badge--完了      { background: #333; color: #fff; }
+  .rq-badge--差し戻し  { background: #fff176; color: #555; }
+  .rq-badge--承認待ち  { background: #43a047; color: #fff; }
+  .rq-badge--確認待ち  { background: #e57373; color: #fff; }
+
+  /* 全情報テーブル */
+  .req-info-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  .req-info-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .req-info-table td:first-child { color: var(--muted); width: 38%; white-space: nowrap; }
+  .req-info-table td:last-child { word-break: break-all; }
+
+  /* メモ */
+  .req-memo-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  .req-memo-area {
+    width: 100%; min-height: 80px; padding: 8px 10px; box-sizing: border-box;
+    border: 1px solid var(--border); border-radius: 8px; font-size: 0.78rem;
+    resize: vertical; font-family: inherit; background: var(--bg); color: var(--text);
+  }
+  .req-memo-area:focus { outline: none; border-color: var(--text); }
+  .req-memo-saved { font-size: 0.65rem; color: #2e7d32; margin-top: 3px; opacity: 0; transition: opacity .3s; }
+  .req-memo-saved.show { opacity: 1; }
+  .req-chat { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 0 16px; }
+  .req-chat-msg { display: flex; flex-direction: column; gap: 2px; }
+  .req-chat-bubble {
+    background: #f0f0f0; border-radius: 12px 12px 12px 2px;
+    padding: 8px 12px; font-size: 0.8rem; max-width: 85%; line-height: 1.5;
+  }
+  .req-chat-time { font-size: 0.62rem; color: var(--muted); padding-left: 4px; }
+  .req-chat-form {
+    display: flex; gap: 8px; padding: 12px 24px 16px; border-top: 1px solid var(--border); flex-shrink: 0;
+  }
+  .req-chat-input {
+    flex: 1; padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px;
+    font-size: 0.8rem; outline: none; background: var(--bg);
+  }
+  .req-chat-input:focus { border-color: var(--text); }
+  .req-chat-send {
+    padding: 8px 16px; background: var(--text); color: var(--bg);
+    border: none; border-radius: 20px; cursor: pointer; font-size: 0.78rem; font-weight: 600;
+  }
+  /* Slack送信フォーム */
+  .slack-form { display: flex; flex-direction: column; gap: 8px; padding: 10px 24px 4px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .slack-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .slack-label { font-size: 0.7rem; font-weight: 600; color: var(--muted); flex-shrink: 0; width: 72px; }
+  .slack-select { flex: 1; font-size: 0.78rem; padding: 5px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); min-width: 0; }
+  .slack-members { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-width: 0; }
+  .slack-chip { font-size: 0.7rem; padding: 3px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); cursor: pointer; transition: all .15s; user-select: none; }
+  .slack-chip.selected { background: #4A154B; color: #fff; border-color: #4A154B; }
+  .slack-btn-row { display: flex; gap: 8px; padding: 8px 0 14px; }
+  .slack-send-btn { padding: 7px 16px; background: #4A154B; color: #fff; border: none; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+  .slack-send-btn:hover { background: #3a1039; }
+  .slack-log-btn { padding: 7px 16px; background: #eee; color: #555; border: none; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+  .slack-log-btn:hover { background: #ddd; }
+  .slack-manage-btn { font-size: 0.7rem; color: var(--muted); background: none; border: none; cursor: pointer; text-decoration: underline; margin-left: auto; }
+  /* Slack設定モーダル */
+  .slack-cfg-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 3000; align-items: center; justify-content: center; }
+  .slack-cfg-overlay.show { display: flex; }
+  .slack-cfg-modal { background: var(--bg); border-radius: 16px; padding: 24px; width: 400px; max-width: 95vw; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .slack-cfg-title { font-size: 1rem; font-weight: 800; }
+  .slack-cfg-section { display: flex; flex-direction: column; gap: 8px; }
+  .slack-cfg-label { font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+  .slack-cfg-note { font-size: 0.68rem; color: var(--muted); line-height: 1.5; }
+  .slack-cfg-list { display: flex; flex-direction: column; gap: 6px; }
+  .slack-cfg-chip { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; padding: 5px 10px; border-radius: 8px; background: #f0f0f0; }
+  .slack-cfg-chip-name { font-weight: 600; flex-shrink: 0; }
+  .slack-cfg-chip-url { color: var(--muted); font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+  .slack-cfg-del { background: none; border: none; cursor: pointer; color: #c00; font-weight: 700; font-size: 0.8rem; padding: 0; flex-shrink: 0; }
+  .slack-cfg-add-row { display: flex; flex-direction: column; gap: 5px; }
+  .slack-cfg-input { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.78rem; outline: none; width: 100%; box-sizing: border-box; }
+  .slack-cfg-add-btn { padding: 6px 14px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; align-self: flex-start; }
+  /* Slackログバブル */
+  .req-chat-bubble.slack-bubble { background: #f5eef6; border-left: 3px solid #4A154B; }
+  #req-drawer { display: flex; flex-direction: column; }
+  .rq-status-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .rq-status-label { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
+  .rq-status-select {
+    font-size: 0.78rem; padding: 4px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text); cursor: pointer;
+  }
+  .rq-status-saved { font-size: 0.65rem; color: #2e7d32; opacity: 0; transition: opacity .3s; }
+  .rq-status-saved.show { opacity: 1; }
+
+  /* ── 格納ボタン ── */
+  .req-row-id {
+    font-size: 0.65rem; color: var(--muted); margin-right: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .archive-btn {
+    display: block; width: 100%; margin-top: 12px;
+    background: #e53935; color: #fff; border: none; border-radius: 10px;
+    padding: 14px 0; font-size: 1rem; font-weight: 900; letter-spacing: .1em;
+    cursor: pointer; transition: background .15s; box-shadow: 0 4px 12px rgba(229,57,53,.4);
+  }
+  .archive-btn:hover { background: #b71c1c; }
+
+  /* 製作者タグ */
+  .req-tag-maker {
+    font-size: 0.68rem; padding: 2px 9px; border-radius: 10px;
+    background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9;
+    cursor: pointer; transition: all .15s; display: inline-block;
+  }
+  .req-tag-maker:hover, .req-tag-maker.active { background: #1565c0; color: #fff; border-color: #1565c0; }
+
+  /* 製作者管理ボタン */
+  .nav-btn-maker {
+    margin-left: 8px; background: #2e7d32; color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+  }
+  .nav-btn-maker:hover { background: #1b5e20; }
+  .nav-btn-maker.active { background: #1b5e20; }
+
+  /* 製作者管理セクション */
+  #maker-section { padding: 16px; }
+  .maker-table-wrap { overflow-x: auto; }
+  .maker-table { border-collapse: collapse; font-size: 0.72rem; white-space: nowrap; min-width: 100%; }
+  .maker-table th { background: #f0f0f0; padding: 6px 10px; border: 1px solid #ddd; font-weight: 700; text-align: center; position: sticky; top: 0; z-index: 1; }
+  .maker-table th.th-name { text-align: left; min-width: 100px; }
+  .maker-table td { padding: 5px 10px; border: 1px solid #eee; text-align: right; }
+  .maker-table td.td-name { text-align: left; font-weight: 600; min-width: 100px; }
+  .maker-table tr:hover td { background: #f5f5f5; }
+  .maker-table .col-confirm { background: #f1f8e9; }
+  .maker-table .col-forecast { background: #fff8e1; }
+  .maker-table .th-confirm { background: #c8e6c9 !important; }
+  .maker-table .th-forecast { background: #fff3cd !important; }
+  .maker-month-hdr { background: #e8eaf6 !important; }
+  .maker-section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; font-weight: 700; color: var(--muted);
+    border-top: 2px solid var(--border); padding: 8px 0 10px 0; margin-bottom: 10px;
+    justify-content: flex-start;
+  }
+  .maker-reload-btn { font-size: 0.72rem; padding: 4px 12px; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; }
+  .maker-reload-btn:hover { background: #eee; }
+  .maker-table .th-thismonth { background: #ff8f00 !important; color: #fff; }
+  .maker-table .td-thismonth { background: #fff8e1; font-weight: 700; }
+  .maker-table .col-amt { color: #1b5e20; }
+  .maker-table .col-amt-fore { color: #e65100; }
+  .maker-amount-note { font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 6px 12px; display: inline-block; }
+
+  /* ── 格納モーダル ── */
+
+  /* 新規依頼作成ボタン */
+  .req-new-btn {
+    background: #1a4fa8; color: #fff; border: none;
+    padding: 7px 16px; border-radius: 20px; font-weight: 700;
+    font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .req-new-btn:hover { background: #153d85; }
+
+  /* 新規依頼モーダル */
+  #new-req-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 2000;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  #new-req-overlay.show { display: flex; }
+  #new-req-modal {
+    background: #fff; border-radius: 14px;
+    width: 100%; max-width: 560px; max-height: 90vh;
+    overflow-y: auto; padding: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  }
+  .nrm-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 18px; }
+  .nrm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .nrm-grid .nrm-full { grid-column: 1 / -1; }
+  .nrm-field { display: flex; flex-direction: column; gap: 4px; }
+  .nrm-field label { font-size: 0.75rem; font-weight: 600; color: #555; }
+  .nrm-field input, .nrm-field select, .nrm-field textarea {
+    border: 1px solid #ccc; border-radius: 8px; padding: 7px 10px;
+    font-size: 0.88rem; font-family: inherit;
+    transition: border-color .15s;
+  }
+  .nrm-field input:focus, .nrm-field select:focus, .nrm-field textarea:focus {
+    outline: none; border-color: #1a4fa8;
+  }
+  .nrm-field textarea { min-height: 72px; resize: vertical; }
+  .nrm-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .nrm-msg { font-size: 0.82rem; color: #1a4fa8; margin-top: 8px; min-height: 18px; }
+
+  .arc-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 2000; display: none; align-items: center; justify-content: center;
+  }
+  .arc-overlay.show { display: flex; }
+  .arc-modal {
+    background: #fff; border-radius: 20px; padding: 32px 28px;
+    max-width: 480px; width: 92%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,.35); position: relative;
+  }
+  .arc-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+  .arc-sub   { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+  .arc-step  { display: none; }
+  .arc-step.active { display: block; }
+  .arc-folder-name {
+    background: #f5f5f5; border-radius: 8px; padding: 10px 14px;
+    font-size: 0.85rem; font-weight: 700; font-family: monospace;
+    margin-bottom: 18px; word-break: break-all;
+  }
+  .arc-folder-tree {
+    font-size: 0.78rem; font-family: monospace; background: #f9f9f9;
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+    line-height: 1.9; color: #444;
+  }
+  .arc-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .arc-btn {
+    flex: 1; padding: 12px 0; border-radius: 10px; border: none; cursor: pointer;
+    font-size: 0.88rem; font-weight: 700; transition: all .15s;
+  }
+  .arc-btn-primary { background: #1a4fa8; color: #fff; }
+  .arc-btn-primary:hover { background: #153d85; }
+  .arc-btn-danger  { background: #e53935; color: #fff; }
+  .arc-btn-danger:hover { background: #b71c1c; }
+  .arc-btn-ghost   { background: #eee; color: #555; }
+  .arc-btn-ghost:hover { background: #ddd; }
+  .arc-upload-zone {
+    border: 2px dashed #bbb; border-radius: 12px; padding: 28px;
+    text-align: center; cursor: pointer; transition: all .15s; margin-bottom: 16px;
+  }
+  .arc-upload-zone:hover, .arc-upload-zone.drag { border-color: #1a4fa8; background: #f0f5ff; }
+  .arc-upload-icon { font-size: 2.4rem; margin-bottom: 8px; }
+  .arc-upload-label { font-size: 0.85rem; color: #555; }
+  .arc-upload-sub { font-size: 0.72rem; color: #aaa; margin-top: 4px; }
+  .arc-file-list { font-size: 0.78rem; margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
+  .arc-file-item { background: #f0f5ff; border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .arc-progress { height: 6px; background: #eee; border-radius: 3px; margin: 12px 0; overflow: hidden; }
+  .arc-progress-bar { height: 100%; background: #1a4fa8; border-radius: 3px; transition: width .3s; }
+  .arc-status { font-size: 0.78rem; color: var(--muted); margin-bottom: 12px; min-height: 20px; }
+  .arc-message-box {
+    background: #f5f5f5; border-radius: 10px; padding: 16px;
+    font-size: 0.82rem; line-height: 1.8; white-space: pre-wrap;
+    word-break: break-all; margin-bottom: 14px; color: #222;
+  }
+  .arc-copy-btn {
+    width: 100%; padding: 14px; background: #1a4fa8; color: #fff;
+    border: none; border-radius: 10px; cursor: pointer;
+    font-size: 0.95rem; font-weight: 800; letter-spacing: .05em; transition: background .15s;
+  }
+  .arc-copy-btn:hover { background: #153d85; }
+  .arc-copy-btn.copied { background: #2e7d32; }
+  .arc-step-indicator {
+    display: flex; gap: 6px; margin-bottom: 20px; justify-content: center;
+  }
+  .arc-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #ddd; transition: background .2s;
+  }
+  .arc-dot.done { background: #2e7d32; }
+  .arc-dot.active { background: #1a4fa8; }
+
+  .pdf-error {
+    padding: 24px; background: #fff1f0; border: 1px solid #ffb3b3;
+    border-radius: 4px; color: #c0392b; font-size: 0.85rem; line-height: 1.7; margin: 40px 0;
+  }
+  .pdf-reload-btn {
+    display: inline-block; margin-top: 8px;
+    background: none; border: 1px solid #c0392b; color: #c0392b;
+    border-radius: 2px; padding: 5px 12px; cursor: pointer; font-size: 0.72rem; transition: all .15s;
+  }
+  .pdf-reload-btn:hover { background: #c0392b; color: #fff; }
+
+  /* ── Sticky Nav ── */
+  .sticky-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,.09);
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 20px; transform: translateY(-110%); transition: transform .25s ease;
+  }
+  .sticky-nav.show { transform: translateY(0); }
+  .sticky-nav-filters { display: flex; gap: 5px; align-items: center; flex: 1; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .sticky-nav-filters::-webkit-scrollbar { display: none; }
+  .sticky-nav-top {
+    flex-shrink: 0;
+    background: none; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 20px; cursor: pointer;
+    font-size: 0.72rem; padding: 5px 12px;
+    white-space: nowrap; transition: all .15s;
+  }
+  .sticky-nav-top:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .sticky-nav-req {
+    flex-shrink: 0; margin-left: 10px;
+    background: #c45c00; color: #fff;
+    border: none; border-radius: 20px; cursor: pointer;
+    font-size: 0.78rem; font-weight: 700; padding: 7px 18px;
+    letter-spacing: .03em; white-space: nowrap; transition: background .15s;
+  }
+  .sticky-nav-req:hover { background: #a34d00; }
+
+  /* SP トップヘッダー: PC では非表示 */
+  #sp-top-header { display: none; }
+
+  /* ============================================================
+     SP レスポンシブ (ギャラリー・依頼管理)
+     ============================================================ */
+  @media (max-width: 640px) {
+    :root { --pad: 16px; --gap: 16px; }
+
+    /* PC ヘッダーは SP では非表示 */
+    .site-header { display: none; }
+
+    /* SP トップヘッダー（最上部でのみ表示） */
+    #sp-top-header {
+      display: flex;
+      align-items: center;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 44px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 750;
+      padding: 0 16px;
+      transition: transform .2s;
+    }
+    .sp-logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: var(--primary, #1a1a2e);
+    }
+
+
+    /* Nav: ボトムタブバー化 */
+    .site-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+      z-index: 800; background: #fff;
+      border-top: 1px solid var(--border); border-bottom: none;
+      padding: 0 0 env(safe-area-inset-bottom);
+      display: flex; gap: 0; justify-content: space-around;
+    }
+    .nav-btn {
+      flex: 1; padding: 10px 4px 11px; border-radius: 0;
+      font-size: 0.62rem; font-weight: 600;
+      background: none !important; color: var(--muted) !important;
+    }
+    .nav-btn.active { color: var(--text) !important; font-weight: 700; }
+    #nav-pdf { padding: 10px 4px 11px !important; color: var(--muted) !important; }
+    #nav-pdf.active       { color: #1a4fa8 !important; }
+    .nav-btn-req { margin-left: 0; padding: 10px 4px 11px !important; }
+    .nav-btn-req.active   { color: #c45c00 !important; }
+    .nav-btn-maker.active { color: #1b5e20 !important; }
+    .nav-right    { display: none; }
+
+    /* コンテンツ下部にタブバー分の余白 */
+    .works     { padding-bottom: 90px; }
+    footer     { padding-bottom: 80px; }
+
+    /* ── SP 固定トップバー (検索 + フィルター) ── */
+    .pdf-search-wrap {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 710;
+      background: var(--bg); max-width: none; width: 100%; margin: 0;
+      padding: 8px var(--pad) 6px;
+      justify-content: stretch;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      transition: transform .25s ease;
+    }
+    .pdf-search-input { max-width: 100%; }
+
+    .pdf-filter-bar {
+      position: fixed; top: 50px; left: 0; right: 0; z-index: 709;
+      background: var(--bg); max-width: none; width: 100%; margin: 0;
+      padding: 4px var(--pad) 6px;
+      border-bottom: 1px solid var(--border);
+      transition: transform .25s ease;
+    }
+
+    /* 初期状態: 非表示 (ヘッダーが見えているとき) */
+    .sp-bar-hidden {
+      transform: translateY(-200%) !important;
+      pointer-events: none;
+    }
+
+    /* フィルター行: 横1列スクロール */
+    .pdf-filter-row {
+      flex-wrap: nowrap; overflow-x: auto;
+      scrollbar-width: none; margin-bottom: 3px; padding-bottom: 2px;
+    }
+    .pdf-filter-row::-webkit-scrollbar { display: none; }
+    .pdf-filter-label { flex-shrink: 0; font-size: 0.6rem; }
+    .pdf-filter-btn {
+      flex-shrink: 0; font-size: 0.65rem;
+      padding: 6px 13px; min-height: 30px; border-radius: 15px;
+    }
+
+    /* 依頼カード: 1カラム */
+    .req-cards {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding-left: var(--pad); padding-right: var(--pad);
+      padding-bottom: 90px;
+    }
+
+    /* ドロワー: 全画面 */
+    .drawer, #req-drawer { width: 100vw; }
+    .drawer-header { padding: 16px var(--pad) 12px; }
+    .drawer-body   { padding: 16px var(--pad); }
+
+    /* 依頼ドロワー内パディング */
+    .req-drawer-header { padding: 12px var(--pad) 10px; }
+    .req-drawer-body   { padding: 12px var(--pad) 8px; }
+    .req-chat-form     { padding: 10px var(--pad) 12px; }
+    .slack-form        { padding: 8px var(--pad) 4px; }
+    .slack-btn-row     { padding: 6px 0 16px; }
+
+    /* モーダル */
+    .arc-modal        { width: 95vw; max-height: 90vh; border-radius: 14px; }
+    .slack-cfg-modal  { width: 95vw; max-height: 85vh; }
+
+    /* スティッキーナビ: SP では不要なので完全非表示 */
+    .sticky-nav, .sticky-nav.show { display: none !important; }
+
+    /* 完了フォルダリンク */
+    .req-card-folder-link { display: block; text-align: center; }
+
+    /* ドロワーの情報テーブル */
+    .rq-info-table th,
+    .rq-info-table td { font-size: 0.72rem; padding: 5px 6px; }
+  }
 </style>
 </head>
 <body>
 
+
+<div id="sp-top-header">
+  <span class="sp-logo">アイケアラボ</span>
+</div>
 <header class="site-header">
-  <h1 class="site-title"><em>(</em>アイケアラボ<em>)</em></h1>
+  <h1 class="site-title">アイケアラボ</h1>
   <div class="site-meta">制作物ダッシュボード<br>Web Design &amp; Development<br>Japan</div>
 </header>
 
 <nav class="site-nav">
-  <button class="nav-btn active" data-status="all">All Works</button>
-  <span class="nav-sep">|</span>
-  <button class="nav-btn" data-status="active">Active</button>
-  <button class="nav-btn" data-status="wip">WIP</button>
-  <button class="nav-btn" data-status="paused">Paused</button>
-  <button class="nav-btn" data-status="planning">Planning</button>
-  <span class="nav-sep">|</span>
-  <button class="nav-btn" id="rec-btn" data-status="rec">★ おすすめ</button>
+  <button class="nav-btn active" id="nav-pdf" onclick="switchTab('pdf')">制作物一覧</button>
+  <button class="nav-btn nav-btn-req" id="nav-req" onclick="switchTab('req')">📋 依頼管理</button>
+  <button class="nav-btn nav-btn-maker" id="nav-maker" onclick="switchTab('maker')">👷 製作者管理</button>
   <div class="nav-right">
-    <input class="search-input" type="text" id="search" placeholder="検索...">
+    <div class="nav-stats" id="nav-stats"></div>
     <span class="live-tag" id="live"><span class="live-dot"></span>LIVE</span>
-    <button class="add-btn" id="add-btn">+ Add</button>
   </div>
 </nav>
 
-<div class="genre-row" id="genre-row"></div>
-<div class="tag-row" id="tag-row"></div>
+<!-- Sticky Nav -->
+<div class="sticky-nav" id="sticky-nav">
+  <button class="sticky-nav-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲ TOP</button>
+  <div class="sticky-nav-filters" id="sticky-filter-btns"></div>
+  <button class="sticky-nav-req" onclick="switchTab('req')">📋 依頼管理</button>
+</div>
 
-<section class="works">
-  <div class="masonry" id="masonry"></div>
-</section>
+<!-- PDF Gallery (GAS連携) -->
+<div id="pdf-section">
+  <div class="pdf-search-wrap">
+    <input class="pdf-search-input" id="pdf-search" type="search" placeholder="タイトル・ファイル名で検索…" oninput="setPdfSearch(this.value)">
+  </div>
+  <div class="pdf-filter-bar" id="pdf-filter-bar"></div>
+  <section class="works">
+    <div class="masonry" id="pdf-masonry">
+      <div class="pdf-loading">読み込み中...</div>
+    </div>
+  </section>
+</div>
+
+<!-- 製作者管理セクション -->
+<div id="maker-section" style="display:none">
+  <div class="maker-section-title">👷 製作者管理
+    <button class="maker-reload-btn" onclick="reloadMakerData()">↺ 再読み込み</button>
+  </div>
+  <div id="maker-table-wrap"><div class="pdf-loading">読み込み中...</div></div>
+</div>
+
+<!-- 依頼管理セクション -->
+<div id="req-section" style="display:none">
+  <div class="pdf-search-wrap">
+    <input class="pdf-search-input" id="req-search" type="search" placeholder="案件名・店舗名で検索…" oninput="renderReqCards()">
+    <button class="req-new-btn" onclick="openNewReqModal()">＋ 新規依頼作成</button>
+  </div>
+  <div class="pdf-filter-bar" id="req-filter-bar"></div>
+  <div class="req-cards" id="req-cards">
+    <div class="pdf-loading">読み込み中...</div>
+  </div>
+</div>
+
+<!-- 依頼詳細ドロワー（チャット） -->
+<div class="drawer-bg" id="req-drawer-bg" onclick="closeReqDrawer()"></div>
+<div class="drawer" id="req-drawer">
+  <button class="drawer-close" onclick="closeReqDrawer()">×</button>
+  <div class="req-drawer-header" id="rq-header">
+    <div class="rq-status-badges" id="rq-badges"></div>
+    <div class="req-drawer-title" id="rq-title"></div>
+    <div class="req-drawer-meta" id="rq-meta"></div>
+    <div class="rq-status-row">
+      <span class="rq-status-label">ステータス変更:</span>
+      <select class="rq-status-select" id="rq-status-select" onchange="updateReqStatus(this.value)">
+        <option value="">---</option>
+        <option>未着手</option>
+        <option>進行中</option>
+        <option>差し戻し</option>
+        <option>確認待ち</option>
+        <option>保留</option>
+        <option>承認待ち</option>
+        <option>データ送付完了</option>
+        <option>完了</option>
+      </select>
+      <span class="rq-status-saved" id="rq-status-saved">更新しました</span>
+    </div>
+    <div id="rq-archive-btn-row"></div>
+  </div>
+  <div class="req-drawer-body">
+    <!-- 全情報 -->
+    <details class="req-info-section" open>
+      <summary>📋 シート情報 <button class="req-edit-toggle" id="rq-edit-btn" onclick="toggleReqEdit(event)">編集</button></summary>
+      <table class="req-info-table" id="rq-info-table"></table>
+    </details>
+    <!-- メモ -->
+    <div>
+      <div class="req-memo-label">📝 メモ（自分用・ローカル保存）</div>
+      <textarea class="req-memo-area" id="rq-memo" placeholder="メモを入力…" oninput="saveReqMemo()"></textarea>
+      <div class="req-memo-saved" id="rq-memo-saved">保存しました</div>
+    </div>
+    <!-- コメントログ -->
+    <details open>
+      <summary style="cursor:pointer;font-weight:600;font-size:0.72rem;color:var(--muted);margin-bottom:6px">💬 ステータスログ</summary>
+      <div class="req-chat" id="req-chat"></div>
+    </details>
+  </div>
+  <!-- コメント入力フォーム -->
+  <div class="req-chat-form">
+    <input class="req-chat-input" id="req-chat-input" type="text" placeholder="コメントを入力…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendComment();event.preventDefault()}">
+    <button class="req-chat-send" onclick="sendComment()">送信</button>
+  </div>
+  <!-- Slack送信フォーム -->
+  <div class="slack-form">
+    <div class="slack-row">
+      <span class="slack-label">チャンネル</span>
+      <select class="slack-select" id="slack-ch-select"><option value="">チャンネルを選択</option></select>
+      <button class="slack-manage-btn" onclick="openSlackCfg()">⚙ 設定</button>
+    </div>
+    <div class="slack-row">
+      <span class="slack-label">メンション</span>
+      <div class="slack-chips" id="slack-chips"></div>
+    </div>
+    <div class="slack-btn-row">
+      <button class="slack-send-btn" id="slack-send-btn" onclick="sendToSlack()">📨 Slackで送信</button>
+      <button class="slack-log-btn" onclick="saveSlackLog()">📝 ログに残す</button>
+    </div>
+  </div>
+</div>
+
+<!-- Slack設定モーダル -->
+<div class="slack-cfg-overlay" id="slack-cfg-overlay">
+  <div class="slack-cfg-modal">
+    <div class="slack-cfg-title">⚙ Slack設定</div>
+    <div class="slack-cfg-section">
+      <div class="slack-cfg-label">チャンネル & Webhook URL</div>
+      <div class="slack-cfg-note">Slack管理画面でIncoming Webhookを作成し、チャンネル名とURLを登録してください。</div>
+      <div class="slack-cfg-list" id="slack-cfg-channels"></div>
+      <div class="slack-cfg-add-row">
+        <input class="slack-cfg-input" id="slack-cfg-ch-name" placeholder="チャンネル名（例: 制作チーム）">
+        <input class="slack-cfg-input" id="slack-cfg-ch-url" placeholder="Webhook URL (https://hooks.slack.com/...)">
+        <button class="slack-cfg-add-btn" onclick="addSlackChannel()">追加</button>
+      </div>
+    </div>
+    <div class="slack-cfg-section">
+      <div class="slack-cfg-label">メンバー</div>
+      <div class="slack-cfg-list" id="slack-cfg-members"></div>
+      <div class="slack-cfg-add-row">
+        <input class="slack-cfg-input" id="slack-cfg-member-name" placeholder="表示名（例: 田中）">
+        <input class="slack-cfg-input" id="slack-cfg-member-id" placeholder="Slack UserID（例: U01234ABC）任意">
+        <button class="slack-cfg-add-btn" onclick="addSlackMember()">追加</button>
+      </div>
+    </div>
+    <button class="arc-btn arc-btn-ghost" style="width:100%" onclick="closeSlackCfg()">閉じる</button>
+  </div>
+</div>
 
 <footer>
   <p id="count"></p>
-  <p>image/projects/&lt;slug&gt;.png を置くと自動反映</p>
+  <p id="footer-hint" style="display:none"></p>
 </footer>
+
+<!-- 格納モーダル -->
+
+<!-- 新規依頼作成モーダル -->
+<div id="new-req-overlay">
+  <div id="new-req-modal">
+    <div class="nrm-title">＋ 新規依頼作成</div>
+    <div class="nrm-grid">
+      <div class="nrm-field">
+        <label>店舗 <span style="color:#e53935">*</span></label>
+        <input id="nrm-store" type="text" placeholder="例）本部">
+      </div>
+      <div class="nrm-field">
+        <label>制作物 <span style="color:#e53935">*</span></label>
+        <input id="nrm-title-input" type="text" placeholder="例）チラシ A4">
+      </div>
+      <div class="nrm-field nrm-full">
+        <label>依頼内容</label>
+        <textarea id="nrm-content" placeholder="具体的な依頼内容を入力…"></textarea>
+      </div>
+      <div class="nrm-field">
+        <label>依頼者</label>
+        <input id="nrm-requester" type="text" placeholder="">
+      </div>
+      <div class="nrm-field">
+        <label>製作者</label>
+        <select id="nrm-maker"><option value="">未定</option></select>
+      </div>
+      <div class="nrm-field">
+        <label>依頼日</label>
+        <input id="nrm-reqdate" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>納期</label>
+        <input id="nrm-deadline" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>初稿納品希望日</label>
+        <input id="nrm-firstdate" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>優先度</label>
+        <select id="nrm-priority">
+          <option value="通常">通常</option>
+          <option value="緊急">緊急</option>
+        </select>
+      </div>
+      <div class="nrm-field">
+        <label>サイズ</label>
+        <input id="nrm-size" type="text" placeholder="例）A4 / 1080×1080px">
+      </div>
+      <div class="nrm-field">
+        <label>納品時のFMT</label>
+        <input id="nrm-fmt" type="text" placeholder="例）PDF / AI">
+      </div>
+      <div class="nrm-field nrm-full">
+        <label>掲載したい情報・特記事項</label>
+        <textarea id="nrm-note" placeholder="掲載内容、注意事項など…"></textarea>
+      </div>
+    </div>
+    <div class="nrm-msg" id="nrm-msg"></div>
+    <div class="nrm-actions">
+      <button class="arc-btn arc-btn-ghost" onclick="closeNewReqModal()">キャンセル</button>
+      <button class="arc-btn arc-btn-primary" id="nrm-submit-btn" onclick="submitNewReq()">作成する</button>
+    </div>
+  </div>
+</div>
+
+<div class="arc-overlay" id="arc-overlay">
+  <div class="arc-modal" id="arc-modal">
+    <div class="arc-step-indicator" id="arc-dots"></div>
+
+    <!-- STEP 0: フォルダ自動準備 -->
+    <div class="arc-step active" id="arc-step-0">
+      <div class="arc-title">📁 格納フォルダの準備中...</div>
+      <div class="arc-sub">フォルダを確認・作成しています</div>
+      <div class="arc-folder-name" id="arc-folder-name"></div>
+      <div class="arc-folder-tree">
+        <span id="arc-folder-name-tree">フォルダ名</span>/<br>
+        ├ アウトプット/<br>
+        ├ 制作データ/<br>
+        │　├ 入稿前データ/<br>
+        │　└ 入稿データ/<br>
+        └ 参考資料/
+      </div>
+      <div class="arc-status" id="arc-status-0"></div>
+      <div class="arc-btn-row">
+        <button class="arc-btn arc-btn-ghost" onclick="closeArchiveModal()">キャンセル</button>
+        <button class="arc-btn arc-btn-danger" id="arc-create-btn" onclick="arcAutoSetupFolders()" style="display:none">↺ 再試行</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: アウトプット -->
+    <div class="arc-step" id="arc-step-1">
+      <div class="arc-title">① アウトプットデータ</div>
+      <div class="arc-sub">アウトプットフォルダに格納するデータをアップロードしてください</div>
+      <div class="arc-upload-zone" id="arc-zone-1" onclick="document.getElementById('arc-input-1').click()" ondragover="arcDrag(event,true,'arc-zone-1')" ondragleave="arcDrag(event,false,'arc-zone-1')" ondrop="arcDrop(event,1)">
+        <div class="arc-upload-icon">📄</div>
+        <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
+        <div class="arc-upload-sub">複数ファイル選択可</div>
+      </div>
+      <input type="file" id="arc-input-1" multiple style="display:none" onchange="arcFilePick(event,1)">
+      <div class="arc-file-list" id="arc-files-1"></div>
+      <div class="arc-progress"><div class="arc-progress-bar" id="arc-prog-1" style="width:0%"></div></div>
+      <div class="arc-status" id="arc-status-1"></div>
+      <div class="arc-btn-row">
+        <button class="arc-btn arc-btn-ghost" onclick="arcSkip(2)">スキップ</button>
+        <button class="arc-btn arc-btn-primary" onclick="arcUpload(1,2)">アップロードして次へ</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: 入稿前データ -->
+    <div class="arc-step" id="arc-step-2">
+      <div class="arc-title">② 入稿前データ</div>
+      <div class="arc-sub">入稿前データをアップロードしてください</div>
+      <div class="arc-upload-zone" id="arc-zone-2" onclick="document.getElementById('arc-input-2').click()" ondragover="arcDrag(event,true,'arc-zone-2')" ondragleave="arcDrag(event,false,'arc-zone-2')" ondrop="arcDrop(event,2)">
+        <div class="arc-upload-icon">📐</div>
+        <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
+        <div class="arc-upload-sub">複数ファイル選択可</div>
+      </div>
+      <input type="file" id="arc-input-2" multiple style="display:none" onchange="arcFilePick(event,2)">
+      <div class="arc-file-list" id="arc-files-2"></div>
+      <div class="arc-progress"><div class="arc-progress-bar" id="arc-prog-2" style="width:0%"></div></div>
+      <div class="arc-status" id="arc-status-2"></div>
+      <div class="arc-btn-row">
+        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(1)">← 戻る</button>
+        <button class="arc-btn arc-btn-ghost" onclick="arcSkip(3)">スキップ</button>
+        <button class="arc-btn arc-btn-primary" onclick="arcUpload(2,3)">アップロードして次へ</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 入稿データ -->
+    <div class="arc-step" id="arc-step-3">
+      <div class="arc-title">③ 入稿データ</div>
+      <div class="arc-sub">入稿データをアップロードしてください</div>
+      <div class="arc-upload-zone" id="arc-zone-3" onclick="document.getElementById('arc-input-3').click()" ondragover="arcDrag(event,true,'arc-zone-3')" ondragleave="arcDrag(event,false,'arc-zone-3')" ondrop="arcDrop(event,3)">
+        <div class="arc-upload-icon">📦</div>
+        <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
+        <div class="arc-upload-sub">複数ファイル選択可</div>
+      </div>
+      <input type="file" id="arc-input-3" multiple style="display:none" onchange="arcFilePick(event,3)">
+      <div class="arc-file-list" id="arc-files-3"></div>
+      <div class="arc-progress"><div class="arc-progress-bar" id="arc-prog-3" style="width:0%"></div></div>
+      <div class="arc-status" id="arc-status-3"></div>
+      <div class="arc-btn-row">
+        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(2)">← 戻る</button>
+        <button class="arc-btn arc-btn-ghost" onclick="arcSkip(4)">スキップ</button>
+        <button class="arc-btn arc-btn-primary" onclick="arcUpload(3,4)">アップロードして完了</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: 完了・メッセージ -->
+    <div class="arc-step" id="arc-step-4">
+      <div class="arc-title">✅ 格納完了！</div>
+      <div class="arc-sub">以下のメッセージをコピーして送付してください</div>
+      <div class="arc-message-box" id="arc-message"></div>
+      <button class="arc-copy-btn" id="arc-copy-btn" onclick="arcCopyMessage()">📋 メッセージをコピー</button>
+      <a id="arc-folder-link" href="#" target="_blank" style="display:block;margin-top:10px;text-align:center;padding:9px 0;background:#f0f5ff;border:1px solid #b3c8f0;border-radius:8px;color:#1a4fa8;font-size:0.85rem;font-weight:600;text-decoration:none;">📁 格納フォルダに移動する</a>
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(3)">← 戻る</button>
+        <button class="arc-btn arc-btn-ghost" style="flex:1" onclick="closeArchiveModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Detail Drawer -->
 <div class="drawer-bg" id="drawer-bg"></div>
@@ -590,6 +1516,7 @@
   </div>
   <div class="drawer-body">
     <img id="d-img" class="drawer-img" alt="" onerror="this.style.display='none'">
+    <iframe id="d-pdf-iframe" class="drawer-pdf-iframe" style="display:none" allowfullscreen></iframe>
     <div class="drawer-desc" id="d-desc"></div>
     <div class="drawer-tags" id="d-tags"></div>
 
@@ -807,7 +1734,7 @@ function workHtml(p) {
 }
 
 function render() {
-  const q = (document.getElementById('search').value||'').trim().toLowerCase();
+  const q = (document.getElementById('search')?.value||'').trim().toLowerCase();
   const list = PROJECTS.filter(p => {
     const okStatus = currentStatus === 'all' ||
       (currentStatus === 'rec' ? !!p.recommended : p.status === currentStatus);
@@ -856,15 +1783,7 @@ function filterByGenre(genre) {
   render();
 }
 
-document.getElementById('search').addEventListener('input', render);
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentStatus = btn.dataset.status;
-    render();
-  });
-});
+// (tools section removed)
 
 // ── API ───────────────────────────────────────────────────────────
 async function loadProjects() {
@@ -1199,7 +2118,7 @@ document.getElementById('btn-delete').addEventListener('click', async () => {
 document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-bg').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
-document.getElementById('add-btn').addEventListener('click', openAdd);
+document.getElementById('add-btn')?.addEventListener('click', openAdd);
 
 // ── SSE ──────────────────────────────────────────────────────────
 function connectSSE() {
@@ -1222,8 +2141,1519 @@ function connectSSE() {
   es.onerror = () => { live.classList.remove('on'); es.close(); setTimeout(connectSSE, 5000); };
 }
 
-loadProjects();
+// ============================================================
+//  GAS PDF Gallery
+// ============================================================
+
+// ★ GAS Web App の URL を設定してください（デプロイ後のexec URL）
+const GAS_API_URL  = 'https://script.google.com/macros/s/AKfycbxUCriKCKqi1WWbzdWS4ZXpq5TWGQOLPGQ0oURFyjIg-DnHrSNylrOn6PE3Aq92jbPBrA/exec';
+const GAS_CACHE_MS = 5 * 60 * 1000; // キャッシュ有効期間: 5分
+
+let gasItems     = [];  // 全PDFデータ
+let gasFetchedAt = 0;   // 最終取得時刻 (ms)
+let pdfCategory  = '';  // 選択中カテゴリ
+let pdfStore     = '';  // 選択中店舗名
+let pdfSearch    = '';  // 検索テキスト
+let currentMode  = 'pdf';
+
+// (switchMode removed — PDF only mode)
+
+// ── GASデータ取得（sessionStorageキャッシュ付き）──────────────────────
+async function loadGasData(forceRefresh = false) {
+  const CACHE_KEY    = 'gas_pdf_data';
+  const CACHE_AT_KEY = 'gas_pdf_fetched_at';
+
+  // インメモリキャッシュ
+  if (!forceRefresh && gasItems.length && Date.now() - gasFetchedAt < GAS_CACHE_MS) {
+    renderPdfGallery(); return;
+  }
+
+  // sessionStorage キャッシュ
+  if (!forceRefresh) {
+    try {
+      const cached   = sessionStorage.getItem(CACHE_KEY);
+      const cachedAt = Number(sessionStorage.getItem(CACHE_AT_KEY) || 0);
+      if (cached && Date.now() - cachedAt < GAS_CACHE_MS) {
+        gasItems     = JSON.parse(cached);
+        gasFetchedAt = cachedAt;
+        renderPdfGallery(); return;
+      }
+    } catch { /* ignore */ }
+  }
+
+  const masonry = document.getElementById('pdf-masonry');
+
+  if (!GAS_API_URL) {
+    masonry.innerHTML = `<div class="pdf-error">
+      <strong>GAS_API_URL が未設定です。</strong><br>
+      Code.gs をスプレッドシートに設置してデプロイし、<br>
+      aicare-portfolio.html 内の <code>GAS_API_URL</code> に URL を設定してください。
+    </div>`;
+    document.getElementById('count').textContent = '— works';
+    return;
+  }
+
+  masonry.innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+
+  try {
+    const res  = await fetch(`${GAS_API_URL}?status=active`, { cache: 'no-store' });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'APIエラー');
+
+    gasItems     = (json.data || []).filter(d => d.sync_status === 'ok');
+    gasFetchedAt = Date.now();
+
+    // sessionStorage に保存
+    try {
+      sessionStorage.setItem(CACHE_KEY,    JSON.stringify(gasItems));
+      sessionStorage.setItem(CACHE_AT_KEY, String(gasFetchedAt));
+    } catch { /* ignore */ }
+
+    renderPdfGallery();
+
+  } catch (e) {
+    masonry.innerHTML = `<div class="pdf-error">
+      <strong>取得エラー:</strong> ${esc(e.message)}<br>
+      GAS_API_URL とデプロイ設定を確認してください。<br>
+      <button class="pdf-reload-btn" onclick="loadGasData(true)">再読み込み</button>
+    </div>`;
+    document.getElementById('count').textContent = '— works';
+  }
+}
+
+
+
+// ── PDFギャラリー描画 ─────────────────────────────────────────────────
+function renderPdfGallery() {
+  renderPdfFilters();
+
+  const items   = getFilteredPdfItems();
+  const masonry = document.getElementById('pdf-masonry');
+
+  document.getElementById('count').textContent = `${items.length} works`;
+
+  if (!items.length) {
+    masonry.innerHTML = '<div class="empty">条件に一致する制作物が見つかりません</div>';
+    return;
+  }
+
+  // 更新日時が新しい順にソート
+  const sorted = [...items].sort((a, b) =>
+    new Date(b.pdf_updated_at || 0) - new Date(a.pdf_updated_at || 0)
+  );
+
+  masonry.innerHTML = sorted.map(pdfCardHtml).join('');
+}
+
+// pdf_url から Drive ファイルIDを抽出してユニークキーとして使う
+function pdfItemKey(d) {
+  if (d.pdf_url) {
+    const m = d.pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+  }
+  return d.item_id || '';
+}
+
+// ── PDFカードHTML生成 ──────────────────────────────────────────────────
+function pdfCardHtml(d) {
+  const pdfUrl  = esc(d.pdf_url     || '');
+  const title   = esc(d.title || d.matched_folder_name || d.store_name || '');
+  const store   = esc(d.store_name  || '');
+  const cat     = esc(d.category    || '');
+  const itemId  = esc(pdfItemKey(d));
+  const updDate = d.pdf_updated_at
+    ? new Date(d.pdf_updated_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric' })
+    : '';
+
+  // Google Drive サムネイル（PDFの1ページ目）
+  const thumbUrl  = driveThumbUrl(d.pdf_url || '');
+  const thumbHtml = thumbUrl
+    ? `<img src="${esc(thumbUrl)}" alt="${title}" loading="lazy"
+           onerror="this.outerHTML='<div class=pdf-thumb-ph>📄<span>PDF</span></div>'">`
+    : '<div class="pdf-thumb-ph">📄<span>PDF</span></div>';
+
+  const pdfBtnHtml = pdfUrl
+    ? `<a class="ov-btn primary" href="${pdfUrl}" target="_blank" rel="noopener"
+          onclick="event.stopPropagation()">PDF を開く</a>`
+    : '';
+
+  const genre    = pdfGenre(d);
+  const isOverridden = !!genreOverrides[itemId];
+  const catTag   = `<button class="pdf-card-tag cat" data-genre="${esc(genre)}" onclick="setPdfCategory('${esc(genre)}');event.stopPropagation()">${esc(genre)}</button><button class="genre-edit-btn" title="ジャンルを変更" onclick="openGenrePicker('${itemId}',this,event)">${isOverridden ? '✏️' : '✎'}</button>`;
+  const storeTag = store ? `<button class="pdf-card-tag store" onclick="setPdfStore('${store}');event.stopPropagation()">${store}</button>` : '';
+
+  return `
+<div class="pdf-work" data-id="${itemId}" data-category="${cat}" data-store="${store}">
+  <div class="pdf-thumb" onclick="openPdfDetail('${itemId}')">
+    ${thumbHtml}
+    <div class="pdf-thumb-overlay">
+      ${pdfBtnHtml}
+      <button class="ov-detail-btn" onclick="openPdfDetail('${itemId}');event.stopPropagation()">詳細 →</button>
+    </div>
+  </div>
+  <div class="pdf-card-caption">
+    <div class="pdf-card-title" onclick="openPdfDetail('${itemId}')"><span class="row-num">${d._rowNum ?? ''}</span>${title}</div>
+    <div class="pdf-card-meta">${store}${updDate ? ' · ' + updDate : ''}</div>
+    <div class="pdf-card-tags">${catTag}${storeTag}</div>
+  </div>
+</div>`;
+}
+
+// Google Drive URL からファイルIDを抽出してサムネイルURLを生成
+function driveThumbUrl(url) {
+  if (!url) return null;
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600` : null;
+}
+
+// ── フィルターバー描画 ────────────────────────────────────────────────
+function renderPdfFilters() {
+  const withPdf = gasItems.filter(d => d.pdf_url);
+  const stores  = [...new Set(withPdf.map(d => d.store_name).filter(Boolean))].sort();
+  const bar     = document.getElementById('pdf-filter-bar');
+
+  const genreBtns = [
+    `<button class="pdf-filter-btn${!pdfCategory ? ' active' : ''}" onclick="setPdfCategory('')">すべて</button>`,
+    ...GENRE_MAP.map(g => {
+      const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${g.color};margin-right:4px;vertical-align:middle"></span>`;
+      const active = pdfCategory === g.label ? ' active' : '';
+      return `<button class="pdf-filter-btn${active}" style="${active ? `background:${g.color};border-color:${g.color};` : `color:${g.color};border-color:${g.color};`}" onclick="setPdfCategory('${esc(g.label)}')">${dot}${esc(g.label)}</button>`;
+    }),
+    `<button class="pdf-filter-btn${pdfCategory === 'その他' ? ' active' : ''}" onclick="setPdfCategory('その他')">その他</button>`,
+  ].join('');
+
+  const storeBtns = [
+    `<button class="pdf-filter-btn${!pdfStore ? ' active' : ''}" onclick="setPdfStore('')">すべての店舗</button>`,
+    ...stores.map(s =>
+      `<button class="pdf-filter-btn${pdfStore === s ? ' active' : ''}" onclick="setPdfStore('${esc(s)}')">${esc(s)}</button>`
+    ),
+  ].join('');
+
+  bar.innerHTML = `
+    <div class="pdf-filter-row"><span class="pdf-filter-label">ジャンル</span>${genreBtns}</div>
+    <div class="pdf-filter-row"><span class="pdf-filter-label">店舗</span>${storeBtns}</div>`;
+
+  // sticky nav にもジャンルボタンを同期
+  document.getElementById('sticky-filter-btns').innerHTML = genreBtns;
+
+  // 右上：総数・ジャンル別件数
+  const total = withPdf.length;
+  const statsEl = document.getElementById('nav-stats');
+  if (statsEl) {
+    const genreCounts = GENRE_MAP.map(g => {
+      const cnt = withPdf.filter(d => pdfGenre(d) === g.label).length;
+      return cnt ? `<span class="nav-stat-item" style="color:${g.color}"><strong>${cnt}</strong> ${g.label}</span>` : '';
+    }).filter(Boolean).join('');
+    statsEl.innerHTML = `<span class="nav-stat-item"><strong>${total}</strong> 件</span>${genreCounts}`;
+  }
+}
+
+function setPdfCategory(cat) {
+  pdfCategory = pdfCategory === cat ? '' : cat;
+  renderPdfGallery();
+  if (!cat) { pdfStore = ''; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+}
+function setPdfStore(store) {
+  pdfStore = pdfStore === store ? '' : store;
+  renderPdfGallery();
+  if (!store) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Sticky Nav scroll ──────────────────────────────────────────────────
+(function() {
+  const THRESHOLD = 120;
+  window.addEventListener('scroll', () => {
+    const show = window.scrollY > THRESHOLD;
+    document.getElementById('sticky-nav').classList.toggle('show', show);
+  }, { passive: true });
+})();
+
+// ── タブ切り替え ──────────────────────────────────────────────────────
+let currentTab = 'pdf';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('pdf-section').style.display   = tab === 'pdf'   ? '' : 'none';
+  document.getElementById('req-section').style.display   = tab === 'req'   ? '' : 'none';
+  document.getElementById('maker-section').style.display = tab === 'maker' ? '' : 'none';
+  document.getElementById('nav-pdf').classList.toggle('active',   tab === 'pdf');
+  document.getElementById('nav-req').classList.toggle('active',   tab === 'req');
+  document.getElementById('nav-maker').classList.toggle('active', tab === 'maker');
+  document.body.classList.toggle('tab-pdf',   tab === 'pdf');
+  document.body.classList.toggle('tab-req',   tab === 'req');
+  if (tab === 'req')   loadReqData();
+  if (tab === 'maker') loadMakerData();
+}
+
+// ── 依頼管理 ─────────────────────────────────────────────────────────
+let reqItems = [], reqLogs = {}, currentReqId = null;
+let reqSortMode      = '';    // 'asc' | 'desc' | ''
+let reqStatusFilter  = '';    // ステータス文字列 or 
+let reqMakerFilter   = '';    // 製作者フィルター
+
+// 日付を YYYY.MM.DD 形式にフォーマット
+const DATE_COLS = new Set(['依頼日', '納期', '初稿納品希望日', '実質完了日']);
+function fmtDate(v) {
+  if (!v) return v;
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return v;
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
+}
+
+const REQ_STATUS_LIST = ['未着手','進行中','差し戻し','確認待ち','保留','承認待ち','データ送付完了','完了'];
+
+// 列番号(1始まり) → タイトルのマッピング
+const COL_TITLES = [
+  '店舗', '制作物', '目的 / 掲出期間', '掲載場所', '依頼内容',
+  '依頼者', '製作者', '依頼日', '納期', '初稿納品希望日',
+  '優先度（緊急／通常）', 'ステータス', '実質完了日', 'サイズ',
+  '納品時のFMT', '過去の参考となるデザイン物', '参考資料', '店舗情報',
+  '掲載したい情報 / 特記事項', '制作完了データ(googleドライブURL)',
+];
+
+async function loadReqData() {
+  if (reqItems.length) { renderReqFilterBar(); renderReqCards(); return; }
+  document.getElementById('req-cards').innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+  try {
+    const res = await fetch(GAS_API_URL + '?mode=requests', { cache: 'no-store' });
+    reqItems = await res.json();
+    renderReqFilterBar();
+    renderReqCards();
+  } catch(e) {
+    document.getElementById('req-cards').innerHTML = '<div class="pdf-loading">読み込みエラー</div>';
+  }
+}
+
+function renderReqFilterBar() {
+  const sortBtns = [
+    `<button class="pdf-filter-btn${reqSortMode==='' ? ' active' : ''}" onclick="setReqSort('')">デフォルト</button>`,
+    `<button class="pdf-filter-btn${reqSortMode==='asc' ? ' active' : ''}" onclick="setReqSort('asc')">📅 納期が早い順</button>`,
+    `<button class="pdf-filter-btn${reqSortMode==='desc' ? ' active' : ''}" onclick="setReqSort('desc')">📅 納期が遅い順</button>`,
+  ].join('');
+  const statusBtns = [
+    `<button class="pdf-filter-btn${!reqStatusFilter ? ' active' : ''}" onclick="setReqStatus('')">すべて</button>`,
+    ...REQ_STATUS_LIST.map(s =>
+      `<button class="pdf-filter-btn${reqStatusFilter===s ? ' active' : ''}" onclick="setReqStatus('${esc(s)}')">${esc(s)}</button>`
+    ),
+  ].join('');
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const makerBtns = makers.length ? [
+    `<button class="pdf-filter-btn${!reqMakerFilter ? ' active' : ''}" onclick="setMakerFilter('')">すべて</button>`,
+    ...makers.map(m => `<button class="pdf-filter-btn${reqMakerFilter===m ? ' active' : ''}" onclick="setMakerFilter('${esc(m)}')">${esc(m)}</button>`),
+  ].join('') : '';
+  const makerRow = makerBtns ? `<div class="pdf-filter-row"><span class="pdf-filter-label">製作者</span>${makerBtns}</div>` : '';
+  document.getElementById('req-filter-bar').innerHTML = `
+    <div class="pdf-filter-row"><span class="pdf-filter-label">並び替え</span>${sortBtns}</div>
+    <div class="pdf-filter-row"><span class="pdf-filter-label">ステータス</span>${statusBtns}</div>
+    ${makerRow}`;
+}
+
+function setReqSort(mode)     { reqSortMode = reqSortMode === mode && mode !== '' ? '' : mode; renderReqFilterBar(); renderReqCards(); }
+function setReqStatus(status) { reqStatusFilter = reqStatusFilter === status ? '' : status; renderReqFilterBar(); renderReqCards(); }
+function setMakerFilter(name) { reqMakerFilter = reqMakerFilter === name ? '' : name; renderReqFilterBar(); renderReqCards(); }
+
+function renderReqCards() {
+  const q = (document.getElementById('req-search')?.value || '').toLowerCase();
+  const totalAll = reqItems.length;
+
+  let items = reqItems.filter(d => {
+    const colL = String(d.col_l || '');
+    // 完了はステータスフィルターで '完了' を選んだときのみ表示
+    if (colL === '完了' && reqStatusFilter !== '完了') return false;
+    if (reqStatusFilter && colL !== reqStatusFilter) return false;
+    if (reqMakerFilter && String(d['製作者'] || '').trim() !== reqMakerFilter) return false;
+    if (!q) return true;
+    return [d.title, d.store_name, d['製作者']].filter(Boolean).some(s => s.toLowerCase().includes(q));
+  });
+
+  if (reqSortMode === 'asc' || reqSortMode === 'desc') {
+    items = [...items].sort((a, b) => {
+      const da = new Date(a['納期'] || '9999');
+      const db = new Date(b['納期'] || '9999');
+      return reqSortMode === 'asc' ? da - db : db - da;
+    });
+  }
+
+  document.getElementById('count').textContent = `${items.length} / ${totalAll} 件`;
+  if (!items.length) {
+    document.getElementById('req-cards').innerHTML = '<div class="pdf-loading">該当なし</div>';
+    return;
+  }
+  document.getElementById('req-cards').innerHTML = items.map(reqCardHtml).join('');
+}
+
+function reqCardHtml(d) {
+  const title  = esc(d.title || d.store_name || '');
+  const store  = esc(d.store_name || '');
+  const colK   = String(d.col_k || '').trim();
+  const colL   = String(d.col_l || '').trim();
+  const maker  = String(d['製作者'] || '').trim();
+  const tagK   = colK ? `<span class="req-tag">${esc(colK)}</span>` : '';
+  const tagL   = colL ? `<span class="req-tag" data-status="${esc(colL)}">${esc(colL)}</span>` : '';
+  const tagM   = (maker && !MAKER_EXCLUDE.has(maker)) ? `<span class="req-tag-maker${reqMakerFilter===maker ? ' active' : ''}" onclick="setMakerFilter('${esc(maker)}');event.stopPropagation()">${esc(maker)}</span>` : '';
+  const _rawDriveUrl = String(d['制作完了データ(googleドライブURL)'] || d.drive_url || '').trim();
+  const driveUrl = _rawDriveUrl.startsWith('http')
+    ? _rawDriveUrl
+    : (_rawDriveUrl ? `https://drive.google.com/drive/folders/${_rawDriveUrl}` : '');
+  const tagArchived = driveUrl ? `<span class="req-tag-archived">📦 格納完了済み</span>` : '';
+  const folderLink  = driveUrl ? `<a class="req-card-folder-link" href="${driveUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📁 格納フォルダに移動する</a>` : '';
+  // 納期（COL_TITLES[8] = '納期'）
+  const deadline = fmtDate(String(d['納期'] || '').trim());
+  const deadlineEl = deadline ? `<div class="req-card-deadline">📅 納期: ${esc(deadline)}</div>` : '';
+  const log    = reqLogs[d.row_id];
+  const lastMsg = log && log.length ? esc(log[log.length-1].comment) : '';
+  const lastComment = lastMsg ? `<div class="req-card-comment">💬 ${lastMsg}</div>` : '';
+  // NEW バッジ: 依頼日から5日以内
+  const reqDateRaw = String(d['依頼日'] || '').trim();
+  let newBadge = '';
+  if (reqDateRaw) {
+    const reqMs = new Date(reqDateRaw.replace(/\//g, '-')).getTime();
+    if (!isNaN(reqMs) && (Date.now() - reqMs) <= 5 * 86400000) {
+      newBadge = '<span class="req-new-badge">NEW</span>';
+    }
+  }
+  return `<div class="req-card" data-status="${esc(colL)}" onclick="openReqDrawer('${esc(d.row_id)}')">
+    ${newBadge}
+    <div class="req-card-title">${title}</div>
+    <div class="req-card-store"><span class="req-row-id">#${esc(d.row_id)}</span>${store}</div>
+    ${deadlineEl}
+    <div class="req-card-tags">${tagK}${tagL}${tagM}${tagArchived}</div>
+    ${folderLink}
+    ${lastComment}
+  </div>`;
+}
+
+// 除外するキー（内部用・表示不要）
+const REQ_SKIP_KEYS = new Set(['row_id']);
+
+async function updateReqStatus(status) {
+  if (!currentReqId) return;
+  try {
+    await fetch(GAS_API_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateStatus', rowId: currentReqId, status }),
+    });
+    // ローカルキャッシュ更新
+    const item = reqItems.find(d => d.row_id === currentReqId);
+    if (item) { item.col_l = status; item.status = status; }
+    renderReqCards();
+    // ヘッダー背景色を即時切り替え
+    const header = document.getElementById('rq-header');
+    const STATUS_KEYS = ['未着手','進行中','保留','データ送付完了','完了','差し戻し','承認待ち','確認待ち'];
+    STATUS_KEYS.forEach(s => header.classList.remove(`rq-status--${s}`));
+    if (status) header.classList.add(`rq-status--${status}`);
+    // バッジ更新
+    const badgeL = document.querySelector('#rq-badges .rq-badge:last-child');
+    if (badgeL) { badgeL.className = `rq-badge rq-badge--${status}`; badgeL.textContent = status; }
+    updateDrawerArchiveBtn(status);
+    const saved = document.getElementById('rq-status-saved');
+    saved.classList.add('show');
+    setTimeout(() => saved.classList.remove('show'), 2000);
+  } catch(e) {
+    alert('ステータス更新エラー: ' + e.message);
+  }
+}
+
+function updateDrawerArchiveBtn(colL) {
+  const row = document.getElementById('rq-archive-btn-row');
+  if (!row) return;
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  const rawUrl = item ? String(item['制作完了データ(googleドライブURL)'] || item.drive_url || '').trim() : '';
+  const folderUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://drive.google.com/drive/folders/${rawUrl}` : '');
+  let html = '';
+  if (folderUrl) {
+    html += `<a class="archive-btn" href="${folderUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block;text-align:center;margin-bottom:6px">📁 格納フォルダに移動する</a>`;
+  }
+  if (colL === '完了') {
+    html += `<button class="archive-btn" onclick="openArchiveModal('${currentReqId}',event)">📦 ${folderUrl ? '再' : ''}格納する</button>`;
+  }
+  row.innerHTML = html;
+}
+
+async function openReqDrawer(rowId) {
+  currentReqId = rowId;
+  const item = reqItems.find(d => d.row_id === rowId);
+  if (!item) return;
+
+  document.getElementById('rq-title').textContent = item.title || item.store_name || '';
+  document.getElementById('rq-meta').textContent  = ['#' + rowId, item.store_name, item.category].filter(Boolean).join(' · ');
+
+  // L列ステータスによるヘッダー背景色 + バッジ
+  const colK = String(item.col_k || '').trim();
+  const colL = String(item.col_l || item.status || '').trim();
+  const header = document.getElementById('rq-header');
+  // 全ステータスクラスを除去して付け直す
+  const STATUS_KEYS = ['未着手','進行中','保留','データ送付完了','完了','差し戻し','承認待ち','確認待ち'];
+  STATUS_KEYS.forEach(s => header.classList.remove(`rq-status--${s}`));
+  if (colL) header.classList.add(`rq-status--${colL}`);
+
+  // バッジ表示
+  const badgesEl = document.getElementById('rq-badges');
+  const badgeK = colK ? `<span class="rq-badge rq-badge-k">${esc(colK)}</span>` : '';
+  const badgeL = colL ? `<span class="rq-badge rq-badge--${esc(colL)}">${esc(colL)}</span>` : '';
+  badgesEl.innerHTML = badgeK + badgeL;
+
+  // ステータスセレクト復元（L列の値）
+  const sel = document.getElementById('rq-status-select');
+  const currentStatus = colL;
+  let found = Array.from(sel.options).some(o => o.value === currentStatus);
+  if (!found && currentStatus) {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = currentStatus;
+    sel.appendChild(opt);
+  }
+  sel.value = currentStatus;
+  document.getElementById('rq-status-saved').classList.remove('show');
+  updateDrawerArchiveBtn(colL);
+
+  // 全情報テーブル（A〜T列を全20列確実に表示）
+  renderReqInfoView();
+
+  // メモ復元
+  const memo = localStorage.getItem(`reqMemo_${rowId}`) || '';
+  document.getElementById('rq-memo').value = memo;
+  document.getElementById('rq-memo-saved').classList.remove('show');
+
+  document.getElementById('req-drawer-bg').style.display = 'block';
+  document.getElementById('req-drawer').classList.add('open');
+  document.getElementById('req-chat').innerHTML = '<div class="pdf-loading" style="padding:10px;font-size:0.75rem">読み込み中...</div>';
+  slackSelectedMembers.clear();
+  renderSlackForm();
+
+  try {
+    const res = await fetch(`${GAS_API_URL}?mode=log&id=${encodeURIComponent(rowId)}`, { cache: 'no-store' });
+    reqLogs[rowId] = await res.json();
+    renderChat(rowId);
+  } catch(e) {
+    document.getElementById('req-chat').innerHTML = '<div style="font-size:0.75rem;color:var(--muted)">読み込みエラー</div>';
+  }
+}
+
+let memoTimer = null;
+function saveReqMemo() {
+  if (!currentReqId) return;
+  localStorage.setItem(`reqMemo_${currentReqId}`, document.getElementById('rq-memo').value);
+  const el = document.getElementById('rq-memo-saved');
+  el.classList.add('show');
+  clearTimeout(memoTimer);
+  memoTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function renderChat(rowId) {
+  const logs = reqLogs[rowId] || [];
+  const chat = document.getElementById('req-chat');
+  if (!logs.length) {
+    chat.innerHTML = '<div class="pdf-loading" style="padding:20px;font-size:0.78rem">コメントはまだありません</div>';
+    return;
+  }
+  chat.innerHTML = logs.map(l => {
+    const time = l.timestamp ? new Date(l.timestamp).toLocaleString('ja-JP', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+    const isSlack = l.author === 'Slack';
+    const author = l.author ? `<strong>${esc(l.author)}</strong> ` : '';
+    return `<div class="req-chat-msg">
+      <div class="req-chat-bubble${isSlack ? ' slack-bubble' : ''}">${author}${esc(l.comment)}</div>
+      <div class="req-chat-time">${time}</div>
+    </div>`;
+  }).join('');
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendComment() {
+  const input = document.getElementById('req-chat-input');
+  const btn = document.querySelector('.req-chat-send');
+  const comment = input.value.trim();
+  if (!comment || !currentReqId) return;
+  if (btn) { btn.disabled = true; btn.textContent = '送信中'; }
+  try {
+    await fetch(GAS_API_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment, author: '' }),
+    });
+    input.value = '';
+    if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
+    reqLogs[currentReqId].push({ row_id: currentReqId, comment, author: '', timestamp: new Date().toISOString() });
+    renderChat(currentReqId);
+    renderReqCards();
+  } catch(e) {
+    alert('送信エラー: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '送信'; }
+  }
+}
+
+// ── Slack送信 ────────────────────────────────────────────────────────────
+function getSlackChannels() { try { return JSON.parse(localStorage.getItem('slackChannels') || '[]'); } catch(e){ return []; } }
+function getSlackMembers()  { try { return JSON.parse(localStorage.getItem('slackMembers')  || '[]'); } catch(e){ return []; } }
+function saveSlackChannels(a) { localStorage.setItem('slackChannels', JSON.stringify(a)); }
+function saveSlackMembers(a)  { localStorage.setItem('slackMembers',  JSON.stringify(a)); }
+
+let slackSelectedMembers = new Set();
+
+function renderSlackForm() {
+  const channels = getSlackChannels();
+  const sel = document.getElementById('slack-ch-select');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">チャンネルを選択</option>' +
+    channels.map(c => `<option value="${esc(c.url)}"${c.url===cur?' selected':''}>${esc(c.name)}</option>`).join('');
+
+  const members = getSlackMembers();
+  document.getElementById('slack-chips').innerHTML = members.length
+    ? members.map(m => `<span class="slack-chip${slackSelectedMembers.has(m.name)?' selected':''}" onclick="toggleSlackMember('${esc(m.name)}')">${esc(m.name)}</span>`).join('')
+    : '<span style="font-size:0.7rem;color:var(--muted)">設定からメンバーを追加</span>';
+}
+
+function toggleSlackMember(name) {
+  if (slackSelectedMembers.has(name)) slackSelectedMembers.delete(name);
+  else slackSelectedMembers.add(name);
+  renderSlackForm();
+}
+
+function buildSlackText(commentText) {
+  const members = getSlackMembers();
+  const mentions = [...slackSelectedMembers].map(name => {
+    const m = members.find(x => x.name === name);
+    return m && m.uid ? `<@${m.uid}>` : `@${name}`;
+  }).join(' ');
+  return [mentions, commentText].filter(Boolean).join('\n');
+}
+
+async function sendToSlack() {
+  if (!currentReqId) return;
+  const webhookUrl = document.getElementById('slack-ch-select').value;
+  const commentText = document.getElementById('req-chat-input').value.trim();
+  const text = buildSlackText(commentText);
+  if (!webhookUrl) { alert('チャンネルを選択してください'); return; }
+  if (!text) { alert('コメントを入力するかメンションを選択してください'); return; }
+
+  const btn = document.getElementById('slack-send-btn');
+  btn.textContent = '送信中...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/slack-send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhookUrl, text }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || `status ${data.status}`);
+
+    // ログにも保存
+    const chName = document.getElementById('slack-ch-select').selectedOptions[0]?.text || '';
+    const logText = `[Slack→${chName}] ${text}`;
+    await _saveCommentLog(logText, 'Slack');
+    btn.textContent = '✅ 送信しました！';
+    document.getElementById('req-chat-input').value = '';
+    slackSelectedMembers.clear();
+    renderSlackForm();
+  } catch(e) {
+    alert('Slack送信エラー: ' + e.message);
+    btn.textContent = '📨 Slackで送信';
+  } finally {
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = '📨 Slackで送信'; }, 2500);
+  }
+}
+
+async function saveSlackLog() {
+  if (!currentReqId) return;
+  const commentText = document.getElementById('req-chat-input').value.trim();
+  const chName = document.getElementById('slack-ch-select').selectedOptions[0]?.text || '';
+  const text = buildSlackText(commentText);
+  if (!text) { alert('コメントを入力するかメンションを選択してください'); return; }
+  const logText = chName ? `[Slack→${chName}] ${text}` : `[Slack] ${text}`;
+  await _saveCommentLog(logText, 'Slack');
+  document.getElementById('req-chat-input').value = '';
+  slackSelectedMembers.clear();
+  renderSlackForm();
+}
+
+async function _saveCommentLog(logText, author) {
+  await fetch(GAS_API_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment: logText, author }),
+  });
+  if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
+  reqLogs[currentReqId].push({ row_id: currentReqId, comment: logText, author, timestamp: new Date().toISOString() });
+  renderChat(currentReqId);
+  renderReqCards();
+}
+
+// Slack設定モーダル
+function openSlackCfg()  { renderSlackCfg(); document.getElementById('slack-cfg-overlay').classList.add('show'); }
+function closeSlackCfg() { document.getElementById('slack-cfg-overlay').classList.remove('show'); renderSlackForm(); }
+
+function renderSlackCfg() {
+  const channels = getSlackChannels();
+  document.getElementById('slack-cfg-channels').innerHTML = channels.length
+    ? channels.map((c, i) => `<div class="slack-cfg-chip"><span class="slack-cfg-chip-name">${esc(c.name)}</span><span class="slack-cfg-chip-url">${esc(c.url)}</span><button class="slack-cfg-del" onclick="deleteSlackChannel(${i})">×</button></div>`).join('')
+    : '<span style="font-size:0.72rem;color:var(--muted)">なし</span>';
+  const members = getSlackMembers();
+  document.getElementById('slack-cfg-members').innerHTML = members.length
+    ? members.map((m, i) => `<div class="slack-cfg-chip"><span class="slack-cfg-chip-name">${esc(m.name)}</span><span class="slack-cfg-chip-url">${m.uid ? esc(m.uid) : '（UserID未設定）'}</span><button class="slack-cfg-del" onclick="deleteSlackMember(${i})">×</button></div>`).join('')
+    : '<span style="font-size:0.72rem;color:var(--muted)">なし</span>';
+}
+
+function addSlackChannel() {
+  const name = document.getElementById('slack-cfg-ch-name').value.trim();
+  const url  = document.getElementById('slack-cfg-ch-url').value.trim();
+  if (!name || !url) return;
+  const a = getSlackChannels();
+  a.push({ name, url });
+  saveSlackChannels(a);
+  document.getElementById('slack-cfg-ch-name').value = '';
+  document.getElementById('slack-cfg-ch-url').value  = '';
+  renderSlackCfg();
+}
+
+function addSlackMember() {
+  const name = document.getElementById('slack-cfg-member-name').value.trim();
+  const uid  = document.getElementById('slack-cfg-member-id').value.trim();
+  if (!name) return;
+  const a = getSlackMembers();
+  if (!a.find(m => m.name === name)) { a.push({ name, uid }); saveSlackMembers(a); }
+  document.getElementById('slack-cfg-member-name').value = '';
+  document.getElementById('slack-cfg-member-id').value   = '';
+  renderSlackCfg();
+}
+
+function deleteSlackChannel(idx) { const a = getSlackChannels(); a.splice(idx,1); saveSlackChannels(a); renderSlackCfg(); }
+function deleteSlackMember(idx)  { const a = getSlackMembers();  a.splice(idx,1); saveSlackMembers(a);  slackSelectedMembers.clear(); renderSlackCfg(); }
+
+function closeReqDrawer() {
+  document.getElementById('req-drawer-bg').style.display = 'none';
+  document.getElementById('req-drawer').classList.remove('open');
+  currentReqId = null;
+}
+function setPdfSearch(q)       { pdfSearch   = q;     renderPdfGallery(); }
+
+// ── PDF詳細ドロワー ───────────────────────────────────────────────────
+// 既存のドロワーUIを流用。将来は /detail?id=xxx に拡張可能。
+function openPdfDetail(itemId) {
+  const item = gasItems.find(d => pdfItemKey(d) === itemId);
+  if (!item) return;
+
+  // URL更新（ブックマーク・共有可能）
+  history.pushState({ pdfId: itemId }, '', `?mode=pdf&id=${encodeURIComponent(itemId)}`);
+
+  document.getElementById('d-name').textContent = item.title || item.matched_folder_name || item.store_name || '';
+
+  const sl = document.getElementById('d-status');
+  sl.textContent = item.category || '';
+  sl.className   = 'drawer-status-label active';
+
+  document.getElementById('d-desc').textContent =
+    [item.store_name, item.status].filter(Boolean).join(' · ');
+
+  // PDF埋め込みビューア（全ページスクロール）
+  const dImg    = document.getElementById('d-img');
+  const dIframe = document.getElementById('d-pdf-iframe');
+  dImg.style.display = 'none';
+  if (item.pdf_url) {
+    const fileId = (item.pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/) || [])[1];
+    if (fileId) {
+      dIframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+      dIframe.style.display = 'block';
+    } else {
+      dIframe.style.display = 'none';
+    }
+  } else {
+    dIframe.style.display = 'none';
+  }
+
+  // タグ
+  document.getElementById('d-tags').innerHTML = [
+    item.category  ? `<span class="drawer-tag">${esc(item.category)}</span>`   : '',
+    item.store_name ? `<span class="drawer-tag">${esc(item.store_name)}</span>` : '',
+    item.pdf_updated_at
+      ? `<span class="drawer-tag">更新: ${new Date(item.pdf_updated_at).toLocaleDateString('ja-JP')}</span>` : '',
+  ].join('');
+
+  // PDF リンク
+  document.getElementById('d-links').innerHTML = item.pdf_url
+    ? `<a class="drawer-link primary" href="${esc(item.pdf_url)}" target="_blank" rel="noopener">PDF を開く</a>`
+    : '<span style="color:var(--muted);font-size:.8rem">PDFなし</span>';
+
+  document.getElementById('d-resources').innerHTML = '';
+  document.getElementById('r-label').value = '';
+  document.getElementById('r-url').value   = '';
+  document.getElementById('sheets-preview').style.display  = 'none';
+  document.getElementById('sheets-import-url').value       = '';
+  document.getElementById('d-edit-btn').style.display      = 'none'; // PDF詳細では編集不要
+
+  document.getElementById('drawer-bg').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+// ドロワーを閉じるときのPDFモード後処理
+const _origCloseDrawer = closeDrawer;
+// eslint-disable-next-line no-func-assign
+closeDrawer = function() {
+  _origCloseDrawer();
+  document.getElementById('d-edit-btn').style.display = '';
+  // iframeをリセット（動画/PDF再生を停止）
+  const iframe = document.getElementById('d-pdf-iframe');
+  iframe.src = '';
+  iframe.style.display = 'none';
+  history.replaceState(null, '', location.pathname);
+};
+
+
+
+
+// ── シート情報 表示 / 編集モード ────────────────────────────────
+let reqEditMode = false;
+
+function renderReqInfoView() {
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (!item) return;
+  const table = document.getElementById('rq-info-table');
+  table.classList.remove('edit-mode');
+  const rows = COL_TITLES.map((label) => {
+    const raw = String(item[label] !== undefined ? item[label] : '').trim();
+    if (!raw) return '';
+    const vs = DATE_COLS.has(label) ? fmtDate(raw) : raw;
+    const isDeadline = label === '納期';
+    const val = raw.startsWith('http')
+      ? `<a href="${esc(raw)}" target="_blank" rel="noopener" style="color:#1a5fbe;word-break:break-all">${esc(raw)}</a>`
+      : esc(vs);
+    const bold = isDeadline ? ' style="font-weight:700;color:#111"' : '';
+    return `<tr><td${bold}>${esc(label)}</td><td${bold}>${val}</td></tr>`;
+  }).join('');
+  table.innerHTML = rows || '<tr><td colspan="2" style="color:var(--muted);text-align:center">データなし</td></tr>';
+}
+
+function toggleReqEdit(event) {
+  event.preventDefault(); event.stopPropagation();
+  reqEditMode = !reqEditMode;
+  const btn = document.getElementById('rq-edit-btn');
+  if (reqEditMode) {
+    btn.textContent = 'キャンセル'; btn.classList.add('is-editing');
+    renderReqInfoEdit();
+  } else {
+    btn.textContent = '編集'; btn.classList.remove('is-editing');
+    renderReqInfoView();
+  }
+}
+
+function renderReqInfoEdit() {
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (!item) return;
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const table = document.getElementById('rq-info-table');
+  table.classList.add('edit-mode');
+
+  const TEXTAREA_COLS = new Set(['依頼内容','店舗情報','掲載したい情報 / 特記事項']);
+
+  const rows = COL_TITLES.map((label) => {
+    const raw = String(item[label] !== undefined ? item[label] : '').trim();
+    let input;
+    if (TEXTAREA_COLS.has(label)) {
+      input = `<textarea name="${esc(label)}">${esc(raw)}</textarea>`;
+    } else if (label === 'ステータス') {
+      const opts = REQ_STATUS_LIST.map(s => `<option value="${esc(s)}"${s===raw?' selected':''}>${esc(s)}</option>`).join('');
+      input = `<select name="${esc(label)}">${opts}</select>`;
+    } else if (label === '優先度（緊急／通常）') {
+      input = `<select name="${esc(label)}">
+        <option value="通常"${raw==='通常'?' selected':''}>通常</option>
+        <option value="緊急"${raw==='緊急'?' selected':''}>緊急</option>
+      </select>`;
+    } else if (label === '製作者') {
+      const opts = ['<option value="">未定</option>',
+        ...makers.map(m => `<option value="${esc(m)}"${m===raw?' selected':''}>${esc(m)}</option>`)
+      ].join('');
+      input = `<select name="${esc(label)}">${opts}</select>`;
+    } else if (DATE_COLS.has(label)) {
+      const dateVal = raw.replace(/\./g, '-').replace(/\//g, '-').slice(0,10);
+      input = `<input type="date" name="${esc(label)}" value="${dateVal}">`;
+    } else if (label === '制作完了データ(googleドライブURL)') {
+      input = `<input type="url" name="${esc(label)}" value="${esc(raw)}" placeholder="https://...">`;
+    } else {
+      input = `<input type="text" name="${esc(label)}" value="${esc(raw)}">`;
+    }
+    return `<tr><td>${esc(label)}</td><td>${input}</td></tr>`;
+  }).join('');
+
+  table.innerHTML = rows + `<tr><td colspan="2"><div class="rq-info-save-row">
+    <button class="arc-btn arc-btn-ghost" style="flex:1" onclick="toggleReqEdit(event)">キャンセル</button>
+    <button class="arc-btn arc-btn-primary" style="flex:2" id="rq-save-btn" onclick="saveReqFields()">💾 保存する</button>
+  </div></td></tr>`;
+}
+
+async function saveReqFields() {
+  const table = document.getElementById('rq-info-table');
+  const saveBtn = document.getElementById('rq-save-btn');
+  const fields = {};
+  table.querySelectorAll('[name]').forEach(el => { fields[el.name] = el.value; });
+
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '保存中…'; }
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateFields', rowId: currentReqId, fields }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (json.error) throw new Error(json.error);
+  } catch(e) {
+    alert('保存エラー: ' + e.message);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 保存する'; }
+    return;
+  }
+
+  // ローカルデータ更新
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  if (item) {
+    Object.assign(item, fields);
+    item.title      = item['制作物'] || item['店舗'];
+    item.store_name = item['店舗'];
+    item.col_k      = item['優先度（緊急／通常）'];
+    item.col_l      = item['ステータス'];
+    item.drive_url  = item['制作完了データ(googleドライブURL)'];
+  }
+  reqEditMode = false;
+  const btn = document.getElementById('rq-edit-btn');
+  if (btn) { btn.textContent = '編集'; btn.classList.remove('is-editing'); }
+  renderReqInfoView();
+  renderReqCards();
+}
+
+// ── 新規依頼作成モーダル ────────────────────────────────────────────
+function openNewReqModal() {
+  // 製作者ドロップダウンを最新データで更新
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const sel = document.getElementById('nrm-maker');
+  sel.innerHTML = '<option value="">未定</option>' + makers.map(m => `<option>${esc(m)}</option>`).join('');
+  // 依頼日を今日に設定
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('nrm-reqdate').value = today;
+  // フォームリセット
+  ['nrm-store','nrm-title-input','nrm-content','nrm-requester','nrm-deadline','nrm-firstdate','nrm-size','nrm-fmt','nrm-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('nrm-priority').value = '通常';
+  document.getElementById('nrm-msg').textContent = '';
+  document.getElementById('nrm-submit-btn').disabled = false;
+  document.getElementById('new-req-overlay').classList.add('show');
+}
+
+function closeNewReqModal() {
+  document.getElementById('new-req-overlay').classList.remove('show');
+}
+
+async function submitNewReq() {
+  const store = document.getElementById('nrm-store').value.trim();
+  const title = document.getElementById('nrm-title-input').value.trim();
+  if (!store || !title) {
+    document.getElementById('nrm-msg').textContent = '店舗と制作物は必須です。';
+    return;
+  }
+  const btn = document.getElementById('nrm-submit-btn');
+  btn.disabled = true;
+  document.getElementById('nrm-msg').textContent = '送信中…';
+  const fields = {
+    '店舗':   store,
+    '制作物': title,
+    '依頼内容': document.getElementById('nrm-content').value.trim(),
+    '依頼者':  document.getElementById('nrm-requester').value.trim(),
+    '製作者':  document.getElementById('nrm-maker').value,
+    '依頼日':  document.getElementById('nrm-reqdate').value,
+    '納期':    document.getElementById('nrm-deadline').value,
+    '初稿納品希望日': document.getElementById('nrm-firstdate').value,
+    '優先度':  document.getElementById('nrm-priority').value,
+    'サイズ':  document.getElementById('nrm-size').value.trim(),
+    '納品時のFMT': document.getElementById('nrm-fmt').value.trim(),
+    '掲載したい情報/特記事項': document.getElementById('nrm-note').value.trim(),
+    'ステータス': '未着手',
+  };
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createRequest', fields }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (json.ok) {
+      // ローカルに即追加して再描画
+      const newItem = {
+        row_id: json.rowId || String(reqItems.length + 2),
+        title: fields['制作物'],
+        store_name: fields['店舗'],
+        col_k: fields['優先度'],
+        col_l: '未着手',
+        '制作物': fields['制作物'],
+        '店舗': fields['店舗'],
+        '依頼内容': fields['依頼内容'],
+        '依頼者': fields['依頼者'],
+        '製作者': fields['製作者'],
+        '依頼日': fields['依頼日'],
+        '納期': fields['納期'],
+        '初稿納品希望日': fields['初稿納品希望日'],
+        '優先度': fields['優先度'],
+        'ステータス': '未着手',
+        'サイズ': fields['サイズ'],
+        '納品時のFMT': fields['納品時のFMT'],
+        '掲載したい情報/特記事項': fields['掲載したい情報/特記事項'],
+      };
+      reqItems.unshift(newItem);
+      renderReqCards();
+      closeNewReqModal();
+    } else {
+      document.getElementById('nrm-msg').textContent = 'エラー: ' + (json.error || '不明なエラー');
+      btn.disabled = false;
+    }
+  } catch(e) {
+    document.getElementById('nrm-msg').textContent = 'エラー: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+// new-req-overlay のオーバーレイクリックで閉じる
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('new-req-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeNewReqModal();
+  });
+});
+
+// ── 格納ボタン / Archive Modal ────────────────────────────────────
+let arcRowId = '';
+let arcFolderName = '';
+let arcFolderIds = {}; // { mainId, outputId, nyukoMaeId, nyukoId, nyukoUrl }
+let arcFiles = { 1: [], 2: [], 3: [] };
+
+function openArchiveModal(rowId, event) {
+  if (event) event.stopPropagation();
+  const item = reqItems.find(d => d.row_id === rowId);
+  if (!item) return;
+  arcRowId = rowId;
+  const store = String(item.store_name || item['店舗'] || '').trim();
+  const title = String(item.title || item['制作物'] || '').trim();
+  arcFolderName = [rowId, store, title].filter(Boolean).join('_');
+  arcFiles = { 1: [], 2: [], 3: [] };
+  arcFolderIds = {};
+
+  document.getElementById('arc-folder-name').textContent = arcFolderName;
+  document.getElementById('arc-folder-name-tree').textContent = arcFolderName;
+  document.getElementById('arc-status-0').textContent = '';
+  const createBtn = document.getElementById('arc-create-btn');
+  createBtn.disabled = false;
+  createBtn.textContent = 'フォルダを作成する';
+
+  [1,2,3].forEach(n => {
+    document.getElementById(`arc-files-${n}`).innerHTML = '';
+    document.getElementById(`arc-prog-${n}`).style.width = '0%';
+    document.getElementById(`arc-status-${n}`).textContent = '';
+  });
+
+  arcShowStep(0);
+  document.getElementById('arc-overlay').classList.add('show');
+  // フォルダ準備を自動実行
+  setTimeout(() => arcAutoSetupFolders(), 200);
+}
+
+function closeArchiveModal() {
+  document.getElementById('arc-overlay').classList.remove('show');
+  arcRowId = '';
+}
+
+function arcShowStep(n) {
+  document.querySelectorAll('.arc-step').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+  });
+  const dots = document.getElementById('arc-dots');
+  dots.innerHTML = [0,1,2,3,4].map(i =>
+    `<div class="arc-dot${i < n ? ' done' : i === n ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+async function arcAutoSetupFolders() {
+  const btn = document.getElementById('arc-create-btn');
+  const statusEl = document.getElementById('arc-status-0');
+  const title = document.querySelector('#arc-step-0 .arc-title');
+  btn.style.display = 'none';
+  statusEl.textContent = '🔍 フォルダを確認しています...';
+
+  try {
+    const url = `${GAS_API_URL}?mode=getOrCreateFolders&name=${encodeURIComponent(arcFolderName)}`;
+    const res  = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'フォルダ処理失敗');
+    arcFolderIds = data;
+    if (data.existed) {
+      title.textContent = '📁 既存フォルダを使用';
+      statusEl.textContent = '✅ フォルダが見つかりました。不足フォルダを補完しました。';
+    } else {
+      title.textContent = '📁 フォルダを作成しました';
+      statusEl.textContent = '✅ 新規フォルダを作成しました。';
+    }
+    setTimeout(() => arcShowStep(1), 900);
+  } catch(e) {
+    statusEl.textContent = '❌ エラー: ' + e.message;
+    btn.style.display = '';
+  }
+}
+
+function arcDrag(event, isOver, zoneId) {
+  event.preventDefault();
+  document.getElementById(zoneId).classList.toggle('drag', isOver);
+}
+
+function arcDrop(event, stepNum) {
+  event.preventDefault();
+  document.getElementById(`arc-zone-${stepNum}`).classList.remove('drag');
+  arcAddFiles(stepNum, Array.from(event.dataTransfer.files));
+}
+
+function arcFilePick(event, stepNum) {
+  arcAddFiles(stepNum, Array.from(event.target.files));
+  event.target.value = '';
+}
+
+function arcAddFiles(stepNum, newFiles) {
+  arcFiles[stepNum] = [...(arcFiles[stepNum] || []), ...newFiles];
+  renderArcFileList(stepNum);
+}
+
+function arcRemoveFile(stepNum, idx) {
+  arcFiles[stepNum].splice(idx, 1);
+  renderArcFileList(stepNum);
+}
+
+function renderArcFileList(stepNum) {
+  const list = arcFiles[stepNum] || [];
+  document.getElementById(`arc-files-${stepNum}`).innerHTML = list.map((f, i) =>
+    `<div class="arc-file-item">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ${esc(f.name)}</span>
+      <span style="font-size:0.7rem;color:#999;margin:0 8px;flex-shrink:0">${(f.size/1024).toFixed(0)}KB</span>
+      <button style="background:none;border:none;cursor:pointer;color:#c00;font-weight:700;flex-shrink:0" onclick="arcRemoveFile(${stepNum},${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function arcUpload(stepNum, nextStep) {
+  const files = arcFiles[stepNum] || [];
+  if (!files.length) {
+    if (!confirm('ファイルがアップロードされていませんが、大丈夫ですか？')) return;
+    arcSkip(nextStep); return;
+  }
+
+  const folderIdMap = { 1: arcFolderIds.outputId, 2: arcFolderIds.nyukoMaeId, 3: arcFolderIds.nyukoId };
+  const folderId = folderIdMap[stepNum];
+  if (!folderId) { arcSkip(nextStep); return; }
+
+  const progEl   = document.getElementById(`arc-prog-${stepNum}`);
+  const statusEl = document.getElementById(`arc-status-${stepNum}`);
+  statusEl.textContent = `アップロード中 (0/${files.length})...`;
+
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    try {
+      const b64 = await fileToBase64(f);
+      await fetch(GAS_API_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'uploadFile',
+          folderId,
+          fileName: f.name,
+          mimeType: f.type || 'application/octet-stream',
+          base64Data: b64,
+        }),
+      });
+      progEl.style.width = `${Math.round((i + 1) / files.length * 100)}%`;
+      statusEl.textContent = `アップロード中 (${i + 1}/${files.length})...`;
+    } catch(e) {
+      statusEl.textContent = `❌ エラー: ${esc(f.name)} — ${e.message}`;
+      return;
+    }
+  }
+
+  statusEl.textContent = `✅ ${files.length}件アップロード完了！`;
+  progEl.style.width = '100%';
+
+  if (nextStep === 4) {
+    await arcWriteDriveUrl();
+    arcGoStep4();
+  } else {
+    setTimeout(() => arcShowStep(nextStep), 600);
+  }
+}
+
+async function arcWriteDriveUrl() {
+  if (!arcRowId || !arcFolderIds.nyukoUrl) return;
+  try {
+    const url = `${GAS_API_URL}?mode=writeDriveUrl&rowId=${encodeURIComponent(arcRowId)}&url=${encodeURIComponent(arcFolderIds.nyukoUrl)}`;
+    await fetch(url, { cache: 'no-store' });
+    const item = reqItems.find(d => d.row_id === arcRowId);
+    if (item) item['制作完了データ(googleドライブURL)'] = arcFolderIds.nyukoUrl;
+  } catch(e) { /* ignore */ }
+}
+
+function arcSkip(nextStep) {
+  if (nextStep === 4) {
+    arcWriteDriveUrl().then(() => arcGoStep4());
+  } else {
+    arcShowStep(nextStep);
+  }
+}
+
+function arcGoStep4() {
+  const item = reqItems.find(d => d.row_id === arcRowId);
+  const store    = item ? (item.store_name || item['店舗'] || '') : '';
+  const title    = item ? (item.title || item['制作物'] || '') : '';
+  const nyukoUrl = arcFolderIds.nyukoUrl || '';
+  const lines = [
+    `${arcRowId}　${store}　${title}のデータを送付します！`,
+    '',
+    '格納先はこちらになりますので、ご査収ください！',
+    nyukoUrl,
+  ];
+  document.getElementById('arc-message').textContent = lines.join('\n');
+  document.getElementById('arc-copy-btn').textContent = '📋 メッセージをコピー';
+  const mainUrl = arcFolderIds.mainId
+    ? `https://drive.google.com/drive/folders/${arcFolderIds.mainId}`
+    : (arcFolderIds.nyukoUrl || '#');
+  document.getElementById('arc-folder-link').href = mainUrl;
+  arcShowStep(4);
+}
+
+function arcCopyMessage() {
+  const msg = document.getElementById('arc-message').textContent;
+  const copyBtn = document.getElementById('arc-copy-btn');
+  navigator.clipboard.writeText(msg).then(() => {
+    copyBtn.textContent = '✅ コピーしました！';
+    copyBtn.classList.add('copied');
+    setTimeout(() => { copyBtn.textContent = '📋 メッセージをコピー'; copyBtn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    copyBtn.textContent = '✅ コピーしました！';
+    setTimeout(() => { copyBtn.textContent = '📋 メッセージをコピー'; }, 2000);
+  });
+}
+// ── URL パラメータ: ?id=xxx で詳細を直接開く ──────────────────────────
+
+// ── 起動 ──────────────────────────────────────────────────────────────
+document.body.classList.add('tab-pdf');
 connectSSE();
+loadGasData();
+(async () => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  if (id) { await loadGasData(); openPdfDetail(id); }
+})();
+
+// ── 製作者管理 ────────────────────────────────────────────────────────
+const CONFIRMED_STATUS = new Set(['完了', 'データ送付完了']);
+
+function loadMakerData() {
+  if (!reqItems.length) {
+    document.getElementById('maker-table-wrap').innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+    fetch(GAS_API_URL + '?mode=requests', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => { reqItems = data; renderMakerTable(); })
+      .catch(() => { document.getElementById('maker-table-wrap').innerHTML = '<div class="pdf-loading">読み込みエラー</div>'; });
+    return;
+  }
+  renderMakerTable();
+}
+
+function reloadMakerData() {
+  reqItems = [];
+  loadMakerData();
+}
+
+// 製作者名として扱わないプレースホルダー値
+const MAKER_EXCLUDE = new Set(['製作者名を記載']);
+
+// 金額列ラベル（スプレッドシートに「金額」列を追加したら自動反映）
+const MAKER_AMOUNT_COL = '金額';
+const TAX_RATE = 0.10;
+
+function makerAmt(item) {
+  const v = parseFloat(String(item[MAKER_AMOUNT_COL] || '').replace(/[,¥\s]/g, '')) || 0;
+  return v;
+}
+function fmtAmt(n) {
+  return n === 0 ? '-' : n.toLocaleString();
+}
+
+function renderMakerTable() {
+  const now = new Date();
+  const thisYM = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const months = [];
+  for (let i = 0; i < 24; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+
+  function itemMonth(item) {
+    const confirmed = CONFIRMED_STATUS.has(String(item.col_l || ''));
+    const ds = confirmed
+      ? (String(item['実質完了日'] || '').trim() || String(item['納期'] || '').trim())
+      : String(item['納期'] || '').trim();
+    if (!ds) return null;
+    const d = new Date(ds);
+    if (isNaN(d.getTime())) return null;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+
+  // 集計
+  const map = {};
+  reqItems.forEach(item => {
+    const rawMk = String(item['製作者'] || '').trim();
+    if (MAKER_EXCLUDE.has(rawMk)) return;
+    const mk = rawMk || '(未設定)';
+    if (!map[mk]) map[mk] = {
+      confirmedCnt: 0, forecastCnt: 0,
+      confirmedAmt: 0, forecastAmt: 0,
+      months: {}
+    };
+    const confirmed = CONFIRMED_STATUS.has(String(item.col_l || ''));
+    const amt = makerAmt(item);
+    if (confirmed) { map[mk].confirmedCnt++; map[mk].confirmedAmt += amt; }
+    else           { map[mk].forecastCnt++;  map[mk].forecastAmt  += amt; }
+    const ym = itemMonth(item);
+    if (ym) {
+      if (!map[mk].months[ym]) map[mk].months[ym] = { cnt: 0, amt: 0, cntF: 0, amtF: 0 };
+      if (confirmed) { map[mk].months[ym].cnt++; map[mk].months[ym].amt += amt; }
+      else           { map[mk].months[ym].cntF++; map[mk].months[ym].amtF += amt; }
+    }
+  });
+
+  const makers = Object.keys(map).sort();
+  if (!makers.length) {
+    document.getElementById('maker-table-wrap').innerHTML = '<div class="pdf-loading">製作者データなし</div>';
+    return;
+  }
+
+  // 金額列が実際にデータにあるか確認
+  const hasAmtCol = reqItems.some(item => item[MAKER_AMOUNT_COL] !== undefined && item[MAKER_AMOUNT_COL] !== '');
+  const amtNote = hasAmtCol ? '' : `<div class="maker-amount-note">⚠ スプレッドシートに「金額」列（U列以降）を追加すると金額集計が反映されます。現在は件数のみ集計中。</div>`;
+
+  let html = amtNote + `<div class="maker-table-wrap"><table class="maker-table"><thead>
+    <tr>
+      <th class="th-name" rowspan="2" style="position:sticky;left:0;z-index:2">製作者</th>
+      <th class="th-confirm" rowspan="2">確定<br>件数</th>
+      <th class="th-forecast" rowspan="2">見込み<br>件数</th>
+      <th class="th-confirm" rowspan="2">金額<br>（税抜）</th>
+      <th class="th-forecast" rowspan="2">見込み金額<br>（税抜）</th>
+      <th class="th-confirm" rowspan="2">税込<br>合計</th>
+      <th class="th-forecast" rowspan="2">見込み<br>税込合計</th>
+      <th class="th-thismonth" colspan="2">今月 ${thisYM}</th>
+      ${months.map(ym => {
+        const cls = ym === thisYM ? 'th-thismonth' : 'maker-month-hdr';
+        return `<th class="${cls}" colspan="2">${ym}</th>`;
+      }).join('')}
+    </tr>
+    <tr>
+      <th class="th-thismonth">件数</th><th class="th-thismonth">金額</th>
+      ${months.map(ym => {
+        const cls = ym === thisYM ? 'th-thismonth' : '';
+        return `<th class="th-confirm ${cls}">確定<br>件数</th><th class="th-forecast ${cls}">確定<br>金額</th>`;
+      }).join('')}
+    </tr>
+  </thead><tbody>`;
+
+  function rowHtml(label, m, bold) {
+    const tax    = Math.round(m.confirmedAmt * TAX_RATE);
+    const taxF   = Math.round(m.forecastAmt  * TAX_RATE);
+    const tmData = m.months[thisYM] || {};
+    const tmCnt  = (tmData.cnt||0) + (tmData.cntF||0);
+    const tmAmt  = (tmData.amt||0) + (tmData.amtF||0);
+    const style  = bold ? ' style="font-weight:700;border-top:2px solid #aaa"' : '';
+    return `<tr${style}>
+      <td class="td-name" style="${bold?'font-weight:700':''}position:sticky;left:0;background:#fff">${label}</td>
+      <td class="col-confirm">${m.confirmedCnt}</td>
+      <td class="col-forecast">${m.forecastCnt}</td>
+      <td class="col-confirm col-amt">${fmtAmt(m.confirmedAmt)}</td>
+      <td class="col-forecast col-amt-fore">${fmtAmt(m.forecastAmt)}</td>
+      <td class="col-confirm col-amt">${fmtAmt(m.confirmedAmt + tax)}</td>
+      <td class="col-forecast col-amt-fore">${fmtAmt(m.forecastAmt + taxF)}</td>
+      <td class="td-thismonth">${tmCnt||'-'}</td>
+      <td class="td-thismonth">${fmtAmt(tmAmt)}</td>
+      ${months.map(ym => {
+        const md  = m.months[ym] || {};
+        const isTM = ym === thisYM;
+        const tc  = isTM ? ' td-thismonth' : ' col-confirm';
+        const tf  = isTM ? ' td-thismonth' : ' col-forecast';
+        return `<td class="${tc}">${md.cnt||0}</td><td class="${tf}">${fmtAmt(md.amt||0)}</td>`;
+      }).join('')}
+    </tr>`;
+  }
+
+  makers.forEach(mk => html += rowHtml(esc(mk), map[mk], false));
+
+  // 合計行
+  const tot = { confirmedCnt:0, forecastCnt:0, confirmedAmt:0, forecastAmt:0, months:{} };
+  Object.values(map).forEach(m => {
+    tot.confirmedCnt += m.confirmedCnt;
+    tot.forecastCnt  += m.forecastCnt;
+    tot.confirmedAmt += m.confirmedAmt;
+    tot.forecastAmt  += m.forecastAmt;
+    months.forEach(ym => {
+      if (!tot.months[ym]) tot.months[ym] = { cnt:0, amt:0, cntF:0, amtF:0 };
+      const md = m.months[ym] || {};
+      tot.months[ym].cnt  += md.cnt||0;  tot.months[ym].amt  += md.amt||0;
+      tot.months[ym].cntF += md.cntF||0; tot.months[ym].amtF += md.amtF||0;
+    });
+  });
+  html += rowHtml('合計', tot, true);
+
+  html += `</tbody></table></div>`;
+  document.getElementById('maker-table-wrap').innerHTML = html;
+}
+
+// ── SP スクロール動作: 検索+フィルターバー表示制御 ─────────────────────────
+(function() {
+  const SP_W = 640;
+  let lastY = 0;
+  let barsVisible = false;
+  let headerVisible = false;
+  const SP_HEADER_H = 44;
+
+  function isSP() { return window.innerWidth <= SP_W; }
+
+  // 現在表示中のセクションの検索バー・フィルターバーを取得
+  function getBars() {
+    for (const id of ['pdf-section', 'req-section']) {
+      const sec = document.getElementById(id);
+      if (sec && sec.style.display !== 'none') {
+        return [
+          sec.querySelector('.pdf-search-wrap'),
+          sec.querySelector('.pdf-filter-bar'),
+        ].filter(Boolean);
+      }
+    }
+    return [];
+  }
+
+  // 各セクションのバーの高さを計測して保存
+  const barHeights = {};
+
+  function calcBarHeight(id) {
+    const sec = document.getElementById(id);
+    if (!sec) return 0;
+    const sw = sec.querySelector('.pdf-search-wrap');
+    const fb = sec.querySelector('.pdf-filter-bar');
+    if (!sw || !fb) return 0;
+    const topOffset = headerVisible ? SP_HEADER_H : 0;
+    sw.style.top = topOffset + 'px';
+    const swH = sw.offsetHeight || 50;
+    fb.style.top = (topOffset + swH) + 'px';
+    barHeights[id] = topOffset + swH + (fb.offsetHeight || 80) + 6;
+    return barHeights[id];
+  }
+
+  function setContentPadding(visible) {
+    ['pdf-section', 'req-section'].forEach(id => {
+      const sec = document.getElementById(id);
+      if (!sec) return;
+      const content = sec.querySelector('.masonry, .req-cards');
+      if (content) {
+        content.style.paddingTop = visible ? ((barHeights[id] || calcBarHeight(id)) + 'px') : '0px';
+      }
+    });
+  }
+
+  function showHeader(visible) {
+    headerVisible = visible;
+    const h = document.getElementById('sp-top-header');
+    if (h) h.classList.toggle('sp-bar-hidden', !visible);
+  }
+
+  function showBars(visible) {
+    barsVisible = visible;
+    getBars().forEach(el => el.classList.toggle('sp-bar-hidden', !visible));
+    setContentPadding(visible);
+  }
+
+  // フィルターバーの top 位置を計算
+  function updateLayout() {
+    if (!isSP()) return;
+    ['pdf-section', 'req-section'].forEach(id => calcBarHeight(id));
+    setContentPadding(barsVisible);
+  }
+
+  // スクロールイベント
+  window.addEventListener('scroll', function() {
+    if (!isSP()) return;
+    const y = window.scrollY;
+    const delta = y - lastY;
+    if (Math.abs(delta) < 3) return;
+    lastY = y;
+
+    if (y < 20) {
+      const changed = !headerVisible || !barsVisible;
+      showHeader(true);
+      showBars(true);      // 最上部: ヘッダー + バー両方表示
+      if (changed) updateLayout();
+    } else if (delta > 0) {
+      showHeader(false);
+      showBars(false);     // 下スクロール: 全部隠す
+    } else {
+      // 上スクロール: ヘッダーも検索バーも表示
+      const changed = !headerVisible || !barsVisible;
+      showHeader(true);
+      showBars(true);
+      if (changed) updateLayout();
+    }
+  }, { passive: true });
+
+  // タブ切り替え時: バーを隠してレイアウト再計算
+  const _origSwitchTab = window.switchTab;
+  window.switchTab = function(tab) {
+    _origSwitchTab(tab);
+    if (isSP()) {
+      const atTop = window.scrollY < 20;
+      showHeader(atTop);
+      showBars(atTop);
+      lastY = window.scrollY;
+      setTimeout(updateLayout, 80);
+    }
+  };
+
+  // フィルターバーの中身が変わったら再計算 (MutationObserver)
+  function observeFilterBar(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    new MutationObserver(function() {
+      if (isSP()) setTimeout(updateLayout, 60);
+    }).observe(el, { childList: true, subtree: true });
+  }
+  observeFilterBar('pdf-filter-bar');
+  observeFilterBar('req-filter-bar');
+
+  window.addEventListener('resize', updateLayout);
+
+  // 初期化 (データロード後)
+  setTimeout(function() {
+    if (isSP()) {
+      const atTop = window.scrollY < 20;
+      showHeader(atTop);
+      showBars(atTop);
+      updateLayout();
+    }
+  }, 400);
+})();
 </script>
 </body>
 </html>
