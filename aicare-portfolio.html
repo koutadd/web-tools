@@ -1051,6 +1051,14 @@
 
   /* SP トップヘッダー: PC では非表示 */
   #sp-top-header { display: none; }
+  .howto-btn {
+    font-size: 0.72rem; font-weight: 600;
+    color: var(--primary, #1a1a2e); background: #f0f0f8;
+    border: 1px solid #ccd; border-radius: 6px;
+    padding: 4px 10px; text-decoration: none;
+    transition: background .15s;
+  }
+  .howto-btn:hover { background: #e0e0f0; }
 
   /* ============================================================
      SP レスポンシブ (ギャラリー・依頼管理)
@@ -1079,6 +1087,7 @@
       font-weight: 700;
       letter-spacing: .02em;
       color: var(--primary, #1a1a2e);
+      flex: 1;
     }
 
 
@@ -1185,10 +1194,12 @@
 
 <div id="sp-top-header">
   <span class="sp-logo">アイケアラボ</span>
+  <a href="aicare-howto.html" class="howto-btn" target="_blank">使い方</a>
 </div>
 <header class="site-header">
   <h1 class="site-title">アイケアラボ</h1>
   <div class="site-meta">制作物ダッシュボード<br>Web Design &amp; Development<br>Japan</div>
+  <a href="aicare-howto.html" class="howto-btn" target="_blank">使い方</a>
 </header>
 
 <nav class="site-nav">
@@ -2528,7 +2539,11 @@ function reqCardHtml(d) {
   const colL   = String(d.col_l || '').trim();
   const maker  = String(d['製作者'] || '').trim();
   const tagK   = colK ? `<span class="req-tag">${esc(colK)}</span>` : '';
-  const tagL   = colL ? `<span class="req-tag" data-status="${esc(colL)}">${esc(colL)}</span>` : '';
+  const hasProductionData = colL === '完了'
+    ? gasItems.some(g => g.store_name === d.store_name)
+    : true;
+  const tagL   = (colL && (colL !== '完了' || hasProductionData))
+    ? `<span class="req-tag" data-status="${esc(colL)}">${esc(colL)}</span>` : '';
   const tagM   = (maker && !MAKER_EXCLUDE.has(maker)) ? `<span class="req-tag-maker${reqMakerFilter===maker ? ' active' : ''}" onclick="setMakerFilter('${esc(maker)}');event.stopPropagation()">${esc(maker)}</span>` : '';
   const _rawDriveUrl = String(d['制作完了データ(googleドライブURL)'] || d.drive_url || '').trim();
   const driveUrl = _rawDriveUrl.startsWith('http')
