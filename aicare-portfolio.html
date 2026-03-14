@@ -918,28 +918,36 @@
     align-items: center; justify-content: center; padding: 16px;
   }
   #new-req-overlay.show { display: flex; }
+  #new-req-overlay { padding: 12px; }
   #new-req-modal {
     background: #fff; border-radius: 14px;
-    width: 100%; max-width: 560px; max-height: 90vh;
-    overflow-y: auto; padding: 24px;
+    width: 100%; max-width: 560px; max-height: 92vh;
+    overflow-y: auto; padding: 20px;
     box-shadow: 0 8px 40px rgba(0,0,0,.2);
   }
-  .nrm-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 18px; }
-  .nrm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .nrm-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 16px; }
+  .nrm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .nrm-grid .nrm-full { grid-column: 1 / -1; }
   .nrm-field { display: flex; flex-direction: column; gap: 4px; }
-  .nrm-field label { font-size: 0.75rem; font-weight: 600; color: #555; }
+  .nrm-field label { font-size: 0.73rem; font-weight: 600; color: #555; }
   .nrm-field input, .nrm-field select, .nrm-field textarea {
     border: 1px solid #ccc; border-radius: 8px; padding: 7px 10px;
-    font-size: 0.88rem; font-family: inherit;
-    transition: border-color .15s;
+    font-size: 0.88rem; font-family: inherit; width: 100%;
+    transition: border-color .15s; box-sizing: border-box;
   }
   .nrm-field input:focus, .nrm-field select:focus, .nrm-field textarea:focus {
     outline: none; border-color: #1a4fa8;
   }
-  .nrm-field textarea { min-height: 72px; resize: vertical; }
-  .nrm-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .nrm-field textarea {
+    min-height: 68px; resize: none; overflow: hidden;
+    line-height: 1.55;
+  }
+  .nrm-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
   .nrm-msg { font-size: 0.82rem; color: #1a4fa8; margin-top: 8px; min-height: 18px; }
+  @media (max-width: 480px) {
+    .nrm-grid { grid-template-columns: 1fr; }
+    .nrm-grid .nrm-full { grid-column: 1; }
+  }
 
   .arc-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.6);
@@ -3155,8 +3163,21 @@ function openNewReqModal() {
   document.getElementById('nrm-msg').textContent = '';
   document.getElementById('nrm-submit-btn').disabled = false;
   document.getElementById('new-req-overlay').classList.add('show');
+
+  setTimeout(nrmInitAutoGrow, 0);
 }
 
+function nrmAutoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight) + 'px';
+}
+function nrmInitAutoGrow() {
+  document.querySelectorAll('#new-req-modal textarea').forEach(ta => {
+    ta.style.height = 'auto';
+    ta.style.height = (ta.scrollHeight) + 'px';
+    ta.addEventListener('input', () => nrmAutoGrow(ta));
+  });
+}
 function closeNewReqModal() {
   document.getElementById('new-req-overlay').classList.remove('show');
 }
