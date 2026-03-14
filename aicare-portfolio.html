@@ -2355,6 +2355,40 @@ function getFilteredPdfItems() {
   });
 }
 
+// ── ジャンル自動分類 ──────────────────────────────────────────────────
+const GENRE_MAP = [
+  { label: 'チラシ',       keys: ['チラシ', 'ポスター'],                            color: '#c45c00', bg: '#fff5eb' },
+  { label: '店舗サイン',   keys: ['看板', 'カッティング', 'のぼり', '窓面', 'サインシート'], color: '#6b3fa0', bg: '#f6f0fc' },
+  { label: '名刺・ツール', keys: ['名刺', '検査シート'],                            color: '#197a6a', bg: '#edfaf7' },
+  { label: 'ブランド',     keys: ['ロゴ', 'クレド'],                                color: '#b5365a', bg: '#fdf0f4' },
+  { label: 'Web',          keys: ['サイト', 'アプリ'],                              color: '#1a5fbe', bg: '#eef4fd' },
+];
+
+let genreOverrides = {};  // { [pdfItemKey]: ジャンルラベル }
+
+function pdfGenre(d) {
+  const key = pdfItemKey(d);
+  if (genreOverrides[key]) return genreOverrides[key];
+  const text = [d.title, d.matched_folder_name, d.pdf_name].filter(Boolean).join(' ');
+  for (const g of GENRE_MAP) {
+    if (g.keys.some(k => text.includes(k))) return g.label;
+  }
+  return 'その他';
+}
+
+// ── フィルター適用 ────────────────────────────────────────────────────
+function getFilteredPdfItems() {
+  const q = pdfSearch.trim().toLowerCase();
+  return gasItems.filter(d => {
+    if (!d.pdf_url) return false;
+    const okGenre  = !pdfCategory || pdfGenre(d) === pdfCategory;
+    const okStore  = !pdfStore    || d.store_name === pdfStore;
+    const okSearch = !q || [d.title, d.store_name]
+      .filter(Boolean).some(s => s.toLowerCase().includes(q));
+    return okGenre && okStore && okSearch;
+  });
+}
+
 // ── PDFギャラリー描画 ─────────────────────────────────────────────────
 function renderPdfGallery() {
   renderPdfFilters();
