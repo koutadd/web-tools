@@ -670,6 +670,13 @@
     background: #fff; border: 2px solid rgba(255,255,255,.8); border-radius: 12px;
     padding: 16px; cursor: pointer; transition: box-shadow .15s;
     overflow: hidden; min-width: 0; box-sizing: border-box;
+    position: relative;
+  }
+  .req-new-badge {
+    position: absolute; top: 8px; right: 10px;
+    background: #e53935; color: #fff; font-size: 0.62rem;
+    font-weight: 800; padding: 2px 7px; border-radius: 10px;
+    letter-spacing: .04em; pointer-events: none;
   }
   .req-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
   .req-card[data-status] { border-color: rgba(255,255,255,.7); }
@@ -894,6 +901,46 @@
   .maker-amount-note { font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 6px 12px; display: inline-block; }
 
   /* ── 格納モーダル ── */
+
+  /* 新規依頼作成ボタン */
+  .req-new-btn {
+    background: #1a4fa8; color: #fff; border: none;
+    padding: 7px 16px; border-radius: 20px; font-weight: 700;
+    font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .req-new-btn:hover { background: #153d85; }
+
+  /* 新規依頼モーダル */
+  #new-req-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 2000;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  #new-req-overlay.show { display: flex; }
+  #new-req-modal {
+    background: #fff; border-radius: 14px;
+    width: 100%; max-width: 560px; max-height: 90vh;
+    overflow-y: auto; padding: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  }
+  .nrm-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 18px; }
+  .nrm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .nrm-grid .nrm-full { grid-column: 1 / -1; }
+  .nrm-field { display: flex; flex-direction: column; gap: 4px; }
+  .nrm-field label { font-size: 0.75rem; font-weight: 600; color: #555; }
+  .nrm-field input, .nrm-field select, .nrm-field textarea {
+    border: 1px solid #ccc; border-radius: 8px; padding: 7px 10px;
+    font-size: 0.88rem; font-family: inherit;
+    transition: border-color .15s;
+  }
+  .nrm-field input:focus, .nrm-field select:focus, .nrm-field textarea:focus {
+    outline: none; border-color: #1a4fa8;
+  }
+  .nrm-field textarea { min-height: 72px; resize: vertical; }
+  .nrm-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .nrm-msg { font-size: 0.82rem; color: #1a4fa8; margin-top: 8px; min-height: 18px; }
+
   .arc-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.6);
     z-index: 2000; display: none; align-items: center; justify-content: center;
@@ -1002,6 +1049,9 @@
   }
   .sticky-nav-req:hover { background: #a34d00; }
 
+  /* SP トップヘッダー: PC では非表示 */
+  #sp-top-header { display: none; }
+
   /* ============================================================
      SP レスポンシブ (ギャラリー・依頼管理)
      ============================================================ */
@@ -1046,7 +1096,7 @@
       background: none !important; color: var(--muted) !important;
     }
     .nav-btn.active { color: var(--text) !important; font-weight: 700; }
-    #nav-pdf { padding: 10px 4px 11px !important; }
+    #nav-pdf { padding: 10px 4px 11px !important; color: var(--muted) !important; }
     #nav-pdf.active       { color: #1a4fa8 !important; }
     .nav-btn-req { margin-left: 0; padding: 10px 4px 11px !important; }
     .nav-btn-req.active   { color: #c45c00 !important; }
@@ -1137,7 +1187,7 @@
   <span class="sp-logo">アイケアラボ</span>
 </div>
 <header class="site-header">
-  <h1 class="site-title"><em>(</em>アイケアラボ<em>)</em></h1>
+  <h1 class="site-title">アイケアラボ</h1>
   <div class="site-meta">制作物ダッシュボード<br>Web Design &amp; Development<br>Japan</div>
 </header>
 
@@ -1183,6 +1233,7 @@
 <div id="req-section" style="display:none">
   <div class="pdf-search-wrap">
     <input class="pdf-search-input" id="req-search" type="search" placeholder="案件名・店舗名で検索…" oninput="renderReqCards()">
+    <button class="req-new-btn" onclick="openNewReqModal()">＋ 新規依頼作成</button>
   </div>
   <div class="pdf-filter-bar" id="req-filter-bar"></div>
   <div class="req-cards" id="req-cards">
@@ -1289,6 +1340,72 @@
 </footer>
 
 <!-- 格納モーダル -->
+
+<!-- 新規依頼作成モーダル -->
+<div id="new-req-overlay">
+  <div id="new-req-modal">
+    <div class="nrm-title">＋ 新規依頼作成</div>
+    <div class="nrm-grid">
+      <div class="nrm-field">
+        <label>店舗 <span style="color:#e53935">*</span></label>
+        <input id="nrm-store" type="text" placeholder="例）本部">
+      </div>
+      <div class="nrm-field">
+        <label>制作物 <span style="color:#e53935">*</span></label>
+        <input id="nrm-title-input" type="text" placeholder="例）チラシ A4">
+      </div>
+      <div class="nrm-field nrm-full">
+        <label>依頼内容</label>
+        <textarea id="nrm-content" placeholder="具体的な依頼内容を入力…"></textarea>
+      </div>
+      <div class="nrm-field">
+        <label>依頼者</label>
+        <input id="nrm-requester" type="text" placeholder="">
+      </div>
+      <div class="nrm-field">
+        <label>製作者</label>
+        <select id="nrm-maker"><option value="">未定</option></select>
+      </div>
+      <div class="nrm-field">
+        <label>依頼日</label>
+        <input id="nrm-reqdate" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>納期</label>
+        <input id="nrm-deadline" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>初稿納品希望日</label>
+        <input id="nrm-firstdate" type="date">
+      </div>
+      <div class="nrm-field">
+        <label>優先度</label>
+        <select id="nrm-priority">
+          <option value="通常">通常</option>
+          <option value="緊急">緊急</option>
+        </select>
+      </div>
+      <div class="nrm-field">
+        <label>サイズ</label>
+        <input id="nrm-size" type="text" placeholder="例）A4 / 1080×1080px">
+      </div>
+      <div class="nrm-field">
+        <label>納品時のFMT</label>
+        <input id="nrm-fmt" type="text" placeholder="例）PDF / AI">
+      </div>
+      <div class="nrm-field nrm-full">
+        <label>掲載したい情報・特記事項</label>
+        <textarea id="nrm-note" placeholder="掲載内容、注意事項など…"></textarea>
+      </div>
+    </div>
+    <div class="nrm-msg" id="nrm-msg"></div>
+    <div class="nrm-actions">
+      <button class="arc-btn arc-btn-ghost" onclick="closeNewReqModal()">キャンセル</button>
+      <button class="arc-btn arc-btn-primary" id="nrm-submit-btn" onclick="submitNewReq()">作成する</button>
+    </div>
+  </div>
+</div>
+
 <div class="arc-overlay" id="arc-overlay">
   <div class="arc-modal" id="arc-modal">
     <div class="arc-step-indicator" id="arc-dots"></div>
@@ -2029,7 +2146,7 @@ function connectSSE() {
 // ============================================================
 
 // ★ GAS Web App の URL を設定してください（デプロイ後のexec URL）
-const GAS_API_URL  = 'https://script.google.com/macros/s/AKfycbxUCriKCKqi1WWbzdWS4ZXpq5TWGQOLPGQ0oURFyjIg-DnHrSNylrOn6PE3Aq92jbPBrA/exec';
+const GAS_API_URL  = '/api/gas-proxy';
 const GAS_CACHE_MS = 5 * 60 * 1000; // キャッシュ有効期間: 5分
 
 let gasItems     = [];  // 全PDFデータ
@@ -2376,16 +2493,29 @@ function reqCardHtml(d) {
   const tagK   = colK ? `<span class="req-tag">${esc(colK)}</span>` : '';
   const tagL   = colL ? `<span class="req-tag" data-status="${esc(colL)}">${esc(colL)}</span>` : '';
   const tagM   = (maker && !MAKER_EXCLUDE.has(maker)) ? `<span class="req-tag-maker${reqMakerFilter===maker ? ' active' : ''}" onclick="setMakerFilter('${esc(maker)}');event.stopPropagation()">${esc(maker)}</span>` : '';
-  const driveUrl = String(d['制作完了データ(googleドライブURL)'] || d.drive_url || '').trim();
+  const _rawDriveUrl = String(d['制作完了データ(googleドライブURL)'] || d.drive_url || '').trim();
+  const driveUrl = _rawDriveUrl.startsWith('http')
+    ? _rawDriveUrl
+    : (_rawDriveUrl ? `https://drive.google.com/drive/folders/${_rawDriveUrl}` : '');
   const tagArchived = driveUrl ? `<span class="req-tag-archived">📦 格納完了済み</span>` : '';
-  const folderLink  = driveUrl ? `<a class="req-card-folder-link" href="${esc(driveUrl)}" target="_blank" onclick="event.stopPropagation()">📁 格納フォルダに移動する</a>` : '';
+  const folderLink  = driveUrl ? `<a class="req-card-folder-link" href="${driveUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📁 格納フォルダに移動する</a>` : '';
   // 納期（COL_TITLES[8] = '納期'）
   const deadline = fmtDate(String(d['納期'] || '').trim());
   const deadlineEl = deadline ? `<div class="req-card-deadline">📅 納期: ${esc(deadline)}</div>` : '';
   const log    = reqLogs[d.row_id];
   const lastMsg = log && log.length ? esc(log[log.length-1].comment) : '';
   const lastComment = lastMsg ? `<div class="req-card-comment">💬 ${lastMsg}</div>` : '';
+  // NEW バッジ: 依頼日から5日以内
+  const reqDateRaw = String(d['依頼日'] || '').trim();
+  let newBadge = '';
+  if (reqDateRaw) {
+    const reqMs = new Date(reqDateRaw.replace(/\//g, '-')).getTime();
+    if (!isNaN(reqMs) && (Date.now() - reqMs) <= 5 * 86400000) {
+      newBadge = '<span class="req-new-badge">NEW</span>';
+    }
+  }
   return `<div class="req-card" data-status="${esc(colL)}" onclick="openReqDrawer('${esc(d.row_id)}')">
+    ${newBadge}
     <div class="req-card-title">${title}</div>
     <div class="req-card-store"><span class="req-row-id">#${esc(d.row_id)}</span>${store}</div>
     ${deadlineEl}
@@ -2430,11 +2560,17 @@ async function updateReqStatus(status) {
 function updateDrawerArchiveBtn(colL) {
   const row = document.getElementById('rq-archive-btn-row');
   if (!row) return;
-  if (colL === '完了') {
-    row.innerHTML = `<button class="archive-btn" onclick="openArchiveModal('${currentReqId}',event)">📦 格納する</button>`;
-  } else {
-    row.innerHTML = '';
+  const item = reqItems.find(d => d.row_id === currentReqId);
+  const rawUrl = item ? String(item['制作完了データ(googleドライブURL)'] || item.drive_url || '').trim() : '';
+  const folderUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://drive.google.com/drive/folders/${rawUrl}` : '');
+  let html = '';
+  if (folderUrl) {
+    html += `<a class="archive-btn" href="${folderUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block;text-align:center;margin-bottom:6px">📁 格納フォルダに移動する</a>`;
   }
+  if (colL === '完了') {
+    html += `<button class="archive-btn" onclick="openArchiveModal('${currentReqId}',event)">📦 ${folderUrl ? '再' : ''}格納する</button>`;
+  }
+  row.innerHTML = html;
 }
 
 async function openReqDrawer(rowId) {
@@ -2539,23 +2675,25 @@ function renderChat(rowId) {
 
 async function sendComment() {
   const input = document.getElementById('req-chat-input');
+  const btn = document.querySelector('.req-chat-send');
   const comment = input.value.trim();
   if (!comment || !currentReqId) return;
-  input.value = '';
-
+  if (btn) { btn.disabled = true; btn.textContent = '送信中'; }
   try {
     await fetch(GAS_API_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment, author: '' }),
     });
-    // 楽観的UI更新
+    input.value = '';
     if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
     reqLogs[currentReqId].push({ row_id: currentReqId, comment, author: '', timestamp: new Date().toISOString() });
     renderChat(currentReqId);
     renderReqCards();
   } catch(e) {
     alert('送信エラー: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '送信'; }
   }
 }
 
@@ -2776,6 +2914,105 @@ closeDrawer = function() {
   history.replaceState(null, '', location.pathname);
 };
 
+
+
+// ── 新規依頼作成モーダル ────────────────────────────────────────────
+function openNewReqModal() {
+  // 製作者ドロップダウンを最新データで更新
+  const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
+  const sel = document.getElementById('nrm-maker');
+  sel.innerHTML = '<option value="">未定</option>' + makers.map(m => `<option>${esc(m)}</option>`).join('');
+  // 依頼日を今日に設定
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('nrm-reqdate').value = today;
+  // フォームリセット
+  ['nrm-store','nrm-title-input','nrm-content','nrm-requester','nrm-deadline','nrm-firstdate','nrm-size','nrm-fmt','nrm-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('nrm-priority').value = '通常';
+  document.getElementById('nrm-msg').textContent = '';
+  document.getElementById('nrm-submit-btn').disabled = false;
+  document.getElementById('new-req-overlay').classList.add('show');
+}
+
+function closeNewReqModal() {
+  document.getElementById('new-req-overlay').classList.remove('show');
+}
+
+async function submitNewReq() {
+  const store = document.getElementById('nrm-store').value.trim();
+  const title = document.getElementById('nrm-title-input').value.trim();
+  if (!store || !title) {
+    document.getElementById('nrm-msg').textContent = '店舗と制作物は必須です。';
+    return;
+  }
+  const btn = document.getElementById('nrm-submit-btn');
+  btn.disabled = true;
+  document.getElementById('nrm-msg').textContent = '送信中…';
+  const fields = {
+    '店舗':   store,
+    '制作物': title,
+    '依頼内容': document.getElementById('nrm-content').value.trim(),
+    '依頼者':  document.getElementById('nrm-requester').value.trim(),
+    '製作者':  document.getElementById('nrm-maker').value,
+    '依頼日':  document.getElementById('nrm-reqdate').value,
+    '納期':    document.getElementById('nrm-deadline').value,
+    '初稿納品希望日': document.getElementById('nrm-firstdate').value,
+    '優先度':  document.getElementById('nrm-priority').value,
+    'サイズ':  document.getElementById('nrm-size').value.trim(),
+    '納品時のFMT': document.getElementById('nrm-fmt').value.trim(),
+    '掲載したい情報/特記事項': document.getElementById('nrm-note').value.trim(),
+    'ステータス': '未着手',
+  };
+  try {
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createRequest', fields }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (json.ok) {
+      // ローカルに即追加して再描画
+      const newItem = {
+        row_id: json.rowId || String(reqItems.length + 2),
+        title: fields['制作物'],
+        store_name: fields['店舗'],
+        col_k: fields['優先度'],
+        col_l: '未着手',
+        '制作物': fields['制作物'],
+        '店舗': fields['店舗'],
+        '依頼内容': fields['依頼内容'],
+        '依頼者': fields['依頼者'],
+        '製作者': fields['製作者'],
+        '依頼日': fields['依頼日'],
+        '納期': fields['納期'],
+        '初稿納品希望日': fields['初稿納品希望日'],
+        '優先度': fields['優先度'],
+        'ステータス': '未着手',
+        'サイズ': fields['サイズ'],
+        '納品時のFMT': fields['納品時のFMT'],
+        '掲載したい情報/特記事項': fields['掲載したい情報/特記事項'],
+      };
+      reqItems.unshift(newItem);
+      renderReqCards();
+      closeNewReqModal();
+    } else {
+      document.getElementById('nrm-msg').textContent = 'エラー: ' + (json.error || '不明なエラー');
+      btn.disabled = false;
+    }
+  } catch(e) {
+    document.getElementById('nrm-msg').textContent = 'エラー: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+// new-req-overlay のオーバーレイクリックで閉じる
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('new-req-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeNewReqModal();
+  });
+});
 
 // ── 格納ボタン / Archive Modal ────────────────────────────────────
 let arcRowId = '';
@@ -3184,6 +3421,8 @@ function renderMakerTable() {
   const SP_W = 640;
   let lastY = 0;
   let barsVisible = false;
+  let headerVisible = false;
+  const SP_HEADER_H = 44;
 
   function isSP() { return window.innerWidth <= SP_W; }
 
@@ -3210,9 +3449,11 @@ function renderMakerTable() {
     const sw = sec.querySelector('.pdf-search-wrap');
     const fb = sec.querySelector('.pdf-filter-bar');
     if (!sw || !fb) return 0;
+    const topOffset = headerVisible ? SP_HEADER_H : 0;
+    sw.style.top = topOffset + 'px';
     const swH = sw.offsetHeight || 50;
-    fb.style.top = swH + 'px';
-    barHeights[id] = swH + (fb.offsetHeight || 80) + 6;
+    fb.style.top = (topOffset + swH) + 'px';
+    barHeights[id] = topOffset + swH + (fb.offsetHeight || 80) + 6;
     return barHeights[id];
   }
 
@@ -3228,6 +3469,7 @@ function renderMakerTable() {
   }
 
   function showHeader(visible) {
+    headerVisible = visible;
     const h = document.getElementById('sp-top-header');
     if (h) h.classList.toggle('sp-bar-hidden', !visible);
   }
@@ -3254,14 +3496,19 @@ function renderMakerTable() {
     lastY = y;
 
     if (y < 20) {
-      showBars(false);     // 最上部: バー隠してヘッダー表示
+      const changed = !headerVisible || !barsVisible;
       showHeader(true);
+      showBars(true);      // 最上部: ヘッダー + バー両方表示
+      if (changed) updateLayout();
     } else if (delta > 0) {
+      showHeader(false);
       showBars(false);     // 下スクロール: 全部隠す
-      showHeader(false);
     } else {
-      showBars(true);      // 上スクロール: 検索バー表示
-      showHeader(false);
+      // 上スクロール: ヘッダーも検索バーも表示
+      const changed = !headerVisible || !barsVisible;
+      showHeader(true);
+      showBars(true);
+      if (changed) updateLayout();
     }
   }, { passive: true });
 
@@ -3270,8 +3517,9 @@ function renderMakerTable() {
   window.switchTab = function(tab) {
     _origSwitchTab(tab);
     if (isSP()) {
-      showBars(false);
-      showHeader(window.scrollY < 20);
+      const atTop = window.scrollY < 20;
+      showHeader(atTop);
+      showBars(atTop);
       lastY = window.scrollY;
       setTimeout(updateLayout, 80);
     }
@@ -3293,8 +3541,9 @@ function renderMakerTable() {
   // 初期化 (データロード後)
   setTimeout(function() {
     if (isSP()) {
-      showBars(false);
-      showHeader(window.scrollY < 20);
+      const atTop = window.scrollY < 20;
+      showHeader(atTop);
+      showBars(atTop);
       updateLayout();
     }
   }, 400);
