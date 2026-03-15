@@ -395,6 +395,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ── Auth guard: 未認証は /login へリダイレクト ────────────────
+  // バージョン確認（認証不要）
+  if (urlPath === '/api/version') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ version: 'ce28a94', ts: '2026-03-15' }));
+    return;
+  }
+
   if (AUTH_PASSWORD && !isAuth(req)) {
     // API は 401 を返す
     if (urlPath.startsWith('/api/')) {
