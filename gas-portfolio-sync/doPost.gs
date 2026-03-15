@@ -20,27 +20,10 @@ function doPost(e) {
       return json_({ ok: true, fileId: file.getId(), fileName: file.getName() });
     }
 
-    // ── 大ファイル: Resumableアップロードセッション作成 ──────
+    // ── 大ファイル: OAuthトークンをサーバーに渡す（UrlFetchApp不要）──
     if (action === 'createUploadSession') {
-      const token    = ScriptApp.getOAuthToken();
-      const mimeType = data.mimeType || 'application/octet-stream';
-      const metadata = JSON.stringify({ name: data.fileName, parents: [data.folderId] });
-      const res = UrlFetchApp.fetch(
-        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json; charset=UTF-8',
-            'X-Upload-Content-Type': mimeType,
-          },
-          payload: metadata,
-          muteHttpExceptions: true,
-        }
-      );
-      const uploadUrl = res.getHeaders()['Location'];
-      if (!uploadUrl) return json_({ ok: false, error: 'uploadUrl取得失敗: ' + res.getContentText().slice(0, 200) });
-      return json_({ ok: true, uploadUrl });
+      const token = ScriptApp.getOAuthToken();
+      return json_({ ok: true, token, fileName: data.fileName, folderId: data.folderId, mimeType: data.mimeType || 'application/octet-stream' });
     }
 
     // ── ステータス更新 ───────────────────────────────────────

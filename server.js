@@ -537,6 +537,33 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify({ ok: false, error: 'GASエラー: デプロイURLを確認してください' }));
           return;
         }
+        // createUploadSession: GASからtokenを受け取り、サーバー側でDrive APIを呼び出す
+        const gasData = JSON.parse(text);
+        if (gasData.ok && gasData.token && gasData.fileName) {
+          const driveInit = await fetch(
+            'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + gasData.token,
+                'Content-Type': 'application/json',
+                'X-Upload-Content-Type': gasData.mimeType,
+              },
+              body: JSON.stringify({ name: gasData.fileName, parents: [gasData.folderId] }),
+              signal: AbortSignal.timeout(15000),
+            }
+          );
+          const uploadUrl = driveInit.headers.get('location') || driveInit.headers.get('Location');
+          if (!uploadUrl) {
+            const errText = await driveInit.text().catch(() => '');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: false, error: `Drive uploadUrl取得失敗 (${driveInit.status}): ${errText.slice(0, 100)}` }));
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, uploadUrl }));
+          return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(text);
       }
