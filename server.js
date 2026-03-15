@@ -342,7 +342,11 @@ function serveFile(req, res) {
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] ?? 'application/octet-stream' });
+    const noCache = ['.html', '.js'].includes(ext);
+    res.writeHead(200, {
+      'Content-Type': MIME[ext] ?? 'application/octet-stream',
+      'Cache-Control': noCache ? 'no-cache, no-store, must-revalidate' : 'max-age=86400',
+    });
     res.end(data);
   });
 }
