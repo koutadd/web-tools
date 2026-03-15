@@ -23,8 +23,8 @@ function doPost(e) {
     // ── ステータス更新 ───────────────────────────────────────
     if (action === 'updateStatus') {
       const ss    = SpreadsheetApp.getActiveSpreadsheet();
-      const sheet = ss.getSheetByName('依頼管理');
-      if (!sheet) return json_({ ok: false, error: '依頼管理シートが見つかりません' });
+      const sheet = ss.getSheetByName('依頼シート');
+      if (!sheet) return json_({ ok: false, error: '依頼シートが見つかりません' });
       const row = findReqRow_(sheet, data.rowId);
       if (!row) return json_({ ok: false, error: '行が見つかりません: ' + data.rowId });
       sheet.getRange(row, 12).setValue(data.status); // L列
@@ -43,8 +43,8 @@ function doPost(e) {
     // ── 新規依頼作成 ─────────────────────────────────────────
     if (action === 'createRequest') {
       const ss    = SpreadsheetApp.getActiveSpreadsheet();
-      const sheet = ss.getSheetByName('依頼管理');
-      if (!sheet) return json_({ ok: false, error: '依頼管理シートが見つかりません' });
+      const sheet = ss.getSheetByName('依頼シート');
+      if (!sheet) return json_({ ok: false, error: '依頼シートが見つかりません' });
       const lastRow = sheet.getLastRow();
       const newId   = String(lastRow); // row番号をIDとして使用
       const d       = data.fields || {};
@@ -63,8 +63,8 @@ function doPost(e) {
     // ── フィールド更新 ───────────────────────────────────────
     if (action === 'updateFields') {
       const ss    = SpreadsheetApp.getActiveSpreadsheet();
-      const sheet = ss.getSheetByName('依頼管理');
-      if (!sheet) return json_({ ok: false, error: '依頼管理シートが見つかりません' });
+      const sheet = ss.getSheetByName('依頼シート');
+      if (!sheet) return json_({ ok: false, error: '依頼シートが見つかりません' });
       const row = findReqRow_(sheet, data.rowId);
       if (!row) return json_({ ok: false, error: '行が見つかりません' });
       const COL_MAP = {
