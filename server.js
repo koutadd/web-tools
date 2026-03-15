@@ -499,7 +499,7 @@ const server = http.createServer(async (req, res) => {
           method: 'POST', redirect: 'follow',
           headers: { 'Content-Type': 'application/json' },
           body,
-          signal: AbortSignal.timeout(20000),
+          signal: AbortSignal.timeout(60000),
         });
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(await r.text().catch(() => '{"ok":true}'));
