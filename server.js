@@ -482,7 +482,7 @@ const server = http.createServer(async (req, res) => {
 
   // ── GAS proxy ──────────────────────────────────────────────────
   if (req.url.startsWith('/api/gas-proxy')) {
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzdTSBlUR7RAkYvjLi6SQb9aFvfPvCW0dNIGqmul7-HYn2TXlS9dL0Z__pU1ZcooBjZfQ/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwGfa8kZeYxpmRtmSDFYqfMHgyhkBG5KXQrmhplcMOYj9Ya1rctoX9pkOTykdL_pgFTJg/exec';
     const urlObj = new URL(req.url, 'http://localhost');
     const qs = urlObj.search; // e.g. ?mode=requests
     try {
