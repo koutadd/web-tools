@@ -492,21 +492,47 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(text);
       } else if (req.method === 'POST') {
+        // 35MB body limit (base64 of 25MB file ≈ 33MB)
+        const MAX_BODY = 35 * 1024 * 1024;
         let body = '';
-        req.on('data', c => { body += c; });
-        await new Promise(resolve => req.on('end', resolve));
+        let bodySize = 0;
+        let tooLarge = false;
+        req.on('data', c => {
+          bodySize += c.length;
+          if (bodySize > MAX_BODY) { tooLarge = true; req.destroy(); return; }
+          body += c;
+        });
+        await new Promise((resolve, reject) => {
+          req.on('end', resolve);
+          req.on('error', reject);
+          req.on('close', resolve);
+        });
+        if (tooLarge) {
+          res.writeHead(413, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'ファイルが大きすぎます。25MB以内のファイルを使用してください。' }));
+          return;
+        }
         const r = await fetch(GAS_URL, {
           method: 'POST', redirect: 'follow',
           headers: { 'Content-Type': 'application/json' },
           body,
           signal: AbortSignal.timeout(60000),
         });
+        const text = await r.text().catch(() => '{"ok":false,"error":"GASレスポンス取得失敗"}');
+        // GASがHTMLエラーページを返した場合はJSONに変換
+        const isJson = text.trimStart().startsWith('{') || text.trimStart().startsWith('[');
+        if (!isJson) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'GASエラー: デプロイURLを確認してください' }));
+          return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(await r.text().catch(() => '{"ok":true}'));
+        res.end(text);
       }
     } catch (e) {
+      const msg = e.name === 'TimeoutError' ? 'GASリクエストがタイムアウトしました（60秒）。ファイルを小さくするか再試行してください。' : e.message;
       res.writeHead(502, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
+      res.end(JSON.stringify({ ok: false, error: msg }));
     }
     return;
   }
