@@ -3394,21 +3394,48 @@ function fileToBase64(file) {
   });
 }
 
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024; // 25MB
+// 10MB以下: base64、10MB超: Resumableストリーミング
+const BASE64_THRESHOLD = 10 * 1024 * 1024;
+
+async function arcUploadFile(f, folderId, statusEl, progEl, idx, total) {
+  const mimeType = f.type || 'application/octet-stream';
+  if (f.size <= BASE64_THRESHOLD) {
+    // ── base64ルート ──
+    const b64 = await fileToBase64(f);
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'uploadFile', folderId, fileName: f.name, mimeType, base64Data: b64 }),
+    });
+    const result = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+    if (!res.ok || result.ok === false) throw new Error(result.error || `HTTP ${res.status}`);
+  } else {
+    // ── Resumableストリーミングルート ──
+    statusEl.textContent = `アップロード準備中 (${idx + 1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
+    const sessionRes = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createUploadSession', folderId, fileName: f.name, mimeType }),
+    });
+    const session = await sessionRes.json().catch(() => ({ ok: false, error: `HTTP ${sessionRes.status}` }));
+    if (!sessionRes.ok || session.ok === false) throw new Error(session.error || 'セッション作成失敗');
+    statusEl.textContent = `アップロード中 (${idx + 1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
+    const uploadRes = await fetch('/api/drive-upload', {
+      method: 'PUT',
+      headers: { 'Content-Type': mimeType, 'X-Upload-Url': session.uploadUrl, 'Content-Length': String(f.size) },
+      body: f,
+      duplex: 'half',
+    });
+    const result = await uploadRes.json().catch(() => ({ ok: false, error: `HTTP ${uploadRes.status}` }));
+    if (!uploadRes.ok || result.ok === false) throw new Error(result.error || `HTTP ${uploadRes.status}`);
+  }
+}
 
 async function arcUpload(stepNum, nextStep) {
   const files = arcFiles[stepNum] || [];
   if (!files.length) {
     if (!confirm('ファイルがアップロードされていませんが、大丈夫ですか？')) return;
     arcSkip(nextStep); return;
-  }
-
-  // ファイルサイズ事前チェック（25MB超はGASに送れない）
-  const oversized = files.filter(f => f.size > MAX_UPLOAD_BYTES);
-  if (oversized.length) {
-    const names = oversized.map(f => `・${f.name}（${(f.size/1024/1024).toFixed(1)}MB）`).join('\n');
-    alert(`以下のファイルは25MBを超えているためアップロードできません。\n\n${names}\n\nGoogleドライブに直接アップロードしてリンクを貼り付けてください。`);
-    return;
   }
 
   const folderIdMap = { 1: arcFolderIds.outputId, 2: arcFolderIds.nyukoMaeId, 3: arcFolderIds.nyukoId };
@@ -3422,22 +3449,7 @@ async function arcUpload(stepNum, nextStep) {
   for (let i = 0; i < files.length; i++) {
     const f = files[i];
     try {
-      const b64 = await fileToBase64(f);
-      const uploadRes = await fetch(GAS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'uploadFile',
-          folderId,
-          fileName: f.name,
-          mimeType: f.type || 'application/octet-stream',
-          base64Data: b64,
-        }),
-      });
-      const result = await uploadRes.json().catch(() => ({ ok: false, error: `HTTP ${uploadRes.status}` }));
-      if (!uploadRes.ok || result.ok === false) {
-        throw new Error(result.error || `HTTP ${uploadRes.status}`);
-      }
+      await arcUploadFile(f, folderId, statusEl, progEl, i, files.length);
       progEl.style.width = `${Math.round((i + 1) / files.length * 100)}%`;
       statusEl.textContent = `アップロード中 (${i + 1}/${files.length})...`;
     } catch(e) {
