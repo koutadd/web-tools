@@ -537,6 +537,40 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── Drive ストリーミングアップロード（大ファイル対応）─────────
+  if (req.method === 'PUT' && req.url === '/api/drive-upload') {
+    const uploadUrl = req.headers['x-upload-url'];
+    if (!uploadUrl) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'x-upload-url header missing' }));
+      return;
+    }
+    try {
+      const driveRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: req,
+        headers: {
+          'Content-Type': req.headers['content-type'] || 'application/octet-stream',
+          ...(req.headers['content-length'] ? { 'Content-Length': req.headers['content-length'] } : {}),
+        },
+        duplex: 'half',
+      });
+      const text = await driveRes.text();
+      if (driveRes.status === 200 || driveRes.status === 201) {
+        const d = JSON.parse(text);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, fileId: d.id, fileName: d.name }));
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: `Drive ${driveRes.status}: ${text.slice(0, 200)}` }));
+      }
+    } catch (e) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
   // ── Slack Webhook proxy ────────────────────────────────────────
   if (req.method === 'POST' && req.url === '/api/slack-send') {
     let body = '';

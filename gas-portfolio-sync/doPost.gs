@@ -11,13 +11,36 @@ function doPost(e) {
     const data   = JSON.parse(e.postData.contents);
     const action = data.action;
 
-    // ── ファイルアップロード ─────────────────────────────────
+    // ── ファイルアップロード（小ファイル: base64）────────────
     if (action === 'uploadFile') {
       const folder   = DriveApp.getFolderById(data.folderId);
       const decoded  = Utilities.base64Decode(data.base64Data);
       const blob     = Utilities.newBlob(decoded, data.mimeType || 'application/octet-stream', data.fileName);
       const file     = folder.createFile(blob);
       return json_({ ok: true, fileId: file.getId(), fileName: file.getName() });
+    }
+
+    // ── 大ファイル: Resumableアップロードセッション作成 ──────
+    if (action === 'createUploadSession') {
+      const token    = ScriptApp.getOAuthToken();
+      const mimeType = data.mimeType || 'application/octet-stream';
+      const metadata = JSON.stringify({ name: data.fileName, parents: [data.folderId] });
+      const res = UrlFetchApp.fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json; charset=UTF-8',
+            'X-Upload-Content-Type': mimeType,
+          },
+          payload: metadata,
+          muteHttpExceptions: true,
+        }
+      );
+      const uploadUrl = res.getHeaders()['Location'];
+      if (!uploadUrl) return json_({ ok: false, error: 'uploadUrl取得失敗: ' + res.getContentText().slice(0, 200) });
+      return json_({ ok: true, uploadUrl });
     }
 
     // ── ステータス更新 ───────────────────────────────────────
