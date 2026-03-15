@@ -3410,7 +3410,7 @@ async function arcUploadFile(f, folderId, statusEl, progEl, idx, total) {
     const result = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
     if (!res.ok || result.ok === false) throw new Error(result.error || `HTTP ${res.status}`);
   } else {
-    // ── Resumableストリーミングルート ──
+    // ── Resumable直接アップロード（ブラウザ → Drive直接、Render経由なし）──
     statusEl.textContent = `アップロード準備中 (${idx + 1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
     const sessionRes = await fetch(GAS_API_URL, {
       method: 'POST',
@@ -3420,14 +3420,16 @@ async function arcUploadFile(f, folderId, statusEl, progEl, idx, total) {
     const session = await sessionRes.json().catch(() => ({ ok: false, error: `HTTP ${sessionRes.status}` }));
     if (!sessionRes.ok || session.ok === false) throw new Error(session.error || 'セッション作成失敗');
     statusEl.textContent = `アップロード中 (${idx + 1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
-    const uploadRes = await fetch('/api/drive-upload', {
+    // ブラウザからDriveへ直接PUT（Renderのタイムアウト回避）
+    const uploadRes = await fetch(session.uploadUrl, {
       method: 'PUT',
-      headers: { 'Content-Type': mimeType, 'X-Upload-Url': session.uploadUrl, 'Content-Length': String(f.size) },
+      headers: { 'Content-Type': mimeType },
       body: f,
-      duplex: 'half',
     });
-    const result = await uploadRes.json().catch(() => ({ ok: false, error: `HTTP ${uploadRes.status}` }));
-    if (!uploadRes.ok || result.ok === false) throw new Error(result.error || `HTTP ${uploadRes.status}`);
+    if (uploadRes.status !== 200 && uploadRes.status !== 201) {
+      const txt = await uploadRes.text().catch(() => '');
+      throw new Error(`Drive ${uploadRes.status}: ${txt.slice(0, 100)}`);
+    }
   }
 }
 
