@@ -874,6 +874,15 @@
   .nav-btn-maker:hover { background: #1b5e20; }
   .nav-btn-maker.active { background: #1b5e20; }
 
+  /* 店舗管理ボタン */
+  .nav-btn-stores {
+    margin-left: 8px; background: #00695c; color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .nav-btn-stores:hover { background: #00564d; }
+  .nav-btn-stores.active { background: #00564d; }
+
   /* 製作者管理セクション */
   #maker-section { padding: 16px; }
   .maker-table-wrap { overflow-x: auto; }
@@ -944,6 +953,21 @@
     min-height: 68px; resize: none; overflow: hidden;
     line-height: 1.55;
   }
+  .nrm-size-list { display: flex; flex-direction: column; gap: 6px; }
+  .nrm-size-row  { display: flex; gap: 6px; align-items: center; }
+  .nrm-size-row input { flex: 1; }
+  .nrm-size-remove {
+    flex-shrink: 0; width: 26px; height: 26px; border: 1px solid #ccc; border-radius: 6px;
+    background: #fff; color: #999; cursor: pointer; font-size: 1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center; transition: all .12s;
+  }
+  .nrm-size-remove:hover { border-color: #dc2626; color: #dc2626; background: #fff5f5; }
+  .nrm-size-add {
+    margin-top: 2px; font-size: 0.72rem; font-weight: 700; color: #1a4fa8;
+    background: none; border: 1px dashed #1a4fa8; border-radius: 6px;
+    padding: 4px 10px; cursor: pointer; transition: all .12s; align-self: flex-start;
+  }
+  .nrm-size-add:hover { background: #f0f4ff; }
   .nrm-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
   .nrm-msg { font-size: 0.82rem; color: #1a4fa8; margin-top: 8px; min-height: 18px; }
   @media (max-width: 480px) {
@@ -1158,6 +1182,8 @@
     .nav-btn-req { margin-left: 0; padding: 15px 4px 16px !important; }
     .nav-btn-req.active   { color: #c45c00 !important; }
     .nav-btn-maker.active { color: #1b5e20 !important; }
+    .nav-btn-stores { margin-left: 0; padding: 15px 4px 16px !important; font-size: 0.90rem !important; }
+    .nav-btn-stores.active { color: #00695c !important; }
     .nav-right    { display: none; }
 
     /* コンテンツ下部にタブバー分の余白 */
@@ -1253,6 +1279,7 @@
       <button class="hm-item" onclick="switchTab('pdf');closeHM()"><span class="hm-icon">🖼</span>制作物一覧</button>
       <button class="hm-item" onclick="switchTab('req');closeHM()"><span class="hm-icon">📋</span>依頼管理</button>
       <button class="hm-item" onclick="switchTab('maker');closeHM()"><span class="hm-icon">👷</span>製作者管理</button>
+      <a class="hm-item" href="aicare-stores.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;"><span class="hm-icon">🏪</span>店舗管理</a>
     </div>
   </div>
 </div>
@@ -1270,6 +1297,7 @@
       <button class="hm-item" onclick="switchTab('pdf');closeHM()"><span class="hm-icon">🖼</span>制作物一覧</button>
       <button class="hm-item" onclick="switchTab('req');closeHM()"><span class="hm-icon">📋</span>依頼管理</button>
       <button class="hm-item" onclick="switchTab('maker');closeHM()"><span class="hm-icon">👷</span>製作者管理</button>
+      <a class="hm-item" href="aicare-stores.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;"><span class="hm-icon">🏪</span>店舗管理</a>
     </div>
   </div>
 </header>
@@ -1278,6 +1306,7 @@
   <button class="nav-btn active" id="nav-pdf" onclick="switchTab('pdf')">制作物一覧</button>
   <button class="nav-btn nav-btn-req" id="nav-req" onclick="switchTab('req')">📋 依頼管理</button>
   <button class="nav-btn nav-btn-maker" id="nav-maker" onclick="switchTab('maker')">👷 製作者管理</button>
+  <a href="aicare-stores.html" class="nav-btn nav-btn-stores" id="nav-stores">🏪 店舗管理</a>
   <div class="nav-right">
     <div class="nav-stats" id="nav-stats"></div>
     <span class="live-tag" id="live"><span class="live-dot"></span>LIVE</span>
@@ -1471,7 +1500,12 @@
       </div>
       <div class="nrm-field">
         <label>サイズ</label>
-        <input id="nrm-size" type="text" placeholder="例）A4 / 1080×1080px">
+        <div class="nrm-size-list" id="nrm-size-list">
+          <div class="nrm-size-row">
+            <input class="nrm-size-input" type="text" placeholder="例）A4 / 1080×1080px">
+          </div>
+        </div>
+        <button type="button" class="nrm-size-add" onclick="addSizeRow()">＋ サイズを追加</button>
       </div>
       <div class="nrm-field">
         <label>納品時のFMT</label>
@@ -1619,7 +1653,7 @@
 
     <!-- Google Sheets から一括インポート -->
     <div class="sheets-import-row">
-      <input id="sheets-import-url" type="url" placeholder="スプレッドシートのURLを貼り付けて一括取得">
+      <input id="sheets-import-url" type="url" placeholder="スプレッドシートのURLを貼���付けて一括取得">
       <button id="sheets-import-btn">📊 Sheetsから取得</button>
     </div>
     <div class="sheets-preview" id="sheets-preview">
@@ -1641,7 +1675,7 @@
   <div class="modal" role="dialog">
     <div class="modal-title">
       <span id="modal-heading">Edit Work</span>
-      <button class="modal-close" id="modal-close">×</button>
+      <button class="modal-close" id="modal-close">��</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="field"><label>Name</label><input type="text" id="f-name" placeholder="Project Name"></div>
@@ -3160,6 +3194,17 @@ async function saveReqFields() {
 }
 
 // ── 新規依頼作成モーダル ────────────────────────────────────────────
+function addSizeRow() {
+  const list = document.getElementById('nrm-size-list');
+  const row  = document.createElement('div');
+  row.className = 'nrm-size-row';
+  row.innerHTML = `
+    <input class="nrm-size-input" type="text" placeholder="例）1080×1080px">
+    <button type="button" class="nrm-size-remove" onclick="this.closest('.nrm-size-row').remove()" title="削除">×</button>`;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
 function openNewReqModal() {
   // 製作者ドロップダウンを最新データで更新
   const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
@@ -3169,10 +3214,13 @@ function openNewReqModal() {
   const today = new Date().toISOString().slice(0, 10);
   document.getElementById('nrm-reqdate').value = today;
   // フォームリセット
-  ['nrm-store','nrm-title-input','nrm-content','nrm-requester','nrm-deadline','nrm-firstdate','nrm-size','nrm-fmt','nrm-note'].forEach(id => {
+  ['nrm-store','nrm-title-input','nrm-content','nrm-requester','nrm-deadline','nrm-firstdate','nrm-fmt','nrm-note'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // サイズ欄を1行にリセット
+  document.getElementById('nrm-size-list').innerHTML =
+    '<div class="nrm-size-row"><input class="nrm-size-input" type="text" placeholder="例）A4 / 1080×1080px"></div>';
   document.getElementById('nrm-priority').value = '通常';
   document.getElementById('nrm-msg').textContent = '';
   document.getElementById('nrm-submit-btn').disabled = false;
@@ -3216,7 +3264,8 @@ async function submitNewReq() {
     '納期':    document.getElementById('nrm-deadline').value,
     '初稿納品希望日': document.getElementById('nrm-firstdate').value,
     '優先度':  document.getElementById('nrm-priority').value,
-    'サイズ':  document.getElementById('nrm-size').value.trim(),
+    'サイズ':  [...document.querySelectorAll('#nrm-size-list .nrm-size-input')]
+               .map(i => i.value.trim()).filter(Boolean).join('\n'),
     '納品時のFMT': document.getElementById('nrm-fmt').value.trim(),
     '掲載したい情報/特記事項': document.getElementById('nrm-note').value.trim(),
     'ステータス': '未着手',

@@ -1,0 +1,2742 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>店舗管理 | アイケアラボ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #f9f8f6;
+    --text:    #111;
+    --muted:   #999;
+    --border:  #dedad5;
+    --green:   #2a9d2a;
+    --yellow:  #c48a00;
+    --red:     #c0392b;
+    --purple:  #7b4fa6;
+    --teal:    #00695c;
+    --blue:    #1a4fa8;
+    --pad:     40px;
+    --gap:     20px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ─────────────────────────────────────── */
+  .site-nav {
+    max-width: 1400px; margin: 0 auto;
+    padding: 0 var(--pad) 20px;
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.78rem; color: var(--muted);
+    padding: 5px 18px; border-radius: 20px;
+    transition: all .15s; letter-spacing: .03em; font-weight: 600;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .nav-btn:hover { color: var(--text); background: #eee; }
+  #nav-pdf {
+    background: #1a4fa8; color: #fff !important;
+    padding: 5px 40px;
+  }
+  #nav-pdf:hover { background: #153d85; }
+  .nav-btn-req {
+    margin-left: 0; background: #c45c00; color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+  }
+  .nav-btn-req:hover { background: #a34d00; }
+  .nav-btn-maker {
+    margin-left: 8px; background: #2e7d32; color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+  }
+  .nav-btn-maker:hover { background: #1b5e20; }
+  .nav-btn-stores {
+    margin-left: 8px; background: var(--teal); color: #fff !important;
+    border-radius: 20px; padding: 5px 18px; font-weight: 700;
+    border: none; cursor: pointer; font-size: 0.78rem;
+    letter-spacing: .03em;
+  }
+  .nav-btn-stores:hover { background: #00564d; }
+
+  /* ── Header ───────────────────────────────────── */
+  .site-header {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px var(--pad) 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site-logo { font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; color: var(--text); text-decoration: none; }
+  .header-subtitle { font-size: 0.68rem; color: var(--muted); letter-spacing: .04em; }
+
+  /* ── Page title ─────────────────────────────────── */
+  .page-title-bar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px var(--pad) 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .page-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .page-title-sub { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+
+  /* ── Filter bar ─────────────────────────────────── */
+  .filter-bar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 12px var(--pad);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: #fff; border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .filter-select {
+    font-size: 0.75rem; padding: 5px 10px; border: 1px solid var(--border);
+    border-radius: 6px; background: #fff; color: var(--text); cursor: pointer;
+    outline: none; transition: border-color .15s;
+  }
+  .filter-select:focus { border-color: var(--teal); }
+  .filter-search {
+    font-size: 0.75rem; padding: 5px 10px; border: 1px solid var(--border);
+    border-radius: 6px; background: #fff; color: var(--text);
+    outline: none; width: 180px; transition: border-color .15s;
+  }
+  .filter-search:focus { border-color: var(--teal); }
+  .filter-search::placeholder { color: #bbb; }
+  .filter-divider { color: var(--border); margin: 0 2px; }
+  .sort-btn {
+    font-size: 0.72rem; color: var(--muted); padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer;
+    transition: all .15s; display: flex; align-items: center; gap: 4px;
+  }
+  .sort-btn:hover { border-color: var(--text); color: var(--text); }
+  .sort-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .filter-count { font-size: 0.72rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+  /* ── Store grid ─────────────────────────────────── */
+  .stores-grid {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px var(--pad) 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+  }
+  @media (max-width: 1100px) { .stores-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px)  { .stores-grid { grid-template-columns: 1fr; --pad: 16px; } }
+
+  /* ── Store card ─────────────────────────────────── */
+  .store-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; cursor: pointer;
+    transition: box-shadow .2s, transform .2s;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .store-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+  .card-top { display: flex; flex-direction: column; gap: 6px; }
+  .card-badge-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card-store-name { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+  .badge {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+  }
+  /* 属性色 (固定: 店舗タイプ) */
+  .badge-type-direct { background: #dbeafe; color: #1e40af; }   /* 直営 = blue */
+  .badge-type-fc     { background: #ede9fe; color: #5b21b6; }   /* FC  = purple */
+
+  /* 状態色 (動的: 運営ステータス) */
+  .badge-status-good  { background: #dcfce7; color: #15803d; }  /* 順調 = green */
+  .badge-status-warn  { background: #fef9c3; color: #a16207; }  /* 注意 = amber */
+  .badge-status-delay { background: #fee2e2; color: #b91c1c; }  /* 遅延 = red   */
+
+  /* カード左辺 属性識別ライン */
+  .store-card.card-type-direct { border-left: 4px solid #2563eb; }
+  .store-card.card-type-fc     { border-left: 4px solid #7c3aed; }
+
+  .card-meta { font-size: 0.73rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+  .card-meta-item { display: flex; align-items: center; gap: 3px; }
+
+  .card-phase {
+    font-size: 0.73rem; color: var(--teal); font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .card-phase::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+  .progress-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .progress-bar-row { display: flex; align-items: center; gap: 8px; }
+  .progress-bar-bg {
+    flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+  .progress-bar-fill.good  { background: var(--green); }
+  .progress-bar-fill.warn  { background: #f59e0b; }
+  .progress-bar-fill.delay { background: var(--red); }
+  .progress-pct { font-size: 0.73rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+
+  .card-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat-item { display: flex; flex-direction: column; gap: 1px; }
+  .stat-label { font-size: 0.62rem; color: var(--muted); letter-spacing: .03em; }
+  .stat-value { font-size: 0.8rem; font-weight: 600; }
+  .stat-value.delay-red { color: var(--red); }
+  .stat-value.delay-zero { color: var(--green); }
+
+  .card-footer {
+    border-top: 1px solid var(--border); padding-top: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.72rem; color: var(--muted);
+  }
+  .card-footer-person { font-weight: 600; color: var(--text); }
+
+  /* ── Phase check card section ─────────────────────── */
+  .card-phase-check {
+    background: #f5f4f0; border-radius: 8px; padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .pc-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pc-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .pc-count { font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+  .pc-bar-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .pc-bar-bg { flex: 1; height: 4px; background: #dedad5; border-radius: 2px; overflow: hidden; }
+  .pc-bar-fill { height: 100%; border-radius: 2px; background: var(--teal); transition: width .3s; }
+  .pc-rows { display: flex; flex-direction: column; gap: 4px; }
+  .pc-row { display: flex; align-items: baseline; gap: 5px; font-size: 0.71rem; min-width: 0; }
+  .pc-row-icon { flex-shrink: 0; font-size: 0.68rem; }
+  .pc-row-label { color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .pc-row-count { font-weight: 700; flex-shrink: 0; }
+  .pc-row-count.ok   { color: var(--green); }
+  .pc-row-count.warn { color: var(--red); }
+  .pc-row-items { color: var(--muted); font-size: 0.67rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .pc-next { display: flex; align-items: flex-start; gap: 5px; font-size: 0.71rem; min-width: 0; }
+  .pc-next-label { color: var(--muted); white-space: nowrap; flex-shrink: 0; font-weight: 600; }
+  .pc-next-value { color: var(--teal); font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .pc-no-tmpl { font-size: 0.68rem; color: var(--muted); font-style: italic; }
+
+  /* ── Phase check detail tab ───────────────────────── */
+  .phcheck-header {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .phcheck-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .phcheck-stat { display: flex; flex-direction: column; gap: 3px; }
+  .phcheck-stat-label { font-size: 0.62rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .phcheck-stat-value { font-size: 1rem; font-weight: 800; color: var(--text); }
+  .phcheck-stat-value.ok { color: var(--green); }
+  .phcheck-stat-value.ng { color: var(--red); }
+  .phcheck-phase-sel { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; flex-shrink: 0; }
+  .phcheck-phase-sel label { color: var(--muted); font-weight: 600; }
+
+  .phcheck-type-group { margin-bottom: 12px; }
+  .phcheck-type-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px; background: #f5f4f0; border-radius: 8px 8px 0 0;
+    border: 1px solid var(--border); border-bottom: none;
+  }
+  .phcheck-type-icon { font-size: 0.9rem; flex-shrink: 0; }
+  .phcheck-type-name { font-size: 0.8rem; font-weight: 700; }
+  .phcheck-type-count { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+
+  .phcheck-items { border: 1px solid var(--border); border-radius: 0 0 8px 8px; overflow: hidden; }
+  .phcheck-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 11px 16px;
+    border-bottom: 1px solid #f0ece8; background: #fff; transition: background .12s;
+  }
+  .phcheck-item:last-child { border-bottom: none; }
+  .phcheck-item:hover { background: #fafaf8; }
+  .phcheck-item.is-done { background: #f8fdf8; }
+  .phcheck-item.is-done .phcheck-item-name { color: var(--muted); text-decoration: line-through; }
+
+  .phcheck-cb {
+    width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 4px;
+    flex-shrink: 0; cursor: pointer; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s; margin-top: 2px; user-select: none;
+  }
+  .phcheck-cb.checked { background: var(--teal); border-color: var(--teal); color: #fff; font-size: 0.68rem; font-weight: 700; }
+  .phcheck-cb:hover { border-color: var(--teal); }
+
+  .phcheck-item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .phcheck-item-name { font-size: 0.8rem; font-weight: 600; }
+  .phcheck-item-req { font-size: 0.6rem; color: var(--red); font-weight: 700; margin-left: 4px; }
+  .phcheck-item-status { font-size: 0.68rem; }
+  .phcheck-item-status.done  { color: var(--green); }
+  .phcheck-item-status.pend  { color: var(--muted); }
+  .phcheck-note-input {
+    font-size: 0.72rem; padding: 4px 8px; border: 1px solid transparent;
+    border-radius: 5px; outline: none; background: none; color: var(--text);
+    width: 100%; max-width: 300px; transition: border-color .15s; font-family: inherit;
+  }
+  .phcheck-note-input:hover, .phcheck-note-input:focus { border-color: var(--border); background: #fff; }
+
+  .phcheck-empty {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 48px 24px; text-align: center; color: var(--muted);
+  }
+  .phcheck-empty h3 { font-size: 0.95rem; color: var(--text); margin-bottom: 8px; }
+  .phcheck-empty p  { font-size: 0.8rem; line-height: 1.7; }
+
+  /* ── Gallery tab ──────────────────────────────── */
+  .gallery-toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .gallery-upload-btn {
+    font-size: 0.78rem; font-weight: 700; padding: 8px 18px;
+    background: var(--teal); color: #fff; border: none; border-radius: 6px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: background .15s;
+  }
+  .gallery-upload-btn:hover { background: #00564d; }
+  .gallery-filter-select {
+    font-size: 0.75rem; padding: 5px 10px; border: 1px solid var(--border);
+    border-radius: 6px; background: #fff; cursor: pointer; outline: none;
+    color: var(--text); transition: border-color .15s;
+  }
+  .gallery-filter-select:focus { border-color: var(--teal); }
+  .gallery-sort-group { display: flex; gap: 4px; margin-left: auto; }
+  .gallery-sort-btn {
+    font-size: 0.7rem; padding: 5px 10px; border: 1px solid var(--border);
+    border-radius: 5px; background: #fff; cursor: pointer; color: var(--muted);
+    transition: all .15s;
+  }
+  .gallery-sort-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  /* Drop zone */
+  .gallery-drop-zone {
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 36px 24px; text-align: center; color: var(--muted);
+    margin-bottom: 20px; transition: all .2s; cursor: pointer; background: #fafafa;
+  }
+  .gallery-drop-zone.drag-over { border-color: var(--teal); background: #f0faf8; color: var(--teal); }
+  .gallery-drop-zone-icon { font-size: 2rem; margin-bottom: 8px; }
+  .gallery-drop-zone-text { font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
+  .gallery-drop-zone-sub { font-size: 0.72rem; }
+
+  /* Thumbnail grid */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .gallery-thumb {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; cursor: pointer; transition: box-shadow .2s, transform .2s;
+    position: relative;
+  }
+  .gallery-thumb:hover { box-shadow: 0 4px 20px rgba(0,0,0,.1); transform: translateY(-2px); }
+  .gallery-thumb-img {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: #f0ece8;
+  }
+  .gallery-thumb-placeholder {
+    width: 100%; aspect-ratio: 4/3; background: #f0ece8;
+    display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #ccc;
+  }
+  .gallery-thumb-info { padding: 10px 12px; }
+  .gallery-thumb-title {
+    font-size: 0.78rem; font-weight: 700; margin-bottom: 4px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .gallery-thumb-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .gallery-cat-badge {
+    font-size: 0.6rem; padding: 2px 7px; border-radius: 8px;
+    background: #f0ece8; color: var(--muted); font-weight: 600;
+  }
+  .gallery-thumb-date { font-size: 0.65rem; color: var(--muted); }
+  .gallery-cover-badge {
+    position: absolute; top: 8px; left: 8px;
+    background: #f59e0b; color: #fff;
+    font-size: 0.58rem; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+    letter-spacing: .04em;
+  }
+  .gallery-empty {
+    text-align: center; padding: 60px 24px;
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    color: var(--muted);
+  }
+  .gallery-empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .gallery-empty h3 { font-size: 0.95rem; color: var(--text); margin-bottom: 8px; }
+  .gallery-empty p { font-size: 0.8rem; line-height: 1.7; }
+
+  /* Lightbox */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 1000;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .lightbox-overlay.show { display: flex; }
+  .lightbox-box {
+    background: #fff; border-radius: 14px; overflow: hidden;
+    max-width: 900px; width: 100%; max-height: calc(100vh - 40px);
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox-img-area {
+    background: #111; position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; min-height: 200px;
+  }
+  .lightbox-img { max-width: 100%; max-height: 50vh; object-fit: contain; display: block; }
+  .lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    font-size: 1.2rem; padding: 8px 12px; cursor: pointer; border-radius: 6px;
+    transition: background .15s; line-height: 1;
+  }
+  .lightbox-nav:hover { background: rgba(255,255,255,.3); }
+  .lightbox-nav.prev { left: 10px; }
+  .lightbox-nav.next { right: 10px; }
+  .lightbox-close-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    font-size: 0.9rem; padding: 5px 9px; cursor: pointer; border-radius: 6px;
+    transition: background .15s; line-height: 1;
+  }
+  .lightbox-close-btn:hover { background: rgba(255,255,255,.3); }
+  .lightbox-counter {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 0.7rem; color: rgba(255,255,255,.7); background: rgba(0,0,0,.4);
+    padding: 3px 10px; border-radius: 10px; white-space: nowrap;
+  }
+  .lightbox-meta { padding: 16px 20px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+  .lightbox-meta-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px;
+  }
+  .lightbox-title-input {
+    font-size: 1rem; font-weight: 700; border: none; outline: none;
+    background: none; color: var(--text); font-family: inherit; flex: 1;
+    padding: 3px 6px; border-radius: 4px; transition: background .12s;
+  }
+  .lightbox-title-input:hover, .lightbox-title-input:focus { background: #f5f5f2; }
+  .lightbox-meta-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+  .lightbox-action-btn {
+    font-size: 0.72rem; padding: 5px 12px; border: 1px solid var(--border);
+    border-radius: 5px; cursor: pointer; background: #fff; color: var(--text);
+    transition: all .15s; white-space: nowrap;
+  }
+  .lightbox-action-btn:hover { background: #f5f5f2; }
+  .lightbox-action-btn.cover-active { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+  .lightbox-action-btn.delete-btn:hover { background: #fee2e2; color: var(--red); border-color: var(--red); }
+  .lightbox-meta-fields {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px 20px; margin-bottom: 14px;
+  }
+  .lightbox-field { display: flex; flex-direction: column; gap: 4px; }
+  .lightbox-field-label { font-size: 0.62rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .lightbox-field-input, .lightbox-field-select {
+    font-size: 0.78rem; padding: 5px 8px; border: 1px solid var(--border);
+    border-radius: 5px; outline: none; background: #fff; color: var(--text);
+    font-family: inherit; transition: border-color .15s;
+  }
+  .lightbox-field-input:focus, .lightbox-field-select:focus { border-color: var(--teal); }
+  .lightbox-note-label { font-size: 0.62rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .lightbox-note-input {
+    width: 100%; font-size: 0.78rem; padding: 8px 10px;
+    border: 1px solid var(--border); border-radius: 6px; outline: none;
+    background: #fff; color: var(--text); font-family: inherit; resize: vertical;
+    min-height: 60px; transition: border-color .15s;
+  }
+  .lightbox-note-input:focus { border-color: var(--teal); }
+
+  /* ── Management Dashboard tab ────────────────── */
+  .db-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px; margin-bottom: 20px;
+  }
+  .db-kpi {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 12px; text-align: center;
+    border-top: 3px solid transparent; transition: box-shadow .15s;
+  }
+  .db-kpi:hover { box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+  .db-kpi.kpi-good   { border-top-color: #16a34a; }
+  .db-kpi.kpi-warn   { border-top-color: #d97706; }
+  .db-kpi.kpi-danger { border-top-color: #dc2626; }
+  .db-kpi.kpi-teal   { border-top-color: var(--teal); }
+  .db-kpi-value {
+    font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 5px;
+  }
+  .db-kpi-value.v-good   { color: #16a34a; }
+  .db-kpi-value.v-warn   { color: #d97706; }
+  .db-kpi-value.v-danger { color: #dc2626; }
+  .db-kpi-value.v-teal   { color: var(--teal); }
+  .db-kpi-sub   { font-size: 0.68rem; color: var(--muted); margin-bottom: 3px; }
+  .db-kpi-label { font-size: 0.62rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+
+  .db-main-grid {
+    display: grid; grid-template-columns: 1fr 320px;
+    gap: 16px; margin-bottom: 20px; align-items: start;
+  }
+  .db-action-zone { display: flex; flex-direction: column; gap: 14px; }
+  .db-alert-zone  { display: flex; flex-direction: column; gap: 14px; }
+
+  .db-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px;
+  }
+  .db-card.border-teal   { border-left: 4px solid var(--teal); }
+  .db-card.border-amber  { border-left: 4px solid #f59e0b; }
+  .db-card.border-red    { border-left: 4px solid #dc2626; background: #fffbfb; }
+
+  .db-card-label {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+  }
+  .db-card-label.lbl-teal  { color: var(--teal); }
+  .db-card-label.lbl-amber { color: #b45309; }
+  .db-card-label.lbl-red   { color: #dc2626; }
+  .db-card-label.lbl-muted { color: var(--muted); }
+
+  .db-action-value {
+    font-size: 1.05rem; font-weight: 800; color: var(--text); line-height: 1.4;
+  }
+  .db-action-empty { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+
+  .db-blocker-list { display: flex; flex-direction: column; gap: 7px; }
+  .db-blocker-item { display: flex; align-items: baseline; gap: 8px; font-size: 0.82rem; }
+  .db-blocker-tag {
+    font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 6px;
+    flex-shrink: 0; letter-spacing: .04em;
+  }
+  .db-blocker-tag.doc  { background: #fee2e2; color: #b91c1c; }
+  .db-blocker-tag.conf { background: #fef9c3; color: #78350f; }
+  .db-blocker-name { color: var(--text); font-weight: 600; }
+
+  /* Phase progress bar inside db-card */
+  .db-phase-name { font-size: 1rem; font-weight: 800; color: var(--teal); margin-bottom: 10px; }
+  .db-progress-track {
+    height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-bottom: 6px;
+  }
+  .db-progress-fill { height: 100%; border-radius: 5px; transition: width .4s; }
+  .db-progress-fill.pf-good   { background: #16a34a; }
+  .db-progress-fill.pf-warn   { background: #f59e0b; }
+  .db-progress-fill.pf-danger { background: #dc2626; }
+  .db-progress-meta { font-size: 0.72rem; color: var(--muted); }
+
+  /* Alert rows */
+  .db-alert-row {
+    display: flex; align-items: flex-start; gap: 10px; padding: 9px 0;
+    border-bottom: 1px solid #f0ece8; font-size: 0.78rem;
+  }
+  .db-alert-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .db-alert-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+  .db-alert-dot.d-red   { background: #dc2626; }
+  .db-alert-dot.d-amber { background: #f59e0b; }
+  .db-alert-dot.d-green { background: #16a34a; }
+  .db-alert-name { flex: 1; font-weight: 600; }
+  .db-alert-due  { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .db-alert-due.overdue { color: #dc2626; font-weight: 700; }
+  .db-no-alerts  { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+
+  /* Gallery mini */
+  .db-gallery-mini  { display: flex; gap: 12px; align-items: center; }
+  .db-gallery-thumb {
+    width: 80px; height: 60px; border-radius: 8px; flex-shrink: 0;
+    object-fit: cover; border: 1px solid var(--border);
+    background: #f0ece8; display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; color: #ccc; overflow: hidden;
+  }
+  .db-gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .db-gallery-link { font-size: 0.72rem; color: var(--teal); cursor: pointer; margin-top: 4px; }
+  .db-gallery-link:hover { text-decoration: underline; }
+
+  /* Overdue section */
+  .db-overdue-section { margin-bottom: 20px; }
+  .db-overdue-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    background: #fff9f9; border: 1px solid #fca5a5; border-radius: 10px 10px 0 0;
+  }
+  .db-overdue-title { font-size: 0.85rem; font-weight: 700; color: #b91c1c; }
+  .db-overdue-count { font-size: 0.75rem; color: #b91c1c; font-weight: 600; margin-left: auto; }
+  .db-overdue-body  {
+    border: 1px solid #fca5a5; border-top: none; border-radius: 0 0 10px 10px; overflow: hidden;
+  }
+  .db-overdue-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    border-bottom: 1px solid #fef2f2; background: #fff; font-size: 0.78rem;
+  }
+  .db-overdue-row:last-child { border-bottom: none; }
+  .db-overdue-name { flex: 1; font-weight: 600; }
+  .db-overdue-dept { color: var(--muted); font-size: 0.7rem; }
+  .db-overdue-date { color: #b91c1c; font-weight: 700; font-size: 0.72rem; white-space: nowrap; }
+  .db-done-btn {
+    font-size: 0.68rem; padding: 3px 10px; border: 1px solid var(--border);
+    border-radius: 5px; cursor: pointer; background: #fff; color: var(--text);
+    transition: all .15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .db-done-btn:hover { background: #dcfce7; color: #15803d; border-color: #86efac; }
+
+  @media (max-width: 900px) {
+    .db-kpi-strip   { grid-template-columns: repeat(3, 1fr); }
+    .db-main-grid   { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .db-kpi-strip   { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Detail view ─────────────────────────────────── */
+  #view-detail { display: none; }
+
+  .detail-back-bar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 16px var(--pad) 0;
+  }
+  .back-btn {
+    font-size: 0.75rem; color: var(--muted); background: none; border: none;
+    cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 4px 0;
+    transition: color .15s;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  .detail-header {
+    max-width: 1400px; margin: 0 auto;
+    padding: 16px var(--pad) 24px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .detail-header-left { flex: 1; min-width: 0; }
+  .detail-store-name { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .detail-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .detail-info-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px 24px; font-size: 0.78rem;
+  }
+  .detail-info-item { display: flex; flex-direction: column; gap: 2px; }
+  .detail-info-label { font-size: 0.65rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .detail-info-value { font-weight: 600; }
+
+  .detail-header-right {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0;
+  }
+  .detail-progress-box {
+    background: #f5f5f2; border-radius: 10px; padding: 14px 18px;
+    display: flex; flex-direction: column; gap: 6px; min-width: 200px; text-align: center;
+  }
+  .detail-progress-pct { font-size: 2rem; font-weight: 800; line-height: 1; }
+  .detail-progress-pct.good  { color: var(--green); }
+  .detail-progress-pct.warn  { color: #f59e0b; }
+  .detail-progress-pct.delay { color: var(--red); }
+  .detail-progress-label { font-size: 0.65rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .detail-delay-chip {
+    font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .detail-delay-chip.has-delay { background: #ffebee; color: var(--red); }
+  .detail-delay-chip.no-delay  { background: #e8f5e9; color: #2e7d32; }
+
+  /* Phase selector */
+  .phase-selector {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 0.75rem;
+  }
+  .phase-selector label { color: var(--muted); font-weight: 600; }
+  .phase-select {
+    font-size: 0.75rem; padding: 5px 10px; border: 1px solid var(--border);
+    border-radius: 6px; background: #fff; cursor: pointer; outline: none;
+    color: var(--teal); font-weight: 600;
+  }
+  .phase-select:focus { border-color: var(--teal); }
+
+  /* ── Tabs ─────────────────────────────────────── */
+  .tabs-bar {
+    max-width: 1400px; margin: 0 auto;
+    padding: 0 var(--pad);
+    border-bottom: 2px solid var(--border);
+    display: flex; gap: 0;
+  }
+  .tab-btn {
+    font-size: 0.8rem; font-weight: 600; letter-spacing: .03em;
+    padding: 10px 20px; border: none; background: none; cursor: pointer;
+    color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab-btn.placeholder { opacity: .5; cursor: default; }
+
+  .tab-panel { display: none; max-width: 1400px; margin: 0 auto; padding: 24px var(--pad) 80px; }
+  .tab-panel.active { display: block; }
+
+  /* ── Overview tab ─────────────────────────────── */
+  .overview-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px 32px; background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+  }
+  .ov-item { display: flex; flex-direction: column; gap: 4px; }
+  .ov-label { font-size: 0.65rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .ov-value { font-size: 0.88rem; font-weight: 600; }
+
+  /* ── Tasks tab ────────────────────────────────── */
+  .tasks-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .tasks-toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; }
+  .add-task-btn {
+    font-size: 0.75rem; font-weight: 700; padding: 7px 16px;
+    background: var(--teal); color: #fff; border: none; border-radius: 6px; cursor: pointer;
+    transition: background .15s;
+  }
+  .add-task-btn:hover { background: #00564d; }
+
+  /* Category group */
+  .cat-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .cat-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; background: #f5f5f2; cursor: pointer;
+    user-select: none; transition: background .15s;
+  }
+  .cat-header:hover { background: #ededea; }
+  .cat-header-left { display: flex; align-items: center; gap: 10px; }
+  .cat-toggle { font-size: 0.7rem; color: var(--muted); transition: transform .2s; }
+  .cat-toggle.open { transform: rotate(90deg); }
+  .cat-name { font-size: 0.82rem; font-weight: 700; }
+  .cat-progress-mini { font-size: 0.68rem; color: var(--muted); }
+  .cat-progress-mini strong { color: var(--green); }
+
+  /* Task table */
+  .task-table-wrap { overflow-x: auto; }
+  .task-table {
+    width: 100%; border-collapse: collapse; font-size: 0.75rem;
+    table-layout: fixed;
+  }
+  .task-table th {
+    text-align: left; padding: 8px 10px; background: #fafafa;
+    border-bottom: 1px solid var(--border); font-weight: 600;
+    font-size: 0.68rem; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap; position: sticky; top: 0; z-index: 1;
+  }
+  .task-table td {
+    padding: 8px 10px; border-bottom: 1px solid #f0ece8; vertical-align: middle;
+  }
+  .task-table tr:last-child td { border-bottom: none; }
+  .task-table tr.completed td { opacity: .5; }
+  .task-table tr.overdue td:first-child { border-left: 3px solid var(--red); }
+
+  /* Column widths */
+  .col-task   { width: 22%; }
+  .col-dept   { width: 12%; }
+  .col-assign { width: 12%; }
+  .col-status { width: 10%; }
+  .col-due    { width: 10%; }
+  .col-done   { width: 10%; }
+  .col-notes  { width: 18%; }
+  .col-del    { width: 6%; }
+
+  .status-select {
+    font-size: 0.72rem; padding: 3px 6px; border: 1px solid var(--border);
+    border-radius: 5px; cursor: pointer; outline: none; width: 100%; max-width: 90px;
+    font-weight: 600;
+  }
+  .status-select.s-todo    { color: #666;          border-color: #ccc; background: #f9f9f9; }
+  .status-select.s-doing   { color: #1565c0;       border-color: #90caf9; background: #e3f2fd; }
+  .status-select.s-done    { color: #2e7d32;       border-color: #a5d6a7; background: #e8f5e9; }
+  .status-select.s-hold    { color: #e65100;       border-color: #ffcc80; background: #fff3e0; }
+
+  .due-date-input {
+    font-size: 0.72rem; padding: 3px 6px; border: 1px solid var(--border);
+    border-radius: 5px; outline: none; width: 100%; max-width: 120px; color: var(--text);
+  }
+  .due-date-input.overdue { color: var(--red); font-weight: 700; border-color: var(--red); }
+
+  .notes-input {
+    font-size: 0.72rem; padding: 3px 6px; border: 1px solid transparent;
+    border-radius: 5px; outline: none; width: 100%;
+    background: none; color: var(--text); transition: border-color .15s;
+  }
+  .notes-input:hover, .notes-input:focus { border-color: var(--border); background: #fff; }
+
+  .assignee-input {
+    font-size: 0.72rem; padding: 3px 6px; border: 1px solid transparent;
+    border-radius: 5px; outline: none; width: 100%; max-width: 100px;
+    background: none; color: var(--text); transition: border-color .15s;
+  }
+  .assignee-input:hover, .assignee-input:focus { border-color: var(--border); background: #fff; }
+
+  .del-btn {
+    font-size: 0.72rem; color: var(--muted); background: none; border: none;
+    cursor: pointer; padding: 3px 6px; border-radius: 4px; transition: all .15s;
+  }
+  .del-btn:hover { background: #ffebee; color: var(--red); }
+
+  .required-star { color: var(--red); font-size: 0.6rem; vertical-align: super; }
+  .completed-date-cell { font-size: 0.72rem; color: var(--green); }
+
+  /* ── Log tab ──────────────────────────────────── */
+  .log-list { display: flex; flex-direction: column; gap: 0; }
+  .log-item {
+    display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-time { font-size: 0.7rem; color: var(--muted); white-space: nowrap; min-width: 130px; }
+  .log-body { flex: 1; }
+  .log-action { font-weight: 600; margin-bottom: 2px; }
+  .log-detail { color: var(--muted); font-size: 0.73rem; }
+  .log-icon { font-size: 1rem; flex-shrink: 0; width: 24px; text-align: center; margin-top: 2px; }
+
+  /* ── Modal ────────────────────────────────────── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 2000;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 14px; padding: 28px;
+    width: 100%; max-width: 520px; box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  }
+  .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+  .modal-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .modal-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  .modal-input, .modal-select {
+    font-size: 0.82rem; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: 7px; outline: none; background: #fff; color: var(--text);
+    transition: border-color .15s; font-family: inherit;
+  }
+  .modal-input:focus, .modal-select:focus { border-color: var(--teal); }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+  .modal-cancel { font-size: 0.8rem; padding: 8px 16px; border: 1px solid var(--border); border-radius: 7px; background: none; cursor: pointer; }
+  .modal-cancel:hover { background: #f5f5f2; }
+  .modal-submit { font-size: 0.8rem; padding: 8px 20px; background: var(--teal); color: #fff; border: none; border-radius: 7px; cursor: pointer; font-weight: 700; }
+  .modal-submit:hover { background: #00564d; }
+
+  /* ── Placeholder tabs ─────────────────────────── */
+  .placeholder-tab {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 48px 24px; text-align: center; color: var(--muted);
+  }
+  .placeholder-tab h3 { font-size: 1rem; margin-bottom: 8px; color: var(--text); }
+  .placeholder-tab p { font-size: 0.82rem; line-height: 1.6; }
+
+  /* ── Empty state ──────────────────────────────── */
+  .empty-state { padding: 60px 0; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+  /* ── Toast ────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 3000;
+    background: #222; color: #fff; font-size: 0.78rem;
+    padding: 10px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .25s, transform .25s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive: bottom nav on SP ─────────────── */
+  @media (max-width: 640px) {
+    .site-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+      z-index: 800; background: #fff;
+      border-top: 1px solid var(--border); border-bottom: none;
+      padding: 0 0 env(safe-area-inset-bottom);
+      display: flex; gap: 0; justify-content: space-around; max-width: none;
+    }
+    .nav-btn, #nav-pdf, .nav-btn-req, .nav-btn-maker, .nav-btn-stores {
+      flex: 1; padding: 14px 2px 15px; border-radius: 0; font-size: 0.8rem;
+      background: none !important; color: var(--muted) !important;
+      margin-left: 0 !important; font-weight: 600;
+    }
+    .nav-btn-stores { color: var(--teal) !important; font-weight: 700; }
+    .filter-bar { flex-wrap: wrap; gap: 6px; }
+    .filter-search { width: 100%; }
+    .detail-info-grid { grid-template-columns: repeat(2, 1fr); }
+    .task-table { min-width: 700px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────── -->
+<div class="site-header">
+  <a href="aicare-portfolio.html" class="site-logo">AICARE LAB</a>
+  <span class="header-subtitle">店舗管理システム</span>
+</div>
+
+<!-- ── Nav ────────────────────────────────────── -->
+<nav class="site-nav">
+  <a href="aicare-portfolio.html" class="nav-btn" id="nav-pdf">制作物一覧</a>
+  <a href="aicare-portfolio.html?tab=req" class="nav-btn nav-btn-req">📋 依頼管理</a>
+  <a href="aicare-portfolio.html?tab=maker" class="nav-btn nav-btn-maker">👷 製作者管理</a>
+  <button class="nav-btn nav-btn-stores" id="nav-stores">🏪 店舗管理</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     STORE LIST VIEW
+════════════════════════════════════════════════ -->
+<div id="view-list">
+
+  <div class="page-title-bar">
+    <div class="page-title">🏪 店舗管理 <span class="page-title-sub" id="store-count"></span></div>
+    <button class="add-task-btn" onclick="openAddStoreModal()" style="font-size:0.8rem;padding:8px 18px;">＋ 新規店舗</button>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <select class="filter-select" id="f-type" onchange="applyFilters()">
+      <option value="">全店舗形態</option>
+      <option value="直営">直営</option>
+      <option value="FC">FC</option>
+    </select>
+    <select class="filter-select" id="f-phase" onchange="applyFilters()">
+      <option value="">全フェーズ</option>
+    </select>
+    <select class="filter-select" id="f-status" onchange="applyFilters()">
+      <option value="">全ステータス</option>
+      <option value="順調">順調</option>
+      <option value="注意">注意</option>
+      <option value="遅延">遅延</option>
+    </select>
+    <select class="filter-select" id="f-person" onchange="applyFilters()">
+      <option value="">全担当者</option>
+    </select>
+    <span class="filter-divider">|</span>
+    <input class="filter-search" id="f-search" type="search" placeholder="店舗名で検索…" oninput="applyFilters()">
+    <span class="filter-divider">|</span>
+    <button class="sort-btn" data-sort="store_name" onclick="toggleSort('store_name')">店舗名</button>
+    <button class="sort-btn" data-sort="progress" onclick="toggleSort('progress')">進捗</button>
+    <button class="sort-btn" data-sort="delay" onclick="toggleSort('delay')">遅延</button>
+    <button class="sort-btn" data-sort="next_deadline" onclick="toggleSort('next_deadline')">期限</button>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
+  <!-- Store cards grid -->
+  <div class="stores-grid" id="stores-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     STORE DETAIL VIEW
+════════════════════════════════════════════════ -->
+<div id="view-detail">
+
+  <div class="detail-back-bar">
+    <button class="back-btn" onclick="showListView()">← 一覧に戻る</button>
+  </div>
+
+  <!-- Store header -->
+  <div class="detail-header">
+    <div class="detail-header-left">
+      <div class="detail-store-name" id="d-store-name"></div>
+      <div class="detail-badges" id="d-badges"></div>
+      <div class="detail-info-grid" id="d-info-grid"></div>
+    </div>
+    <div class="detail-header-right">
+      <div class="detail-progress-box">
+        <div class="detail-progress-pct" id="d-progress-pct">—</div>
+        <div class="detail-progress-label">全体進捗</div>
+      </div>
+      <div class="detail-delay-chip" id="d-delay-chip"></div>
+      <div class="phase-selector">
+        <label>フェーズ:</label>
+        <select class="phase-select" id="d-phase-select" onchange="updatePhase(this.value)"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 ダッシュボード</button>
+    <button class="tab-btn" data-tab="overview" onclick="switchTab('overview')">概要</button>
+    <button class="tab-btn" data-tab="tasks" onclick="switchTab('tasks')">工程</button>
+    <button class="tab-btn placeholder" data-tab="hr" onclick="switchTab('hr')">人事</button>
+    <button class="tab-btn placeholder" data-tab="creative" onclick="switchTab('creative')">クリエイティブ</button>
+    <button class="tab-btn placeholder" data-tab="system" onclick="switchTab('system')">システム</button>
+    <button class="tab-btn" data-tab="phasecheck" onclick="switchTab('phasecheck')">📋 フェーズチェック</button>
+    <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">🖼 ギャラリー</button>
+    <button class="tab-btn placeholder" data-tab="comment" onclick="switchTab('comment')">💬 コメント</button>
+    <button class="tab-btn" data-tab="log" onclick="switchTab('log')">ログ</button>
+  </div>
+
+  <!-- Dashboard tab -->
+  <div class="tab-panel active" id="panel-dashboard">
+    <div id="dashboard-content"></div>
+  </div>
+
+  <!-- Overview tab -->
+  <div class="tab-panel" id="panel-overview">
+    <div class="overview-grid" id="overview-content"></div>
+  </div>
+
+  <!-- Tasks tab -->
+  <div class="tab-panel" id="panel-tasks">
+    <div class="tasks-toolbar">
+      <div class="tasks-toolbar-left">
+        <button class="add-task-btn" onclick="openAddTaskModal()">＋ タスク追加</button>
+      </div>
+      <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
+    </div>
+    <div id="tasks-content"></div>
+  </div>
+
+  <!-- HR tab (placeholder) -->
+  <div class="tab-panel" id="panel-hr">
+    <div class="placeholder-tab">
+      <h3>👥 人事管理</h3>
+      <p>スタッフ採用・研修・シフト管理などを<br>今後ここに実装予定です。</p>
+    </div>
+  </div>
+
+  <!-- Creative tab (placeholder) -->
+  <div class="tab-panel" id="panel-creative">
+    <div class="placeholder-tab">
+      <h3>🎨 クリエイティブ管理</h3>
+      <p>チラシ・看板・名刺などのクリエイティブ素材の<br>進行・承認管理を今後ここに実装予定です。</p>
+    </div>
+  </div>
+
+  <!-- System tab (placeholder) -->
+  <div class="tab-panel" id="panel-system">
+    <div class="placeholder-tab">
+      <h3>💻 システム管理</h3>
+      <p>予約システム・決済・POSなどの<br>システム設定管理を今後ここに実装予定です。</p>
+    </div>
+  </div>
+
+  <!-- Phase check tab -->
+  <div class="tab-panel" id="panel-phasecheck">
+    <div id="phasecheck-content"></div>
+  </div>
+
+  <!-- Gallery tab -->
+  <div class="tab-panel" id="panel-gallery">
+    <!-- Toolbar -->
+    <div class="gallery-toolbar">
+      <button class="gallery-upload-btn" onclick="document.getElementById('gallery-file-input').click()">
+        ＋ 画像を追加
+      </button>
+      <input type="file" id="gallery-file-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none" onchange="handleGalleryFileSelect(this.files)">
+      <select class="gallery-filter-select" id="gallery-filter-cat" onchange="renderGalleryTab()">
+        <option value="">すべてのカテゴリ</option>
+        <option>外観</option><option>内観</option><option>看板</option>
+        <option>施工中</option><option>オープン前</option><option>オープン後</option>
+        <option>備品</option><option>その他</option>
+      </select>
+      <select class="gallery-filter-select" id="gallery-filter-phase" onchange="renderGalleryTab()">
+        <option value="">すべてのフェーズ</option>
+      </select>
+      <div class="gallery-sort-group">
+        <button class="gallery-sort-btn active" data-gsort="newest" onclick="setGallerySort('newest')">新しい順</button>
+        <button class="gallery-sort-btn" data-gsort="oldest" onclick="setGallerySort('oldest')">古い順</button>
+        <button class="gallery-sort-btn" data-gsort="category" onclick="setGallerySort('category')">カテゴリ順</button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="gallery-drop-zone" id="gallery-drop-zone"
+         onclick="document.getElementById('gallery-file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleGalleryDrop(event)">
+      <div class="gallery-drop-zone-icon">📷</div>
+      <div class="gallery-drop-zone-text">ここに画像をドラッグ＆ドロップ</div>
+      <div class="gallery-drop-zone-sub">または上の「画像を追加」ボタンから選択（JPG / PNG / WebP）</div>
+    </div>
+
+    <!-- Grid -->
+    <div id="gallery-grid-wrap"></div>
+  </div>
+
+  <!-- Comment tab (placeholder) -->
+  <div class="tab-panel" id="panel-comment">
+    <div class="placeholder-tab">
+      <h3>💬 コメント</h3>
+      <p>店舗に関するコメント・メモ・共有事項を<br>今後ここに実装予定です。</p>
+    </div>
+  </div>
+
+  <!-- Log tab -->
+  <div class="tab-panel" id="panel-log">
+    <div class="log-list" id="log-content"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════ -->
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal-box">
+    <div class="modal-title">タスクを追加</div>
+    <div class="modal-form-group">
+      <label class="modal-label">カテゴリ</label>
+      <select class="modal-select" id="mt-category">
+        <option>契約</option><option>不動産</option><option>内装</option>
+        <option>看板</option><option>チラシ</option><option>名刺・ツール</option>
+        <option>Web</option><option>採用</option><option>研修</option>
+        <option>システム</option><option>備品</option><option>共有</option>
+      </select>
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">タスク名 <span style="color:var(--red)">*</span></label>
+      <input class="modal-input" id="mt-name" type="text" placeholder="タスク名を入力">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">担当部署</label>
+      <input class="modal-input" id="mt-dept" type="text" placeholder="例: クリエイティブ">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">担当者</label>
+      <input class="modal-input" id="mt-assignee" type="text" placeholder="担当者名">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">期限</label>
+      <input class="modal-input" id="mt-due" type="date">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">必須タスク</label>
+      <select class="modal-select" id="mt-required">
+        <option value="true">必須</option>
+        <option value="false">任意</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeModal('modal-task')">キャンセル</button>
+      <button class="modal-submit" onclick="submitAddTask()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Store Modal -->
+<div class="modal-overlay" id="modal-store">
+  <div class="modal-box">
+    <div class="modal-title">新規店舗を追加</div>
+    <div class="modal-form-group">
+      <label class="modal-label">店舗名 <span style="color:var(--red)">*</span></label>
+      <input class="modal-input" id="ms-name" type="text" placeholder="店舗名を入力">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">店舗形態</label>
+      <select class="modal-select" id="ms-type">
+        <option value="直営">直営</option>
+        <option value="FC">FC</option>
+      </select>
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">エリア</label>
+      <input class="modal-input" id="ms-area" type="text" placeholder="例: 東京都渋谷区">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">主担当者</label>
+      <input class="modal-input" id="ms-person" type="text" placeholder="担当者名">
+    </div>
+    <div class="modal-form-group">
+      <label class="modal-label">オープン予定日</label>
+      <input class="modal-input" id="ms-open" type="date">
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeModal('modal-store')">キャンセル</button>
+      <button class="modal-submit" onclick="submitAddStore()">作成する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Lightbox Modal -->
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="handleLightboxBackdrop(event)">
+  <div class="lightbox-box">
+    <div class="lightbox-img-area">
+      <img class="lightbox-img" id="lightbox-img" src="" alt="">
+      <button class="lightbox-nav prev" onclick="lightboxNavigate(-1)">&#8249;</button>
+      <button class="lightbox-nav next" onclick="lightboxNavigate(1)">&#8250;</button>
+      <button class="lightbox-close-btn" onclick="closeLightbox()">✕</button>
+      <div class="lightbox-counter" id="lightbox-counter"></div>
+    </div>
+    <div class="lightbox-meta">
+      <div class="lightbox-meta-header">
+        <input class="lightbox-title-input" id="lb-title" type="text" placeholder="タイトルを入力"
+               onblur="saveLightboxField('title', this.value)">
+        <div class="lightbox-meta-actions">
+          <button class="lightbox-action-btn cover-btn" id="lb-cover-btn" onclick="toggleLightboxCover()">⭐ 代表画像に設定</button>
+          <button class="lightbox-action-btn delete-btn" onclick="deleteLightboxImage()">🗑 削除</button>
+        </div>
+      </div>
+      <div class="lightbox-meta-fields">
+        <div class="lightbox-field">
+          <label class="lightbox-field-label">カテゴリ</label>
+          <select class="lightbox-field-select" id="lb-category" onchange="saveLightboxField('category', this.value)">
+            <option>外観</option><option>内観</option><option>看板</option>
+            <option>施工中</option><option>オープン前</option><option>オープン後</option>
+            <option>備品</option><option>その他</option>
+          </select>
+        </div>
+        <div class="lightbox-field">
+          <label class="lightbox-field-label">フェーズ</label>
+          <select class="lightbox-field-select" id="lb-phase" onchange="saveLightboxField('phase_name', this.value)">
+            <option value="">（未設定）</option>
+          </select>
+        </div>
+        <div class="lightbox-field">
+          <label class="lightbox-field-label">撮影日</label>
+          <input class="lightbox-field-input" id="lb-shot-date" type="date"
+                 onchange="saveLightboxField('shot_date', this.value)">
+        </div>
+        <div class="lightbox-field">
+          <label class="lightbox-field-label">登録者</label>
+          <input class="lightbox-field-input" id="lb-uploaded-by" type="text" placeholder="担当者名"
+                 onblur="saveLightboxField('uploaded_by', this.value)">
+        </div>
+      </div>
+      <div>
+        <div class="lightbox-note-label">メモ</div>
+        <textarea class="lightbox-note-input" id="lb-note" placeholder="メモを入力"
+                  onblur="saveLightboxField('note', this.value)"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════
+     DATA & SCRIPTS
+════════════════════════════════════════════════ -->
+<script src="data/store-templates.js"></script>
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────
+// STORAGE
+// ─────────────────────────────────────────────
+const LS_STORES  = 'aicare_stores_v1';
+const LS_TASKS   = 'aicare_store_tasks_v1';
+const LS_LOGS    = 'aicare_store_logs_v1';
+const LS_CHECKS  = 'aicare_store_checks_v1';
+const LS_GALLERY = 'aicare_store_gallery_v1';
+
+let storesData   = [];
+let tasksData    = {}; // { storeId: task[] }
+let logsData     = {}; // { storeId: log[] }
+let checksData   = {}; // { storeId: phase_check[] }
+let galleriesData = {}; // { storeId: gallery_image[] }
+
+// ギャラリー用状態
+let gallerySortState = 'newest'; // newest | oldest | category
+
+function loadData() {
+  try {
+    const s = localStorage.getItem(LS_STORES);
+    const t = localStorage.getItem(LS_TASKS);
+    const l = localStorage.getItem(LS_LOGS);
+    const c = localStorage.getItem(LS_CHECKS);
+    const g = localStorage.getItem(LS_GALLERY);
+    storesData    = s ? JSON.parse(s) : JSON.parse(JSON.stringify(MOCK_STORES));
+    tasksData     = t ? JSON.parse(t) : JSON.parse(JSON.stringify(MOCK_TASKS));
+    logsData      = l ? JSON.parse(l) : JSON.parse(JSON.stringify(MOCK_LOGS));
+    checksData    = c ? JSON.parse(c) : JSON.parse(JSON.stringify(MOCK_PHASE_CHECKS));
+    galleriesData = g ? JSON.parse(g) : {};
+  } catch(e) {
+    storesData = JSON.parse(JSON.stringify(MOCK_STORES));
+    tasksData  = JSON.parse(JSON.stringify(MOCK_TASKS));
+    logsData   = JSON.parse(JSON.stringify(MOCK_LOGS));
+    checksData    = JSON.parse(JSON.stringify(MOCK_PHASE_CHECKS));
+    galleriesData = {};
+  }
+}
+
+function saveData() {
+  localStorage.setItem(LS_STORES,  JSON.stringify(storesData));
+  localStorage.setItem(LS_TASKS,   JSON.stringify(tasksData));
+  localStorage.setItem(LS_LOGS,    JSON.stringify(logsData));
+  localStorage.setItem(LS_CHECKS,  JSON.stringify(checksData));
+}
+
+function saveGalleryData() {
+  try {
+    localStorage.setItem(LS_GALLERY, JSON.stringify(galleriesData));
+  } catch(e) {
+    showToast('⚠️ ストレージ容量不足。古い画像を削除してください。');
+  }
+}
+
+// ─────────────────────────────────────────────
+// GALLERY: UPLOAD
+// ─────────────────────────────────────────────
+function handleGalleryDrop(e) {
+  e.preventDefault();
+  document.getElementById('gallery-drop-zone').classList.remove('drag-over');
+  handleGalleryFileSelect(e.dataTransfer.files);
+}
+
+function handleGalleryFileSelect(files) {
+  if (!files || !files.length) return;
+  let processed = 0;
+  const total = files.length;
+  Array.from(files).forEach(file => {
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+      showToast(`${file.name}: 非対応形式です`);
+      processed++;
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      resizeImage(e.target.result, 1200, 900, 0.85, fullData => {
+        resizeImage(e.target.result, 400, 300, 0.8, thumbData => {
+          const img = {
+            id:           'gal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+            store_id:     currentStoreId,
+            image_data:   fullData,
+            thumb_data:   thumbData,
+            title:        file.name.replace(/\.[^.]+$/, ''),
+            note:         '',
+            category:     '外観',
+            phase_name:   storesData.find(s => s.id === currentStoreId)?.current_phase || '',
+            shot_date:    todayStr(),
+            uploaded_by:  '',
+            sort_order:   (galleriesData[currentStoreId] || []).length,
+            is_cover:     !(galleriesData[currentStoreId] || []).length, // 初枚目は自動で代表
+            created_at:   todayStr(),
+            updated_at:   todayStr(),
+          };
+          if (!galleriesData[currentStoreId]) galleriesData[currentStoreId] = [];
+          galleriesData[currentStoreId].push(img);
+          processed++;
+          if (processed === total) {
+            saveGalleryData();
+            renderGalleryTab();
+            showToast(`${total}枚の画像を追加しました`);
+          }
+        });
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function resizeImage(dataUrl, maxW, maxH, quality, callback) {
+  const img = new Image();
+  img.onload = () => {
+    let w = img.width, h = img.height;
+    if (w > maxW || h > maxH) {
+      const ratio = Math.min(maxW / w, maxH / h);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width  = w;
+    canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
+// ─────────────────────────────────────────────
+// GALLERY: LIGHTBOX
+// ─────────────────────────────────────────────
+let lightboxImageId = null;
+
+function openLightbox(imageId) {
+  lightboxImageId = imageId;
+  _renderLightbox();
+  document.getElementById('lightbox-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  // ライトボックスのフェーズ選択肢を初期化
+  const sel = document.getElementById('lb-phase');
+  if (sel.options.length <= 1) {
+    PHASES.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p; opt.textContent = p;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  lightboxImageId = null;
+}
+
+function handleLightboxBackdrop(e) {
+  if (e.target === document.getElementById('lightbox-overlay')) closeLightbox();
+}
+
+function _renderLightbox() {
+  const images  = _getLightboxImages();
+  const idx     = images.findIndex(img => img.id === lightboxImageId);
+  if (idx === -1) { closeLightbox(); return; }
+  const img     = images[idx];
+
+  document.getElementById('lightbox-img').src = img.image_data || img.thumb_data || '';
+  document.getElementById('lb-title').value   = img.title || '';
+  document.getElementById('lb-note').value    = img.note  || '';
+  document.getElementById('lb-shot-date').value    = img.shot_date    || '';
+  document.getElementById('lb-uploaded-by').value  = img.uploaded_by  || '';
+
+  const catSel = document.getElementById('lb-category');
+  catSel.value = img.category || '外観';
+
+  const phaseSel = document.getElementById('lb-phase');
+  phaseSel.value = img.phase_name || '';
+
+  const coverBtn = document.getElementById('lb-cover-btn');
+  coverBtn.textContent = img.is_cover ? '⭐ 代表画像（設定済）' : '⭐ 代表画像に設定';
+  coverBtn.classList.toggle('cover-active', img.is_cover);
+
+  document.getElementById('lightbox-counter').textContent = `${idx + 1} / ${images.length}`;
+
+  // 前後ナビ
+  document.querySelector('.lightbox-nav.prev').style.display = idx > 0 ? '' : 'none';
+  document.querySelector('.lightbox-nav.next').style.display = idx < images.length - 1 ? '' : 'none';
+}
+
+function _getLightboxImages() {
+  const catFilter   = (document.getElementById('gallery-filter-cat')   || {}).value || '';
+  const phaseFilter = (document.getElementById('gallery-filter-phase') || {}).value || '';
+  let images = (galleriesData[currentStoreId] || []).slice();
+  if (catFilter)   images = images.filter(img => img.category   === catFilter);
+  if (phaseFilter) images = images.filter(img => img.phase_name === phaseFilter);
+  if (gallerySortState === 'newest') {
+    images.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  } else if (gallerySortState === 'oldest') {
+    images.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  } else {
+    images.sort((a, b) => GALLERY_CATEGORIES.indexOf(a.category) - GALLERY_CATEGORIES.indexOf(b.category));
+  }
+  return images;
+}
+
+function lightboxNavigate(dir) {
+  const images = _getLightboxImages();
+  const idx = images.findIndex(img => img.id === lightboxImageId);
+  const next = images[idx + dir];
+  if (next) { lightboxImageId = next.id; _renderLightbox(); }
+}
+
+function saveLightboxField(field, value) {
+  if (!lightboxImageId) return;
+  const all = galleriesData[currentStoreId] || [];
+  const img = all.find(i => i.id === lightboxImageId);
+  if (!img) return;
+  img[field]     = value;
+  img.updated_at = todayStr();
+  saveGalleryData();
+  renderGalleryTab();
+}
+
+function toggleLightboxCover() {
+  if (!lightboxImageId) return;
+  const all = galleriesData[currentStoreId] || [];
+  // 既存の代表を外す
+  all.forEach(i => { i.is_cover = false; });
+  const img = all.find(i => i.id === lightboxImageId);
+  if (img) { img.is_cover = true; img.updated_at = todayStr(); }
+  saveGalleryData();
+  renderGalleryTab();
+  _renderLightbox();
+  showToast('代表画像を設定しました');
+}
+
+function deleteLightboxImage() {
+  if (!lightboxImageId || !currentStoreId) return;
+  const all = galleriesData[currentStoreId] || [];
+  const idx = all.findIndex(i => i.id === lightboxImageId);
+  if (idx === -1) return;
+  const wasCover = all[idx].is_cover;
+  all.splice(idx, 1);
+  // 代表が削除された場合は先頭を代表に
+  if (wasCover && all.length) all[0].is_cover = true;
+  saveGalleryData();
+  closeLightbox();
+  renderGalleryTab();
+  showToast('画像を削除しました');
+}
+
+// ─────────────────────────────────────────────
+// COMPUTED VALUES
+// ─────────────────────────────────────────────
+function calcProgress(storeId) {
+  const tasks = tasksData[storeId] || [];
+  const req = tasks.filter(t => t.is_required);
+  if (!req.length) return 0;
+  return Math.round(tasks.filter(t => t.is_required && t.status === '完了').length / req.length * 100);
+}
+
+function calcDelays(storeId) {
+  const today = todayStr();
+  return (tasksData[storeId] || []).filter(t => t.status !== '完了' && t.due_date && t.due_date < today).length;
+}
+
+function getNextDeadline(storeId) {
+  const today = todayStr();
+  const upcoming = (tasksData[storeId] || [])
+    .filter(t => t.status !== '完了' && t.due_date && t.due_date >= today)
+    .sort((a, b) => a.due_date.localeCompare(b.due_date));
+  return upcoming[0]?.due_date || null;
+}
+
+function getStoreStatus(storeId) {
+  const delays = calcDelays(storeId);
+  if (delays > 0) return '遅延';
+
+  // 7日以内に期限を迎える未完了タスクがあれば「注意」
+  const today = todayStr();
+  const sevenDays = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+  const hasUpcoming = (tasksData[storeId] || []).some(
+    t => t.status !== '完了' && t.due_date && t.due_date >= today && t.due_date <= sevenDays
+  );
+  if (hasUpcoming) return '注意';
+
+  return '順調';
+}
+
+// ─────────────────────────────────────────────
+// PHASE CHECK HELPERS
+// ─────────────────────────────────────────────
+function getPhaseChecks(storeId, phase) {
+  const s = storesData.find(x => x.id === storeId);
+  const p = phase || s?.current_phase;
+  return (checksData[storeId] || []).filter(c => c.phase_name === p);
+}
+
+function calcPhaseCheck(storeId) {
+  const checks   = getPhaseChecks(storeId);
+  const total    = checks.length;
+  const done     = checks.filter(c => c.status === 'completed').length;
+  const docs     = checks.filter(c => c.item_type === 'document');
+  const docsDone = docs.filter(c => c.status === 'completed').length;
+  const confs     = checks.filter(c => c.item_type === 'confirmation');
+  const confsDone = confs.filter(c => c.status === 'completed').length;
+  const pending  = checks.filter(c => c.status === 'pending').sort((a, b) => a.sort_order - b.sort_order);
+  return { total, done, docs: docs.length, docsDone, confs: confs.length, confsDone, pending };
+}
+
+function getNextAction(storeId) {
+  const checks = getPhaseChecks(storeId);
+  const first  = checks.filter(c => c.status === 'pending').sort((a, b) => a.sort_order - b.sort_order)[0];
+  return first?.item_name || null;
+}
+
+function getMissingDocs(storeId) {
+  return getPhaseChecks(storeId).filter(c => c.item_type === 'document' && c.status === 'pending');
+}
+
+function getPendingConfirms(storeId) {
+  return getPhaseChecks(storeId).filter(c => c.item_type === 'confirmation' && c.status === 'pending');
+}
+
+// テンプレートから未作成のチェック項目を初期化（フェーズ変更時・詳細表示時に呼ぶ）
+function initPhaseChecksForStore(storeId, phase) {
+  const tmpl = PHASE_CHECK_TEMPLATES[phase];
+  if (!tmpl || !tmpl.length) return;
+  if (!checksData[storeId]) checksData[storeId] = [];
+  const existingIds = checksData[storeId].filter(c => c.phase_name === phase).map(c => c.template_id);
+  let added = false;
+  tmpl.forEach(t => {
+    if (!existingIds.includes(t.id)) {
+      checksData[storeId].push({
+        id:          `chk-${storeId}-${t.id}`,
+        store_id:    storeId,
+        phase_name:  phase,
+        template_id: t.id,
+        item_name:   t.item_name,
+        item_type:   t.item_type,
+        is_required: t.is_required,
+        sort_order:  t.sort_order,
+        status:      'pending',
+        checked_at:  '',
+        checked_by:  '',
+        note:        '',
+        created_at:  todayStr(),
+        updated_at:  todayStr(),
+      });
+      added = true;
+    }
+  });
+  if (added) saveData();
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.replace(/-/g, '/').slice(2); // 'YY/MM/DD'
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentView    = 'list';
+let currentStoreId = null;
+let currentTab     = 'overview';
+let openCats       = {};   // category name → true/false
+
+let filterState = { type: '', phase: '', status: '', person: '', query: '' };
+let sortState   = { field: '', dir: 'asc' };
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  buildFilterOptions();
+
+  // Check URL ?id=
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('id');
+  if (sid && storesData.find(s => s.id === sid)) {
+    openStoreDetail(sid);
+  } else {
+    renderStoreList();
+  }
+});
+
+function buildFilterOptions() {
+  // Phases
+  const pSel = document.getElementById('f-phase');
+  PHASES.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    pSel.appendChild(o);
+  });
+  // Persons
+  const persons = [...new Set(storesData.map(s => s.lead_person).filter(Boolean))];
+  const perSel = document.getElementById('f-person');
+  persons.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    perSel.appendChild(o);
+  });
+}
+
+// ─────────────────────────────────────────────
+// STORE LIST
+// ─────────────────────────────────────────────
+function applyFilters() {
+  filterState.type   = document.getElementById('f-type').value;
+  filterState.phase  = document.getElementById('f-phase').value;
+  filterState.status = document.getElementById('f-status').value;
+  filterState.person = document.getElementById('f-person').value;
+  filterState.query  = document.getElementById('f-search').value.trim().toLowerCase();
+  renderStoreList();
+}
+
+function toggleSort(field) {
+  if (sortState.field === field) {
+    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortState.field = field;
+    sortState.dir   = field === 'delay' ? 'desc' : 'asc';
+  }
+  document.querySelectorAll('.sort-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === sortState.field);
+  });
+  renderStoreList();
+}
+
+function getFilteredStores() {
+  return storesData.filter(s => {
+    if (filterState.type   && s.store_type    !== filterState.type)   return false;
+    if (filterState.phase  && s.current_phase !== filterState.phase)  return false;
+    if (filterState.person && s.lead_person   !== filterState.person) return false;
+    if (filterState.query  && !s.store_name.toLowerCase().includes(filterState.query)) return false;
+    if (filterState.status) {
+      if (getStoreStatus(s.id) !== filterState.status) return false;
+    }
+    return true;
+  });
+}
+
+function getSortedStores(list) {
+  if (!sortState.field) return list;
+  return [...list].sort((a, b) => {
+    let av, bv;
+    if (sortState.field === 'store_name') {
+      av = a.store_name; bv = b.store_name;
+      return sortState.dir === 'asc' ? av.localeCompare(bv, 'ja') : bv.localeCompare(av, 'ja');
+    }
+    if (sortState.field === 'progress') {
+      av = calcProgress(a.id); bv = calcProgress(b.id);
+    } else if (sortState.field === 'delay') {
+      av = calcDelays(a.id); bv = calcDelays(b.id);
+    } else if (sortState.field === 'next_deadline') {
+      av = getNextDeadline(a.id) || '9999'; bv = getNextDeadline(b.id) || '9999';
+      return sortState.dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+    return sortState.dir === 'asc' ? av - bv : bv - av;
+  });
+}
+
+function renderStoreList() {
+  const filtered = getFilteredStores();
+  const sorted   = getSortedStores(filtered);
+  const grid     = document.getElementById('stores-grid');
+
+  document.getElementById('store-count').textContent = `(${storesData.length}店舗)`;
+  document.getElementById('filter-count').textContent = `${sorted.length} 件表示`;
+
+  if (!sorted.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">条件に一致する店舗がありません</div>';
+    return;
+  }
+
+  grid.innerHTML = sorted.map(s => renderStoreCard(s)).join('');
+}
+
+function buildTypeBadge(store_type) {
+  return store_type === '直営'
+    ? '<span class="badge badge-type-direct">直営</span>'
+    : '<span class="badge badge-type-fc">FC</span>';
+}
+
+function buildStatusBadge(status) {
+  const map = {
+    '順調': '<span class="badge badge-status-good">● 順調</span>',
+    '注意': '<span class="badge badge-status-warn">● 注意</span>',
+    '遅延': '<span class="badge badge-status-delay">● 遅延</span>',
+  };
+  return map[status] || '';
+}
+
+function renderStoreCard(s) {
+  const prog    = calcProgress(s.id);
+  const delays  = calcDelays(s.id);
+  const status  = getStoreStatus(s.id);
+  const pc      = calcPhaseCheck(s.id);
+  const nextAct = getNextAction(s.id);
+  const missDocs   = getMissingDocs(s.id);
+  const pendConfs  = getPendingConfirms(s.id);
+
+  const barClass    = status === '順調' ? 'good' : status === '注意' ? 'warn' : 'delay';
+  const typeBadge   = buildTypeBadge(s.store_type);
+  const statusBadge = buildStatusBadge(status);
+  const typeClass   = s.store_type === '直営' ? 'card-type-direct' : 'card-type-fc';
+
+  // Phase check section
+  let phaseCheckHtml = '';
+  if (pc.total > 0) {
+    const pcPct      = pc.total ? Math.round(pc.done / pc.total * 100) : 0;
+    const pcCountCls = pc.done === pc.total ? 'ok' : '';
+
+    const missDocNames  = missDocs.slice(0, 2).map(d => esc(d.item_name)).join(' / ');
+    const pendConfNames = pendConfs.slice(0, 2).map(d => esc(d.item_name)).join(' / ');
+    const moreDoc  = missDocs.length  > 2 ? ` 他${missDocs.length - 2}件` : '';
+    const moreConf = pendConfs.length > 2 ? ` 他${pendConfs.length - 2}件` : '';
+
+    const docsHtml = missDocs.length > 0
+      ? `<div class="pc-row">
+           <span class="pc-row-icon">📄</span>
+           <span class="pc-row-label">不足書類</span>
+           <span class="pc-row-count warn">${missDocs.length}件</span>
+           <span class="pc-row-items">${missDocNames}${moreDoc}</span>
+         </div>` : '';
+    const confHtml = pendConfs.length > 0
+      ? `<div class="pc-row">
+           <span class="pc-row-icon">✅</span>
+           <span class="pc-row-label">要確認</span>
+           <span class="pc-row-count warn">${pendConfs.length}件</span>
+           <span class="pc-row-items">${pendConfNames}${moreConf}</span>
+         </div>` : '';
+
+    phaseCheckHtml = `
+      <div class="card-phase-check">
+        <div class="pc-header">
+          <span class="pc-title">フェーズチェック</span>
+          <span class="pc-count ${pcCountCls}">${pc.done} / ${pc.total} 完了</span>
+        </div>
+        <div class="pc-bar-row">
+          <div class="pc-bar-bg"><div class="pc-bar-fill" style="width:${pcPct}%"></div></div>
+        </div>
+        ${nextAct ? `<div class="pc-next"><span class="pc-next-label">▶ 次にやること</span><span class="pc-next-value">${esc(nextAct)}</span></div>` : ''}
+        ${docsHtml}${confHtml}
+      </div>`;
+  } else {
+    phaseCheckHtml = `<div class="card-phase-check"><span class="pc-no-tmpl">このフェーズのチェックリストはありません</span></div>`;
+  }
+
+  return `
+    <div class="store-card ${typeClass}" onclick="openStoreDetail('${esc(s.id)}')">
+      <div class="card-top">
+        <div class="card-badge-row">${typeBadge}${statusBadge}</div>
+        <div class="card-store-name">${esc(s.store_name)}</div>
+      </div>
+      <div class="card-meta">
+        <span class="card-meta-item">📍 ${esc(s.area)}</span>
+        ${s.open_date ? `<span class="card-meta-item" style="margin-left:auto;font-size:0.68rem;">OP ${fmtDate(s.open_date)}</span>` : ''}
+      </div>
+      <div class="card-phase">${esc(s.current_phase)}</div>
+      ${phaseCheckHtml}
+      <div class="progress-wrap">
+        <div style="font-size:0.65rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;">工程進捗</div>
+        <div class="progress-bar-row">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill ${barClass}" style="width:${prog}%"></div>
+          </div>
+          <span class="progress-pct">${prog}%</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>主担当: <span class="card-footer-person">${esc(s.lead_person || '—')}</span></span>
+        <span style="display:flex;gap:8px;align-items:center;">
+          ${delays > 0 ? `<span style="font-size:0.68rem;color:var(--red);font-weight:700;">遅延${delays}件</span>` : ''}
+          <span style="font-size:0.68rem;color:var(--muted);">更新 ${fmtDate(s.updated_at)}</span>
+        </span>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// DETAIL VIEW
+// ─────────────────────────────────────────────
+function openStoreDetail(id) {
+  currentStoreId = id;
+  currentTab     = 'overview';
+  history.pushState({ id }, '', `?id=${encodeURIComponent(id)}`);
+  document.getElementById('view-list').style.display   = 'none';
+  document.getElementById('view-detail').style.display = 'block';
+  renderDetailHeader();
+  switchTab('dashboard');
+}
+
+function showListView() {
+  currentStoreId = null;
+  history.pushState({}, '', location.pathname);
+  document.getElementById('view-list').style.display   = 'block';
+  document.getElementById('view-detail').style.display = 'none';
+  renderStoreList();
+}
+
+window.addEventListener('popstate', e => {
+  const id = e.state?.id;
+  if (id) { openStoreDetail(id); }
+  else    { showListView(); }
+});
+
+function renderDetailHeader() {
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (!s) return;
+
+  document.getElementById('d-store-name').textContent = s.store_name;
+
+  const status = getStoreStatus(s.id);
+  document.getElementById('d-badges').innerHTML =
+    buildTypeBadge(s.store_type) + buildStatusBadge(status);
+
+  // 詳細ヘッダーの左辺ラインも属性色で
+  const headerLeft = document.querySelector('.detail-header-left');
+  if (headerLeft) {
+    headerLeft.style.borderLeft = s.store_type === '直営'
+      ? '4px solid #2563eb'
+      : '4px solid #7c3aed';
+    headerLeft.style.paddingLeft = '14px';
+  }
+
+  // Info grid
+  const fields = [
+    ['エリア',          s.area],
+    ['住所',            s.address],
+    ['電話番号',        s.tel],
+    ['オーナー名',      s.owner_name],
+    ['オーナー会社',    s.owner_company],
+    ['プレオープン開始', s.pre_open_start ? fmtDate(s.pre_open_start) : '—'],
+    ['プレオープン終了', s.pre_open_end   ? fmtDate(s.pre_open_end)   : '—'],
+    ['オープン日',      s.open_date      ? fmtDate(s.open_date)       : '—'],
+    ['主担当者',        s.lead_person],
+  ];
+  document.getElementById('d-info-grid').innerHTML = fields.map(([l, v]) =>
+    `<div class="detail-info-item"><span class="detail-info-label">${esc(l)}</span><span class="detail-info-value">${esc(v || '—')}</span></div>`
+  ).join('');
+
+  // Progress
+  updateDetailStats();
+
+  // Phase selector
+  const sel = document.getElementById('d-phase-select');
+  sel.innerHTML = PHASES.map(p =>
+    `<option value="${esc(p)}" ${p === s.current_phase ? 'selected' : ''}>${esc(p)}</option>`
+  ).join('');
+}
+
+function updateDetailStats() {
+  const prog    = calcProgress(currentStoreId);
+  const delays  = calcDelays(currentStoreId);
+  const status  = getStoreStatus(currentStoreId);
+  const pctEl   = document.getElementById('d-progress-pct');
+  const delayEl = document.getElementById('d-delay-chip');
+
+  pctEl.textContent = `${prog}%`;
+  pctEl.className = 'detail-progress-pct ' + (status === '順調' ? 'good' : status === '注意' ? 'warn' : 'delay');
+
+  delayEl.textContent = delays > 0 ? `遅延 ${delays}件` : '遅延なし';
+  delayEl.className   = 'detail-delay-chip ' + (delays > 0 ? 'has-delay' : 'no-delay');
+
+  // 状態バッジをバッジ行に反映（属性バッジは保持）
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) {
+    document.getElementById('d-badges').innerHTML =
+      buildTypeBadge(s.store_type) + buildStatusBadge(status);
+  }
+}
+
+function updatePhase(phase) {
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (!s || s.current_phase === phase) return;
+  addLog(currentStoreId, null, 'phase_change', s.current_phase, phase);
+  s.current_phase = phase;
+  s.updated_at = todayStr();
+  initPhaseChecksForStore(currentStoreId, phase); // 新フェーズのチェック項目を自動生成
+  saveData();
+  updateDetailStats();
+  showToast('フェーズを更新しました');
+}
+
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id === `panel-${tab}`);
+  });
+  if (tab === 'dashboard')   renderDashboardTab();
+  if (tab === 'overview')    renderOverviewTab();
+  if (tab === 'tasks')       renderTasksTab();
+  if (tab === 'phasecheck')  { phaseCheckViewPhase = null; renderPhaseCheckTab(); }
+  if (tab === 'gallery')     renderGalleryTab();
+  if (tab === 'log')         renderLogTab();
+}
+
+// ─────────────────────────────────────────────
+// DASHBOARD TAB
+// ─────────────────────────────────────────────
+function renderDashboardTab() {
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (!s) return;
+
+  const today     = todayStr();
+  const d7        = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+  const prog      = calcProgress(currentStoreId);
+  const delays    = calcDelays(currentStoreId);
+  const status    = getStoreStatus(currentStoreId);
+  const pc        = calcPhaseCheck(currentStoreId);
+  const nextAct   = getNextAction(currentStoreId);
+  const missDocs  = getMissingDocs(currentStoreId);
+  const pendConfs = getPendingConfirms(currentStoreId);
+  const tasks     = tasksData[currentStoreId] || [];
+
+  // Overdue tasks
+  const overdueTasks = tasks
+    .filter(t => t.status !== '完了' && t.due_date && t.due_date < today)
+    .sort((a, b) => a.due_date.localeCompare(b.due_date));
+
+  // Upcoming 7 days
+  const upcomingTasks = tasks
+    .filter(t => t.status !== '完了' && t.due_date && t.due_date >= today && t.due_date <= d7)
+    .sort((a, b) => a.due_date.localeCompare(b.due_date));
+
+  // Gallery
+  const imgs = galleriesData[currentStoreId] || [];
+  const cover = imgs.find(i => i.is_cover) || imgs[0] || null;
+
+  // KPI color helpers
+  const progClass = prog >= 70 ? 'good' : prog >= 40 ? 'warn' : 'danger';
+  function kpiC(n, dangerIf, warnIf) {
+    if (n >= dangerIf) return 'danger';
+    if (n >= warnIf)   return 'warn';
+    return 'good';
+  }
+
+  // ── KPI strip ──────────────────────────────
+  const kpiHtml = `
+    <div class="db-kpi-strip">
+      <div class="db-kpi kpi-${progClass}">
+        <div class="db-kpi-value v-${progClass}">${prog}<span style="font-size:1.2rem">%</span></div>
+        <div class="db-kpi-label">全体進捗</div>
+      </div>
+      <div class="db-kpi kpi-${pc.total && pc.done === pc.total ? 'good' : pc.total ? 'teal' : 'teal'}">
+        <div class="db-kpi-value v-${pc.total && pc.done === pc.total ? 'good' : 'teal'}">${pc.done}<span style="font-size:1rem;font-weight:400;color:var(--muted)"> / ${pc.total}</span></div>
+        <div class="db-kpi-sub">${pc.total ? '' : 'テンプレートなし'}</div>
+        <div class="db-kpi-label">チェック完了</div>
+      </div>
+      <div class="db-kpi kpi-${delays > 0 ? 'danger' : 'good'}">
+        <div class="db-kpi-value v-${delays > 0 ? 'danger' : 'good'}">${delays}</div>
+        <div class="db-kpi-label">遅延タスク</div>
+      </div>
+      <div class="db-kpi kpi-${missDocs.length > 0 ? 'danger' : 'good'}">
+        <div class="db-kpi-value v-${missDocs.length > 0 ? 'danger' : 'good'}">${missDocs.length}</div>
+        <div class="db-kpi-label">不足書類</div>
+      </div>
+      <div class="db-kpi kpi-${pendConfs.length > 0 ? 'warn' : 'good'}">
+        <div class="db-kpi-value v-${pendConfs.length > 0 ? 'warn' : 'good'}">${pendConfs.length}</div>
+        <div class="db-kpi-label">要確認事項</div>
+      </div>
+    </div>`;
+
+  // ── Phase + progress card ──────────────────
+  const phaseHtml = `
+    <div class="db-card">
+      <div class="db-card-label lbl-muted">現在フェーズ</div>
+      <div class="db-phase-name">${esc(s.current_phase)}</div>
+      <div class="db-progress-track">
+        <div class="db-progress-fill pf-${progClass}" style="width:${prog}%"></div>
+      </div>
+      <div class="db-progress-meta">
+        全体進捗 <strong>${prog}%</strong>
+        ／ チェック <strong>${pc.done} / ${pc.total}</strong> 完了
+        ／ 遅延 <strong style="color:${delays > 0 ? '#dc2626' : 'inherit'}">${delays}件</strong>
+      </div>
+    </div>`;
+
+  // ── 今やること ────────────────────────────
+  const actionHtml = `
+    <div class="db-card border-teal">
+      <div class="db-card-label lbl-teal">▶ 今やること</div>
+      ${nextAct
+        ? `<div class="db-action-value">${esc(nextAct)}</div>`
+        : `<div class="db-action-empty">今やることはありません ✓</div>`}
+    </div>`;
+
+  // ── 詰まりポイント ───────────────────────
+  const totalBlockers = missDocs.length + pendConfs.length;
+  const blockerItems  = [
+    ...missDocs.slice(0, 3).map(d =>
+      `<div class="db-blocker-item"><span class="db-blocker-tag doc">不足書類</span><span class="db-blocker-name">${esc(d.item_name)}</span></div>`),
+    ...pendConfs.slice(0, 2).map(c =>
+      `<div class="db-blocker-item"><span class="db-blocker-tag conf">要確認</span><span class="db-blocker-name">${esc(c.item_name)}</span></div>`),
+  ];
+  const blockerHtml = `
+    <div class="db-card ${totalBlockers > 0 ? 'border-amber' : ''}">
+      <div class="db-card-label ${totalBlockers > 0 ? 'lbl-amber' : 'lbl-muted'}">⚠ 詰まりポイント${totalBlockers > 0 ? ` (${totalBlockers}件)` : ''}</div>
+      ${totalBlockers > 0
+        ? `<div class="db-blocker-list">${blockerItems.join('')}</div>`
+        : `<div class="db-action-empty">詰まっている項目はありません ✓</div>`}
+    </div>`;
+
+  // ── 直近7日の期限 ────────────────────────
+  const upcomingRows = upcomingTasks.slice(0, 6).map(t => {
+    const daysLeft = Math.round((new Date(t.due_date) - new Date(today)) / 864e5);
+    const urgency  = daysLeft <= 2 ? 'overdue' : '';
+    return `
+      <div class="db-alert-row">
+        <div class="db-alert-dot ${daysLeft <= 2 ? 'd-red' : 'd-amber'}"></div>
+        <div class="db-alert-name">${esc(t.task_name)}</div>
+        <div class="db-alert-due ${urgency}">あと${daysLeft}日</div>
+      </div>`;
+  });
+  const upcomingHtml = `
+    <div class="db-card">
+      <div class="db-card-label lbl-muted">📅 直近7日の期限</div>
+      ${upcomingRows.length
+        ? upcomingRows.join('')
+        : `<div class="db-no-alerts">直近7日に期限のタスクはありません</div>`}
+    </div>`;
+
+  // ── Gallery mini ──────────────────────────
+  const galleryMiniHtml = `
+    <div class="db-card">
+      <div class="db-card-label lbl-muted">🖼 店舗ギャラリー</div>
+      <div class="db-gallery-mini">
+        <div class="db-gallery-thumb">
+          ${cover?.thumb_data ? `<img src="${cover.thumb_data}" alt="代表画像">` : '📷'}
+        </div>
+        <div>
+          <div style="font-size:0.88rem;font-weight:700;">${imgs.length}枚</div>
+          ${cover ? `<div style="font-size:0.7rem;color:var(--muted);">${esc(cover.category)} / ${fmtDate(cover.created_at)}</div>` : '<div style="font-size:0.7rem;color:var(--muted);">まだ画像がありません</div>'}
+          <div class="db-gallery-link" onclick="switchTab('gallery')">ギャラリーを見る →</div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── 期限超過リスト ────────────────────────
+  const overdueHtml = overdueTasks.length ? `
+    <div class="db-overdue-section">
+      <div class="db-overdue-header">
+        <span>🚨</span>
+        <span class="db-overdue-title">期限超過タスク</span>
+        <span class="db-overdue-count">${overdueTasks.length}件</span>
+      </div>
+      <div class="db-overdue-body">
+        ${overdueTasks.map(t => `
+          <div class="db-overdue-row">
+            <div class="db-overdue-name">${esc(t.task_name)}</div>
+            <div class="db-overdue-dept">${esc(t.department || '—')}</div>
+            <div class="db-overdue-date">期限: ${fmtDate(t.due_date)}</div>
+            <button class="db-done-btn" onclick="quickDoneTask('${esc(t.id)}')">完了にする</button>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  document.getElementById('dashboard-content').innerHTML = `
+    ${kpiHtml}
+    <div class="db-main-grid">
+      <div class="db-action-zone">
+        ${phaseHtml}
+        ${actionHtml}
+        ${blockerHtml}
+      </div>
+      <div class="db-alert-zone">
+        ${upcomingHtml}
+        ${galleryMiniHtml}
+      </div>
+    </div>
+    ${overdueHtml}`;
+}
+
+function quickDoneTask(taskId) {
+  const tasks = tasksData[currentStoreId] || [];
+  const task  = tasks.find(t => t.id === taskId);
+  if (!task) return;
+  const prev        = task.status;
+  task.status       = '完了';
+  task.completed_at = todayStr();
+  task.updated_at   = todayStr();
+  addLog(currentStoreId, taskId, 'status_change', prev, '完了');
+  saveData();
+  updateDetailStats();
+  renderDashboardTab();
+  showToast(`「${task.task_name}」を完了にしました`);
+}
+
+// ─────────────────────────────────────────────
+// OVERVIEW TAB
+// ─────────────────────────────────────────────
+function renderOverviewTab() {
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (!s) return;
+
+  const fields = [
+    ['店舗名',            s.store_name],
+    ['店舗形態',          s.store_type],
+    ['エリア',            s.area],
+    ['住所',              s.address],
+    ['電話番号',          s.tel],
+    ['オーナー名',        s.owner_name],
+    ['オーナー会社',      s.owner_company],
+    ['プレオープン開始',  s.pre_open_start ? fmtDate(s.pre_open_start) : '—'],
+    ['プレオープン終了',  s.pre_open_end   ? fmtDate(s.pre_open_end)   : '—'],
+    ['オープン日',        s.open_date      ? fmtDate(s.open_date)      : '—'],
+    ['主担当者',          s.lead_person    || '—'],
+    ['作成日',            s.created_at     || '—'],
+    ['最終更新',          s.updated_at     || '—'],
+  ];
+  document.getElementById('overview-content').innerHTML = fields.map(([l, v]) =>
+    `<div class="ov-item"><span class="ov-label">${esc(l)}</span><span class="ov-value">${esc(v || '—')}</span></div>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────────
+// TASKS TAB
+// ─────────────────────────────────────────────
+function renderTasksTab() {
+  const tasks = tasksData[currentStoreId] || [];
+  const today = todayStr();
+
+  // Group by category
+  const cats = {};
+  tasks.forEach(t => {
+    if (!cats[t.category]) cats[t.category] = [];
+    cats[t.category].push(t);
+  });
+
+  const totalReq  = tasks.filter(t => t.is_required).length;
+  const doneReq   = tasks.filter(t => t.is_required && t.status === '完了').length;
+  const allDelays = tasks.filter(t => t.status !== '完了' && t.due_date && t.due_date < today).length;
+  document.getElementById('tasks-summary').textContent =
+    `必須 ${doneReq}/${totalReq}件完了  遅延 ${allDelays}件`;
+
+  const html = Object.keys(cats).map(cat => {
+    const catTasks = cats[cat].sort((a, b) => a.sort_order - b.sort_order);
+    const catDone  = catTasks.filter(t => t.status === '完了').length;
+    const isOpen   = openCats[cat] !== false; // default open
+
+    const rows = catTasks.map(t => {
+      const isOverdue   = t.status !== '完了' && t.due_date && t.due_date < today;
+      const isCompleted = t.status === '完了';
+      const rowClass    = isCompleted ? 'completed' : isOverdue ? 'overdue' : '';
+      const statusClass = { '未着手': 's-todo', '対応中': 's-doing', '完了': 's-done', '保留': 's-hold' }[t.status] || 's-todo';
+      const dueClass    = isOverdue ? 'overdue' : '';
+
+      return `
+        <tr class="${rowClass}" id="row-${esc(t.id)}">
+          <td class="col-task">
+            ${t.is_required ? '<span class="required-star">★</span> ' : ''}${esc(t.task_name)}
+          </td>
+          <td class="col-dept">${esc(t.department || '—')}</td>
+          <td class="col-assign">
+            <input class="assignee-input" value="${esc(t.assignee || '')}"
+              onblur="updateTaskField('${esc(t.id)}','assignee',this.value)" />
+          </td>
+          <td class="col-status">
+            <select class="status-select ${statusClass}"
+              onchange="updateTaskStatus('${esc(t.id)}',this.value);applyStatusClass(this)">
+              ${TASK_STATUSES.map(s =>
+                `<option ${s === t.status ? 'selected' : ''}>${esc(s)}</option>`
+              ).join('')}
+            </select>
+          </td>
+          <td class="col-due">
+            <input type="date" class="due-date-input ${dueClass}" value="${esc(t.due_date || '')}"
+              onchange="updateTaskField('${esc(t.id)}','due_date',this.value)" />
+          </td>
+          <td class="col-done">
+            <span class="completed-date-cell">${t.completed_at ? fmtDate(t.completed_at) : '—'}</span>
+          </td>
+          <td class="col-notes">
+            <input class="notes-input" value="${esc(t.notes || '')}" placeholder="—"
+              onblur="updateTaskField('${esc(t.id)}','notes',this.value)" />
+          </td>
+          <td class="col-del">
+            <button class="del-btn" onclick="deleteTask('${esc(t.id)}')" title="削除">✕</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <div class="cat-group">
+        <div class="cat-header" onclick="toggleCategory('${esc(cat)}')">
+          <div class="cat-header-left">
+            <span class="cat-toggle ${isOpen ? 'open' : ''}">▶</span>
+            <span class="cat-name">${esc(cat)}</span>
+            <span class="cat-progress-mini"><strong>${catDone}</strong>/${catTasks.length}完了</span>
+          </div>
+        </div>
+        <div class="task-table-wrap" id="cat-body-${esc(cat)}" style="display:${isOpen ? 'block' : 'none'}">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th class="col-task">タスク名</th>
+                <th class="col-dept">部署</th>
+                <th class="col-assign">担当者</th>
+                <th class="col-status">ステータス</th>
+                <th class="col-due">期限</th>
+                <th class="col-done">完了日</th>
+                <th class="col-notes">特記事項</th>
+                <th class="col-del"></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('tasks-content').innerHTML = html || '<div class="empty-state">タスクがありません</div>';
+}
+
+function toggleCategory(cat) {
+  openCats[cat] = !(openCats[cat] !== false);
+  const body   = document.getElementById(`cat-body-${cat}`);
+  const toggle = body?.previousElementSibling?.querySelector('.cat-toggle');
+  if (body)   body.style.display   = openCats[cat] ? 'block' : 'none';
+  if (toggle) toggle.className = 'cat-toggle ' + (openCats[cat] ? 'open' : '');
+}
+
+function applyStatusClass(sel) {
+  const map = { '未着手': 's-todo', '対応中': 's-doing', '完了': 's-done', '保留': 's-hold' };
+  sel.className = `status-select ${map[sel.value] || 's-todo'}`;
+}
+
+function updateTaskStatus(taskId, newStatus) {
+  const tasks = tasksData[currentStoreId];
+  if (!tasks) return;
+  const t = tasks.find(x => x.id === taskId);
+  if (!t || t.status === newStatus) return;
+  const oldStatus = t.status;
+  t.status = newStatus;
+  if (newStatus === '完了') {
+    t.completed_at = todayStr();
+  } else {
+    t.completed_at = '';
+  }
+  addLog(currentStoreId, taskId, 'status_change', oldStatus, newStatus);
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = todayStr();
+  saveData();
+  updateDetailStats();
+  renderTasksTab(); // re-render to update row styling + completed_at
+}
+
+function updateTaskField(taskId, field, value) {
+  const tasks = tasksData[currentStoreId];
+  if (!tasks) return;
+  const t = tasks.find(x => x.id === taskId);
+  if (!t || t[field] === value) return;
+  const old = t[field];
+  t[field] = value;
+  if (field === 'assignee') {
+    addLog(currentStoreId, taskId, 'assignee_change', old, value);
+  } else if (field === 'notes') {
+    addLog(currentStoreId, taskId, 'notes_update', old, value);
+  }
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = todayStr();
+  saveData();
+  if (field === 'due_date') renderTasksTab();
+}
+
+function deleteTask(taskId) {
+  if (!confirm('このタスクを削除しますか？')) return;
+  const tasks = tasksData[currentStoreId];
+  if (!tasks) return;
+  const t = tasks.find(x => x.id === taskId);
+  if (!t) return;
+  tasksData[currentStoreId] = tasks.filter(x => x.id !== taskId);
+  addLog(currentStoreId, taskId, 'task_delete', t.task_name, '');
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = todayStr();
+  saveData();
+  updateDetailStats();
+  renderTasksTab();
+  showToast('タスクを削除しました');
+}
+
+// ─────────────────────────────────────────────
+// PHASE CHECK TAB
+// ─────────────────────────────────────────────
+let phaseCheckViewPhase = null; // null = use store's current_phase
+
+function renderPhaseCheckTab() {
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (!s) return;
+  const phase = phaseCheckViewPhase || s.current_phase;
+
+  // 未作成のチェック項目を自動生成
+  initPhaseChecksForStore(currentStoreId, phase);
+
+  const el  = document.getElementById('phasecheck-content');
+  const tmpl = PHASE_CHECK_TEMPLATES[phase];
+
+  // テンプレートがないフェーズ
+  if (!tmpl || !tmpl.length) {
+    const phaseOptions = Object.keys(PHASE_CHECK_TEMPLATES).map(p =>
+      `<option value="${esc(p)}" ${p === phase ? 'selected' : ''}>${esc(p)}</option>`
+    ).join('');
+    el.innerHTML = `
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <div class="phcheck-phase-sel">
+          <label>別フェーズを確認:</label>
+          <select class="phase-select" onchange="phaseCheckViewPhase=this.value;renderPhaseCheckTab()">${phaseOptions}</select>
+        </div>
+      </div>
+      <div class="phcheck-empty">
+        <h3>このフェーズのチェックリストはありません</h3>
+        <p>「${esc(phase)}」フェーズのテンプレートは未設定です。<br>上のセレクターで他のフェーズのチェックリストを確認できます。</p>
+      </div>`;
+    return;
+  }
+
+  const checks    = getPhaseChecks(currentStoreId, phase);
+  const total     = checks.length;
+  const done      = checks.filter(c => c.status === 'completed').length;
+  const docs      = checks.filter(c => c.item_type === 'document');
+  const docsDone  = docs.filter(c => c.status === 'completed').length;
+  const confs     = checks.filter(c => c.item_type === 'confirmation');
+  const confsDone = confs.filter(c => c.status === 'completed').length;
+  const pcPct     = total ? Math.round(done / total * 100) : 0;
+
+  const phaseOptions = Object.keys(PHASE_CHECK_TEMPLATES).map(p =>
+    `<option value="${esc(p)}" ${p === phase ? 'selected' : ''}>${esc(p)}</option>`
+  ).join('');
+
+  const headerHtml = `
+    <div class="phcheck-header">
+      <div class="phcheck-stats">
+        <div class="phcheck-stat">
+          <span class="phcheck-stat-label">全体進捗</span>
+          <span class="phcheck-stat-value ${done === total ? 'ok' : ''}">${done} / ${total}</span>
+        </div>
+        <div class="phcheck-stat">
+          <span class="phcheck-stat-label">必要書類</span>
+          <span class="phcheck-stat-value ${docsDone === docs.length ? 'ok' : 'ng'}">${docsDone} / ${docs.length}</span>
+        </div>
+        <div class="phcheck-stat">
+          <span class="phcheck-stat-label">確認事項</span>
+          <span class="phcheck-stat-value ${confsDone === confs.length ? 'ok' : 'ng'}">${confsDone} / ${confs.length}</span>
+        </div>
+      </div>
+      <div class="phcheck-phase-sel">
+        <label>フェーズ:</label>
+        <select class="phase-select" onchange="phaseCheckViewPhase=this.value;initPhaseChecksForStore('${esc(currentStoreId)}',this.value);renderPhaseCheckTab()">${phaseOptions}</select>
+      </div>
+    </div>`;
+
+  const typeGroups = [
+    { type: 'checklist',    label: '段取り',   icon: '📋' },
+    { type: 'document',     label: '必要書類', icon: '📄' },
+    { type: 'confirmation', label: '確認事項', icon: '✅' },
+  ];
+
+  const groupsHtml = typeGroups.map(g => {
+    const items = checks.filter(c => c.item_type === g.type).sort((a, b) => a.sort_order - b.sort_order);
+    if (!items.length) return '';
+    const doneCount = items.filter(c => c.status === 'completed').length;
+    return `
+      <div class="phcheck-type-group">
+        <div class="phcheck-type-header">
+          <span class="phcheck-type-icon">${g.icon}</span>
+          <span class="phcheck-type-name">${g.label}</span>
+          <span class="phcheck-type-count">${doneCount} / ${items.length} 完了</span>
+        </div>
+        <div class="phcheck-items">
+          ${items.map(item => renderPhaseCheckItem(item)).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = headerHtml + groupsHtml;
+}
+
+function renderPhaseCheckItem(item) {
+  const isDone = item.status === 'completed';
+  const statusLabel = {
+    'checklist':    isDone ? '✓ 完了'    : '未完了',
+    'document':     isDone ? '✓ 用意済み' : '未用意',
+    'confirmation': isDone ? '✓ 確認済み' : '未確認',
+  }[item.item_type] || (isDone ? '完了' : '未完了');
+
+  const checkedMeta = isDone && item.checked_at
+    ? `${esc(item.checked_by || '管理者')}  ${esc(item.checked_at.slice(0,10))}`
+    : '';
+
+  return `
+    <div class="phcheck-item ${isDone ? 'is-done' : ''}" id="phchk-${esc(item.id)}">
+      <div class="phcheck-cb ${isDone ? 'checked' : ''}" onclick="togglePhaseCheck('${esc(item.id)}')">${isDone ? '✓' : ''}</div>
+      <div class="phcheck-item-body">
+        <div class="phcheck-item-name">
+          ${esc(item.item_name)}
+          ${item.is_required ? '<span class="phcheck-item-req">★必須</span>' : ''}
+        </div>
+        <div class="phcheck-item-status ${isDone ? 'done' : 'pend'}">
+          ${esc(statusLabel)} ${checkedMeta ? `<span style="color:var(--muted);margin-left:6px;">${checkedMeta}</span>` : ''}
+        </div>
+        <input class="phcheck-note-input" type="text" value="${esc(item.note || '')}"
+          placeholder="メモを入力…"
+          onblur="updatePhaseCheckNote('${esc(item.id)}', this.value)" />
+      </div>
+    </div>`;
+}
+
+function togglePhaseCheck(checkId) {
+  const storeChecks = checksData[currentStoreId] || [];
+  const item = storeChecks.find(c => c.id === checkId);
+  if (!item) return;
+  const wasDone    = item.status === 'completed';
+  item.status      = wasDone ? 'pending' : 'completed';
+  item.checked_at  = wasDone ? '' : new Date().toISOString();
+  item.checked_by  = wasDone ? '' : '管理者';
+  item.updated_at  = todayStr();
+  addLog(currentStoreId, null, 'status_change',
+    `チェック[${item.item_name}]: ${wasDone ? '完了' : '未完了'}`,
+    `チェック[${item.item_name}]: ${wasDone ? '未完了' : '完了'}`
+  );
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = todayStr();
+  saveData();
+  updateDetailStats();
+  renderPhaseCheckTab();
+}
+
+function updatePhaseCheckNote(checkId, note) {
+  const storeChecks = checksData[currentStoreId] || [];
+  const item = storeChecks.find(c => c.id === checkId);
+  if (!item || item.note === note) return;
+  item.note       = note;
+  item.updated_at = todayStr();
+  saveData();
+}
+
+// ─────────────────────────────────────────────
+// GALLERY TAB
+// ─────────────────────────────────────────────
+const GALLERY_CATEGORIES = ['外観','内観','看板','施工中','オープン前','オープン後','備品','その他'];
+
+function renderGalleryTab() {
+  if (!currentStoreId) return;
+
+  // フェーズフィルタ選択肢を同期
+  const phaseSelEl = document.getElementById('gallery-filter-phase');
+  if (phaseSelEl && phaseSelEl.options.length <= 1) {
+    PHASES.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p; opt.textContent = p;
+      phaseSelEl.appendChild(opt);
+    });
+  }
+
+  const catFilter   = (document.getElementById('gallery-filter-cat')   || {}).value || '';
+  const phaseFilter = (document.getElementById('gallery-filter-phase') || {}).value || '';
+
+  let images = (galleriesData[currentStoreId] || []).slice();
+
+  // フィルタ
+  if (catFilter)   images = images.filter(img => img.category   === catFilter);
+  if (phaseFilter) images = images.filter(img => img.phase_name === phaseFilter);
+
+  // ソート
+  if (gallerySortState === 'newest') {
+    images.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  } else if (gallerySortState === 'oldest') {
+    images.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  } else if (gallerySortState === 'category') {
+    images.sort((a, b) => GALLERY_CATEGORIES.indexOf(a.category) - GALLERY_CATEGORIES.indexOf(b.category));
+  }
+
+  const wrap = document.getElementById('gallery-grid-wrap');
+  if (!images.length) {
+    const all = galleriesData[currentStoreId] || [];
+    if (!all.length) {
+      // ドロップゾーンを表示・グリッド非表示
+      document.getElementById('gallery-drop-zone').style.display = '';
+      wrap.innerHTML = '';
+    } else {
+      document.getElementById('gallery-drop-zone').style.display = 'none';
+      wrap.innerHTML = `<div class="gallery-empty"><div class="gallery-empty-icon">🔍</div><h3>該当する画像がありません</h3><p>フィルタを変更してみてください。</p></div>`;
+    }
+    return;
+  }
+
+  document.getElementById('gallery-drop-zone').style.display = 'none';
+
+  wrap.innerHTML = `<div class="gallery-grid">${images.map(img => renderGalleryThumb(img)).join('')}</div>`;
+}
+
+function renderGalleryThumb(img) {
+  const title  = esc(img.title || img.category || '');
+  const cover  = img.is_cover ? '<span class="gallery-cover-badge">★ 代表</span>' : '';
+  const imgEl  = img.thumb_data
+    ? `<img class="gallery-thumb-img" src="${img.thumb_data}" alt="${title}" loading="lazy">`
+    : `<div class="gallery-thumb-placeholder">📷</div>`;
+  const date   = img.shot_date ? `<span class="gallery-thumb-date">${fmtDate(img.shot_date)}</span>` : '';
+  return `
+    <div class="gallery-thumb" onclick="openLightbox('${esc(img.id)}')">
+      ${cover}
+      ${imgEl}
+      <div class="gallery-thumb-info">
+        <div class="gallery-thumb-title">${title || '（タイトルなし）'}</div>
+        <div class="gallery-thumb-meta">
+          <span class="gallery-cat-badge">${esc(img.category)}</span>
+          ${date}
+        </div>
+      </div>
+    </div>`;
+}
+
+function setGallerySort(mode) {
+  gallerySortState = mode;
+  document.querySelectorAll('.gallery-sort-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.gsort === mode);
+  });
+  renderGalleryTab();
+}
+
+// ─────────────────────────────────────────────
+// LOG TAB
+// ─────────────────────────────────────────────
+function renderLogTab() {
+  const logs = (logsData[currentStoreId] || []).slice().reverse();
+  if (!logs.length) {
+    document.getElementById('log-content').innerHTML = '<div class="empty-state">ログがありません</div>';
+    return;
+  }
+  const tasks = tasksData[currentStoreId] || [];
+
+  document.getElementById('log-content').innerHTML = logs.map(l => {
+    const task    = tasks.find(t => t.id === l.task_id);
+    const taskName = task ? task.task_name : l.task_id ? `タスクID:${l.task_id}` : null;
+    const icons   = { phase_change: '🔄', status_change: '✅', assignee_change: '👤', notes_update: '📝', task_delete: '🗑️', task_add: '➕', memo: '💬' };
+    const icon    = icons[l.action_type] || '📋';
+    const dtStr   = l.updated_at ? l.updated_at.replace('T', ' ').slice(0, 16) : '—';
+
+    let action = '';
+    if (l.action_type === 'phase_change')   action = `フェーズ変更: ${l.old_value || '—'} → ${l.new_value}`;
+    else if (l.action_type === 'status_change')  action = `ステータス変更: ${l.old_value || '—'} → ${l.new_value}`;
+    else if (l.action_type === 'assignee_change') action = `担当者変更: ${l.old_value || '—'} → ${l.new_value}`;
+    else if (l.action_type === 'notes_update')   action = 'メモ更新';
+    else if (l.action_type === 'task_delete')    action = `タスク削除: ${l.old_value || l.task_id}`;
+    else if (l.action_type === 'task_add')       action = `タスク追加: ${l.new_value}`;
+    else if (l.action_type === 'memo')           action = `メモ: ${l.new_value}`;
+    else action = l.action_type;
+
+    return `
+      <div class="log-item">
+        <span class="log-icon">${icon}</span>
+        <div class="log-body">
+          <div class="log-action">${esc(action)}</div>
+          ${taskName ? `<div class="log-detail">対象: ${esc(taskName)}</div>` : ''}
+          <div class="log-detail">更新者: ${esc(l.updated_by || '—')}</div>
+        </div>
+        <span class="log-time">${esc(dtStr)}</span>
+      </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+// LOG
+// ─────────────────────────────────────────────
+function addLog(storeId, taskId, actionType, oldVal, newVal) {
+  if (!logsData[storeId]) logsData[storeId] = [];
+  logsData[storeId].push({
+    id:          `log-${Date.now()}`,
+    store_id:    storeId,
+    task_id:     taskId,
+    action_type: actionType,
+    old_value:   oldVal,
+    new_value:   newVal,
+    updated_by:  '管理者',
+    updated_at:  new Date().toISOString(),
+  });
+  saveData();
+}
+
+// ─────────────────────────────────────────────
+// ADD TASK MODAL
+// ─────────────────────────────────────────────
+function openAddTaskModal() {
+  document.getElementById('mt-name').value = '';
+  document.getElementById('mt-dept').value = '';
+  document.getElementById('mt-assignee').value = '';
+  document.getElementById('mt-due').value = '';
+  document.getElementById('modal-task').classList.add('show');
+  setTimeout(() => document.getElementById('mt-name').focus(), 100);
+}
+
+function submitAddTask() {
+  const name = document.getElementById('mt-name').value.trim();
+  if (!name) { alert('タスク名を入力してください'); return; }
+
+  const cat      = document.getElementById('mt-category').value;
+  const dept     = document.getElementById('mt-dept').value.trim();
+  const assignee = document.getElementById('mt-assignee').value.trim();
+  const due      = document.getElementById('mt-due').value;
+  const required = document.getElementById('mt-required').value === 'true';
+
+  if (!tasksData[currentStoreId]) tasksData[currentStoreId] = [];
+
+  const existing = tasksData[currentStoreId];
+  const maxOrder = existing.length ? Math.max(...existing.map(t => t.sort_order)) : 0;
+
+  const newTask = {
+    id:           `task-${Date.now()}`,
+    store_id:     currentStoreId,
+    template_id:  null,
+    category:     cat,
+    task_name:    name,
+    department:   dept,
+    assignee:     assignee,
+    status:       '未着手',
+    due_date:     due,
+    completed_at: '',
+    notes:        '',
+    sort_order:   maxOrder + 1,
+    is_required:  required,
+    created_at:   todayStr(),
+    updated_at:   todayStr(),
+  };
+  tasksData[currentStoreId].push(newTask);
+  addLog(currentStoreId, newTask.id, 'task_add', '', name);
+
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = todayStr();
+  saveData();
+  closeModal('modal-task');
+  updateDetailStats();
+  renderTasksTab();
+  showToast('タスクを追加しました');
+}
+
+// ─────────────────────────────────────────────
+// ADD STORE MODAL
+// ─────────────────────────────────────────────
+function openAddStoreModal() {
+  ['ms-name','ms-area','ms-person','ms-open'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('modal-store').classList.add('show');
+  setTimeout(() => document.getElementById('ms-name').focus(), 100);
+}
+
+function submitAddStore() {
+  const name = document.getElementById('ms-name').value.trim();
+  if (!name) { alert('店舗名を入力してください'); return; }
+
+  const type   = document.getElementById('ms-type').value;
+  const area   = document.getElementById('ms-area').value.trim();
+  const person = document.getElementById('ms-person').value.trim();
+  const open   = document.getElementById('ms-open').value;
+
+  const newStore = {
+    id:            `store-${Date.now()}`,
+    store_name:    name,
+    store_type:    type,
+    area:          area,
+    tel:           '',
+    address:       '',
+    owner_name:    '',
+    owner_company: '',
+    pre_open_start: '',
+    pre_open_end:   '',
+    open_date:     open,
+    current_phase: '契約準備',
+    lead_person:   person,
+    created_at:    todayStr(),
+    updated_at:    todayStr(),
+  };
+  storesData.push(newStore);
+
+  // Init tasks from template
+  tasksData[newStore.id] = (TASK_TEMPLATES[type] || []).map((t, i) => ({
+    id:           `${newStore.id}-t${i}`,
+    store_id:     newStore.id,
+    template_id:  t.id,
+    category:     t.category,
+    task_name:    t.task_name,
+    department:   t.department,
+    assignee:     '',
+    status:       '未着手',
+    due_date:     '',
+    completed_at: '',
+    notes:        '',
+    sort_order:   t.sort_order,
+    is_required:  t.is_required,
+    created_at:   todayStr(),
+    updated_at:   todayStr(),
+  }));
+  logsData[newStore.id]      = [];
+  galleriesData[newStore.id] = [];
+
+  saveData();
+  saveGalleryData();
+  closeModal('modal-store');
+  showToast(`「${name}」を追加しました`);
+  renderStoreList();
+}
+
+// ─────────────────────────────────────────────
+// MODAL UTILS
+// ─────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
