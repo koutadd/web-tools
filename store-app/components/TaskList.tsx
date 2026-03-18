@@ -329,49 +329,62 @@ export default function TaskList({
       <form
         onSubmit={addTask}
         style={{
-          marginTop: 14, display: 'flex', gap: 8, alignItems: 'center',
-          padding: '10px 12px',
+          marginTop: 14,
+          padding: '12px',
           background: 'var(--color-accent-light)',
           border: '1px dashed #93c5fd',
           borderRadius: 'var(--radius)',
         }}
       >
+        {/* 入力欄（全幅）*/}
         <input
           type="text"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="タスク名を入力..."
           style={{
-            flex: 1, border: '1px solid var(--color-border)',
-            borderRadius: 6, padding: '6px 10px', fontSize: 13,
-            outline: 'none', background: 'white',
+            width: '100%',
+            boxSizing: 'border-box',
+            border: '1px solid var(--color-border)',
+            borderRadius: 6,
+            padding: '8px 10px',
+            fontSize: 13,
+            outline: 'none',
+            background: 'white',
+            marginBottom: 8,
           }}
         />
-        <select
-          value={newPhase}
-          onChange={(e) => setNewPhase(e.target.value as Phase)}
-          style={{
-            border: '1px solid var(--color-border)', borderRadius: 6,
-            padding: '6px 8px', fontSize: 13,
-            background: 'white', outline: 'none',
-          }}
-        >
-          {PHASES.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-        <button
-          type="submit"
-          disabled={adding || !newTitle.trim()}
-          style={{
-            padding: '6px 14px', borderRadius: 6, border: 'none',
-            background: 'var(--color-accent)', color: 'white',
-            fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
-            cursor: adding || !newTitle.trim() ? 'not-allowed' : 'pointer',
-            opacity: adding || !newTitle.trim() ? 0.5 : 1,
-            transition: 'opacity 0.15s',
-          }}
-        >
-          {adding ? '追加中...' : '+ 追加'}
-        </button>
+        {/* フェーズ選択 + 追加ボタン（横並び、画面幅内に収める）*/}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <select
+            value={newPhase}
+            onChange={(e) => setNewPhase(e.target.value as Phase)}
+            style={{
+              flex: 1,
+              border: '1px solid var(--color-border)', borderRadius: 6,
+              padding: '8px 6px', fontSize: 13,
+              background: 'white', outline: 'none',
+              minWidth: 0,
+            }}
+          >
+            {PHASES.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <button
+            type="submit"
+            disabled={adding || !newTitle.trim()}
+            style={{
+              flex: '0 0 auto',
+              padding: '8px 18px', borderRadius: 6, border: 'none',
+              background: 'var(--color-accent)', color: 'white',
+              fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+              cursor: adding || !newTitle.trim() ? 'not-allowed' : 'pointer',
+              opacity: adding || !newTitle.trim() ? 0.5 : 1,
+              transition: 'opacity 0.15s, transform 0.1s',
+            }}
+          >
+            {adding ? '追加中...' : '+ 追加'}
+          </button>
+        </div>
       </form>
     </div>
   );
