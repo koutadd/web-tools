@@ -7,6 +7,7 @@ import ChecklistPanel, { type DriveFolderUrls } from '@/components/ChecklistPane
 import OwnerPurchaseSection, { type PurchaseItemData } from '@/components/OwnerPurchaseSection';
 import OwnerTodoSection, { type TodoItem } from '@/components/OwnerTodoSection';
 import OwnerPageLogger from '@/components/OwnerPageLogger';
+import OwnerFixedCTA from '@/components/OwnerFixedCTA';
 
 export const dynamic = 'force-dynamic';
 
@@ -249,7 +250,7 @@ export default async function OwnerPage({
         </div>
       </header>
 
-      <main style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 56px' }}>
+      <main style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 100px' }}>
         <OwnerPageLogger storeId={id} phase={currentPhase} />
 
         {/* ─── 期限アラート（緊急時のみ）─── */}
@@ -438,6 +439,9 @@ export default async function OwnerPage({
         </section>
 
       </main>
+
+      {/* ─── 下部固定CTA ─── */}
+      <OwnerFixedCTA />
 
       {/* フッター */}
       <footer style={{

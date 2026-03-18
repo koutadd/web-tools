@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export type PurchaseItemData = {
   id: string;
@@ -42,6 +42,63 @@ const PHASE_LABEL: Record<string, string> = {
   '納品': '公開前まで',
   '': '時期は担当者と確認',
 };
+
+// ─── 購入状態トグルボタン ────────────────────────────────────────────────────
+
+function PurchaseToggle({
+  itemId,
+  initialStatus,
+  necessity,
+}: {
+  itemId: string;
+  initialStatus: string;
+  necessity: string;
+}) {
+  const [status, setStatus] = useState(initialStatus);
+  const [loading, setLoading] = useState(false);
+
+  const toggle = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const next = status === 'purchased' ? 'pending' : 'purchased';
+      setStatus(next); // 楽観的更新
+      setLoading(true);
+      try {
+        await fetch(`/api/purchase-items/${itemId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: next }),
+        });
+      } catch {
+        setStatus(status); // 失敗時ロールバック
+      } finally {
+        setLoading(false);
+      }
+    },
+    [itemId, status],
+  );
+
+  const isPurchased = status === 'purchased';
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={loading}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 5,
+        padding: '5px 11px', borderRadius: 99, flexShrink: 0,
+        fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none',
+        background: isPurchased ? '#dcfce7' : (necessity === 'must' ? '#fef2f2' : '#f3f4f6'),
+        color: isPurchased ? '#15803d' : (necessity === 'must' ? '#dc2626' : '#6b7280'),
+        transition: 'all 0.15s',
+        opacity: loading ? 0.6 : 1,
+      }}
+    >
+      <span style={{ fontSize: 13 }}>{isPurchased ? '✅' : (necessity === 'must' ? '⚠️' : '○')}</span>
+      {isPurchased ? '購入済' : (necessity === 'must' ? '未購入' : '未購入')}
+    </button>
+  );
+}
 
 // ─── 商品詳細モーダル ─────────────────────────────────────────────────────────
 
@@ -251,70 +308,108 @@ function ItemCard({
   compact?: boolean;
 }) {
   const meta = NECESSITY_META[item.necessity] ?? NECESSITY_META['recommend'];
+  const isPurchased = item.status === 'purchased';
 
   return (
-    <button
-      onClick={() => onDetail(item)}
+    <div
       style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: compact ? '10px 12px' : '13px 14px',
         borderRadius: 12,
-        border: `1px solid ${item.necessity === 'must' ? meta.border : 'var(--color-border)'}`,
-        background: item.necessity === 'must' ? meta.bg : 'white',
-        textAlign: 'left', cursor: 'pointer', width: '100%',
-        boxShadow: item.necessity === 'must' ? `0 0 0 2px ${meta.border}` : 'none',
-        transition: 'box-shadow 0.15s',
+        border: `1px solid ${isPurchased ? '#bbf7d0' : item.necessity === 'must' ? meta.border : 'var(--color-border)'}`,
+        background: isPurchased ? '#f0fdf4' : item.necessity === 'must' ? meta.bg : 'white',
+        boxShadow: !isPurchased && item.necessity === 'must' ? `0 0 0 2px ${meta.border}` : 'none',
+        overflow: 'hidden',
       }}
     >
-      {/* アイコン */}
-      <div style={{
-        width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-        background: meta.bg,
-        border: `1px solid ${meta.border}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 22,
-      }}>
-        {item.emoji}
-      </div>
+      {/* 必須・未購入の警告バナー */}
+      {item.necessity === 'must' && !isPurchased && (
+        <div style={{
+          background: '#dc2626', color: 'white',
+          fontSize: 11, fontWeight: 700, padding: '4px 14px',
+          display: 'flex', alignItems: 'center', gap: 5,
+        }}>
+          <span>⚠️</span> ※必ず購入してください ─ 出店に必須です
+        </div>
+      )}
 
-      {/* テキスト */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
-          <span style={{
-            display: 'inline-block',
-            padding: '1px 7px', borderRadius: 99, fontSize: 10, fontWeight: 700,
-            background: meta.bg, color: meta.text, border: `1px solid ${meta.border}`,
-            flexShrink: 0,
-          }}>
-            {meta.label}
-          </span>
-          {item.phase && (
+      <button
+        onClick={() => onDetail(item)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: compact ? '10px 12px' : '13px 14px',
+          background: 'none', border: 'none',
+          textAlign: 'left', cursor: 'pointer', width: '100%',
+        }}
+      >
+        {/* アイコン */}
+        <div style={{
+          width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+          background: isPurchased ? '#dcfce7' : meta.bg,
+          border: `1px solid ${isPurchased ? '#86efac' : meta.border}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 22, position: 'relative',
+        }}>
+          {item.emoji}
+          {isPurchased && (
             <span style={{
-              display: 'inline-block',
-              padding: '1px 7px', borderRadius: 99, fontSize: 10,
-              background: '#fffbeb', color: '#92400e', border: '1px solid #fde68a',
-              flexShrink: 0,
-            }}>
-              {PHASE_LABEL[item.phase] ?? item.phase}
-            </span>
+              position: 'absolute', bottom: -4, right: -4,
+              fontSize: 14, lineHeight: 1,
+            }}>✅</span>
           )}
         </div>
-        <p style={{
-          fontSize: 14, fontWeight: 700, color: 'var(--color-text)',
-          marginBottom: 2, lineHeight: 1.4,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {item.name}
-        </p>
-        <p style={{ fontSize: 12, color: 'var(--color-text-sub)' }}>
-          {item.brand}
-          {item.price && <span style={{ marginLeft: 8, color: '#dc2626', fontWeight: 700 }}>{item.price}〜</span>}
-        </p>
-      </div>
 
-      {/* 矢印 */}
-      <span style={{ fontSize: 16, color: '#9ca3af', flexShrink: 0 }}>›</span>
-    </button>
+        {/* テキスト */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+            <span style={{
+              display: 'inline-block',
+              padding: '1px 7px', borderRadius: 99, fontSize: 10, fontWeight: 700,
+              background: meta.bg, color: meta.text, border: `1px solid ${meta.border}`,
+              flexShrink: 0,
+            }}>
+              {meta.label}
+            </span>
+            {item.phase && (
+              <span style={{
+                display: 'inline-block',
+                padding: '1px 7px', borderRadius: 99, fontSize: 10,
+                background: '#fffbeb', color: '#92400e', border: '1px solid #fde68a',
+                flexShrink: 0,
+              }}>
+                {PHASE_LABEL[item.phase] ?? item.phase}
+              </span>
+            )}
+          </div>
+          <p style={{
+            fontSize: 14, fontWeight: 700,
+            color: isPurchased ? '#15803d' : 'var(--color-text)',
+            marginBottom: 2, lineHeight: 1.4,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            textDecoration: isPurchased ? 'line-through' : 'none',
+          }}>
+            {item.name}
+          </p>
+          <p style={{ fontSize: 12, color: 'var(--color-text-sub)' }}>
+            {item.brand}
+            {item.price && <span style={{ marginLeft: 8, color: '#dc2626', fontWeight: 700 }}>{item.price}〜</span>}
+          </p>
+        </div>
+
+        {/* 矢印 */}
+        <span style={{ fontSize: 16, color: '#9ca3af', flexShrink: 0 }}>›</span>
+      </button>
+
+      {/* 購入トグル行 */}
+      <div style={{
+        padding: '0 14px 12px',
+        display: 'flex', justifyContent: 'flex-end',
+      }}>
+        <PurchaseToggle
+          itemId={item.id}
+          initialStatus={item.status}
+          necessity={item.necessity}
+        />
+      </div>
+    </div>
   );
 }
 

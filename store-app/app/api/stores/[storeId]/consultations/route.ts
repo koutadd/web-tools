@@ -1,5 +1,7 @@
-import { prisma } from '@/lib/prisma';
-import { ok, err } from '@/lib/api';
+import { prisma }       from '@/lib/prisma';
+import { ok, err }      from '@/lib/api';
+import { notifySlack }  from '@/lib/slack';
+import { appendChatLog } from '@/lib/sheets';
 
 type Ctx = { params: Promise<{ storeId: string }> };
 
@@ -38,17 +40,35 @@ export async function POST(req: Request, { params }: Ctx) {
       return err('メッセージは必須です');
     }
 
+    const text        = String(message).trim();
+    const authorName  = String(body.authorName ?? '').trim();
+    const createdByFinal = createdBy ?? 'owner';
+
     const consultation = await prisma.consultation.create({
       data: {
         storeId,
         title: String(title).trim(),
-        message: String(message).trim(),
-        createdBy: createdBy ?? 'owner',
+        message: text,
+        createdBy: createdByFinal,
         targetType: targetType ?? 'general',
         targetId: targetId ?? '',
         consultationCategory: consultationCategory ?? '',
       },
     });
+
+    // 初回メッセージを ConsultationMessage にも記録（チャット UI 用）
+    await prisma.consultationMessage.create({
+      data: {
+        consultationId: consultation.id,
+        text,
+        userType:   createdByFinal,
+        authorName,
+      },
+    });
+
+    // サイドエフェクト
+    notifySlack(store.name, createdByFinal, authorName, text).catch(() => {});
+    appendChatLog(store.name, createdByFinal, authorName, text).catch(() => {});
 
     return ok(consultation, 201);
   } catch {
