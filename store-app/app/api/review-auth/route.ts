@@ -11,7 +11,7 @@ import { type NextRequest } from 'next/server';
 const COOKIE_NAME = 'review_access';
 
 export async function POST(req: NextRequest) {
-  const passcode = process.env.REVIEW_PASSCODE;
+  const passcode = process.env.REVIEW_PASSCODE?.trim();
   if (!passcode) {
     // 環境変数未設定時はそもそも保護なし → 成功扱い
     return Response.json({ ok: true });
