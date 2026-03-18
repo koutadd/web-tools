@@ -3,103 +3,160 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // ════════════════════════════════════════════════════════════
-// 店舗データ
+// デモ店舗データ（5パターン）
 // ════════════════════════════════════════════════════════════
+// 1. 初回     — 企画フェーズ開始直後。情報収集待ち
+// 2. 進行中   — デザインフェーズ。一部提出済み・オーナー対応中
+// 3. 確認待ち — 制作フェーズ。多数提出済み・管理者確認待ち
+// 4. 差し戻し — デザインフェーズ。提出物が却下されオーナー再対応待ち
+// 5. 完了間近 — 納品フェーズ。残り1件のみ
 
 const seedData = [
+  // ─── 1. 初回 ─────────────────────────────────────────────
   {
-    name: 'アイケアラボ 駒込店',
-    category: '眼科・コンタクト',
-    currentPhase: 'デザイン',
-    startDate: '2026-03-01',
-    deadline: '2026-04-30',
-    memo: 'シンプルで清潔感のあるデザインを希望。カラー：白・水色系。',
-    whoWaiting: 'owner',
-    tasks: [
-      { title: 'ヒアリングシート送付', done: true,  phase: '企画',    order: 0, whoWaiting: 'none' },
-      { title: '要件定義書作成',       done: true,  phase: '企画',    order: 1, whoWaiting: 'none' },
-      { title: 'ワイヤーフレーム作成', done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none' },
-      { title: 'デザインカンプ提出',   done: false, phase: 'デザイン', order: 3, whoWaiting: 'admin' },
-      { title: 'コーディング',         done: false, phase: '制作',    order: 4, whoWaiting: 'none' },
-      { title: '動作確認・修正',       done: false, phase: '制作',    order: 5, whoWaiting: 'none' },
-      { title: '本番公開',             done: false, phase: '納品',    order: 6, whoWaiting: 'none' },
-    ],
-  },
-  {
-    name: 'アイケアラボ 南浦和店',
-    category: '眼科・コンタクト',
-    currentPhase: '制作',
-    startDate: '2026-02-15',
-    deadline: '2026-04-15',
-    memo: '店舗写真は3月末に受け取り予定。予約フォームのSNS連携が必要。',
-    whoWaiting: 'owner',
-    tasks: [
-      { title: 'ヒアリング完了',           done: true,  phase: '企画',    order: 0, whoWaiting: 'none' },
-      { title: 'サイトマップ作成',         done: true,  phase: '企画',    order: 1, whoWaiting: 'none' },
-      { title: 'デザイン確定',             done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none' },
-      { title: 'TOPページ制作',            done: true,  phase: '制作',    order: 3, whoWaiting: 'none' },
-      { title: 'メニューページ制作',       done: true,  phase: '制作',    order: 4, whoWaiting: 'none' },
-      { title: 'アクセスページ制作',       done: false, phase: '制作',    order: 5, whoWaiting: 'owner' },
-      { title: 'お問い合わせフォーム設置', done: false, phase: '制作',    order: 6, whoWaiting: 'none' },
-      { title: '最終確認・公開',           done: false, phase: '納品',    order: 7, whoWaiting: 'none' },
-    ],
-  },
-  {
-    name: 'アイケアラボ 渋谷店',
+    pattern: 1,
+    name: 'アイケアラボ 大宮店',
     category: '眼科・コンタクト',
     currentPhase: '企画',
-    startDate: '2026-03-10',
-    deadline: '2026-05-31',
-    memo: '予約システム導入を検討中。LINE連携希望。',
-    whoWaiting: 'none',
+    startDate: '2026-03-15',
+    deadline: '2026-06-30',
+    memo: '新規開業に合わせたWebサイト制作。ブランドカラーは青系を希望。',
+    whoWaiting: 'owner',
+    openStatus: '準備前',
+    staffReadiness: '未定',
+    canMoveToPostOpenApp: false,
     tasks: [
-      { title: '初回ヒアリング',       done: true,  phase: '企画',    order: 0, whoWaiting: 'none' },
-      { title: '競合サイト調査',       done: false, phase: '企画',    order: 1, whoWaiting: 'admin' },
-      { title: '要件定義書作成',       done: false, phase: '企画',    order: 2, whoWaiting: 'none' },
-      { title: 'ワイヤーフレーム作成', done: false, phase: 'デザイン', order: 3, whoWaiting: 'none' },
-      { title: 'デザインカンプ提出',   done: false, phase: 'デザイン', order: 4, whoWaiting: 'none' },
-      { title: 'コーディング',         done: false, phase: '制作',    order: 5, whoWaiting: 'none' },
-      { title: '公開・納品',           done: false, phase: '納品',    order: 6, whoWaiting: 'none' },
+      { title: 'ヒアリングシート送付',   done: true,  phase: '企画',    order: 0, whoWaiting: 'none'  },
+      { title: '初回ヒアリング実施',     done: false, phase: '企画',    order: 1, whoWaiting: 'owner' },
+      { title: '要件定義書作成',         done: false, phase: '企画',    order: 2, whoWaiting: 'none'  },
+      { title: 'ワイヤーフレーム作成',   done: false, phase: 'デザイン', order: 3, whoWaiting: 'none'  },
+      { title: 'デザインカンプ提出',     done: false, phase: 'デザイン', order: 4, whoWaiting: 'none'  },
+      { title: 'コーディング',           done: false, phase: '制作',    order: 5, whoWaiting: 'none'  },
+      { title: '動作確認・修正',         done: false, phase: '制作',    order: 6, whoWaiting: 'none'  },
+      { title: '本番公開',               done: false, phase: '納品',    order: 7, whoWaiting: 'none'  },
     ],
   },
+  // ─── 2. 進行中 ───────────────────────────────────────────
   {
-    name: 'アイケアラボ 池袋店',
+    pattern: 2,
+    name: 'アイケアラボ 横浜店',
+    category: '眼科・コンタクト',
+    currentPhase: 'デザイン',
+    startDate: '2026-02-20',
+    deadline: '2026-05-15',
+    memo: 'リニューアル案件。既存サイトのドメインを引き継ぎ予定。',
+    whoWaiting: 'owner',
+    openStatus: '準備中',
+    staffReadiness: '本部対応',
+    canMoveToPostOpenApp: false,
+    tasks: [
+      { title: 'ヒアリング完了',           done: true,  phase: '企画',    order: 0, whoWaiting: 'none'  },
+      { title: '競合サイト調査',           done: true,  phase: '企画',    order: 1, whoWaiting: 'none'  },
+      { title: '要件定義書確定',           done: true,  phase: '企画',    order: 2, whoWaiting: 'none'  },
+      { title: 'ワイヤーフレーム完成',     done: true,  phase: 'デザイン', order: 3, whoWaiting: 'none'  },
+      { title: 'デザインカンプ提出',       done: false, phase: 'デザイン', order: 4, whoWaiting: 'admin' },
+      { title: 'コーディング',             done: false, phase: '制作',    order: 5, whoWaiting: 'none'  },
+      { title: 'お問い合わせフォーム設置', done: false, phase: '制作',    order: 6, whoWaiting: 'none'  },
+      { title: '最終確認・公開',           done: false, phase: '納品',    order: 7, whoWaiting: 'none'  },
+    ],
+  },
+  // ─── 3. 確認待ち ─────────────────────────────────────────
+  {
+    pattern: 3,
+    name: 'アイケアラボ 吉祥寺店',
+    category: '眼科・コンタクト',
+    currentPhase: '制作',
+    startDate: '2026-01-20',
+    deadline: '2026-04-20',
+    memo: '予約フォームはLINE予約で実装予定。コンタクトの取扱いブランドが多いため情報量が多い。',
+    whoWaiting: 'admin',
+    openStatus: '準備中',
+    staffReadiness: '店舗対応',
+    canMoveToPostOpenApp: false,
+    tasks: [
+      { title: 'ヒアリング',               done: true,  phase: '企画',    order: 0, whoWaiting: 'none'  },
+      { title: '要件定義',                 done: true,  phase: '企画',    order: 1, whoWaiting: 'none'  },
+      { title: 'デザイン確定',             done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none'  },
+      { title: 'TOPページ制作',            done: true,  phase: '制作',    order: 3, whoWaiting: 'none'  },
+      { title: 'メニューページ制作',       done: true,  phase: '制作',    order: 4, whoWaiting: 'none'  },
+      { title: 'スタッフページ制作',       done: false, phase: '制作',    order: 5, whoWaiting: 'admin' },
+      { title: 'アクセスページ制作',       done: false, phase: '制作',    order: 6, whoWaiting: 'none'  },
+      { title: '最終確認・公開',           done: false, phase: '納品',    order: 7, whoWaiting: 'none'  },
+    ],
+  },
+  // ─── 4. 差し戻し ─────────────────────────────────────────
+  {
+    pattern: 4,
+    name: 'アイケアラボ 新宿店',
+    category: '眼科・コンタクト',
+    currentPhase: 'デザイン',
+    startDate: '2026-02-01',
+    deadline: '2026-05-01',
+    memo: '院長希望：シンプルで落ち着いた雰囲気。外観写真は再撮影対応中。',
+    whoWaiting: 'owner',
+    openStatus: '準備中',
+    staffReadiness: '本部対応',
+    canMoveToPostOpenApp: false,
+    tasks: [
+      { title: 'ヒアリング完了',         done: true,  phase: '企画',    order: 0, whoWaiting: 'none'  },
+      { title: '要件定義確定',           done: true,  phase: '企画',    order: 1, whoWaiting: 'none'  },
+      { title: 'ワイヤーフレーム確認',   done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none'  },
+      { title: 'デザインカンプ提出',     done: false, phase: 'デザイン', order: 3, whoWaiting: 'owner' },
+      { title: 'コーディング',           done: false, phase: '制作',    order: 4, whoWaiting: 'none'  },
+      { title: '動作確認',               done: false, phase: '制作',    order: 5, whoWaiting: 'none'  },
+      { title: '本番公開',               done: false, phase: '納品',    order: 6, whoWaiting: 'none'  },
+    ],
+  },
+  // ─── 5. 完了間近 ─────────────────────────────────────────
+  {
+    pattern: 5,
+    name: 'アイケアラボ 銀座店',
     category: '眼科・コンタクト',
     currentPhase: '納品',
-    startDate: '2026-01-10',
-    deadline: '2026-03-20',
-    memo: '予約フォームの修正のみ残り。来週中に完了予定。',
-    whoWaiting: 'none',
+    startDate: '2026-01-05',
+    deadline: '2026-03-31',
+    memo: 'Googleマイビジネス設定のみ残り。公開準備はほぼ完了。',
+    whoWaiting: 'owner',
+    openStatus: '出店可能',
+    staffReadiness: '完了',
+    canMoveToPostOpenApp: true,
     tasks: [
-      { title: 'ヒアリング',           done: true,  phase: '企画',    order: 0, whoWaiting: 'none' },
-      { title: '要件定義',             done: true,  phase: '企画',    order: 1, whoWaiting: 'none' },
-      { title: 'デザイン確定',         done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none' },
-      { title: 'コーディング完了',     done: true,  phase: '制作',    order: 3, whoWaiting: 'none' },
-      { title: '動作確認',             done: true,  phase: '制作',    order: 4, whoWaiting: 'none' },
-      { title: '予約フォーム最終修正', done: false, phase: '納品',    order: 5, whoWaiting: 'owner' },
-      { title: '本番公開・完了報告',   done: false, phase: '納品',    order: 6, whoWaiting: 'none' },
+      { title: 'ヒアリング',           done: true,  phase: '企画',    order: 0, whoWaiting: 'none'  },
+      { title: '要件定義',             done: true,  phase: '企画',    order: 1, whoWaiting: 'none'  },
+      { title: 'デザイン確定',         done: true,  phase: 'デザイン', order: 2, whoWaiting: 'none'  },
+      { title: 'コーディング完了',     done: true,  phase: '制作',    order: 3, whoWaiting: 'none'  },
+      { title: '動作確認完了',         done: true,  phase: '制作',    order: 4, whoWaiting: 'none'  },
+      { title: 'GBP・アナリティクス設定', done: false, phase: '納品', order: 5, whoWaiting: 'owner' },
+      { title: '本番公開・完了報告',   done: false, phase: '納品',    order: 6, whoWaiting: 'none'  },
     ],
   },
 ];
 
 // ════════════════════════════════════════════════════════════
-// 必要項目（スプレッドシート差分補完後の完全版）
+// 必要項目（パターン別）
+// sortOrder 対応:
+//  企画: 0=既存サイト, 1=ドメイン, 2=問い合わせ先, 3=SNS
+//  デザイン: 4=キャッチコピー, 5=外観写真, 6=ロゴ
+//  制作: 7=スタッフ文, 8=スタッフ写真, 9=院内写真, 10=診療内容,
+//        11=コンタクトブランド, 12=診療時間, 13=アクセス, 14=予約システム, 15=プライバシポリシー
+//  納品: 16=GBP
 // ════════════════════════════════════════════════════════════
-// [差分補完] 以下の項目を追加（スプレッドシートは参照不可のため眼科クリニックWebプロジェクト標準フロー基準）:
-// - 院長・スタッフプロフィール文
-// - キャッチコピー・コンセプト文
-// - 診療内容・料金表
-// - コンタクトレンズ取扱いブランド一覧
-// - ドメイン名の希望・取得状況
-// - SNS・口コミサイトURL
-// - お問い合わせ先（電話・メール）確認
-// - 予約システム情報
-// - プライバシーポリシー文面
-// - Googleマイビジネス掲載URL
-// - 既存サイトURL（リニューアル有無）
-// - 院内写真（待合室・診察室）
 
-function requiredItems(storeId: string) {
+type ItemOverride = {
+  status?: string;
+  whoWaiting?: string;
+};
+
+function requiredItems(storeId: string, overrides: Record<number, ItemOverride> = {}) {
+  const base = baseRequiredItems(storeId);
+  return base.map(item => {
+    const ov = overrides[item.sortOrder];
+    if (!ov) return item;
+    return { ...item, ...ov };
+  });
+}
+
+function baseRequiredItems(storeId: string) {
   return [
     // ── 企画フェーズ ─────────────────────────────────────────
     {
@@ -125,7 +182,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'document',
       label: 'ドメイン名の希望・取得状況',
-      description: '希望するドメイン名（例: aicare-komagome.com）と、既に取得済みかどうかをお知らせください。',
+      description: '希望するドメイン名（例: aicare-omiya.com）と、既に取得済みかどうかをお知らせください。',
       requiredPhase: '企画',
       assigneeType: 'owner',
       ownerResponsibleName: '院長',
@@ -144,7 +201,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'document',
       label: 'お問い合わせ先（電話番号・メールアドレス）',
-      description: 'サイトに掲載する代表電話番号・メールアドレスをご確認ください。予約受付・一般問い合わせの区分も合わせて教えてください。',
+      description: 'サイトに掲載する代表電話番号・メールアドレスをご確認ください。',
       requiredPhase: '企画',
       assigneeType: 'owner',
       ownerResponsibleName: '受付担当',
@@ -163,7 +220,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'sns',
       label: 'SNS・口コミサイトのURL一覧',
-      description: 'Instagram / Googleマイビジネス / Epark / じゃらん等、運用中のアカウントURLをすべてお知らせください。',
+      description: 'Instagram / Googleマイビジネス / Epark 等、運用中のアカウントURLをすべてお知らせください。',
       requiredPhase: '企画',
       assigneeType: 'owner',
       ownerResponsibleName: '院長',
@@ -190,7 +247,7 @@ function requiredItems(storeId: string) {
       adminResponsibleName: 'コピーライティング担当',
       whoWaiting: 'owner',
       dueLabel: 'デザインカンプ作成前',
-      reason: 'キャッチコピーはサイトの第一印象を決める最重要テキストです。担当者と一緒に作成することを推奨します。',
+      reason: 'キャッチコピーはサイトの第一印象を決める最重要テキストです。',
       status: 'pending',
       sortOrder: 4,
       isPhotoRequired: false,
@@ -208,7 +265,7 @@ function requiredItems(storeId: string) {
       ownerResponsibleName: '店長',
       adminResponsibleName: 'Webデザイン担当',
       whoWaiting: 'owner',
-      dueLabel: 'デザイン開始前（3月末まで）',
+      dueLabel: 'デザイン開始前',
       reason: 'デザインカンプ制作の前に実素材が必要なため、早めに準備をお願いします。',
       status: 'pending',
       sortOrder: 5,
@@ -296,7 +353,7 @@ function requiredItems(storeId: string) {
       adminResponsibleName: 'Webデザイン担当',
       whoWaiting: 'owner',
       dueLabel: '制作フェーズ中',
-      reason: '院内の雰囲気が分かると「安心して行けそう」という印象を与えられます。初診患者の来院率に影響します。',
+      reason: '院内の雰囲気が分かると「安心して行けそう」という印象を与えられます。',
       status: 'pending',
       sortOrder: 9,
       isPhotoRequired: true,
@@ -312,7 +369,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'document',
       label: '診療内容・料金表',
-      description: '提供する診療メニューと費用（保険・自費別）をまとめたテキストをご提供ください。コンタクトレンズの処方流れも含めてください。',
+      description: '提供する診療メニューと費用（保険・自費別）をまとめたテキストをご提供ください。',
       requiredPhase: '制作',
       assigneeType: 'owner',
       ownerResponsibleName: '受付担当',
@@ -374,10 +431,10 @@ function requiredItems(storeId: string) {
       assigneeType: 'owner',
       ownerResponsibleName: '院長',
       adminResponsibleName: 'コーディング担当',
-      whoWaiting: 'admin',
+      whoWaiting: 'owner',
       dueLabel: 'コーディング開始前',
       reason: '患者さんが迷わないよう正確なアクセス情報が必要です。',
-      status: 'submitted',
+      status: 'pending',
       sortOrder: 13,
       isPhotoRequired: false,
       guideTitle: '',
@@ -388,7 +445,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'document',
       label: '予約システムの情報（LINE・電話・外部サービス）',
-      description: '患者様の予約方法を教えてください。電話のみ / LINE予約 / ホットペッパー / 自社フォーム等。導入済みの場合はURLや管理情報もお知らせください。',
+      description: '患者様の予約方法を教えてください。電話のみ / LINE予約 / ホットペッパー / 自社フォーム等。',
       requiredPhase: '制作',
       assigneeType: 'owner',
       ownerResponsibleName: '院長',
@@ -407,7 +464,7 @@ function requiredItems(storeId: string) {
       storeId,
       category: 'document',
       label: 'プライバシーポリシー文面の確認',
-      description: '患者様の個人情報取り扱いに関するプライバシーポリシーです。既存の文面があればご提供ください。ない場合はテンプレートを作成します。',
+      description: '患者様の個人情報取り扱いに関するプライバシーポリシーです。',
       requiredPhase: '制作',
       assigneeType: 'owner',
       ownerResponsibleName: '院長',
@@ -445,11 +502,98 @@ function requiredItems(storeId: string) {
   ];
 }
 
+// パターン別オーバーライド
+// ─── Pattern 1: 初回 ───────────────────────────────────────
+// 企画開始直後。0と2は確認済み。残りはすべて待機中。
+const overridesPattern1: Record<number, ItemOverride> = {
+  1: { status: 'pending', whoWaiting: 'owner' },
+  3: { status: 'pending', whoWaiting: 'owner' },
+};
+
+// ─── Pattern 2: 進行中 ─────────────────────────────────────
+// 企画フェーズ完了 → デザインフェーズ進行中。外観写真がオーナー待ち。
+const overridesPattern2: Record<number, ItemOverride> = {
+  // 企画フェーズ: 全承認済み
+  1:  { status: 'approved', whoWaiting: 'none' },
+  3:  { status: 'approved', whoWaiting: 'none' },
+  // デザインフェーズ: キャッチコピーは提出済み（管理者確認待ち）、外観写真は未提出、ロゴは承認済み
+  4:  { status: 'submitted', whoWaiting: 'admin' },
+  5:  { status: 'pending',   whoWaiting: 'owner' },
+  6:  { status: 'approved',  whoWaiting: 'none'  },
+};
+
+// ─── Pattern 3: 確認待ち ───────────────────────────────────
+// 制作フェーズ。大量の素材が提出済みで管理者確認待ち。
+const overridesPattern3: Record<number, ItemOverride> = {
+  // 企画フェーズ: 全承認済み
+  1:  { status: 'approved', whoWaiting: 'none' },
+  3:  { status: 'approved', whoWaiting: 'none' },
+  // デザインフェーズ: 全承認済み
+  4:  { status: 'approved', whoWaiting: 'none' },
+  5:  { status: 'approved', whoWaiting: 'none' },
+  6:  { status: 'approved', whoWaiting: 'none' },
+  // 制作フェーズ: 多数が提出済み（管理者確認待ち）
+  7:  { status: 'submitted', whoWaiting: 'admin' },
+  8:  { status: 'submitted', whoWaiting: 'admin' },
+  9:  { status: 'submitted', whoWaiting: 'admin' },
+  10: { status: 'submitted', whoWaiting: 'admin' },
+  11: { status: 'submitted', whoWaiting: 'admin' },
+  // 12は診療時間（デフォルトapproved）
+  13: { status: 'submitted', whoWaiting: 'admin' },
+  14: { status: 'approved',  whoWaiting: 'none'  },
+  15: { status: 'submitted', whoWaiting: 'admin' },
+  // 納品フェーズ: まだ未着手
+  16: { status: 'pending', whoWaiting: 'owner' },
+};
+
+// ─── Pattern 4: 差し戻し ───────────────────────────────────
+// 外観写真とロゴが却下。オーナーが再提出待ち。
+const overridesPattern4: Record<number, ItemOverride> = {
+  // 企画フェーズ: 全承認済み
+  1:  { status: 'approved', whoWaiting: 'none' },
+  3:  { status: 'approved', whoWaiting: 'none' },
+  // デザインフェーズ: キャッチコピーは承認済み、外観写真とロゴが却下
+  4:  { status: 'approved',  whoWaiting: 'none'  },
+  5:  { status: 'rejected',  whoWaiting: 'owner' },
+  6:  { status: 'rejected',  whoWaiting: 'owner' },
+};
+
+// ─── Pattern 5: 完了間近 ───────────────────────────────────
+// 納品フェーズ。GBP設定のみ残り。
+const overridesPattern5: Record<number, ItemOverride> = {
+  // 企画フェーズ: 全承認済み
+  1:  { status: 'approved', whoWaiting: 'none' },
+  3:  { status: 'approved', whoWaiting: 'none' },
+  // デザインフェーズ: 全承認済み
+  4:  { status: 'approved', whoWaiting: 'none' },
+  5:  { status: 'approved', whoWaiting: 'none' },
+  6:  { status: 'approved', whoWaiting: 'none' },
+  // 制作フェーズ: 全承認済み
+  7:  { status: 'approved', whoWaiting: 'none' },
+  8:  { status: 'approved', whoWaiting: 'none' },
+  9:  { status: 'approved', whoWaiting: 'none' },
+  10: { status: 'approved', whoWaiting: 'none' },
+  11: { status: 'approved', whoWaiting: 'none' },
+  13: { status: 'approved', whoWaiting: 'none' },
+  14: { status: 'approved', whoWaiting: 'none' },
+  15: { status: 'approved', whoWaiting: 'none' },
+  // 納品フェーズ: GBPのみ未完
+  16: { status: 'pending', whoWaiting: 'owner' },
+};
+
+const patternOverrides: Record<number, Record<number, ItemOverride>> = {
+  1: overridesPattern1,
+  2: overridesPattern2,
+  3: overridesPattern3,
+  4: overridesPattern4,
+  5: overridesPattern5,
+};
+
 // ════════════════════════════════════════════════════════════
-// 購入備品（新規追加）
+// 購入備品
+// ════════════════════════════════════════════════════════════
 function purchaseItems(storeId: string) {
   return [
-    // ── 必須品（must）──
     {
       storeId,
       category: 'equipment',
@@ -478,7 +622,7 @@ function purchaseItems(storeId: string) {
       tag: '必須',
       tagColor: '#dc2626',
       desc: 'サイト公開に必要なサーバーです。自動バックアップ・SSL無料付き。制作完了前に契約しておくことを推奨します。',
-      notes: '契約後、DNS（ネームサーバー）の切り替えに最大24〜72時間かかります。公開日から逆算して余裕を持って契約してください。契約者名・ログイン情報は必ず担当者と共有してください。',
+      notes: '契約後、DNS（ネームサーバー）の切り替えに最大24〜72時間かかります。公開日から逆算して余裕を持って契約してください。',
       necessity: 'must',
       phase: '制作',
       status: 'pending',
@@ -501,7 +645,6 @@ function purchaseItems(storeId: string) {
       status: 'pending',
       sortOrder: 2,
     },
-    // ── 推奨品（recommend）──
     {
       storeId,
       category: 'service',
@@ -513,7 +656,7 @@ function purchaseItems(storeId: string) {
       tag: '推奨',
       tagColor: '#2563eb',
       desc: 'デザインカンプに実素材を使うとクライアント承認が早くなります。ダミー画像では承認率が下がります。',
-      notes: 'Adobe CCのサブスクリプションと共用できます。月額プランは初月無料キャンペーンがある場合があります。素材の商用利用範囲を確認してください。',
+      notes: 'Adobe CCのサブスクリプションと共用できます。月額プランは初月無料キャンペーンがある場合があります。',
       necessity: 'recommend',
       phase: 'デザイン',
       status: 'pending',
@@ -536,7 +679,6 @@ function purchaseItems(storeId: string) {
       status: 'pending',
       sortOrder: 4,
     },
-    // ── オーナー向け推奨購入品（recommend_product）──
     {
       storeId,
       category: 'recommend_product',
@@ -565,7 +707,7 @@ function purchaseItems(storeId: string) {
       tag: 'アイケアの必需品',
       tagColor: '#8b5cf6',
       desc: 'スリムで持ち運びやすい。外出先での取り外しに便利。',
-      notes: '定期的な交換をおすすめします。使用し続けると雑菌が繁殖する可能性があります。目安は1〜3ヶ月ごとの交換です。',
+      notes: '定期的な交換をおすすめします。目安は1〜3ヶ月ごとの交換です。',
       necessity: 'recommend',
       phase: '',
       status: 'pending',
@@ -582,7 +724,7 @@ function purchaseItems(storeId: string) {
       tag: '医師推奨タイプ',
       tagColor: '#10b981',
       desc: 'コンタクト装着中でも使用可能。目の乾燥・疲れに効果的。',
-      notes: '「コンタクト装着中使用可」と記載があるものをお選びください。清涼感の強いタイプはコンタクトを傷める場合があります。',
+      notes: '「コンタクト装着中使用可」と記載があるものをお選びください。',
       necessity: 'recommend',
       phase: '',
       status: 'pending',
@@ -609,13 +751,10 @@ function purchaseItems(storeId: string) {
 }
 
 // ════════════════════════════════════════════════════════════
-// 候補（看板業者・印刷業者を追加）
+// 候補
 // ════════════════════════════════════════════════════════════
-// [差分補完] signage（看板業者）と printer（印刷業者）が存在しなかったため追加
-
 function candidates(storeId: string) {
   return [
-    // vendor
     {
       storeId,
       category: 'vendor',
@@ -642,7 +781,6 @@ function candidates(storeId: string) {
       score: 72,
       status: 'pending',
     },
-    // studio
     {
       storeId,
       category: 'studio',
@@ -656,7 +794,6 @@ function candidates(storeId: string) {
       score: 90,
       status: 'selected',
     },
-    // property
     {
       storeId,
       category: 'property',
@@ -672,45 +809,17 @@ function candidates(storeId: string) {
     },
     {
       storeId,
-      category: 'property',
-      name: 'Vercel + Supabase（Jamstack構成）',
-      summary: 'Next.jsと相性最高。CDN配信で高速。',
-      pros: 'CDN配信で高速\n無料枠が広い\n開発効率が高い',
-      cons: 'WordPressを使いたい場合は不向き\nコンテンツ管理にCMS連携が別途必要',
-      price: '¥0〜¥2,000/月（規模次第）',
-      contact: 'https://vercel.com/support',
-      url: 'https://vercel.com',
-      score: 75,
-      status: 'pending',
-    },
-    // signage ← 新規追加
-    {
-      storeId,
       category: 'signage',
       name: '株式会社サインマート',
       summary: '医療・クリニック向け看板制作専門。LEDサイン・壁面サイン・窓ガラスシート対応。',
       pros: '医療系クリニックへの納品実績が豊富\n現地調査から設置まで一貫対応\nデザインデータ入稿可',
-      cons: '繁忙期は納期が伸びやすい（要余裕を持ったスケジューリング）\nエリアによっては現地調査費が別途発生',
+      cons: '繁忙期は納期が伸びやすい\nエリアによっては現地調査費が別途発生',
       price: '¥50,000〜¥300,000（サイズ・仕様による）',
       contact: '0120-xxx-xxxx / info@signmart.example',
       url: 'https://signmart.example',
       score: 80,
       status: 'pending',
     },
-    {
-      storeId,
-      category: 'signage',
-      name: 'ローカルサイン工房',
-      summary: '地域密着の看板業者。小ロット・短納期対応。',
-      pros: '地域密着で現地対応が速い\n小ロットでも柔軟に対応\n価格がリーズナブル',
-      cons: 'デザイン提案力はやや限定的\nWebサイトとの連動デザインは要調整',
-      price: '¥30,000〜¥150,000',
-      contact: '担当: 佐藤 / local-sign@example.com',
-      url: '',
-      score: 65,
-      status: 'pending',
-    },
-    // printer ← 新規追加
     {
       storeId,
       category: 'printer',
@@ -728,11 +837,10 @@ function candidates(storeId: string) {
 }
 
 // ════════════════════════════════════════════════════════════
-// 相談
+// 相談（パターン別）
 // ════════════════════════════════════════════════════════════
-
-function consultations(storeId: string) {
-  return [
+function consultations(storeId: string, pattern: number) {
+  const common = [
     {
       storeId,
       title: 'デザイン修正回数の上限について',
@@ -755,29 +863,56 @@ function consultations(storeId: string) {
       createdBy: 'owner',
       consultationCategory: 'cost',
     },
-    {
-      storeId,
-      title: '外観写真の撮影タイミングについて',
-      message: '外観写真はデザイン開始前に必ず必要ですか？制作フェーズに入ってからでも大丈夫ですか？',
-      answer: '',
-      status: 'open',
-      targetType: 'required_item',
-      targetId: '',
-      createdBy: 'owner',
-      consultationCategory: 'photo',
-    },
-    {
-      storeId,
-      title: 'コンタクトレンズブランド掲載の著作権について',
-      message: 'メーカーのロゴや写真をサイトに掲載してもいいですか？許可が必要ですか？',
-      answer: '',
-      status: 'open',
-      targetType: 'general',
-      targetId: '',
-      createdBy: 'owner',
-      consultationCategory: 'design',
-    },
   ];
+
+  // 差し戻しパターンには却下理由に関する相談を追加
+  if (pattern === 4) {
+    return [
+      ...common,
+      {
+        storeId,
+        title: '外観写真の再撮影について（差し戻し対応）',
+        message: '外観写真が却下されました。再撮影の際に気をつけることを教えてください。晴天時というのは快晴でないといけませんか？',
+        answer: '薄曇りでも問題ありません。影が強く出ない柔らかい光の日が理想です。朝10時〜昼12時の時間帯を目安にしてください。',
+        status: 'answered',
+        targetType: 'required_item',
+        targetId: '',
+        createdBy: 'owner',
+        consultationCategory: 'photo',
+      },
+      {
+        storeId,
+        title: 'ロゴのSVF形式への変換方法',
+        message: 'ロゴファイルをSVGに変換する方法が分かりません。手元にあるのはPSDファイルです。',
+        answer: '',
+        status: 'open',
+        targetType: 'required_item',
+        targetId: '',
+        createdBy: 'owner',
+        consultationCategory: 'design',
+      },
+    ];
+  }
+
+  // 確認待ちパターンには管理者側からの相談を追加
+  if (pattern === 3) {
+    return [
+      ...common,
+      {
+        storeId,
+        title: 'スタッフ写真の背景について',
+        message: '提出いただいたスタッフ写真の背景が柄物でした。白い壁の前での再撮影は可能ですか？',
+        answer: '対応します。今週中に再撮影して再提出します。',
+        status: 'answered',
+        targetType: 'required_item',
+        targetId: '',
+        createdBy: 'admin',
+        consultationCategory: 'photo',
+      },
+    ];
+  }
+
+  return common;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -803,37 +938,69 @@ async function main() {
   await prisma.store.deleteMany();
 
   for (const data of seedData) {
-    const { tasks, whoWaiting, ...storeData } = data;
+    const { tasks, pattern, ...storeData } = data;
+
     const store = await prisma.store.create({
       data: {
         ...storeData,
-        whoWaiting,
         tasks: { create: tasks },
       },
     });
 
-    await prisma.requiredItem.createMany({ data: requiredItems(store.id) });
+    // 必要項目（パターン別オーバーライドを適用）
+    const overrides = patternOverrides[pattern] ?? {};
+    const items = requiredItems(store.id, overrides);
+    await prisma.requiredItem.createMany({ data: items });
+
+    // 提出物を作成（確認待ち・差し戻しパターン）
+    if (pattern === 3 || pattern === 4) {
+      const createdItems = await prisma.requiredItem.findMany({
+        where: { storeId: store.id },
+        orderBy: { sortOrder: 'asc' },
+      });
+
+      for (const item of createdItems) {
+        if (item.status === 'submitted') {
+          await prisma.submission.create({
+            data: {
+              requiredItemId: item.id,
+              textValue: `${item.label}のデータを提出しました。ご確認をお願いいたします。`,
+              status: 'pending',
+            },
+          });
+        }
+        if (item.status === 'rejected') {
+          const rejectedReason =
+            item.label === '店舗外観写真'
+              ? '写真が暗く、建物の外観が分かりにくい状態です。晴天時に再撮影をお願いします。正面・斜め・引き構図の3パターンでご提出ください。'
+              : 'ファイル形式が対応していません（JPEGファイルが届いています）。SVGまたは背景透過PNGで再提出をお願いします。';
+          await prisma.submission.create({
+            data: {
+              requiredItemId: item.id,
+              textValue: `${item.label}のデータを提出しました。`,
+              status: 'rejected',
+              rejectedReason,
+            },
+          });
+        }
+        if (item.status === 'approved') {
+          await prisma.submission.create({
+            data: {
+              requiredItemId: item.id,
+              textValue: `${item.label}の情報をご提供いたします。`,
+              status: 'approved',
+            },
+          });
+        }
+      }
+    }
+
     await prisma.purchaseItem.createMany({ data: purchaseItems(store.id) });
     await prisma.candidate.createMany({ data: candidates(store.id) });
-    await prisma.consultation.createMany({ data: consultations(store.id) });
+    await prisma.consultation.createMany({ data: consultations(store.id, pattern) });
 
-    // UploadDestination（駒込店のみ設定済み）
-    if (store.name === 'アイケアラボ 駒込店') {
-      await prisma.uploadDestination.create({
-        data: {
-          storeId:           store.id,
-          provider:          'google_drive',
-          rootFolderName:    'アイケアラボ 駒込店 Webサイト制作',
-          rootFolderUrl:     'https://drive.google.com/drive/folders/DUMMY_KOMAGOME',
-          photoFolderUrl:    'https://drive.google.com/drive/folders/DUMMY_KOMAGOME_PHOTO',
-          assetFolderUrl:    'https://drive.google.com/drive/folders/DUMMY_KOMAGOME_ASSET',
-          documentFolderUrl: 'https://drive.google.com/drive/folders/DUMMY_KOMAGOME_DOC',
-          isConfigured:      true,
-        },
-      });
-    } else {
-      await prisma.uploadDestination.create({ data: { storeId: store.id } });
-    }
+    // UploadDestination
+    await prisma.uploadDestination.create({ data: { storeId: store.id } });
 
     // EventLog サンプル
     await prisma.eventLog.createMany({
@@ -859,7 +1026,14 @@ async function main() {
       ],
     });
 
-    console.log(`  ✔ 作成: ${store.name} (${store.id})`);
+    const phaseLabel: Record<number, string> = {
+      1: '初回',
+      2: '進行中',
+      3: '確認待ち',
+      4: '差し戻し',
+      5: '完了間近',
+    };
+    console.log(`  ✔ 作成: ${store.name}（${phaseLabel[pattern]}）(${store.id})`);
   }
 
   console.log('シード完了');

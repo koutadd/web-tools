@@ -25,6 +25,20 @@ model Store {
   whoWaiting                String              @default("none") // 'owner' | 'admin' | 'system' | 'none'
   googleDriveStoreFolderId  String              @default("")     // 店舗ルートフォルダ ID
   googleDrivePhotoFolderId  String              @default("")     // 01_店舗画像フォルダ ID
+
+  // ─── 出店管理 ─────────────────────────────────────────────
+  // 出店ステータス: 準備前 → 準備中 → 出店可能 → 出店済み → 運用中
+  openStatus           String    @default("準備前")
+  // スタッフ準備区分: 本部対応 | 店舗対応 | 未定 | 完了
+  staffReadiness       String    @default("未定")
+  // 出店後アプリへの切替可能フラグ
+  // 納品フェーズ全タスク完了 & 全 RequiredItem 承認時に true にする
+  canMoveToPostOpenApp Boolean   @default(false)
+  // 出店日（出店済みにした日時を記録）
+  openedAt             DateTime?
+  // 顧客情報は外部管理（CRM / スプレッドシート等）へのリンクのみ保持
+  externalCustomerUrl  String    @default("")
+
   tasks              Task[]
   requiredItems      RequiredItem[]
   uploadDestination  UploadDestination?
@@ -167,21 +181,35 @@ model Suggestion {
 /// 項目単位で相談可能（targetType + targetId で相談対象を特定）
 /// externalThreadKey は将来 Slack thread_ts 等の外部キーを保存する
 model Consultation {
-  id                   String    @id @default(cuid())
+  id                   String                @id @default(cuid())
   storeId              String
-  store                Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  targetType           String    @default("general") // 'required_item' | 'task' | 'general'
-  targetId             String    @default("")        // 関連する RequiredItem.id や Task.id
+  store                Store                 @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  targetType           String                @default("general")
+  targetId             String                @default("")
   title                String
   message              String
-  createdBy            String    @default("owner")   // 'owner' | 'admin'
-  answer               String    @default("")
-  status               String    @default("open")    // 'open' | 'answered' | 'closed'
-  consultationCategory String    @default("")        // 'photo' | 'design' | 'schedule' | 'cost' | 'other'
+  createdBy            String                @default("owner")
+  answer               String                @default("")
+  status               String                @default("open")
+  consultationCategory String                @default("")
   resolvedAt           DateTime?
-  externalThreadKey    String    @default("")        // 将来: Slack thread_ts 等
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  externalThreadKey    String                @default("")
+  // 出店前/出店後を区別するフラグ（履歴は全件継続保持、UIで見せ方を分ける）
+  appPhase             String                @default("pre_open") // 'pre_open' | 'post_open'
+  messages             ConsultationMessage[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+}
+
+/// チャット形式メッセージ（1スレッド = 1 Consultation に複数 Message）
+model ConsultationMessage {
+  id             String       @id @default(cuid())
+  consultationId String
+  consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  text           String
+  userType       String       // 'owner' | 'admin'
+  authorName     String       @default("")
+  createdAt      DateTime     @default(now())
 }
 
 // ════════════════════════════════════════════════════════════
