@@ -7,7 +7,8 @@ import ChecklistPanel, { type DriveFolderUrls } from '@/components/ChecklistPane
 import OwnerPurchaseSection, { type PurchaseItemData } from '@/components/OwnerPurchaseSection';
 import OwnerTodoSection, { type TodoItem } from '@/components/OwnerTodoSection';
 import OwnerPageLogger from '@/components/OwnerPageLogger';
-import OwnerFixedCTA from '@/components/OwnerFixedCTA';
+import OwnerBottomNav from '@/components/OwnerBottomNav';
+import OwnerTutorial from '@/components/OwnerTutorial';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,8 +153,8 @@ export default async function OwnerPage({
           background: 'rgba(255,255,255,0.06)', pointerEvents: 'none',
         }} />
 
-        {/* コンテンツ */}
-        <div style={{ padding: '28px 20px 24px', position: 'relative' }}>
+        {/* コンテンツ（safe area 対応）*/}
+        <div className="pwa-safe-top" style={{ padding: '28px 20px 24px', position: 'relative' }}>
           {/* 上段: 挨拶 + 管理リンク */}
           <div style={{
             display: 'flex', alignItems: 'flex-start',
@@ -167,20 +168,52 @@ export default async function OwnerPage({
                 {raw.name} 様
               </h1>
             </div>
-            <a
-              href={`/stores/${id}`}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '6px 13px', borderRadius: 8, flexShrink: 0,
-                background: 'rgba(255,255,255,0.18)',
-                color: 'rgba(255,255,255,0.95)',
-                fontSize: 11, fontWeight: 600, textDecoration: 'none',
-                border: '1px solid rgba(255,255,255,0.3)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              管理側を見る →
-            </a>
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+              <button
+                data-pwa-install
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '6px 11px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.22)',
+                  color: 'rgba(255,255,255,0.95)',
+                  fontSize: 11, fontWeight: 600,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  whiteSpace: 'nowrap', cursor: 'pointer',
+                }}
+              >
+                📱 アプリ化
+              </button>
+              <button
+                id="tutorial-btn"
+                onClick={undefined}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '6px 11px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.95)',
+                  color: '#2563eb',
+                  fontSize: 11, fontWeight: 700,
+                  border: '1px solid rgba(255,255,255,0.5)',
+                  whiteSpace: 'nowrap', cursor: 'pointer',
+                }}
+                data-tutorial-start
+              >
+                ❓ 使い方
+              </button>
+              <a
+                href={`/stores/${id}`}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '6px 13px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.18)',
+                  color: 'rgba(255,255,255,0.95)',
+                  fontSize: 11, fontWeight: 600, textDecoration: 'none',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                管理側を見る →
+              </a>
+            </div>
           </div>
 
           {/* 中段: フェーズ + 誰待ちバッジ + 期限 */}
@@ -257,6 +290,9 @@ export default async function OwnerPage({
       <main style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 100px' }}>
         <OwnerPageLogger storeId={id} phase={currentPhase} />
 
+        {/* ─── チュートリアル（初回バナー + パネル）─── */}
+        <OwnerTutorial />
+
         {/* ─── 期限アラート（緊急時のみ）─── */}
         {isUrgent && (
           <section style={{
@@ -292,11 +328,13 @@ export default async function OwnerPage({
         </section>
 
         {/* ─── 今やること ─── */}
+        <div id="owner-todo">
         <OwnerTodoSection
           items={todoItems}
           phaseColor={colors}
           isOwnerWaiting={isOwnerWaiting}
         />
+        </div>
 
         {/* ─── 制作の流れ（折りたたみ）─── */}
         <details style={{
@@ -386,11 +424,16 @@ export default async function OwnerPage({
 
         {/* ─── 必要情報チェックリスト ─── */}
         <div id="checklist">
+          <p style={{ fontSize: 11, fontWeight: 800, color: '#6b7280', letterSpacing: 1.2, marginBottom: 10, textTransform: 'uppercase' }}>
+            あなたのやること
+          </p>
           <ChecklistPanel storeId={id} currentPhase={currentPhase} driveFolderUrls={driveFolderUrls} />
         </div>
 
         {/* ─── 購入備品・おすすめ商品 ─── */}
-        <OwnerPurchaseSection items={purchaseItems} />
+        <div id="purchase">
+          <OwnerPurchaseSection items={purchaseItems} />
+        </div>
 
         {/* ─── 相談導線バナー ─── */}
         <section style={{
@@ -408,7 +451,9 @@ export default async function OwnerPage({
         </section>
 
         {/* ─── 担当者への相談 ─── */}
+        <div id="consult">
         <ConsultWidget storeId={id} storeName={raw.name} />
+        </div>
 
         {/* ─── お問い合わせ ─── */}
         <section style={{ marginBottom: 0 }}>
@@ -447,8 +492,9 @@ export default async function OwnerPage({
 
       </main>
 
-      {/* ─── 下部固定CTA ─── */}
-      <OwnerFixedCTA />
+      {/* ─── 下部固定タブナビ ─── */}
+      <OwnerBottomNav />
+
 
       {/* フッター */}
       <footer style={{

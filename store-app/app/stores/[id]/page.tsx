@@ -29,7 +29,8 @@ export default async function StoreDetailPage({
   const store = {
     id: raw.id,
     name: raw.name,
-    category: raw.category,
+    contactName: raw.contactName,
+    location: raw.location,
     currentPhase: raw.currentPhase as Phase,
     startDate: raw.startDate,
     deadline: raw.deadline,
@@ -50,7 +51,7 @@ export default async function StoreDetailPage({
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
       {/* ─── ヘッダー ─── */}
-      <header style={{
+      <header className="pwa-safe-top" style={{
         background: 'var(--color-surface)',
         borderBottom: `3px solid ${meta.border}`,
       }}>
@@ -71,17 +72,32 @@ export default async function StoreDetailPage({
           }}>
             ← 一覧
           </Link>
-          <Link href={`/owner/${store.id}`} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            fontSize: 12, fontWeight: 700,
-            color: meta.badgeText,
-            padding: '5px 12px', borderRadius: 6,
-            background: meta.badge,
-            border: `1px solid ${meta.border}88`,
-            textDecoration: 'none', whiteSpace: 'nowrap',
-          }}>
-            ユーザー画面 →
-          </Link>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              data-pwa-install
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                padding: '5px 10px', borderRadius: 6,
+                background: '#eff6ff', color: '#2563eb',
+                border: '1px solid #bfdbfe',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              📱 アプリ化
+            </button>
+            <Link href={`/owner/${store.id}`} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 12, fontWeight: 700,
+              color: meta.badgeText,
+              padding: '5px 12px', borderRadius: 6,
+              background: meta.badge,
+              border: `1px solid ${meta.border}88`,
+              textDecoration: 'none', whiteSpace: 'nowrap',
+            }}>
+              ユーザー画面 →
+            </Link>
+          </div>
         </div>
 
         {/* 中段: 店舗名（横幅フル） */}
@@ -94,7 +110,7 @@ export default async function StoreDetailPage({
             {store.name}
           </h1>
 
-          {/* チップ行: カテゴリ・フェーズ・期限 */}
+          {/* チップ行: フェーズ・場所・期限 */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
@@ -104,14 +120,26 @@ export default async function StoreDetailPage({
             }}>
               {meta.icon} {store.currentPhase}
             </span>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center',
-              padding: '3px 10px', borderRadius: 99, fontSize: 12,
-              background: 'var(--color-bg)', color: 'var(--color-text-sub)',
-              border: '1px solid var(--color-border)',
-            }}>
-              {store.category}
-            </span>
+            {store.location && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center',
+                padding: '3px 10px', borderRadius: 99, fontSize: 12,
+                background: 'var(--color-bg)', color: 'var(--color-text-sub)',
+                border: '1px solid var(--color-border)',
+              }}>
+                📍 {store.location}
+              </span>
+            )}
+            {store.contactName && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center',
+                padding: '3px 10px', borderRadius: 99, fontSize: 12,
+                background: 'var(--color-bg)', color: 'var(--color-text-sub)',
+                border: '1px solid var(--color-border)',
+              }}>
+                👤 {store.contactName}
+              </span>
+            )}
             <span style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '3px 10px', borderRadius: 99, fontSize: 12,

@@ -22,3 +22,5 @@ prisma/*.db-shm
 
 # PNG screenshots (local dev)
 *.png
+!public/icons/*.png
+.vercel

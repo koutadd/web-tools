@@ -10,7 +10,9 @@ import { PHASES, type Phase } from '@/lib/data';
 export type StoreRow = {
   id: string;
   name: string;
-  category: string;
+  contactName: string;
+  location: string;
+  openStatus: string;
   currentPhase: Phase;
   deadline: string;
   whoWaiting: string;
@@ -253,7 +255,7 @@ export default function StoreList({ stores }: { stores: StoreRow[] }) {
                       {store.name}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--color-text-sub)', marginTop: 2 }}>
-                      {store.category}　期限: {store.deadline}
+                      {store.location ? `${store.location}　` : ''}{store.contactName ? `担当: ${store.contactName}　` : ''}期限: {store.deadline}
                     </div>
                   </div>
 
