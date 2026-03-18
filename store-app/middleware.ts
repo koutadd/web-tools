@@ -34,7 +34,7 @@ function isProtected(pathname: string): boolean {
 }
 
 export function middleware(req: NextRequest) {
-  const passcode = process.env.REVIEW_PASSCODE;
+  const passcode = process.env.REVIEW_PASSCODE?.trim();
 
   // REVIEW_PASSCODE 未設定の場合は保護なし（ローカル開発等）
   if (!passcode) return NextResponse.next();
