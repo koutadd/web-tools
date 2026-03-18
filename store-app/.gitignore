@@ -1,0 +1,24 @@
+# Next.js
+.next/
+out/
+node_modules/
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db-wal
+prisma/*.db-shm
+
+# Env
+.env
+.env.local
+.env.production
+
+# Build
+*.tsbuildinfo
+
+# Playwright MCP logs / screenshots
+.playwright-mcp/
+
+# PNG screenshots (local dev)
+*.png

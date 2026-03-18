@@ -1,0 +1,328 @@
+// Prisma schema — SQLite（開発）/ PostgreSQL（本番）切り替え可能
+// 本番移行: provider を "postgresql" に変更 + DATABASE_URL 更新のみでOK
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ════════════════════════════════════════════════════════════
+// 基本モデル
+// ════════════════════════════════════════════════════════════
+
+model Store {
+  id                 String              @id @default(cuid())
+  name               String
+  category           String
+  currentPhase       String              // '企画' | 'デザイン' | '制作' | '納品'
+  startDate          String              // 'YYYY-MM-DD'
+  deadline           String              // 'YYYY-MM-DD'
+  memo               String              @default("")
+  whoWaiting                String              @default("none") // 'owner' | 'admin' | 'system' | 'none'
+  googleDriveStoreFolderId  String              @default("")     // 店舗ルートフォルダ ID
+  googleDrivePhotoFolderId  String              @default("")     // 01_店舗画像フォルダ ID
+  tasks              Task[]
+  requiredItems      RequiredItem[]
+  uploadDestination  UploadDestination?
+  suggestions        Suggestion[]
+  consultations      Consultation[]
+  candidates         Candidate[]
+  snapshots          FlowSnapshot[]
+  notificationEvents NotificationEvent[]
+  eventLogs          EventLog[]
+  dailyMetrics       DailyMetrics[]
+  purchaseItems      PurchaseItem[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model Task {
+  id         String   @id @default(cuid())
+  title      String
+  done       Boolean  @default(false)
+  phase      String   // '企画' | 'デザイン' | '制作' | '納品'
+  order      Int      @default(0)
+  whoWaiting String   @default("none") // 'owner' | 'admin' | 'system' | 'none'
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeId    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ════════════════════════════════════════════════════════════
+// 必要項目 / 提出データ / ファイル保存先
+// ════════════════════════════════════════════════════════════
+
+/// 店舗ごとに必要な素材・情報の項目リスト
+model RequiredItem {
+  id                   String       @id @default(cuid())
+  storeId              String
+  store                Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category             String       // 'photo' | 'logo' | 'document' | 'access' | 'sns' | 'other'
+  label                String       // 項目名（例: 「店舗外観写真」）
+  description          String       @default("")
+  requiredPhase        String       // どのフェーズまでに必要か（'企画'|'デザイン'|'制作'|'納品'）
+  assigneeType         String       @default("owner")  // 'owner' | 'admin' | 'system'
+  assigneeName         String       @default("")       // 担当者名（任意）
+  ownerResponsibleName String       @default("")       // オーナー側担当者名
+  adminResponsibleName String       @default("")       // 管理者側担当者名
+  whoWaiting           String       @default("none")   // 'owner' | 'admin' | 'system' | 'none'
+  dueAt                DateTime?
+  dueLabel             String       @default("")       // 人間向け期限表現（例: 「デザイン開始前」）
+  reason               String       @default("")       // なぜ必要か
+  status               String       @default("pending") // 'pending' | 'submitted' | 'approved' | 'rejected'
+  sortOrder            Int          @default(0)
+  // 写真撮影ガイド
+  isPhotoRequired      Boolean      @default(false)
+  guideTitle           String       @default("")
+  guideDescription     String       @default("")
+  guideChecklistJson   String       @default("[]")    // JSON: [{label: string, description: string}]
+  guideExampleImageKey String       @default("")       // 将来: S3/GCSキー等
+  submissions          Submission[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+/// 必要項目に紐づく提出データ（テキスト or ファイル）
+model Submission {
+  id             String       @id @default(cuid())
+  requiredItemId String
+  requiredItem   RequiredItem @relation(fields: [requiredItemId], references: [id], onDelete: Cascade)
+  textValue      String       @default("")
+  fileUrl        String       @default("")
+  fileName       String       @default("")
+  driveFileId      String       @default("")        // Google Drive file ID
+  driveFileUrl     String       @default("")        // Drive webViewLink
+  driveFolderId    String       @default("")        // アップロード先フォルダ ID
+  storageProvider  String       @default("")        // 'google_drive' | '' など
+  status           String       @default("pending") // 'pending' | 'approved' | 'rejected'
+  rejectedReason String       @default("")        // 却下理由（status=rejected時に記録）
+  submittedAt    DateTime     @default(now())
+  checkedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+/// ファイル保存先設定（Google Drive等）
+/// isConfigured=false → 保存先未設定として提案エンジンがアラートを生成
+model UploadDestination {
+  id                String   @id @default(cuid())
+  storeId           String   @unique
+  store             Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  provider          String   @default("google_drive") // 'google_drive' | 'dropbox' | 'onedrive'
+  rootFolderName    String   @default("")
+  rootFolderId      String   @default("")        // Drive folder ID
+  rootFolderUrl     String   @default("")
+  photoFolderId     String   @default("")
+  photoFolderUrl    String   @default("")
+  assetFolderId     String   @default("")
+  assetFolderUrl    String   @default("")
+  documentFolderId  String   @default("")
+  documentFolderUrl String   @default("")
+  otherFolderId     String   @default("")
+  submitFolderId    String   @default("")        // 04_提出データ folder ID
+  submitFolderUrl   String   @default("")        // 04_提出データ webViewLink
+  isConfigured      Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ════════════════════════════════════════════════════════════
+// 提案
+// ════════════════════════════════════════════════════════════
+
+/// ルールベース提案（AI対応への拡張を見越した設計）
+/// sourceType='rule' + sourceRef=ruleId で1店舗1ルール1件を保証
+/// audience='owner' → オーナー向け / audience='admin' → 管理者向け
+model Suggestion {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  audience    String                     // 'owner' | 'admin'
+  category    String                     // 'next_action' | 'recommendation' | 'consultation_prompt' | 'missing_info_alert'
+  title       String
+  description String   @default("")
+  reason      String   @default("")
+  priority    Int      @default(0)
+  dueLabel    String   @default("")
+  link        String   @default("")
+  status      String   @default("active") // 'active' | 'dismissed' | 'done'
+  sourceType  String   @default("rule")   // 'rule' | 'ai'（将来拡張）
+  sourceRef   String   @default("")       // ruleId 等
+  phase       String   @default("")       // 対象フェーズ
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, sourceType, sourceRef])
+}
+
+// ════════════════════════════════════════════════════════════
+// 相談
+// ════════════════════════════════════════════════════════════
+
+/// 項目単位で相談可能（targetType + targetId で相談対象を特定）
+/// externalThreadKey は将来 Slack thread_ts 等の外部キーを保存する
+model Consultation {
+  id                   String    @id @default(cuid())
+  storeId              String
+  store                Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  targetType           String    @default("general") // 'required_item' | 'task' | 'general'
+  targetId             String    @default("")        // 関連する RequiredItem.id や Task.id
+  title                String
+  message              String
+  createdBy            String    @default("owner")   // 'owner' | 'admin'
+  answer               String    @default("")
+  status               String    @default("open")    // 'open' | 'answered' | 'closed'
+  consultationCategory String    @default("")        // 'photo' | 'design' | 'schedule' | 'cost' | 'other'
+  resolvedAt           DateTime?
+  externalThreadKey    String    @default("")        // 将来: Slack thread_ts 等
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+// ════════════════════════════════════════════════════════════
+// 候補
+// ════════════════════════════════════════════════════════════
+
+/// 業者・物件・看板・プリンター・スタジオ等の比較候補
+model Candidate {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category  String   // 'vendor' | 'property' | 'signage' | 'printer' | 'studio' | 'other'
+  name      String
+  url       String   @default("")
+  summary   String   @default("")
+  pros      String   @default("") // 改行区切りのメリット
+  cons      String   @default("") // 改行区切りのデメリット
+  price     String   @default("")
+  contact   String   @default("")
+  score     Int      @default(0)
+  status    String   @default("pending") // 'pending' | 'selected' | 'rejected'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ════════════════════════════════════════════════════════════
+// フロースナップショット
+// ════════════════════════════════════════════════════════════
+
+model FlowSnapshot {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  phase     String
+  data      String   // JSON文字列（store + tasks の状態）
+  note      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+// ════════════════════════════════════════════════════════════
+// 通知イベント（Slack連携用 — 今は保存のみ、送信は未実装）
+// ════════════════════════════════════════════════════════════
+
+/// 通知キューとして機能。将来 Slack webhook 送信ワーカーが status='pending' を消費する。
+/// destinationKey: 将来の Slack channel ID / email アドレス等の送信先識別子
+model NotificationEvent {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  eventType      String
+  // 'required_item_submitted' | 'required_item_approved' | 'required_item_rejected'
+  // 'consultation_created' | 'consultation_answered'
+  // 'phase_changed' | 'task_completed' | 'who_waiting_changed'
+  channelType    String    @default("slack") // 'slack' | 'email'（将来）
+  payloadJson    String    // JSON文字列（Slack Block Kit形式を想定）
+  status         String    @default("pending") // 'pending' | 'sent' | 'failed' | 'skipped'
+  sentAt         DateTime?
+  targetType     String    @default("") // 'required_item' | 'consultation' | 'store' | 'task'
+  targetId       String    @default("") // 関連レコードのID
+  destinationKey String    @default("") // 将来: Slack channel ID / email等の送信先識別子
+  createdAt      DateTime  @default(now())
+}
+
+// ════════════════════════════════════════════════════════════
+// イベントログ（意味のある節目のみ保存）
+// ════════════════════════════════════════════════════════════
+
+/// 保存対象イベント例:
+/// screen_viewed / required_item_opened / required_item_started
+/// required_item_submitted / required_item_rejected / required_item_approved
+/// consultation_opened / consultation_created / consultation_resolved
+/// who_waiting_changed / deadline_overdue / upload_destination_configured
+/// task_completed / photo_guide_viewed / suggestion_viewed
+///
+/// 取らないもの: 全キー入力 / マウス移動 / hover / 毎秒滞在時間
+model EventLog {
+  id         String   @id @default(cuid())
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  actorType  String   // 'owner' | 'admin' | 'system'
+  actorName  String   @default("")       // 任意（担当者名等）
+  eventType  String   // 上記イベント種別
+  targetType String   @default("")       // 'required_item' | 'task' | 'consultation' | 'store'
+  targetId   String   @default("")       // 関連レコードのID
+  phase      String   @default("")       // 発生時のフェーズ
+  metaJson   String   @default("{}")     // 追加情報（JSON: 理由・変更前後等）
+  createdAt  DateTime @default(now())
+}
+
+// ════════════════════════════════════════════════════════════
+// 購入備品
+// ════════════════════════════════════════════════════════════
+
+/// 制作に必要な購入品・サービス契約の管理
+/// necessity: 'must'=必須 / 'recommend'=推奨 / 'unnecessary'=不要
+model PurchaseItem {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category  String   // 'equipment' | 'software' | 'service' | 'consumable' | 'recommend_product'
+  name      String
+  brand     String   @default("")
+  price     String   @default("")
+  url       String   @default("")
+  emoji     String   @default("")
+  tag       String   @default("")
+  tagColor  String   @default("#6b7280")
+  desc      String   @default("")
+  necessity String   @default("recommend") // 'must' | 'recommend' | 'unnecessary'
+  phase     String   @default("")
+  notes     String   @default("")          // 買う時の注意点
+  status    String   @default("pending")   // 'pending' | 'purchased' | 'skipped'
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ════════════════════════════════════════════════════════════
+// 日次メトリクス（PDCA集計用）
+// ════════════════════════════════════════════════════════════
+
+/// 日次で集計する KPI。集計ワーカーが毎日 upsert する想定。
+/// @@unique([storeId, date]) で1店舗1日1件を保証
+model DailyMetrics {
+  id                          String   @id @default(cuid())
+  storeId                     String
+  store                       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  date                        String   // 'YYYY-MM-DD'
+  requiredItemsTotalCount     Int      @default(0)  // required_items 総数
+  requiredItemsCompletedCount Int      @default(0)  // 完了（approved）数
+  requiredItemsCompletionRate Float    @default(0)  // 完了率 0.0〜1.0
+  avgCompletionDays           Float    @default(0)  // required_item 平均完了日数
+  consultationCreatedCount    Int      @default(0)  // 当日相談作成数
+  consultationResolvedCount   Int      @default(0)  // 当日解決（resolved）数
+  avgResolutionDays           Float    @default(0)  // 相談平均解決日数
+  whoWaitingOwnerCount        Int      @default(0)  // オーナー待ち件数（当日時点）
+  whoWaitingAdminCount        Int      @default(0)  // 管理者待ち件数（当日時点）
+  deadlineOverdueCount        Int      @default(0)  // 期限超過件数（当日時点）
+  rejectedResubmitCount       Int      @default(0)  // 却下→再提出件数（当日）
+  suggestionCompletedCount    Int      @default(0)  // 提案経由完了件数（当日）
+  createdAt                   DateTime @default(now())
+
+  @@unique([storeId, date])
+}
