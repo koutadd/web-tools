@@ -109,6 +109,7 @@ export async function uploadFileToDrive(
   const stream = Readable.from(buffer);
 
   const res = await drive.files.create({
+    supportsAllDrives: true,
     requestBody: {
       name: safeName,
       parents: [folderId],
@@ -140,6 +141,7 @@ export async function uploadStreamToDrive(
   const safeName = `${Date.now()}_${originalName}`;
 
   const res = await drive.files.create({
+    supportsAllDrives: true,
     requestBody: {
       name:    safeName,
       parents: [folderId],

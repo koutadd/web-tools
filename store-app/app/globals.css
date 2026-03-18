@@ -74,6 +74,61 @@ button {
   animation: slide-down 0.18s ease-out;
 }
 
+/* ── PWA / アプリUI ────────────────────────────────────────────────────── */
+
+/* タップ時のブラウザハイライトを消す */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ページフェードイン（アプリっぽい遷移感）*/
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+main {
+  animation: page-fade-in 0.2s ease-out;
+}
+
+/* タップ押下感 */
+a:active, button:active {
+  opacity: 0.78;
+}
+
+/* ─ Safe Area ─────────────────────────────────────────────────────────── */
+/*
+  viewport-fit=cover + black-translucent status bar を使うと
+  コンテンツがノッチ・ステータスバーの下まで伸びる。
+  各ヘッダーは .pwa-safe-top を付けて上部セーフエリアを確保する。
+*/
+.pwa-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pwa-safe-top-md {
+  padding-top: max(14px, env(safe-area-inset-top, 14px));
+}
+.pwa-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* スタンドアロン起動時のみセーフエリアを追加 */
+@media (display-mode: standalone) {
+  .standalone-top-safe {
+    padding-top: env(safe-area-inset-top, 20px);
+  }
+}
+
+/* スクロールを滑らかに */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 選択テキストのスタイル */
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+}
+
 /* ── 待ちバナー点滅 ────────────────────────────────────────────────────────── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }

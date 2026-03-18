@@ -311,7 +311,6 @@ export default function StoreDetail({ store }: { store: Store }) {
               <dl style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
                   { label: '店舗名',       value: store.name },
-                  { label: '業種',         value: store.category },
                   { label: '開始日',       value: store.startDate },
                   { label: '納期',         value: store.deadline },
                   { label: '現在フェーズ', value: store.currentPhase },

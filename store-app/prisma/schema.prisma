@@ -17,11 +17,15 @@ datasource db {
 model Store {
   id                 String              @id @default(cuid())
   name               String
-  category           String
+  category           String              @default("")   // UIから削除済み（後方互換のみ）
   currentPhase       String              // '企画' | 'デザイン' | '制作' | '納品'
   startDate          String              // 'YYYY-MM-DD'
   deadline           String              // 'YYYY-MM-DD'
   memo               String              @default("")
+  contactName        String              @default("")   // 担当者名
+  contactInfo        String              @default("")   // 連絡先（電話/メール/LINEなど）
+  location           String              @default("")   // 出店場所
+  businessHours      String              @default("")   // 営業時間
   whoWaiting                String              @default("none") // 'owner' | 'admin' | 'system' | 'none'
   googleDriveStoreFolderId  String              @default("")     // 店舗ルートフォルダ ID
   googleDrivePhotoFolderId  String              @default("")     // 01_店舗画像フォルダ ID

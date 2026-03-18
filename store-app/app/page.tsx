@@ -22,7 +22,9 @@ export default async function HomePage() {
   const stores: StoreRow[] = raw.map((s) => ({
     id:           s.id,
     name:         s.name,
-    category:     s.category,
+    contactName:  s.contactName,
+    location:     s.location,
+    openStatus:   s.openStatus,
     currentPhase: s.currentPhase as Phase,
     deadline:     s.deadline,
     whoWaiting:   s.whoWaiting,
@@ -32,34 +34,50 @@ export default async function HomePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
-      {/* ヘッダー */}
-      <header style={{
+      {/* ヘッダー（safe area 対応）*/}
+      <header className="pwa-safe-top" style={{
         background: 'var(--color-surface)',
         borderBottom: '1px solid var(--color-border)',
         padding: '14px 20px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <div>
             <h1 style={{ fontSize: 20, fontWeight: 700 }}>店舗管理</h1>
             <p style={{ fontSize: 12, color: 'var(--color-text-sub)', marginTop: 2 }}>
               制作中の店舗サイトを管理します
             </p>
           </div>
-          {/* ④ チュートリアル導線 */}
-          <Link
-            href="/demo/play"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '8px 14px', borderRadius: 10, flexShrink: 0,
-              background: '#fef9c3', color: '#854d0e',
-              border: '1px solid #fde68a',
-              fontSize: 13, fontWeight: 700,
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            🎮 使い方を見る
-          </Link>
+          <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+            {/* PWA追加ボタン */}
+            <button
+              data-pwa-install
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '7px 12px', borderRadius: 9, cursor: 'pointer',
+                background: '#eff6ff', color: '#2563eb',
+                border: '1px solid #bfdbfe',
+                fontSize: 12, fontWeight: 700,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              📱 アプリ化
+            </button>
+            {/* チュートリアル導線 */}
+            <Link
+              href="/demo/play"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '7px 12px', borderRadius: 9, flexShrink: 0,
+                background: '#fef9c3', color: '#854d0e',
+                border: '1px solid #fde68a',
+                fontSize: 12, fontWeight: 700,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              🎮 使い方
+            </Link>
+          </div>
         </div>
       </header>
 

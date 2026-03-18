@@ -86,7 +86,7 @@ export default function OwnerTodoSection({
           color: accentColor, letterSpacing: 1.2,
           textTransform: 'uppercase' as const,
         }}>
-          {isOwnerWaiting ? '⚡ 今すること' : '✅ 現在の状況'}
+          {isOwnerWaiting ? '⚡ あなたのやること' : '✅ 担当者が作業中です'}
         </p>
         {items.length > 0 && (
           <span style={{
@@ -214,7 +214,7 @@ export default function OwnerTodoSection({
             boxShadow: `0 3px 10px ${accentColor}44`,
           }}
         >
-          チェックリストで対応する ↓
+          今すぐ対応する ↓
         </a>
       </div>
     </section>

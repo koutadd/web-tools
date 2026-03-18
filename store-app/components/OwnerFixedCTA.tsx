@@ -86,7 +86,7 @@ export default function OwnerFixedCTA() {
             style={{ background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}
           >
             <span style={{ fontSize: 16 }}>📋</span>
-            残りタスクを見る
+            あなたのやることを見る
           </button>
           <button
             className="cta-btn"

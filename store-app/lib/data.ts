@@ -12,7 +12,8 @@ export type Task = {
 export type Store = {
   id: string;
   name: string;
-  category: string;
+  contactName: string;
+  location: string;
   currentPhase: Phase;
   startDate: string;
   deadline: string;
@@ -25,7 +26,8 @@ export type Store = {
 export type StoreListItem = {
   id: string;
   name: string;
-  category: string;
+  contactName: string;
+  location: string;
   currentPhase: Phase;
   startDate: string;
   deadline: string;
