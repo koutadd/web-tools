@@ -13,7 +13,7 @@ import { Readable } from 'stream';
 // ─── 定数 ───────────────────────────────────────────────────────────────────
 
 export const PARENT_FOLDER_ID =
-  process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID ?? '1ugm5wM_ShOQAN3YJrVsAP7a2LrfhtfHQ';
+  (process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID ?? '1ugm5wM_ShOQAN3YJrVsAP7a2LrfhtfHQ').trim();
 
 /** 店舗フォルダ内サブフォルダ一覧（将来拡張用に全部作成） */
 export const STORE_SUBFOLDERS = [
