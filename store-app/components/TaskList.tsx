@@ -354,10 +354,10 @@ export default function TaskList({
                 >
                   <span style={{
                     display: 'inline-block',
-                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                     transition: 'transform 0.2s',
                     fontSize: 10,
-                  }}>▼</span>
+                  }}>▶</span>
                 </button>
               </div>
 
