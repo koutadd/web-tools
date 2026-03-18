@@ -163,7 +163,7 @@ export default function OwnerTodoSection({
               }}
             >
               <span>他 <strong style={{ color: accentColor }}>{restItems.length}件</strong> の対応が必要です</span>
-              <span style={{ transition: 'transform 0.2s', transform: expanded ? 'rotate(180deg)' : 'none', fontSize: 12 }}>▼</span>
+              <span style={{ transition: 'transform 0.2s', transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', fontSize: 10 }}>▶</span>
             </button>
 
             {expanded && (

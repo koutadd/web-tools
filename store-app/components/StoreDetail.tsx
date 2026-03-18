@@ -29,6 +29,17 @@ const PHASE_ICONS: Record<Phase, string> = {
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
 const SLIDE_CSS = `
+  /* details/summary アコーディオン統一 */
+  details > summary .summary-arrow {
+    display: inline-block;
+    font-size: 9px;
+    transition: transform 0.2s;
+    transform: rotate(0deg);
+  }
+  details[open] > summary .summary-arrow {
+    transform: rotate(90deg);
+  }
+
   @keyframes tabSlideRight {
     from { transform: translateX(28px); opacity: 0; }
     to   { transform: translateX(0);    opacity: 1; }
@@ -132,7 +143,7 @@ export default function StoreDetail({ store }: { store: Store }) {
             userSelect: 'none', paddingTop: 10,
             borderTop: '1px solid var(--color-border)',
           }}>
-            <span style={{ fontSize: 9 }}>▶</span>
+            <span className="summary-arrow">▶</span>
             手動でフェーズを変更する（管理者用）
           </summary>
           <div style={{ display: 'flex', gap: 6, marginTop: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>

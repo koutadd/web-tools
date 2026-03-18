@@ -126,6 +126,10 @@ export default async function OwnerPage({
 
   return (
     <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      <style>{`
+        .owner-details-arrow { display: inline-block; transition: transform 0.2s; transform: rotate(0deg); }
+        details[open] .owner-details-arrow { transform: rotate(90deg); }
+      `}</style>
 
       {/* ─── ウェルカムヘッダー ─── */}
       <header
@@ -317,7 +321,10 @@ export default async function OwnerPage({
                 全体 <strong style={{ color: colors.text }}>{progress}%</strong> 完了
               </span>
             </div>
-            <span style={{ fontSize: 11, color: '#9ca3af' }}>制作の流れ ▼</span>
+            <span style={{ fontSize: 11, color: '#9ca3af', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              制作の流れ
+              <span className="owner-details-arrow" style={{ fontSize: 9 }}>▶</span>
+            </span>
           </summary>
 
           <div style={{ padding: '0 18px 18px' }}>

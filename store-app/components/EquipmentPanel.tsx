@@ -398,9 +398,10 @@ function ItemCard({
 // ─── セクションヘッダー ──────────────────────────────────────────────────────
 
 function SectionHeader({
-  label, count, bg, text, border, icon,
+  label, count, bg, text, border, icon, arrowOpen,
 }: {
   label: string; count: number; bg: string; text: string; border: string; icon: string;
+  arrowOpen?: boolean;
 }) {
   return (
     <div style={{
@@ -418,6 +419,13 @@ function SectionHeader({
       }}>
         {count}件
       </span>
+      {arrowOpen !== undefined && (
+        <span style={{
+          display: 'inline-block', fontSize: 9, color: text,
+          transform: arrowOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition: 'transform 0.2s',
+        }}>▶</span>
+      )}
     </div>
   );
 }
@@ -501,7 +509,8 @@ export default function EquipmentPanel({ currentPhase }: { currentPhase: Phase }
               }}
             >
               <SectionHeader
-                label={`推奨品 ${showRecommended ? '▲' : '▼'}`}
+                label="推奨品"
+                arrowOpen={showRecommended}
                 count={recommendedItems.length}
                 bg="#eff6ff" text="#1d4ed8" border="#bfdbfe"
                 icon="🔵"
