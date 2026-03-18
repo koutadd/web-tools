@@ -124,13 +124,18 @@ export default function StoreDetail({ store }: { store: Store }) {
         </p>
         <PhaseBar currentPhase={currentPhase} />
 
-        {/* フェーズ変更 */}
-        <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--color-border)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-sub)', marginBottom: 8, letterSpacing: 0.5 }}>
-            フェーズ変更
-          </p>
-          {/* 4つ横1列・横スクロール対応 */}
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {/* ② フェーズ手動変更（折りたたみ・補助的扱い）*/}
+        <details style={{ marginTop: 14 }}>
+          <summary style={{
+            fontSize: 11, color: 'var(--color-text-sub)', cursor: 'pointer',
+            listStyle: 'none', display: 'flex', alignItems: 'center', gap: 5,
+            userSelect: 'none', paddingTop: 10,
+            borderTop: '1px solid var(--color-border)',
+          }}>
+            <span style={{ fontSize: 9 }}>▶</span>
+            手動でフェーズを変更する（管理者用）
+          </summary>
+          <div style={{ display: 'flex', gap: 6, marginTop: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
             {PHASES.map((phase) => {
               const isActive = phase === currentPhase;
               const pid = `phase-${phase}`;
@@ -141,32 +146,25 @@ export default function StoreDetail({ store }: { store: Store }) {
                   disabled={changingPhase}
                   {...press(pid)}
                   style={pressStyle(pid, {
-                    flex: '1 0 0',
-                    minWidth: 0,
-                    padding: '9px 4px',
-                    borderRadius: 10,
-                    border: `2px solid ${PHASE_COLORS[phase]}`,
+                    flex: '1 0 0', minWidth: 0,
+                    padding: '7px 4px', borderRadius: 8,
+                    border: `1.5px solid ${PHASE_COLORS[phase]}`,
                     background: isActive ? PHASE_COLORS[phase] : 'transparent',
                     color: isActive ? 'white' : PHASE_COLORS[phase],
-                    fontSize: 12,
-                    fontWeight: 700,
+                    fontSize: 11, fontWeight: 700,
                     cursor: isActive || changingPhase ? 'default' : 'pointer',
                     opacity: changingPhase && !isActive ? 0.45 : 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 3,
-                    whiteSpace: 'nowrap',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', gap: 2, whiteSpace: 'nowrap',
                   })}
                 >
-                  <span style={{ fontSize: 16 }}>{PHASE_ICONS[phase]}</span>
+                  <span style={{ fontSize: 14 }}>{PHASE_ICONS[phase]}</span>
                   <span>{changingPhase && isActive ? '変更中' : phase}</span>
                 </button>
               );
             })}
           </div>
-        </div>
+        </details>
       </div>
 
       {/* ─── タブバー（横スクロール・横書き固定）─── */}
@@ -222,7 +220,12 @@ export default function StoreDetail({ store }: { store: Store }) {
             padding: '16px',
             boxShadow: 'var(--shadow)',
           }}>
-            <TaskList initialTasks={store.tasks} storeId={store.id} />
+            <TaskList
+              initialTasks={store.tasks}
+              storeId={store.id}
+              currentPhase={currentPhase}
+              onPhaseAdvance={changePhase}
+            />
           </div>
         )}
 
