@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アイケアラボ365 | オンラインサロン</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0D2B5E',
+            accent: '#7BAEE8',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+      color: #111111;
+      background: #ffffff;
+      line-height: 1.75;
+    }
+    @media (max-width: 767px) { body { padding-bottom: 72px; } }
+
+    /* Reveal animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero gradient */
+    .hero-gradient {
+      background: linear-gradient(135deg, #0D2B5E 0%, #1a4080 50%, #0a2050 100%);
+    }
+
+    /* Nav styles */
+    .nav-link { color: #333; font-size: 0.85rem; transition: color 0.2s; }
+    .nav-link:hover { color: #0D2B5E; }
+
+    /* Tab styles */
+    .tab-btn {
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #888;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      color: #0D2B5E;
+      border-bottom-color: #0D2B5E;
+    }
+    .tab-btn:hover { color: #0D2B5E; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Content card */
+    .content-card {
+      background: white;
+      border: 1px solid #e8edf5;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .content-card:hover {
+      box-shadow: 0 6px 30px rgba(13,43,94,0.10);
+      transform: translateY(-2px);
+    }
+    .content-card.locked { position: relative; }
+    .lock-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(13,43,94,0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s;
+      border-radius: 8px;
+    }
+    .content-card.locked:hover .lock-overlay {
+      opacity: 1;
+    }
+
+    /* Plan card */
+    .plan-card {
+      border: 2px solid #e8edf5;
+      border-radius: 12px;
+      transition: all 0.25s;
+    }
+    .plan-card:hover {
+      border-color: #7BAEE8;
+      box-shadow: 0 8px 40px rgba(13,43,94,0.10);
+    }
+    .plan-card.featured {
+      border-color: #0D2B5E;
+      position: relative;
+    }
+
+    /* Badge */
+    .badge-dmm {
+      background: #e8f0f8;
+      color: #0D2B5E;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+    .badge-free {
+      background: #d4edda;
+      color: #155724;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .badge-full {
+      background: #0D2B5E;
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .badge-light {
+      background: #e8f0f8;
+      color: #0D2B5E;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    /* Tag */
+    .tag {
+      background: #f0f4fb;
+      color: #0D2B5E;
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    /* CTA button */
+    .btn-cta {
+      background: #0D2B5E;
+      color: white;
+      border-radius: 6px;
+      padding: 14px 32px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-cta:hover { background: #1a4080; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(13,43,94,0.25); }
+    .btn-cta-outline {
+      border: 2px solid #0D2B5E;
+      color: #0D2B5E;
+      border-radius: 6px;
+      padding: 12px 28px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-cta-outline:hover { background: #0D2B5E; color: white; }
+
+    /* Stat number */
+    .stat-num {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+    }
+
+    /* Mobile sticky footer */
+    .sticky-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e8edf5;
+      padding: 12px 16px;
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+
+    /* Lock icon */
+    .lock-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    /* Type thumb */
+    .type-thumb {
+      width: 48px; height: 48px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    /* Avatar */
+    .avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0D2B5E, #7BAEE8);
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* Secure badges */
+    .secure-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* Eye SVG animation */
+    @keyframes blink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.05); }
+    }
+    .eye-anim { animation: blink 4s ease-in-out infinite; transform-origin: center; }
+
+    /* Scrollable tabs on mobile */
+    .tabs-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+
+    /* Profile card */
+    .profile-section {
+      background: #f8f9fb;
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    /* Check banner */
+    .check-banner {
+      background: linear-gradient(90deg, #e8f0f8 0%, #dceafc 100%);
+      border: 1px solid #c7d5ee;
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="sticky top-0 z-50 bg-white border-b border-gray-100" style="box-shadow: 0 1px 8px rgba(0,0,0,0.06);">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <!-- Logo + Badge -->
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <a href="aicare-top-prototype.html" class="flex items-center gap-2">
+        <img src="eyecare_logo.png" alt="アイケアラボ" class="h-7 w-auto" onerror="this.style.display='none'">
+        <span class="font-bold text-navy text-base hidden sm:inline" style="letter-spacing:-0.01em;">アイケアラボ</span>
+      </a>
+      <span class="badge-dmm">オンラインサロン</span>
+    </div>
+
+    <!-- Center links (PC) -->
+    <div class="hidden md:flex items-center gap-6">
+      <a href="aicare-top-prototype.html" class="nav-link">メインサイトへ</a>
+      <a href="aicare-vision-check.html" class="nav-link">セルフチェック</a>
+    </div>
+
+    <!-- Right actions -->
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <a href="#" class="hidden sm:inline-block text-sm text-gray-500 hover:text-navy transition-colors px-3 py-1">ログイン</a>
+      <a href="#join" class="btn-cta text-sm py-2 px-4">
+        <span>入会する</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ============================================================
+     HERO — サロンカバー
+     ============================================================ -->
+<section class="hero-gradient" style="min-height: 340px; position: relative; overflow: hidden;">
+  <!-- Decorative circles -->
+  <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(123,174,232,0.08);"></div>
+  <div style="position:absolute;bottom:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:rgba(123,174,232,0.06);"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,0.03);"></div>
+
+  <div class="max-w-6xl mx-auto px-4 py-12 md:py-16 relative z-10">
+    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+      <!-- Left: text info -->
+      <div class="flex-1 text-white text-center md:text-left">
+        <!-- Category label -->
+        <div class="inline-flex items-center gap-2 mb-4">
+          <span style="background:rgba(123,174,232,0.25);color:#7BAEE8;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.08em;">HEALTH &amp; EYE CARE</span>
+          <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:20px;">月額制</span>
+        </div>
+
+        <!-- Salon name -->
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2" style="font-family:'Montserrat',sans-serif;letter-spacing:-0.02em;">
+          アイケアラボ<span style="color:#7BAEE8;">365</span>
+        </h1>
+        <p class="text-blue-200 text-base mb-5">目の専門家と一緒に、365日眼のセルフケアを続けるサロン</p>
+
+        <!-- Host info -->
+        <div class="flex items-center gap-3 justify-center md:justify-start mb-6">
+          <div class="avatar" style="width:44px;height:44px;font-size:0.95rem;">山</div>
+          <div>
+            <p class="text-white font-semibold text-sm">院長 山田 眼一</p>
+            <p class="text-blue-300 text-xs">眼の整体院 アイケアラボ 院長 / 視機能訓練士</p>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex items-center gap-6 justify-center md:justify-start">
+          <div class="text-center">
+            <div class="stat-num text-2xl text-white">1,247</div>
+            <div class="text-blue-300 text-xs mt-0.5">フォロワー</div>
+          </div>
+          <div style="width:1px;height:36px;background:rgba(255,255,255,0.15);"></div>
+          <div class="text-center">
+            <div class="stat-num text-2xl text-white">84</div>
+            <div class="text-blue-300 text-xs mt-0.5">投稿</div>
+          </div>
+          <div style="width:1px;height:36px;background:rgba(255,255,255,0.15);"></div>
+          <div class="text-center">
+            <div class="stat-num text-2xl text-white">4.9</div>
+            <div class="text-blue-300 text-xs mt-0.5">評価 ★</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Eye SVG illustration -->
+      <div class="flex-shrink-0 hidden md:flex items-center justify-center" style="width:220px;height:220px;">
+        <svg viewBox="0 0 220 220" width="220" height="220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer glow circle -->
+          <circle cx="110" cy="110" r="100" fill="rgba(123,174,232,0.08)" />
+          <circle cx="110" cy="110" r="80" fill="rgba(123,174,232,0.06)" />
+          <!-- Eye shape group with blink animation -->
+          <g class="eye-anim" style="transform-origin:110px 110px;">
+            <!-- Eye white -->
+            <ellipse cx="110" cy="110" rx="72" ry="44" fill="rgba(255,255,255,0.92)" />
+            <!-- Iris -->
+            <circle cx="110" cy="110" r="28" fill="#7BAEE8" />
+            <!-- Pupil -->
+            <circle cx="110" cy="110" r="14" fill="#0D2B5E" />
+            <!-- Highlight -->
+            <circle cx="120" cy="102" r="6" fill="white" opacity="0.8" />
+            <circle cx="104" cy="116" r="3" fill="white" opacity="0.5" />
+          </g>
+          <!-- Eyelashes top -->
+          <line x1="110" y1="62" x2="110" y2="54" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="90" y1="68" x2="86" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="70" y1="82" x2="65" y2="76" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="130" y1="68" x2="134" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="150" y1="82" x2="155" y2="76" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Iris detail rings -->
+          <circle cx="110" cy="110" r="22" stroke="rgba(13,43,94,0.25)" stroke-width="1" fill="none"/>
+          <circle cx="110" cy="110" r="18" stroke="rgba(13,43,94,0.15)" stroke-width="0.5" fill="none"/>
+          <!-- Sparkles -->
+          <circle cx="58" cy="88" r="3" fill="rgba(123,174,232,0.5)"/>
+          <circle cx="164" cy="92" r="2" fill="rgba(123,174,232,0.4)"/>
+          <circle cx="70" cy="135" r="2.5" fill="rgba(123,174,232,0.35)"/>
+          <circle cx="155" cy="130" r="3.5" fill="rgba(123,174,232,0.3)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     TABS
+     ============================================================ -->
+<div class="sticky top-14 z-40 bg-white border-b border-gray-100" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="tabs-scroll flex">
+      <button class="tab-btn active" onclick="switchTab('contents')">コンテンツ</button>
+      <button class="tab-btn" onclick="switchTab('about')">概要</button>
+      <button class="tab-btn" onclick="switchTab('members')">メンバー</button>
+      <button class="tab-btn" onclick="switchTab('plans')">料金・プラン</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TAB: CONTENTS
+     ============================================================ -->
+<div id="tab-contents" class="tab-content active">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- Main feed -->
+      <div class="flex-1 min-w-0">
+
+        <!-- Self-check banner -->
+        <div class="check-banner mb-6 reveal">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+            <div class="flex items-start gap-3">
+              <div style="font-size:1.6rem;line-height:1;">👁️</div>
+              <div>
+                <p class="font-bold text-navy text-sm mb-0.5">セルフ視界チェック未受診の方へ</p>
+                <p class="text-gray-600 text-xs">あなたの視界タイプを診断すると、おすすめのコンテンツが自動でピックアップされます。まずはチェックをお試しください。</p>
+              </div>
+            </div>
+            <a href="aicare-vision-check.html" class="flex-shrink-0 inline-flex items-center gap-2 text-sm font-bold text-navy border-2 border-navy rounded-md px-4 py-2 hover:bg-navy hover:text-white transition-all">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9 3.5 10.5l.5-3.5L1.5 4.5 5 4z" fill="currentColor"/></svg>
+              チェックを受ける
+            </a>
+          </div>
+        </div>
+
+        <!-- Feed header -->
+        <div class="flex items-center justify-between mb-5 reveal">
+          <h2 class="font-bold text-gray-800 text-lg">最新コンテンツ</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-400">84件の投稿</span>
+            <select class="text-xs border border-gray-200 rounded px-2 py-1 text-gray-600 focus:outline-none focus:border-navy">
+              <option>新しい順</option>
+              <option>人気順</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Content cards -->
+        <div class="space-y-4">
+
+          <!-- Card 1: 動画（フルプラン限定） -->
+          <div class="content-card locked reveal">
+            <div class="lock-overlay">
+              <div class="lock-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2"/></svg>
+              </div>
+              <a href="#join" class="btn-cta text-sm py-2 px-5">入会して視聴する</a>
+            </div>
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#e8f0fb;">
+                🎬
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-full">🔒 フルプラン限定</span>
+                  <span class="text-gray-400 text-xs">2026/03/28</span>
+                  <span class="text-gray-400 text-xs">▶ 視聴 14分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">【完全版】視界タイプ別セルフケアルーティン</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">近視・老眼・疲れ目など、あなたの視界タイプに合わせた最適なセルフケアルーティンを完全版でお届け。毎朝3分からできる実践的なプログラムです。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#視界タイプ</span>
+                  <span class="tag">#セルフケア</span>
+                  <span class="tag">#ルーティン</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#dde8f5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎬</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                521 視聴
+              </span>
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2"/></svg>
+                128 いいね
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 2: 記事（ライトプラン） -->
+          <div class="content-card reveal">
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#f0f8ee;">
+                📝
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-light">ライトプラン</span>
+                  <span class="text-gray-400 text-xs">2026/03/25</span>
+                  <span class="text-gray-400 text-xs">📖 読了 5分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">なぜ夕方になると目がかすむのか？眼精疲労のメカニズム</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">1日のパソコン作業後、夕方になると急に目がかすむ——そのメカニズムを院長が詳しく解説。毛様体筋の疲労と自律神経の関係、すぐできる対策法をお伝えします。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#疲れ目</span>
+                  <span class="tag">#眼精疲労</span>
+                  <span class="tag">#メカニズム</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#e8f5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">📝</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                892 閲覧
+              </span>
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2"/></svg>
+                203 いいね
+              </span>
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg>
+                47 コメント
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 3: Q&A（フルプラン限定） -->
+          <div class="content-card locked reveal">
+            <div class="lock-overlay">
+              <div class="lock-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2"/></svg>
+              </div>
+              <a href="#join" class="btn-cta text-sm py-2 px-5">入会して読む</a>
+            </div>
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#fff3e0;">
+                ❓
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-full">🔒 フルプラン限定</span>
+                  <span class="text-gray-400 text-xs">2026/03/22</span>
+                  <span class="text-gray-400 text-xs">📋 Q&amp;A まとめ</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">3月の院長回答まとめ vol.3</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">メンバーから届いた質問に院長が個別回答。「老眼と近視の両立ケア」「ドライアイに効くサプリメント」「子どもの視力ケア」など今月も充実の内容です。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#Q&amp;A</span>
+                  <span class="tag">#院長回答</span>
+                  <span class="tag">#老眼</span>
+                  <span class="tag">#ドライアイ</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#fff8ec;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">❓</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg>
+                28件の質問に回答
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 4: 動画（無料プレビュー） -->
+          <div class="content-card reveal">
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#e8f0fb;">
+                🎬
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-free">無料プレビュー</span>
+                  <span class="text-gray-400 text-xs">2026/03/18</span>
+                  <span class="text-gray-400 text-xs">▶ 視聴 8分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">【初心者向け】1日3分でできる眼のホットケア</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">電子レンジで作れる蒸しタオルを使った「眼のホットケア」を院長が実演解説。疲れ目に即効性あり。初めての方はまずこの動画から始めてください。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#ホットケア</span>
+                  <span class="tag">#疲れ目</span>
+                  <span class="tag">#初心者向け</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#dde8f5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎬</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-xs text-gray-400 flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  1,204 視聴
+                </span>
+                <span class="text-xs text-gray-400 flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2"/></svg>
+                  347 いいね
+                </span>
+              </div>
+              <a href="#" class="text-xs font-bold text-navy hover:underline flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+                視聴する
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 5: PDF（フルプラン限定） -->
+          <div class="content-card locked reveal">
+            <div class="lock-overlay">
+              <div class="lock-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2"/></svg>
+              </div>
+              <a href="#join" class="btn-cta text-sm py-2 px-5">入会してダウンロード</a>
+            </div>
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#fce4e4;">
+                📊
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-full">🔒 フルプラン限定</span>
+                  <span class="text-gray-400 text-xs">2026/03/15</span>
+                  <span class="text-gray-400 text-xs">📄 PDF / 印刷用</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">視界タイプ診断シート（印刷用）</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">自分や家族の視界タイプを手軽に診断できるA4印刷用シート。近視・老眼・ピント固定・ドライアイの4タイプに対応した設問と対策マップ付き。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#視界タイプ</span>
+                  <span class="tag">#診断シート</span>
+                  <span class="tag">#PDF</span>
+                  <span class="tag">#印刷用</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#faeaea;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">📊</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400">A4 / 2枚 / カラー印刷推奨</span>
+            </div>
+          </div>
+
+          <!-- Card 6: ライブアーカイブ（フルプラン限定） -->
+          <div class="content-card locked reveal">
+            <div class="lock-overlay">
+              <div class="lock-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="white" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="white" stroke-width="2"/></svg>
+              </div>
+              <a href="#join" class="btn-cta text-sm py-2 px-5">入会して視聴する</a>
+            </div>
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#fce8e8;">
+                🔴
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-full">🔒 フルプラン限定</span>
+                  <span style="background:#fce8e8;color:#c0392b;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:3px;">LIVE REC</span>
+                  <span class="text-gray-400 text-xs">2026/03/10</span>
+                  <span class="text-gray-400 text-xs">▶ 収録 42分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">3月ライブQ&amp;A配信（アーカイブ）</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">メンバー限定ライブ配信のアーカイブ動画。「夜のケアはいつするのがベスト？」「コンタクトとメガネの使い分け」など、リアルタイムで寄せられた質問に院長が回答した42分の収録です。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#ライブアーカイブ</span>
+                  <span class="tag">#Q&amp;A</span>
+                  <span class="tag">#コンタクト</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#faeaea;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🔴</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                389 視聴
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 7: 記事（ライトプラン） -->
+          <div class="content-card reveal">
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#f0f8ee;">
+                📝
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-light">ライトプラン</span>
+                  <span class="text-gray-400 text-xs">2026/03/07</span>
+                  <span class="text-gray-400 text-xs">📖 読了 7分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">スマホと目の関係：ブルーライトより怖いピント固定問題</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">「ブルーライトカットメガネ」より先に対処すべきこととは？スマホ使用時の「ピント固定」が毛様体筋に与えるダメージと、今日からできる3つの対策を解説します。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#スマホ</span>
+                  <span class="tag">#ピント調整</span>
+                  <span class="tag">#ブルーライト</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#e8f5e5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">📝</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                1,034 閲覧
+              </span>
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2"/></svg>
+                291 いいね
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 8: 動画（ライトプラン） -->
+          <div class="content-card reveal">
+            <div class="flex gap-4 p-4">
+              <div class="type-thumb flex-shrink-0" style="background:#e8f0fb;">
+                🎬
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="badge-light">ライトプラン</span>
+                  <span class="text-gray-400 text-xs">2026/03/01</span>
+                  <span class="text-gray-400 text-xs">▶ 視聴 11分</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 leading-snug">首・肩こりと視界の意外なつながり</h3>
+                <p class="text-gray-500 text-xs mb-3 line-clamp-2">「肩がこると目も疲れる」は偶然ではありません。頸椎の緊張が視機能に与える影響と、眼と首を同時にケアするエクササイズを解説します。</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="tag">#肩こり</span>
+                  <span class="tag">#視界</span>
+                  <span class="tag">#セルフケア</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 hidden sm:block" style="width:88px;height:72px;background:#dde8f5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎬</div>
+            </div>
+            <div class="border-t border-gray-100 px-4 py-2 flex items-center gap-4">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                756 視聴
+              </span>
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2"/></svg>
+                182 いいね
+              </span>
+            </div>
+          </div>
+
+        </div><!-- /space-y-4 -->
+
+        <!-- もっと見る -->
+        <div class="text-center mt-8 reveal">
+          <a href="#join" class="btn-cta-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2"/></svg>
+            入会して全コンテンツを見る（84件）
+          </a>
+        </div>
+
+      </div><!-- /main feed -->
+
+
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-72 flex-shrink-0 space-y-5">
+
+        <!-- Join CTA card -->
+        <div id="join" class="plan-card featured p-5 reveal" style="scroll-margin-top:120px;">
+          <div class="text-center mb-4">
+            <span style="background:#0D2B5E;color:#7BAEE8;font-size:0.7rem;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:0.05em;">7日間無料</span>
+          </div>
+          <h3 class="font-bold text-navy text-base text-center mb-1">今すぐ入会する</h3>
+          <p class="text-gray-500 text-xs text-center mb-4">最初の7日間は完全無料でお試しいただけます</p>
+
+          <div class="space-y-3 mb-4">
+            <div class="border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-navy transition-colors" onclick="selectPlan(this, 'light')">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-sm text-gray-800">ライトプラン</span>
+                <div class="plan-radio w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0"></div>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="stat-num text-xl text-navy">¥1,980</span>
+                <span class="text-gray-400 text-xs">/月</span>
+              </div>
+              <p class="text-gray-500 text-xs mt-1">動画閲覧・記事読み放題</p>
+            </div>
+            <div class="border-2 border-navy rounded-lg p-3 cursor-pointer" onclick="selectPlan(this, 'full')">
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-navy">フルプラン</span>
+                  <span style="background:#0D2B5E;color:white;font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:3px;">人気No.1</span>
+                </div>
+                <div class="plan-radio w-4 h-4 rounded-full border-2 border-navy flex items-center justify-center flex-shrink-0">
+                  <div class="w-2 h-2 rounded-full bg-navy"></div>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="stat-num text-xl text-navy">¥3,980</span>
+                <span class="text-gray-400 text-xs">/月</span>
+              </div>
+              <p class="text-gray-500 text-xs mt-1">全コンテンツ + Q&amp;A + ライブ</p>
+            </div>
+          </div>
+
+          <a href="#" class="btn-cta w-full justify-center mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="white" stroke-width="2"/></svg>
+            7日間無料で始める
+          </a>
+
+          <div class="flex items-center justify-center gap-4 flex-wrap">
+            <span class="secure-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" stroke-width="2"/></svg>
+              SSL暗号化
+            </span>
+            <span class="secure-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg>
+              安全な決済
+            </span>
+            <span class="secure-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" stroke="currentColor" stroke-width="2"/></svg>
+              いつでも解約
+            </span>
+          </div>
+        </div>
+
+        <!-- About host mini -->
+        <div class="bg-gray-50 rounded-xl p-5 reveal">
+          <h4 class="font-bold text-gray-700 text-sm mb-3">サロンオーナー</h4>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="avatar" style="width:48px;height:48px;">山</div>
+            <div>
+              <p class="font-bold text-sm text-gray-800">院長 山田 眼一</p>
+              <p class="text-gray-500 text-xs">視機能訓練士 / 眼の整体師</p>
+            </div>
+          </div>
+          <p class="text-gray-600 text-xs leading-relaxed">眼の整体院として20年以上の施術経験。「薬に頼らない眼のセルフケア」を広めるためオンラインサロンを開設。累計1,000名以上の目をサポート。</p>
+        </div>
+
+        <!-- Tags -->
+        <div class="bg-gray-50 rounded-xl p-5 reveal">
+          <h4 class="font-bold text-gray-700 text-sm mb-3">人気タグ</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag">#疲れ目</span>
+            <span class="tag">#セルフケア</span>
+            <span class="tag">#ピント調整</span>
+            <span class="tag">#視界タイプ</span>
+            <span class="tag">#老眼</span>
+            <span class="tag">#ドライアイ</span>
+            <span class="tag">#スマホ</span>
+            <span class="tag">#ホットケア</span>
+            <span class="tag">#肩こり</span>
+            <span class="tag">#ブルーライト</span>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TAB: ABOUT
+     ============================================================ -->
+<div id="tab-about" class="tab-content">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+
+    <!-- Concept -->
+    <section class="mb-12 reveal">
+      <div class="flex items-center gap-3 mb-5">
+        <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+        <h2 class="font-bold text-xl text-gray-800">サロンコンセプト</h2>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-6 md:p-8">
+        <p class="text-gray-700 mb-4 leading-relaxed">
+          <strong class="text-navy">「目を整える習慣が、人生の質を変える」</strong>
+        </p>
+        <p class="text-gray-600 text-sm leading-relaxed mb-4">
+          現代人の多くが慢性的な眼精疲労を抱えながら、適切なセルフケアを知らずに過ごしています。眼科に行っても「異常なし」と言われる、でも確かに目はしんどい——そんな方のために、アイケアラボ365は生まれました。
+        </p>
+        <p class="text-gray-600 text-sm leading-relaxed mb-4">
+          このサロンでは、院長・山田眼一が20年以上の施術経験から厳選した「目に効くセルフケア」を毎週お届けします。動画・記事・Q&A・ライブを通じて、あなたの視界タイプに合ったケアを継続できる環境を提供します。
+        </p>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          365日、目の専門家がそばにいる感覚で——それがアイケアラボ365です。
+        </p>
+      </div>
+    </section>
+
+    <!-- こんな人に -->
+    <section class="mb-12 reveal">
+      <div class="flex items-center gap-3 mb-5">
+        <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+        <h2 class="font-bold text-xl text-gray-800">こんな方におすすめ</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">夕方になると目がかすんで仕事に集中できない</p>
+        </div>
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">スマホ・パソコンを長時間使い、目の疲れが取れない</p>
+        </div>
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">眼科で「異常なし」と言われても不調が続いている</p>
+        </div>
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">老眼が気になり始め、予防ケアを始めたい</p>
+        </div>
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">ドライアイで目薬が手放せない状態を改善したい</p>
+        </div>
+        <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-4">
+          <div class="w-7 h-7 rounded-full bg-navy flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="text-gray-700 text-sm">子どもの目の発達・視力低下が心配</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Host profile -->
+    <section class="mb-12 reveal">
+      <div class="flex items-center gap-3 mb-5">
+        <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+        <h2 class="font-bold text-xl text-gray-800">ホストプロフィール</h2>
+      </div>
+      <div class="profile-section">
+        <div class="flex flex-col sm:flex-row items-start gap-5 mb-5">
+          <div class="avatar" style="width:72px;height:72px;font-size:1.4rem;">山</div>
+          <div>
+            <h3 class="font-bold text-lg text-gray-800 mb-0.5">山田 眼一（やまだ がんいち）</h3>
+            <p class="text-gray-500 text-sm mb-2">眼の整体院 アイケアラボ 院長 / 視機能訓練士</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="tag">視機能訓練士</span>
+              <span class="tag">眼の整体師</span>
+              <span class="tag">健康視覚アドバイザー</span>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3 text-gray-600 text-sm leading-relaxed">
+          <p>1975年、大阪府生まれ。視機能訓練士として眼科クリニックに10年勤務後、独立。「眼の整体」という概念を提唱し、眼の筋肉・神経・血流のバランスを整える独自の施術スタイルを確立。</p>
+          <p>2015年に「アイケアラボ」を開院。「薬に頼らず、自分の目を自分でケアする力を身につけてほしい」という思いから、セルフケア指導に力を入れ、延べ3,000名以上の患者・クライアントを施術。</p>
+          <p>2024年より、より多くの方にセルフケアを届けるためオンラインサロン「アイケアラボ365」を開設。現在会員数1,247名。毎週コンテンツを更新中。</p>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <h4 class="font-bold text-gray-700 text-sm mb-3">略歴</h4>
+          <div class="space-y-2">
+            <div class="flex gap-3 text-sm">
+              <span class="text-navy font-bold flex-shrink-0 w-16">1999年</span>
+              <span class="text-gray-600">視機能訓練士資格取得</span>
+            </div>
+            <div class="flex gap-3 text-sm">
+              <span class="text-navy font-bold flex-shrink-0 w-16">2005年</span>
+              <span class="text-gray-600">眼科クリニック勤務（視機能訓練担当）</span>
+            </div>
+            <div class="flex gap-3 text-sm">
+              <span class="text-navy font-bold flex-shrink-0 w-16">2015年</span>
+              <span class="text-gray-600">アイケアラボ開院</span>
+            </div>
+            <div class="flex gap-3 text-sm">
+              <span class="text-navy font-bold flex-shrink-0 w-16">2020年</span>
+              <span class="text-gray-600">著書「目を整える習慣」出版（仮称）</span>
+            </div>
+            <div class="flex gap-3 text-sm">
+              <span class="text-navy font-bold flex-shrink-0 w-16">2024年</span>
+              <span class="text-gray-600">オンラインサロン「アイケアラボ365」開設</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What you get -->
+    <section class="mb-12 reveal">
+      <div class="flex items-center gap-3 mb-5">
+        <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+        <h2 class="font-bold text-xl text-gray-800">サロンで得られること</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="text-center p-5 bg-gray-50 rounded-xl">
+          <div class="text-3xl mb-3">🎬</div>
+          <h4 class="font-bold text-gray-800 text-sm mb-2">専門動画・記事</h4>
+          <p class="text-gray-500 text-xs">毎週2〜3本のコンテンツを更新。隙間時間にすぐ実践できるケア動画を中心に配信。</p>
+        </div>
+        <div class="text-center p-5 bg-gray-50 rounded-xl">
+          <div class="text-3xl mb-3">❓</div>
+          <h4 class="font-bold text-gray-800 text-sm mb-2">院長への質問権</h4>
+          <p class="text-gray-500 text-xs">フルプランのメンバーは院長に直接質問可能。月次のQ&Aまとめで全員に公開。</p>
+        </div>
+        <div class="text-center p-5 bg-gray-50 rounded-xl">
+          <div class="text-3xl mb-3">🔴</div>
+          <h4 class="font-bold text-gray-800 text-sm mb-2">月1回ライブ配信</h4>
+          <p class="text-gray-500 text-xs">毎月1回、メンバー限定のライブQ&A配信を実施。アーカイブでも視聴可能。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="text-center reveal">
+      <a href="#join" class="btn-cta text-base py-4 px-10">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="white" stroke-width="2"/></svg>
+        7日間無料で入会する
+      </a>
+      <p class="text-gray-400 text-xs mt-3">いつでも解約可能 / クレジットカード不要でお試し</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TAB: MEMBERS
+     ============================================================ -->
+<div id="tab-members" class="tab-content">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+
+    <div class="text-center mb-8 reveal">
+      <div class="stat-num text-4xl text-navy mb-1">1,247</div>
+      <p class="text-gray-500 text-sm">現在のメンバー数</p>
+    </div>
+
+    <!-- Member stats -->
+    <div class="grid grid-cols-3 gap-4 mb-10 reveal">
+      <div class="text-center bg-gray-50 rounded-xl p-4">
+        <div class="stat-num text-2xl text-navy mb-1">68%</div>
+        <p class="text-gray-500 text-xs">フルプラン会員</p>
+      </div>
+      <div class="text-center bg-gray-50 rounded-xl p-4">
+        <div class="stat-num text-2xl text-navy mb-1">4.9</div>
+        <p class="text-gray-500 text-xs">平均満足度</p>
+      </div>
+      <div class="text-center bg-gray-50 rounded-xl p-4">
+        <div class="stat-num text-2xl text-navy mb-1">89%</div>
+        <p class="text-gray-500 text-xs">継続率（3ヶ月後）</p>
+      </div>
+    </div>
+
+    <!-- Voice of members -->
+    <div class="flex items-center gap-3 mb-5 reveal">
+      <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+      <h2 class="font-bold text-xl text-gray-800">メンバーの声</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+      <div class="bg-gray-50 rounded-xl p-5 reveal">
+        <div class="flex items-center gap-3 mb-3">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7BAEE8,#0D2B5E);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.85rem;flex-shrink:0;">田</div>
+          <div>
+            <p class="font-bold text-sm text-gray-800">田中 M.（40代・会社員）</p>
+            <div class="text-yellow-400 text-xs">★★★★★</div>
+          </div>
+        </div>
+        <p class="text-gray-600 text-xs leading-relaxed">「3ヶ月前は夕方になると目がしょぼしょぼして仕事にならなかったのですが、ホットケア動画を実践してから明らかに楽になりました。毎週コンテンツが届くので習慣になっています。」</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-5 reveal">
+        <div class="flex items-center gap-3 mb-3">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7BAEE8,#0D2B5E);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.85rem;flex-shrink:0;">佐</div>
+          <div>
+            <p class="font-bold text-sm text-gray-800">佐藤 K.（50代・主婦）</p>
+            <div class="text-yellow-400 text-xs">★★★★★</div>
+          </div>
+        </div>
+        <p class="text-gray-600 text-xs leading-relaxed">「老眼が始まって不安でしたが、このサロンで院長に直接質問できて安心感が全然違います。フルプランにして良かったです。毎月のライブも楽しみにしています。」</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-5 reveal">
+        <div class="flex items-center gap-3 mb-3">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7BAEE8,#0D2B5E);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.85rem;flex-shrink:0;">鈴</div>
+          <div>
+            <p class="font-bold text-sm text-gray-800">鈴木 T.（30代・デザイナー）</p>
+            <div class="text-yellow-400 text-xs">★★★★☆</div>
+          </div>
+        </div>
+        <p class="text-gray-600 text-xs leading-relaxed">「デザイナーでモニターを見続ける仕事なので目がきつかったです。ピント固定の記事を読んで、1時間ごとに遠くを見るようにしたら頭痛が減りました。コンテンツの質が高い。」</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-5 reveal">
+        <div class="flex items-center gap-3 mb-3">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7BAEE8,#0D2B5E);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.85rem;flex-shrink:0;">伊</div>
+          <div>
+            <p class="font-bold text-sm text-gray-800">伊藤 Y.（60代・自営業）</p>
+            <div class="text-yellow-400 text-xs">★★★★★</div>
+          </div>
+        </div>
+        <p class="text-gray-600 text-xs leading-relaxed">「スマホで動画が見られるので移動中にも学べます。専門的な内容をわかりやすく説明してくれるので、医療知識がなくても全然大丈夫。孫の目のケアにも役立てています。」</p>
+      </div>
+    </div>
+
+    <div class="text-center reveal">
+      <a href="#join" class="btn-cta py-3 px-8">仲間に加わる</a>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TAB: PLANS
+     ============================================================ -->
+<div id="tab-plans" class="tab-content">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+
+    <div class="text-center mb-8 reveal">
+      <h2 class="font-bold text-2xl text-gray-800 mb-2">料金プラン</h2>
+      <p class="text-gray-500 text-sm">最初の7日間はどちらのプランも無料でお試しいただけます</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
+      <!-- Light plan -->
+      <div class="plan-card p-6 reveal">
+        <div class="mb-5">
+          <h3 class="font-bold text-xl text-gray-800 mb-1">ライトプラン</h3>
+          <p class="text-gray-500 text-sm">動画・記事で基本を学ぶ</p>
+        </div>
+        <div class="flex items-baseline gap-2 mb-5">
+          <span class="stat-num text-4xl text-navy">¥1,980</span>
+          <span class="text-gray-400 text-sm">/月（税込）</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            動画コンテンツ 視聴し放題
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            記事・コラム 読み放題
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            毎週更新のコンテンツ
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+            Q&Aへの質問・閲覧
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+            ライブ配信・アーカイブ
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+            PDFダウンロード
+          </li>
+        </ul>
+        <a href="#" class="btn-cta-outline w-full justify-center">
+          7日間無料で試す
+        </a>
+      </div>
+
+      <!-- Full plan -->
+      <div class="plan-card featured p-6 reveal" style="background:#fafcff;">
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <span style="background:#0D2B5E;color:white;font-size:0.72rem;font-weight:700;padding:4px 14px;border-radius:20px;">人気No.1 おすすめ</span>
+        </div>
+        <div class="mb-5 mt-2">
+          <h3 class="font-bold text-xl text-navy mb-1">フルプラン</h3>
+          <p class="text-gray-500 text-sm">全コンテンツに無制限でアクセス</p>
+        </div>
+        <div class="flex items-baseline gap-2 mb-5">
+          <span class="stat-num text-4xl text-navy">¥3,980</span>
+          <span class="text-gray-400 text-sm">/月（税込）</span>
+        </div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            動画コンテンツ 視聴し放題
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            記事・コラム 読み放題
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            毎週更新のコンテンツ
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <strong>Q&Aへの質問 + 全回答閲覧</strong>
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <strong>ライブ配信 + アーカイブ視聴</strong>
+          </li>
+          <li class="flex items-center gap-2 text-sm text-gray-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#0D2B5E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <strong>PDFダウンロード 無制限</strong>
+          </li>
+        </ul>
+        <a href="#" class="btn-cta w-full justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="white" stroke-width="2"/></svg>
+          7日間無料で試す
+        </a>
+      </div>
+
+    </div>
+
+    <!-- FAQ -->
+    <div class="reveal">
+      <div class="flex items-center gap-3 mb-5">
+        <div style="width:4px;height:24px;background:#0D2B5E;border-radius:2px;"></div>
+        <h2 class="font-bold text-xl text-gray-800">よくある質問</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <button class="w-full flex items-center justify-between p-4 text-left font-bold text-sm text-gray-800 hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)">
+            <span>いつでも解約できますか？</span>
+            <svg class="faq-chevron w-4 h-4 text-gray-400 transition-transform" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <div class="px-4 pb-4 text-sm text-gray-600 leading-relaxed">
+              はい、いつでも解約いただけます。解約手続きはマイページから簡単に行え、解約月末まで引き続きサービスをご利用いただけます。違約金等は一切ございません。
+            </div>
+          </div>
+        </div>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <button class="w-full flex items-center justify-between p-4 text-left font-bold text-sm text-gray-800 hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)">
+            <span>7日間の無料期間中に解約したら料金はかかりますか？</span>
+            <svg class="faq-chevron w-4 h-4 text-gray-400 transition-transform" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <div class="px-4 pb-4 text-sm text-gray-600 leading-relaxed">
+              無料期間中に解約いただいた場合、一切費用はかかりません。7日間の試用期間が終了する前に解約手続きを行えば、課金されることなくご利用を終了できます。
+            </div>
+          </div>
+        </div>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <button class="w-full flex items-center justify-between p-4 text-left font-bold text-sm text-gray-800 hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)">
+            <span>プランの途中変更はできますか？</span>
+            <svg class="faq-chevron w-4 h-4 text-gray-400 transition-transform" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <div class="px-4 pb-4 text-sm text-gray-600 leading-relaxed">
+              はい、マイページからいつでもプランの変更が可能です。アップグレードは即時反映され、ダウングレードは次回更新日から適用されます。
+            </div>
+          </div>
+        </div>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <button class="w-full flex items-center justify-between p-4 text-left font-bold text-sm text-gray-800 hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)">
+            <span>スマートフォンでも利用できますか？</span>
+            <svg class="faq-chevron w-4 h-4 text-gray-400 transition-transform" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <div class="px-4 pb-4 text-sm text-gray-600 leading-relaxed">
+              はい、スマートフォン・タブレット・PCすべてに対応しています。専用アプリ不要でブラウザからご利用いただけます。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     MOBILE STICKY FOOTER
+     ============================================================ -->
+<div class="sticky-footer md:hidden">
+  <a href="#join" class="btn-cta w-full justify-center text-sm py-3">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="white" stroke-width="2"/></svg>
+    無料で7日間試す
+    <span style="background:rgba(255,255,255,0.2);color:white;font-size:0.65rem;padding:1px 6px;border-radius:10px;margin-left:2px;">7日間無料</span>
+  </a>
+</div>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="bg-gray-50 border-t border-gray-200 mt-16 py-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <img src="eyecare_logo.png" alt="アイケアラボ" class="h-6 w-auto" onerror="this.style.display:'none'">
+          <span class="font-bold text-navy">アイケアラボ365</span>
+        </div>
+        <p class="text-gray-400 text-xs">眼の専門家と365日、目のセルフケアを続けるオンラインサロン</p>
+      </div>
+      <div class="flex flex-wrap gap-4 text-xs text-gray-400">
+        <a href="aicare-top-prototype.html" class="hover:text-navy transition-colors">メインサイトへ</a>
+        <a href="aicare-vision-check.html" class="hover:text-navy transition-colors">セルフ視界チェック</a>
+        <a href="#" class="hover:text-navy transition-colors">プライバシーポリシー</a>
+        <a href="#" class="hover:text-navy transition-colors">特定商取引法</a>
+        <a href="#" class="hover:text-navy transition-colors">お問い合わせ</a>
+      </div>
+    </div>
+    <div class="border-t border-gray-200 mt-6 pt-5 text-center text-xs text-gray-400">
+      &copy; 2026 アイケアラボ / Aicare Lab. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+  // ---- Tab switching ----
+  function switchTab(name) {
+    // Deactivate all tabs and content
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    // Activate selected
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    // Retrigger reveals for newly visible elements
+    triggerReveal();
+  }
+
+  // ---- Plan selector ----
+  function selectPlan(el, planId) {
+    // Reset all plan cards in sidebar
+    el.closest('.space-y-3').querySelectorAll('div[onclick]').forEach(card => {
+      card.classList.remove('border-navy', 'border-2');
+      card.classList.add('border-gray-200', 'border');
+      const radio = card.querySelector('.plan-radio');
+      if (radio) {
+        radio.classList.remove('border-navy');
+        radio.classList.add('border-gray-300');
+        radio.innerHTML = '';
+      }
+    });
+
+    // Activate selected
+    el.classList.remove('border-gray-200', 'border');
+    el.classList.add('border-navy', 'border-2');
+    const radio = el.querySelector('.plan-radio');
+    if (radio) {
+      radio.classList.remove('border-gray-300');
+      radio.classList.add('border-navy');
+      radio.innerHTML = '<div class="w-2 h-2 rounded-full bg-navy"></div>';
+    }
+  }
+
+  // ---- FAQ toggle ----
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const chevron = btn.querySelector('.faq-chevron');
+    const isOpen = answer.style.maxHeight && answer.style.maxHeight !== '0px';
+
+    if (isOpen) {
+      answer.style.maxHeight = '0px';
+      chevron.style.transform = '';
+    } else {
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+      chevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  // ---- Scroll reveal ----
+  function triggerReveal() {
+    const elements = document.querySelectorAll('.reveal:not(.visible)');
+    elements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 60) {
+        el.classList.add('visible');
+      }
+    });
+  }
+
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Small delay for initial reveal
+    setTimeout(triggerReveal, 100);
+    window.addEventListener('scroll', triggerReveal, { passive: true });
+  });
+</script>
+
+</body>
+</html>
