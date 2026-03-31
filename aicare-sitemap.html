@@ -839,13 +839,10 @@ function renderNode(node, depth) {
   row.dataset.id = node.id;
   row.style.paddingLeft = (depth * 20 + 4) + 'px';
 
-  // drag handle
+  // drag handle (visual only)
   const handle = document.createElement('span');
   handle.className = 'drag-handle';
   handle.innerHTML = '&#8942;';
-  handle.draggable = true;
-  handle.addEventListener('dragstart', e => { e.stopPropagation(); onDragStart(e, node.id); });
-  handle.addEventListener('dragend',   () => onDragEnd());
   row.appendChild(handle);
 
   // toggle
@@ -874,12 +871,50 @@ function renderNode(node, depth) {
   badge.textContent = getStatusLabel(node.status);
   row.appendChild(badge);
 
-  // row events — click / context / position-based DnD
-  row.addEventListener('click', () => selectNode(node.id));
+  // ---- row: draggable + all DnD events on the row itself ----
+  row.draggable = true;
+  row.addEventListener('dragstart', e => {
+    e.stopPropagation();
+    dragSrc = node.id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', node.id);
+    requestAnimationFrame(() => row.classList.add('dragging'));
+  });
+  row.addEventListener('dragend', () => {
+    clearDndIndicators();
+    dragSrc = null;
+  });
+  row.addEventListener('dragover', e => {
+    if (!dragSrc || dragSrc === node.id) return;
+    if (isDescendantOf(node.id, dragSrc)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // clear all indicators, then set on this row
+    document.querySelectorAll('.tree-row.dnd-before,.tree-row.dnd-after,.tree-row.dnd-child')
+      .forEach(r => r.classList.remove('dnd-before','dnd-after','dnd-child'));
+    const rect = row.getBoundingClientRect();
+    const pct  = (e.clientY - rect.top) / rect.height;
+    if      (pct < 0.3) row.classList.add('dnd-before');
+    else if (pct > 0.7) row.classList.add('dnd-after');
+    else                row.classList.add('dnd-child');
+  });
+  row.addEventListener('dragleave', e => {
+    if (!row.contains(e.relatedTarget))
+      row.classList.remove('dnd-before','dnd-after','dnd-child');
+  });
+  row.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragSrc || dragSrc === node.id) return;
+    const intent = row.classList.contains('dnd-before') ? 'before'
+                 : row.classList.contains('dnd-after')  ? 'after'
+                 : 'child';
+    row.classList.remove('dnd-before','dnd-after','dnd-child');
+    performMove(dragSrc, node.id, intent);
+    dragSrc = null;
+  });
+  row.addEventListener('click', e => { if (!e._wasDrag) selectNode(node.id); });
   row.addEventListener('contextmenu', e => openCtxMenu(e, node.id));
-  row.addEventListener('dragover',  e => onRowDragOver(e, node.id));
-  row.addEventListener('dragleave', e => onRowDragLeave(e, row));
-  row.addEventListener('drop',      e => onRowDrop(e, node.id));
 
   li.appendChild(row);
 
@@ -1144,118 +1179,45 @@ function bindAccordions() {
 }
 
 // ============================================================
-//  DRAG & DROP
+//  DRAG & DROP — helpers only (events are inline in renderNode)
 // ============================================================
-function canDrop(targetId) {
-  if (!dragSrc) return false;
-  if (dragSrc === targetId) return false;
-  // prevent dropping into own descendant
-  function isDescendant(ancestorId, checkId) {
-    const anc = findNode(ancestorId, siteData);
-    if (!anc) return false;
-    for (const c of anc.children) {
-      if (c.id === checkId || isDescendant(c.id, checkId)) return true;
-    }
-    return false;
-  }
-  if (isDescendant(dragSrc, targetId)) return false;
-  return true;
-}
-
-function onDragStart(e, id) {
-  dragSrc = id;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', id);
-  setTimeout(() => {
-    document.querySelector(`.tree-row[data-id="${id}"]`)?.classList.add('dragging');
-  }, 0);
-}
-
 function clearDndIndicators() {
   document.querySelectorAll('.tree-row.dnd-before,.tree-row.dnd-after,.tree-row.dnd-child,.tree-row.dragging')
     .forEach(el => el.classList.remove('dnd-before','dnd-after','dnd-child','dragging'));
 }
 
-function onDragEnd() {
-  clearDndIndicators();
-  dragSrc = null;
-}
-
-function onRowDragOver(e, targetId) {
-  if (!dragSrc || !canDrop(targetId)) return;
-  e.preventDefault();
-  e.stopPropagation();
-
-  clearDndIndicators();
-  // restore dragging class on source
-  document.querySelector(`.tree-row[data-id="${dragSrc}"]`)?.classList.add('dragging');
-
-  const row = e.currentTarget;
-  const rect = row.getBoundingClientRect();
-  const pct  = (e.clientY - rect.top) / rect.height;
-
-  if (pct < 0.28) {
-    row.classList.add('dnd-before');
-    row._dndIntent = 'before';
-  } else if (pct > 0.72) {
-    row.classList.add('dnd-after');
-    row._dndIntent = 'after';
-  } else {
-    row.classList.add('dnd-child');
-    row._dndIntent = 'child';
+function isDescendantOf(nodeId, ancestorId) {
+  const anc = findNode(ancestorId, siteData);
+  if (!anc) return false;
+  function check(n) {
+    for (const c of n.children) {
+      if (c.id === nodeId || check(c)) return true;
+    }
+    return false;
   }
+  return check(anc);
 }
 
-function onRowDragLeave(e, row) {
-  if (!row.contains(e.relatedTarget)) {
-    row.classList.remove('dnd-before','dnd-after','dnd-child');
-  }
-}
-
-function onRowDrop(e, targetId) {
-  e.preventDefault();
-  e.stopPropagation();
-  const row   = e.currentTarget;
-  const intent = row._dndIntent || 'after';
-  clearDndIndicators();
-
-  if (!dragSrc || !canDrop(targetId)) return;
+function performMove(srcId, targetId, intent) {
+  const srcInfo = findParentArr(srcId, siteData, null);
+  if (!srcInfo) return;
+  const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
 
   if (intent === 'child') {
-    // add as last child of target
     const target = findNode(targetId, siteData);
-    if (!target) return;
-    const srcInfo = findParentArr(dragSrc, siteData, null);
-    if (!srcInfo) return;
-    const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
+    if (!target) { srcInfo.arr.splice(srcInfo.index, 0, moved); return; }
     target.children.push(moved);
     target._open = true;
   } else {
-    onDropSibling(targetId, intent);
+    const refInfo = findParentArr(targetId, siteData, null);
+    if (!refInfo) { srcInfo.arr.splice(srcInfo.index, 0, moved); return; }
+    const idx = intent === 'before' ? refInfo.index : refInfo.index + 1;
+    refInfo.arr.splice(idx, 0, moved);
   }
 
   markDirty();
   renderTree();
   renderDetail();
-}
-
-function onDropSibling(refId, position) {
-  if (!dragSrc || !canDrop(refId)) return;
-
-  const srcInfo = findParentArr(dragSrc, siteData, null);
-  if (!srcInfo) return;
-
-  const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
-
-  // recalculate refInfo after removal (index may have shifted)
-  const refInfo2 = findParentArr(refId, siteData, null);
-  if (!refInfo2) {
-    srcInfo.arr.splice(srcInfo.index, 0, moved);
-    return;
-  }
-
-  const insertIdx = position === 'before' ? refInfo2.index : refInfo2.index + 1;
-  refInfo2.arr.splice(insertIdx, 0, moved);
 }
 
 // ============================================================
