@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アイケアラボ サイトマップエディタ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0D2B5E;
+      --navy-light: #1a3d7c;
+      --navy-pale: #e8eef7;
+      --bg: #f5f6f8;
+      --white: #ffffff;
+      --border: #dde1ea;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --live: #16a34a;
+      --live-bg: #dcfce7;
+      --draft: #ea580c;
+      --draft-bg: #ffedd5;
+      --planned: #4b6896;
+      --planned-bg: #dbeafe;
+      --deprecated: #9f4040;
+      --deprecated-bg: #fee2e2;
+      --drag-line: #3b82f6;
+      --drag-over-bg: #eff6ff;
+      --drag-over-border: #3b82f6;
+      --shadow: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,.15);
+      --radius: 6px;
+      --toolbar-h: 52px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ========== TOOLBAR ========== */
+    #toolbar {
+      height: var(--toolbar-h);
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+      z-index: 100;
+    }
+    #toolbar .logo {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: .02em;
+      margin-right: 12px;
+      white-space: nowrap;
+    }
+    #toolbar .sep {
+      width: 1px;
+      height: 24px;
+      background: rgba(255,255,255,.25);
+      margin: 0 4px;
+    }
+    .tb-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background .15s, opacity .15s;
+      white-space: nowrap;
+    }
+    .tb-btn:disabled { opacity: .45; cursor: default; }
+    .tb-btn.primary { background: rgba(255,255,255,.18); color: #fff; }
+    .tb-btn.primary:hover:not(:disabled) { background: rgba(255,255,255,.28); }
+    .tb-btn.danger { background: rgba(255,100,100,.22); color: #ffb3b3; }
+    .tb-btn.danger:hover:not(:disabled) { background: rgba(255,100,100,.35); }
+    .tb-btn.success { background: rgba(100,220,130,.22); color: #a7f3c0; }
+    .tb-btn.success:hover:not(:disabled) { background: rgba(100,220,130,.35); }
+    .tb-btn.accent { background: rgba(255,255,255,.12); color: #c8d8ff; }
+    .tb-btn.accent:hover:not(:disabled) { background: rgba(255,255,255,.22); }
+    #toolbar .spacer { flex: 1; }
+    #save-indicator {
+      font-size: 11px;
+      color: rgba(255,255,255,.6);
+      white-space: nowrap;
+    }
+
+    /* ========== MAIN LAYOUT ========== */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ========== TREE PANEL ========== */
+    #tree-panel {
+      width: 55%;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    #tree-header {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #tree-header .tree-actions { display: flex; gap: 6px; }
+    .icon-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background .12s, color .12s;
+    }
+    .icon-btn:hover { background: var(--bg); color: var(--text); }
+
+    #tree-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0 40px;
+    }
+    #tree-root { list-style: none; }
+
+    /* ========== TREE NODE ========== */
+    .tree-item { position: relative; }
+    .tree-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 1px 8px 1px 0;
+      position: relative;
+      transition: background .1s;
+      user-select: none;
+    }
+    .tree-row:hover { background: var(--bg); }
+    .tree-row.selected {
+      background: var(--navy-pale);
+      border-left: 3px solid var(--navy);
+    }
+    .tree-row.dragging { opacity: .4; }
+    .tree-row.drag-over-child {
+      background: var(--drag-over-bg);
+      outline: 2px dashed var(--drag-over-border);
+      outline-offset: -2px;
+    }
+
+    /* drop indicators */
+    .drop-line {
+      height: 3px;
+      margin: 0;
+      border-radius: 2px;
+      background: transparent;
+      transition: background .1s;
+      pointer-events: none;
+    }
+    .drop-line.active { background: var(--drag-line); }
+
+    .drag-handle {
+      flex-shrink: 0;
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border);
+      font-size: 14px;
+      cursor: grab;
+      transition: color .12s;
+      padding: 6px 2px;
+    }
+    .drag-handle:hover { color: var(--text-muted); }
+    .drag-handle:active { cursor: grabbing; }
+
+    .toggle-btn {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 10px;
+      border-radius: 3px;
+      transition: background .1s, transform .15s;
+    }
+    .toggle-btn:hover { background: rgba(0,0,0,.07); }
+    .toggle-btn.collapsed { transform: rotate(-90deg); }
+    .toggle-btn.leaf { visibility: hidden; }
+
+    .node-icon {
+      flex-shrink: 0;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+
+    .node-label {
+      flex: 1;
+      font-size: 13.5px;
+      padding: 6px 4px 6px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .node-label-input {
+      flex: 1;
+      font-size: 13.5px;
+      padding: 3px 6px;
+      border: 1px solid var(--navy);
+      border-radius: 3px;
+      outline: none;
+      background: var(--white);
+      font-family: inherit;
+    }
+
+    .status-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-right: 6px;
+      letter-spacing: .03em;
+    }
+    .status-live    { background: var(--live-bg);       color: var(--live);       }
+    .status-draft   { background: var(--draft-bg);      color: var(--draft);      }
+    .status-planned { background: var(--planned-bg);    color: var(--planned);    }
+    .status-deprecated { background: var(--deprecated-bg); color: var(--deprecated); }
+
+    .node-children { list-style: none; }
+    .node-children.collapsed { display: none; }
+
+    /* ========== DETAIL PANEL ========== */
+    #detail-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    #detail-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding: 16px;
+    }
+    #detail-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      gap: 10px;
+    }
+    #detail-empty .empty-icon { font-size: 40px; opacity: .35; }
+    #detail-empty p { font-size: 14px; }
+
+    #detail-content { display: none; }
+    #detail-content.visible { display: block; }
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+    .detail-url {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      word-break: break-all;
+    }
+
+    /* Accordion sections */
+    .accordion {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      background: var(--white);
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: background .12s;
+    }
+    .accordion-header:hover { background: var(--navy-pale); }
+    .accordion-arrow {
+      font-size: 11px;
+      transition: transform .18s;
+      color: var(--text-muted);
+    }
+    .accordion-arrow.open { transform: rotate(90deg); }
+    .accordion-body {
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .accordion-body.open { display: block; }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(13,43,94,.12);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 72px;
+      line-height: 1.5;
+    }
+
+    /* Link checklist */
+    .link-list { display: flex; flex-direction: column; gap: 5px; }
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    .link-item input[type="checkbox"] { accent-color: var(--navy); }
+    .link-item label { cursor: pointer; flex: 1; }
+
+    /* ========== CONTEXT MENU ========== */
+    #ctx-menu {
+      position: fixed;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 9999;
+      min-width: 160px;
+      padding: 4px 0;
+      display: none;
+    }
+    #ctx-menu.visible { display: block; }
+    .ctx-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .1s;
+      color: var(--text);
+    }
+    .ctx-item:hover { background: var(--bg); }
+    .ctx-item.danger { color: var(--deprecated); }
+    .ctx-item.danger:hover { background: var(--deprecated-bg); }
+    .ctx-sep { height: 1px; background: var(--border); margin: 3px 0; }
+
+    /* ========== TOAST ========== */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+      z-index: 99999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 24px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal h3 { font-size: 16px; color: var(--navy); margin-bottom: 14px; }
+    .modal .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+    .modal-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+    }
+    .modal-btn.cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .modal-btn.cancel:hover { background: var(--border); }
+    .modal-btn.confirm { background: var(--navy); color: #fff; }
+    .modal-btn.confirm:hover { background: var(--navy-light); }
+    .modal-btn.danger-btn { background: #dc2626; color: #fff; }
+    .modal-btn.danger-btn:hover { background: #b91c1c; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      #main { flex-direction: column; }
+      #tree-panel { width: 100%; height: 50%; border-right: none; border-bottom: 1px solid var(--border); }
+      #detail-panel { height: 50%; }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #c0c4ce; }
+  </style>
+</head>
+<body>
+
+<!-- ========== TOOLBAR ========== -->
+<div id="toolbar">
+  <span class="logo">&#128065; アイケアラボ サイトマップ</span>
+  <div class="sep"></div>
+  <button class="tb-btn primary" id="btn-add-root" title="ルートページを追加">
+    &#43; ページ追加
+  </button>
+  <button class="tb-btn primary" id="btn-add-child" disabled title="選択中ノードに子を追加">
+    &#43; 子追加
+  </button>
+  <button class="tb-btn danger" id="btn-delete" disabled title="選択中ノードを削除">
+    &#128465; 削除
+  </button>
+  <div class="sep"></div>
+  <button class="tb-btn success" id="btn-save" title="LocalStorageに保存">
+    &#128190; 保存
+  </button>
+  <button class="tb-btn accent" id="btn-export" title="JSONをエクスポート">
+    &#128203; Export JSON
+  </button>
+  <div class="spacer"></div>
+  <span id="save-indicator">未保存の変更あり</span>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div id="main">
+
+  <!-- Tree Panel -->
+  <div id="tree-panel">
+    <div id="tree-header">
+      <span>サイトマップ</span>
+      <div class="tree-actions">
+        <button class="icon-btn" id="btn-expand-all" title="すべて展開">展開</button>
+        <button class="icon-btn" id="btn-collapse-all" title="すべて折りたたむ">折畳</button>
+        <button class="icon-btn" id="btn-reset" title="初期データに戻す" style="color:#dc2626;border-color:#fca5a5;">リセット</button>
+      </div>
+    </div>
+    <div id="tree-scroll">
+      <ul id="tree-root"></ul>
+    </div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div id="detail-panel">
+    <div id="detail-scroll">
+      <div id="detail-empty">
+        <div class="empty-icon">&#128450;</div>
+        <p>ノードを選択すると詳細が表示されます</p>
+      </div>
+      <div id="detail-content">
+        <div class="detail-title" id="d-title"></div>
+        <div class="detail-url" id="d-url-display"></div>
+
+        <!-- Accordion: 基本情報 -->
+        <div class="accordion" id="acc-basic">
+          <button class="accordion-header" data-acc="basic">
+            <span>&#128196; 基本情報</span>
+            <span class="accordion-arrow open">&#9658;</span>
+          </button>
+          <div class="accordion-body open">
+            <div class="form-row">
+              <label class="form-label">ページ名</label>
+              <input class="form-input" id="d-name" type="text" placeholder="ページ名">
+            </div>
+            <div class="form-row">
+              <label class="form-label">URL / アンカー</label>
+              <input class="form-input" id="d-url" type="text" placeholder="https://... または #section">
+            </div>
+            <div class="form-row">
+              <label class="form-label">ステータス</label>
+              <select class="form-select" id="d-status">
+                <option value="live">&#9679; Live</option>
+                <option value="draft">&#9679; Draft</option>
+                <option value="planned">&#9679; Planned</option>
+                <option value="deprecated">&#9679; Deprecated</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion: メモ -->
+        <div class="accordion" id="acc-memo">
+          <button class="accordion-header" data-acc="memo">
+            <span>&#128221; メモ</span>
+            <span class="accordion-arrow">&#9658;</span>
+          </button>
+          <div class="accordion-body">
+            <div class="form-row">
+              <textarea class="form-textarea" id="d-memo" placeholder="このページについての自由メモ&#10;例: ヒーロースライダー3枚、LP要素あり"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion: コンテンツ方針 -->
+        <div class="accordion" id="acc-content">
+          <button class="accordion-header" data-acc="content">
+            <span>&#127919; コンテンツ方針</span>
+            <span class="accordion-arrow">&#9658;</span>
+          </button>
+          <div class="accordion-body">
+            <div class="form-row">
+              <label class="form-label">ターゲット</label>
+              <input class="form-input" id="d-target" type="text" placeholder="例: 30-50代 眼の疲れを感じる会社員">
+            </div>
+            <div class="form-row">
+              <label class="form-label">目的</label>
+              <input class="form-input" id="d-goal" type="text" placeholder="例: 予約CVR向上">
+            </div>
+            <div class="form-row">
+              <label class="form-label">KPI</label>
+              <input class="form-input" id="d-kpi" type="text" placeholder="例: 予約ボタンCTR 5%以上">
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion: リンク・導線 -->
+        <div class="accordion" id="acc-links">
+          <button class="accordion-header" data-acc="links">
+            <span>&#128279; リンク・導線</span>
+            <span class="accordion-arrow">&#9658;</span>
+          </button>
+          <div class="accordion-body">
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">このページから遷移するページ</p>
+            <div class="link-list" id="d-links"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-rename">&#9998; 名前を変更</div>
+  <div class="ctx-item" id="ctx-add-child">&#43; 子ページを追加</div>
+  <div class="ctx-item" id="ctx-add-sibling">&#43; 兄弟ページを追加</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" id="ctx-delete">&#128465; 削除</div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+const STORAGE_KEY = 'aicare-sitemap-v1';
+
+const DEFAULT_DATA = [
+  {
+    id: 'top', name: 'TOP', url: 'aicare-top-prototype.html', status: 'live',
+    memo: 'メインランディングページ。ヒーロースライダー3枚構成。',
+    target: '', goal: '', kpi: '', links: [],
+    children: [
+      {id: 'about',      name: '眼の整体院とは', url: '#about',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'strengths',  name: '強み',          url: '#strengths', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'menu',       name: 'メニュー・料金', url: '#menu',      status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'trust',      name: '専門機関・実績', url: '#trust',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'voice',      name: 'お客様の声',    url: '#voice',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'stores-sec', name: '店舗一覧',      url: '#stores',    status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'faq',        name: 'FAQ',           url: '#faq',       status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'sns',        name: '公式メディア',   url: '#sns',       status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'lab365-sec', name: 'アイケアラボ365', url: '#lab365',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+    ]
+  },
+  {
+    id: 'vision-check', name: 'セルフ視界チェック', url: 'aicare-vision-check.html', status: 'live',
+    memo: '10問の診断ツール。5種類の結果タイプ。',
+    target: '', goal: '', kpi: '', links: [], children: []
+  },
+  {
+    id: 'lab365', name: 'アイケアラボ365', url: 'aicare-lab365.html', status: 'live',
+    memo: 'DMMオンラインサロン風サブスクページ。',
+    target: '', goal: '', kpi: '', links: [],
+    children: [
+      {id: 'lab365-content', name: 'コンテンツフィード', url: 'aicare-lab365.html#content', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'lab365-about',   name: '概要',             url: 'aicare-lab365.html#about',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'lab365-member',  name: 'メンバー',          url: 'aicare-lab365.html#member',  status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'lab365-price',   name: '料金プラン',        url: 'aicare-lab365.html#price',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+    ]
+  },
+  {
+    id: 'stores', name: '店舗一覧', url: 'aicare-stores.html', status: 'live',
+    memo: '', target: '', goal: '', kpi: '', links: [], children: []
+  },
+  {
+    id: 'store-detail', name: '店舗詳細', url: 'aicare-store-detail.html', status: 'live',
+    memo: '', target: '', goal: '', kpi: '', links: [], children: []
+  },
+  {
+    id: 'future-1', name: 'ブログ・コラム', url: '/blog', status: 'planned',
+    memo: '将来追加予定', target: '', goal: '', kpi: '', links: [], children: []
+  }
+];
+
+function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+function ensureFields(node) {
+  node.memo    = node.memo    ?? '';
+  node.target  = node.target  ?? '';
+  node.goal    = node.goal    ?? '';
+  node.kpi     = node.kpi     ?? '';
+  node.links   = node.links   ?? [];
+  node.status  = node.status  ?? 'planned';
+  node.url     = node.url     ?? '';
+  node._open   = node._open   !== undefined ? node._open : true;
+  if (!node.children) node.children = [];
+  node.children.forEach(ensureFields);
+  return node;
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      parsed.forEach(ensureFields);
+      return parsed;
+    }
+  } catch(e) {}
+  const d = deepClone(DEFAULT_DATA);
+  d.forEach(ensureFields);
+  return d;
+}
+
+// ============================================================
+//  STATE
+// ============================================================
+let siteData = loadData();
+let selectedId = null;
+let dirty = false;
+let dragSrc = null;   // { node, parentArr, index }
+let ctxTargetId = null;
+
+// ============================================================
+//  UTILS
+// ============================================================
+let _idCounter = Date.now();
+function genId() { return 'n' + (++_idCounter); }
+
+function findNode(id, arr) {
+  for (const n of arr) {
+    if (n.id === id) return n;
+    const f = findNode(id, n.children);
+    if (f) return f;
+  }
+  return null;
+}
+
+function findParentArr(id, arr, parent) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === id) return { arr, index: i, parent };
+    const r = findParentArr(id, arr[i].children, arr[i]);
+    if (r) return r;
+  }
+  return null;
+}
+
+function getAllNodes(arr, result=[]) {
+  for (const n of arr) { result.push(n); getAllNodes(n.children, result); }
+  return result;
+}
+
+function markDirty() {
+  dirty = true;
+  document.getElementById('save-indicator').textContent = '未保存の変更あり';
+  document.getElementById('save-indicator').style.color = 'rgba(255,200,100,.9)';
+}
+
+function markClean() {
+  dirty = false;
+  const now = new Date();
+  const ts = now.getHours().toString().padStart(2,'0') + ':' +
+             now.getMinutes().toString().padStart(2,'0') + ':' +
+             now.getSeconds().toString().padStart(2,'0');
+  document.getElementById('save-indicator').textContent = '保存済 ' + ts;
+  document.getElementById('save-indicator').style.color = 'rgba(150,255,180,.85)';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============================================================
+//  SAVE / EXPORT
+// ============================================================
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+  markClean();
+  showToast('保存しました');
+}
+
+function exportJSON() {
+  const clean = deepClone(siteData);
+  function strip(nodes) {
+    nodes.forEach(n => { delete n._open; strip(n.children); });
+  }
+  strip(clean);
+  const json = JSON.stringify(clean, null, 2);
+  try {
+    navigator.clipboard.writeText(json);
+    showToast('JSONをクリップボードにコピーしました');
+  } catch(e) {
+    // fallback: download
+    const blob = new Blob([json], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'aicare-sitemap.json';
+    a.click();
+    showToast('JSONをダウンロードしました');
+  }
+}
+
+// ============================================================
+//  RENDER TREE
+// ============================================================
+function getStatusLabel(s) {
+  const map = { live:'Live', draft:'Draft', planned:'Planned', deprecated:'Dep.' };
+  return map[s] || s;
+}
+
+function getNodeIcon(node) {
+  if (node.children.length > 0) return '&#128193;';
+  if (node.url && node.url.startsWith('#')) return '&#128279;';
+  return '&#128196;';
+}
+
+function renderTree() {
+  const root = document.getElementById('tree-root');
+  root.innerHTML = '';
+  siteData.forEach(node => {
+    root.appendChild(renderNode(node, 0));
+  });
+  updateToolbar();
+}
+
+function renderNode(node, depth) {
+  const li = document.createElement('li');
+  li.className = 'tree-item';
+  li.dataset.id = node.id;
+
+  // drop line before
+  const lineBefore = document.createElement('div');
+  lineBefore.className = 'drop-line';
+  lineBefore.dataset.dropBefore = node.id;
+  li.appendChild(lineBefore);
+
+  // row
+  const row = document.createElement('div');
+  row.className = 'tree-row' + (node.id === selectedId ? ' selected' : '');
+  row.dataset.id = node.id;
+  row.style.paddingLeft = (depth * 20 + 4) + 'px';
+  row.draggable = false; // handle-based drag
+
+  // drag handle
+  const handle = document.createElement('span');
+  handle.className = 'drag-handle';
+  handle.innerHTML = '&#8942;';
+  handle.draggable = true;
+  handle.addEventListener('dragstart', e => onDragStart(e, node.id));
+  handle.addEventListener('dragend',   e => onDragEnd(e));
+  row.appendChild(handle);
+
+  // toggle
+  const toggle = document.createElement('button');
+  toggle.className = 'toggle-btn' + (node.children.length === 0 ? ' leaf' : (node._open ? '' : ' collapsed'));
+  toggle.innerHTML = '&#9660;';
+  toggle.addEventListener('click', e => { e.stopPropagation(); toggleNode(node.id); });
+  row.appendChild(toggle);
+
+  // icon
+  const icon = document.createElement('span');
+  icon.className = 'node-icon';
+  icon.innerHTML = getNodeIcon(node);
+  row.appendChild(icon);
+
+  // label
+  const label = document.createElement('span');
+  label.className = 'node-label';
+  label.textContent = node.name;
+  label.addEventListener('dblclick', e => { e.stopPropagation(); startInlineEdit(node.id, label); });
+  row.appendChild(label);
+
+  // badge
+  const badge = document.createElement('span');
+  badge.className = 'status-badge status-' + node.status;
+  badge.textContent = getStatusLabel(node.status);
+  row.appendChild(badge);
+
+  // row events
+  row.addEventListener('click', () => selectNode(node.id));
+  row.addEventListener('contextmenu', e => openCtxMenu(e, node.id));
+  row.addEventListener('dragover',  e => onDragOver(e, node.id, 'child'));
+  row.addEventListener('dragleave', e => onDragLeaveChild(e, row));
+  row.addEventListener('drop',      e => onDropChild(e, node.id));
+
+  li.appendChild(row);
+
+  // drop line after (for last child / same level)
+  const lineAfter = document.createElement('div');
+  lineAfter.className = 'drop-line';
+  lineAfter.dataset.dropAfter = node.id;
+  li.appendChild(lineAfter);
+
+  // children
+  if (node.children.length > 0) {
+    const ul = document.createElement('ul');
+    ul.className = 'node-children' + (node._open ? '' : ' collapsed');
+    ul.dataset.parentId = node.id;
+    node.children.forEach(child => ul.appendChild(renderNode(child, depth + 1)));
+    li.appendChild(ul);
+  }
+
+  // drop-line events
+  [lineBefore, lineAfter].forEach((line, idx) => {
+    const position = idx === 0 ? 'before' : 'after';
+    line.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (canDrop(node.id)) {
+        line.classList.add('active');
+      }
+    });
+    line.addEventListener('dragleave', () => line.classList.remove('active'));
+    line.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      line.classList.remove('active');
+      onDropSibling(e, node.id, position);
+    });
+  });
+
+  return li;
+}
+
+// ============================================================
+//  NODE INTERACTION
+// ============================================================
+function selectNode(id) {
+  selectedId = id;
+  renderTree();
+  renderDetail();
+  updateToolbar();
+}
+
+function toggleNode(id) {
+  const node = findNode(id, siteData);
+  if (node) {
+    node._open = !node._open;
+    renderTree();
+    markDirty();
+  }
+}
+
+function updateToolbar() {
+  const hasSel = !!selectedId;
+  document.getElementById('btn-add-child').disabled = !hasSel;
+  document.getElementById('btn-delete').disabled = !hasSel;
+}
+
+function startInlineEdit(id, labelEl) {
+  const node = findNode(id, siteData);
+  if (!node) return;
+  const input = document.createElement('input');
+  input.className = 'node-label-input';
+  input.value = node.name;
+  labelEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  function commit() {
+    const val = input.value.trim() || node.name;
+    node.name = val;
+    markDirty();
+    renderTree();
+    renderDetail();
+  }
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') { renderTree(); }
+  });
+}
+
+// ============================================================
+//  ADD / DELETE
+// ============================================================
+function addRootNode() {
+  const node = { id: genId(), name: '新規ページ', url: '', status: 'planned',
+                 memo: '', target: '', goal: '', kpi: '', links: [], children: [], _open: true };
+  siteData.push(node);
+  selectedId = node.id;
+  markDirty();
+  renderTree();
+  renderDetail();
+  // auto-focus name
+  setTimeout(() => {
+    const el = document.getElementById('d-name');
+    if (el) { el.focus(); el.select(); }
+  }, 50);
+}
+
+function addChildNode(parentId) {
+  const parent = findNode(parentId, siteData);
+  if (!parent) return;
+  const node = { id: genId(), name: '新規子ページ', url: '', status: 'planned',
+                 memo: '', target: '', goal: '', kpi: '', links: [], children: [], _open: true };
+  parent.children.push(node);
+  parent._open = true;
+  selectedId = node.id;
+  markDirty();
+  renderTree();
+  renderDetail();
+  setTimeout(() => {
+    const el = document.getElementById('d-name');
+    if (el) { el.focus(); el.select(); }
+  }, 50);
+}
+
+function addSiblingNode(siblingId) {
+  const found = findParentArr(siblingId, siteData, null);
+  if (!found) return;
+  const node = { id: genId(), name: '新規ページ', url: '', status: 'planned',
+                 memo: '', target: '', goal: '', kpi: '', links: [], children: [], _open: true };
+  found.arr.splice(found.index + 1, 0, node);
+  selectedId = node.id;
+  markDirty();
+  renderTree();
+  renderDetail();
+  setTimeout(() => {
+    const el = document.getElementById('d-name');
+    if (el) { el.focus(); el.select(); }
+  }, 50);
+}
+
+function deleteNode(id) {
+  const found = findParentArr(id, siteData, null);
+  if (!found) return;
+  found.arr.splice(found.index, 1);
+  if (selectedId === id) selectedId = null;
+  markDirty();
+  renderTree();
+  renderDetail();
+}
+
+function confirmDelete(id) {
+  const node = findNode(id, siteData);
+  if (!node) return;
+  const hasChildren = node.children.length > 0;
+  const msg = hasChildren
+    ? `「${node.name}」と${node.children.length}個の子ページを削除しますか？`
+    : `「${node.name}」を削除しますか？`;
+  showModal(msg, () => deleteNode(id), true);
+}
+
+// ============================================================
+//  DETAIL PANEL
+// ============================================================
+function renderDetail() {
+  const empty = document.getElementById('detail-empty');
+  const content = document.getElementById('detail-content');
+
+  if (!selectedId) {
+    empty.style.display = 'flex';
+    content.classList.remove('visible');
+    return;
+  }
+  const node = findNode(selectedId, siteData);
+  if (!node) {
+    empty.style.display = 'flex';
+    content.classList.remove('visible');
+    return;
+  }
+
+  empty.style.display = 'none';
+  content.classList.add('visible');
+
+  document.getElementById('d-title').textContent = node.name;
+  document.getElementById('d-url-display').textContent = node.url || '（URLなし）';
+
+  // fields — suppress events during fill
+  _filling = true;
+  document.getElementById('d-name').value    = node.name;
+  document.getElementById('d-url').value     = node.url;
+  document.getElementById('d-status').value  = node.status;
+  document.getElementById('d-memo').value    = node.memo;
+  document.getElementById('d-target').value  = node.target;
+  document.getElementById('d-goal').value    = node.goal;
+  document.getElementById('d-kpi').value     = node.kpi;
+  _filling = false;
+
+  // links checklist
+  renderLinksChecklist(node);
+}
+
+let _filling = false;
+
+function bindDetailInputs() {
+  function onChange(field, getValue) {
+    return function() {
+      if (_filling) return;
+      const node = findNode(selectedId, siteData);
+      if (!node) return;
+      node[field] = getValue ? getValue(this) : this.value;
+      if (field === 'name') {
+        document.getElementById('d-title').textContent = node.name;
+        // refresh badge/label in tree
+        const row = document.querySelector(`.tree-row[data-id="${node.id}"] .node-label`);
+        if (row) row.textContent = node.name;
+      }
+      if (field === 'status') {
+        const badge = document.querySelector(`.tree-row[data-id="${node.id}"] .status-badge`);
+        if (badge) {
+          badge.className = 'status-badge status-' + node.status;
+          badge.textContent = getStatusLabel(node.status);
+        }
+      }
+      if (field === 'url') {
+        document.getElementById('d-url-display').textContent = node.url || '（URLなし）';
+      }
+      markDirty();
+    };
+  }
+
+  document.getElementById('d-name').addEventListener('input', onChange('name'));
+  document.getElementById('d-url').addEventListener('input', onChange('url'));
+  document.getElementById('d-status').addEventListener('change', onChange('status'));
+  document.getElementById('d-memo').addEventListener('input', onChange('memo'));
+  document.getElementById('d-target').addEventListener('input', onChange('target'));
+  document.getElementById('d-goal').addEventListener('input', onChange('goal'));
+  document.getElementById('d-kpi').addEventListener('input', onChange('kpi'));
+}
+
+function renderLinksChecklist(node) {
+  const container = document.getElementById('d-links');
+  container.innerHTML = '';
+  const all = getAllNodes(siteData).filter(n => n.id !== node.id);
+  all.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'link-item';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = 'link-' + n.id;
+    cb.checked = (node.links || []).includes(n.id);
+    cb.addEventListener('change', () => {
+      if (_filling) return;
+      const target = findNode(selectedId, siteData);
+      if (!target) return;
+      if (cb.checked) {
+        if (!target.links.includes(n.id)) target.links.push(n.id);
+      } else {
+        target.links = target.links.filter(id => id !== n.id);
+      }
+      markDirty();
+    });
+    const lbl = document.createElement('label');
+    lbl.htmlFor = 'link-' + n.id;
+    lbl.textContent = n.name;
+    const badge = document.createElement('span');
+    badge.className = 'status-badge status-' + n.status;
+    badge.textContent = getStatusLabel(n.status);
+    item.appendChild(cb);
+    item.appendChild(lbl);
+    item.appendChild(badge);
+    container.appendChild(item);
+  });
+}
+
+// ============================================================
+//  ACCORDION
+// ============================================================
+function bindAccordions() {
+  document.querySelectorAll('.accordion-header').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const body = btn.nextElementSibling;
+      const arrow = btn.querySelector('.accordion-arrow');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      arrow.classList.toggle('open', !isOpen);
+    });
+  });
+}
+
+// ============================================================
+//  DRAG & DROP
+// ============================================================
+function canDrop(targetId) {
+  if (!dragSrc) return false;
+  if (dragSrc.id === targetId) return false;
+  // prevent dropping into own descendant
+  function isDescendant(ancestorId, checkId) {
+    const anc = findNode(ancestorId, siteData);
+    if (!anc) return false;
+    for (const c of anc.children) {
+      if (c.id === checkId || isDescendant(c.id, checkId)) return true;
+    }
+    return false;
+  }
+  if (isDescendant(dragSrc.id, targetId)) return false;
+  return true;
+}
+
+function onDragStart(e, id) {
+  dragSrc = { id };
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(() => {
+    const row = document.querySelector(`.tree-row[data-id="${id}"]`);
+    if (row) row.classList.add('dragging');
+  }, 0);
+}
+
+function onDragEnd(e) {
+  // clean up all highlights
+  document.querySelectorAll('.drop-line.active').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.tree-row.drag-over-child').forEach(r => r.classList.remove('drag-over-child'));
+  document.querySelectorAll('.tree-row.dragging').forEach(r => r.classList.remove('dragging'));
+  dragSrc = null;
+}
+
+function onDragOver(e, targetId, mode) {
+  if (!canDrop(targetId)) return;
+  const target = findNode(targetId, siteData);
+  // only allow drop as child if node is open or has no children
+  if (mode === 'child') {
+    e.preventDefault();
+    e.stopPropagation();
+    const row = document.querySelector(`.tree-row[data-id="${targetId}"]`);
+    if (row) row.classList.add('drag-over-child');
+  }
+}
+
+function onDragLeaveChild(e, row) {
+  if (!row.contains(e.relatedTarget)) {
+    row.classList.remove('drag-over-child');
+  }
+}
+
+function onDropChild(e, targetId) {
+  e.preventDefault();
+  e.stopPropagation();
+  const row = document.querySelector(`.tree-row[data-id="${targetId}"]`);
+  if (row) row.classList.remove('drag-over-child');
+
+  if (!dragSrc || !canDrop(targetId)) return;
+
+  const target = findNode(targetId, siteData);
+  if (!target) return;
+
+  // remove from source
+  const srcInfo = findParentArr(dragSrc.id, siteData, null);
+  if (!srcInfo) return;
+  const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
+
+  // add as last child of target
+  target.children.push(moved);
+  target._open = true;
+
+  markDirty();
+  renderTree();
+  if (selectedId === dragSrc.id) renderDetail();
+}
+
+function onDropSibling(e, refId, position) {
+  if (!dragSrc || !canDrop(refId)) return;
+
+  const refInfo = findParentArr(refId, siteData, null);
+  if (!refInfo) return;
+
+  const srcInfo = findParentArr(dragSrc.id, siteData, null);
+  if (!srcInfo) return;
+
+  const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
+
+  // recalculate refInfo after removal (index may have shifted)
+  const refInfo2 = findParentArr(refId, siteData, null);
+  if (!refInfo2) {
+    // re-insert at original position if not found
+    srcInfo.arr.splice(srcInfo.index, 0, moved);
+    return;
+  }
+
+  const insertIdx = position === 'before' ? refInfo2.index : refInfo2.index + 1;
+  refInfo2.arr.splice(insertIdx, 0, moved);
+
+  markDirty();
+  renderTree();
+  if (selectedId === dragSrc.id) renderDetail();
+}
+
+// ============================================================
+//  CONTEXT MENU
+// ============================================================
+function openCtxMenu(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  ctxTargetId = id;
+  selectNode(id);
+  const menu = document.getElementById('ctx-menu');
+  menu.style.left = e.clientX + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight - 160) + 'px';
+  menu.classList.add('visible');
+}
+
+function closeCtxMenu() {
+  document.getElementById('ctx-menu').classList.remove('visible');
+  ctxTargetId = null;
+}
+
+document.addEventListener('click', closeCtxMenu);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCtxMenu(); });
+
+document.getElementById('ctx-rename').addEventListener('click', () => {
+  if (!ctxTargetId) return;
+  const label = document.querySelector(`.tree-row[data-id="${ctxTargetId}"] .node-label`);
+  if (label) startInlineEdit(ctxTargetId, label);
+  closeCtxMenu();
+});
+document.getElementById('ctx-add-child').addEventListener('click', () => {
+  if (ctxTargetId) addChildNode(ctxTargetId);
+  closeCtxMenu();
+});
+document.getElementById('ctx-add-sibling').addEventListener('click', () => {
+  if (ctxTargetId) addSiblingNode(ctxTargetId);
+  closeCtxMenu();
+});
+document.getElementById('ctx-delete').addEventListener('click', () => {
+  if (ctxTargetId) confirmDelete(ctxTargetId);
+  closeCtxMenu();
+});
+
+// ============================================================
+//  MODAL
+// ============================================================
+function showModal(message, onConfirm, isDanger = false) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>確認</h3>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.6;">${message}</p>
+      <div class="modal-footer">
+        <button class="modal-btn cancel">キャンセル</button>
+        <button class="modal-btn ${isDanger ? 'danger-btn' : 'confirm'}">${isDanger ? '削除する' : 'OK'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelector(isDanger ? '.danger-btn' : '.confirm').addEventListener('click', () => {
+    overlay.remove();
+    onConfirm();
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+// ============================================================
+//  EXPAND / COLLAPSE ALL
+// ============================================================
+function setAllOpen(nodes, val) {
+  nodes.forEach(n => { n._open = val; setAllOpen(n.children, val); });
+}
+
+// ============================================================
+//  RESET
+// ============================================================
+function resetToDefault() {
+  showModal('初期データに戻します。現在のデータは失われます。', () => {
+    siteData = deepClone(DEFAULT_DATA);
+    siteData.forEach(ensureFields);
+    selectedId = null;
+    markDirty();
+    renderTree();
+    renderDetail();
+  }, true);
+}
+
+// ============================================================
+//  TOOLBAR BUTTONS
+// ============================================================
+document.getElementById('btn-add-root').addEventListener('click', addRootNode);
+document.getElementById('btn-add-child').addEventListener('click', () => { if (selectedId) addChildNode(selectedId); });
+document.getElementById('btn-delete').addEventListener('click', () => { if (selectedId) confirmDelete(selectedId); });
+document.getElementById('btn-save').addEventListener('click', save);
+document.getElementById('btn-export').addEventListener('click', exportJSON);
+document.getElementById('btn-expand-all').addEventListener('click', () => {
+  setAllOpen(siteData, true); markDirty(); renderTree();
+});
+document.getElementById('btn-collapse-all').addEventListener('click', () => {
+  setAllOpen(siteData, false); markDirty(); renderTree();
+});
+document.getElementById('btn-reset').addEventListener('click', resetToDefault);
+
+// ============================================================
+//  AUTO-SAVE on page unload
+// ============================================================
+window.addEventListener('beforeunload', () => {
+  if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+});
+
+// ============================================================
+//  KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    save();
+  }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selectedId) confirmDelete(selectedId);
+  }
+});
+
+// ============================================================
+//  INIT
+// ============================================================
+bindAccordions();
+bindDetailInputs();
+renderTree();
+renderDetail();
+markClean(); // loaded state is "clean"
+
+// Auto-save interval every 60 seconds
+setInterval(() => {
+  if (dirty) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+    markClean();
+  }
+}, 60000);
+</script>
+</body>
+</html>
