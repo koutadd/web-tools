@@ -375,18 +375,53 @@
     }
 
     /* Link checklist */
-    .link-list { display: flex; flex-direction: column; gap: 5px; }
-    .link-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 8px;
-      background: var(--bg);
-      border-radius: 4px;
-      font-size: 12.5px;
+    /* ---- 導線チェック ---- */
+    .link-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin: 10px 0 5px; display: flex; align-items: center; gap: 5px;
     }
-    .link-item input[type="checkbox"] { accent-color: var(--navy); }
-    .link-item label { cursor: pointer; flex: 1; }
+    .link-section-title:first-child { margin-top: 0; }
+    .link-list { display: flex; flex-direction: column; gap: 4px; }
+    .link-item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 8px; background: var(--bg);
+      border-radius: 4px; font-size: 12.5px;
+      border: 1px solid transparent; transition: border-color .12s;
+    }
+    .link-item.is-linked { background: #f0f5ff; border-color: #c7d8f8; }
+    .link-item input[type="checkbox"] { accent-color: var(--navy); flex-shrink: 0; }
+    .link-item label { cursor: pointer; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .link-url-badge {
+      font-size: 10px; color: var(--text-muted);
+      background: rgba(0,0,0,.05); padding: 1px 5px; border-radius: 3px;
+      max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .link-open-btn {
+      flex-shrink: 0; padding: 2px 7px; font-size: 11px; font-weight: 600;
+      border: 1px solid var(--border); border-radius: 3px; background: var(--white);
+      color: var(--navy); cursor: pointer; text-decoration: none;
+      transition: background .1s, border-color .1s;
+      display: inline-flex; align-items: center; gap: 3px;
+    }
+    .link-open-btn:hover { background: var(--navy-pale); border-color: var(--navy); }
+    .link-verify-btn {
+      flex-shrink: 0; padding: 2px 7px; font-size: 11px;
+      border: 1px solid var(--border); border-radius: 3px; background: var(--white);
+      cursor: pointer; transition: all .1s; font-weight: 500;
+    }
+    .link-verify-btn[data-state="ok"]   { background: #dcfce7; border-color: #86efac; color: #15803d; }
+    .link-verify-btn[data-state="ng"]   { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+    .link-verify-btn[data-state="none"] { color: var(--text-muted); }
+    .link-verify-btn:hover { border-color: var(--navy); }
+    .incoming-item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 8px; background: #fafbff; border-radius: 4px;
+      font-size: 12px; border: 1px solid #e8eef7;
+    }
+    .incoming-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--navy); flex-shrink: 0; opacity: .5; }
+    .link-none { font-size: 12px; color: var(--text-muted); padding: 4px 2px; }
 
     /* ========== CONTEXT MENU ========== */
     #ctx-menu {
@@ -605,12 +640,11 @@
         <!-- Accordion: リンク・導線 -->
         <div class="accordion" id="acc-links">
           <button class="accordion-header" data-acc="links">
-            <span>&#128279; リンク・導線</span>
+            <span>&#128279; 導線チェック</span>
             <span class="accordion-arrow">&#9658;</span>
           </button>
           <div class="accordion-body">
-            <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">このページから遷移するページ</p>
-            <div class="link-list" id="d-links"></div>
+            <div id="d-links"></div>
           </div>
         </div>
       </div>
@@ -686,12 +720,13 @@ const DEFAULT_DATA = [
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 function ensureFields(node) {
-  node.memo    = node.memo    ?? '';
-  node.target  = node.target  ?? '';
-  node.goal    = node.goal    ?? '';
-  node.kpi     = node.kpi     ?? '';
-  node.links   = node.links   ?? [];
-  node.status  = node.status  ?? 'planned';
+  node.memo       = node.memo       ?? '';
+  node.target     = node.target     ?? '';
+  node.goal       = node.goal       ?? '';
+  node.kpi        = node.kpi        ?? '';
+  node.links      = node.links      ?? [];
+  node.linkChecks = node.linkChecks ?? {};   // { targetId: 'ok'|'ng'|'none' }
+  node.status     = node.status     ?? 'planned';
   node.url     = node.url     ?? '';
   node._open   = node._open   !== undefined ? node._open : true;
   if (!node.children) node.children = [];
@@ -1132,35 +1167,145 @@ function renderLinksChecklist(node) {
   const container = document.getElementById('d-links');
   container.innerHTML = '';
   const all = getAllNodes(siteData).filter(n => n.id !== node.id);
+  const linkedIds = node.links || [];
+  const checks    = node.linkChecks || {};
+
+  // ── 発リンク ────────────────────────────────
+  const outTitle = document.createElement('div');
+  outTitle.className = 'link-section-title';
+  outTitle.innerHTML = '&#8594; このページからの導線';
+  container.appendChild(outTitle);
+
+  const outList = document.createElement('div');
+  outList.className = 'link-list';
+  container.appendChild(outList);
+
   all.forEach(n => {
+    const isLinked = linkedIds.includes(n.id);
     const item = document.createElement('div');
-    item.className = 'link-item';
+    item.className = 'link-item' + (isLinked ? ' is-linked' : '');
+
+    // checkbox
     const cb = document.createElement('input');
     cb.type = 'checkbox';
-    cb.id = 'link-' + n.id;
-    cb.checked = (node.links || []).includes(n.id);
+    cb.checked = isLinked;
     cb.addEventListener('change', () => {
       if (_filling) return;
-      const target = findNode(selectedId, siteData);
-      if (!target) return;
-      if (cb.checked) {
-        if (!target.links.includes(n.id)) target.links.push(n.id);
-      } else {
-        target.links = target.links.filter(id => id !== n.id);
-      }
+      const src = findNode(selectedId, siteData);
+      if (!src) return;
+      if (cb.checked) { if (!src.links.includes(n.id)) src.links.push(n.id); }
+      else            { src.links = src.links.filter(id => id !== n.id); }
       markDirty();
+      renderLinksChecklist(src);
     });
-    const lbl = document.createElement('label');
-    lbl.htmlFor = 'link-' + n.id;
-    lbl.textContent = n.name;
-    const badge = document.createElement('span');
-    badge.className = 'status-badge status-' + n.status;
-    badge.textContent = getStatusLabel(n.status);
     item.appendChild(cb);
+
+    // label
+    const lbl = document.createElement('label');
+    lbl.textContent = n.name;
+    lbl.style.cssText = 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;';
+    lbl.addEventListener('click', () => cb.click());
     item.appendChild(lbl);
-    item.appendChild(badge);
-    container.appendChild(item);
+
+    if (isLinked) {
+      // URL badge
+      if (n.url) {
+        const urlBadge = document.createElement('span');
+        urlBadge.className = 'link-url-badge';
+        urlBadge.textContent = n.url;
+        urlBadge.title = n.url;
+        item.appendChild(urlBadge);
+      }
+
+      // 開くボタン
+      if (n.url) {
+        const openBtn = document.createElement('a');
+        openBtn.className = 'link-open-btn';
+        openBtn.href = n.url.startsWith('#') ? 'aicare-top-prototype.html' + n.url : n.url;
+        openBtn.target = '_blank';
+        openBtn.rel = 'noopener';
+        openBtn.innerHTML = '&#128279; 開く';
+        item.appendChild(openBtn);
+      }
+
+      // 検証ボタン (OK / NG / 未)
+      const state = checks[n.id] || 'none';
+      const verifyBtn = document.createElement('button');
+      verifyBtn.className = 'link-verify-btn';
+      verifyBtn.dataset.state = state;
+      verifyBtn.title = '検証ステータスをトグル';
+      const stateLabels = { none: '未確認', ok: '✓ OK', ng: '✗ NG' };
+      verifyBtn.textContent = stateLabels[state];
+      verifyBtn.addEventListener('click', () => {
+        const src = findNode(selectedId, siteData);
+        if (!src) return;
+        if (!src.linkChecks) src.linkChecks = {};
+        const next = { none: 'ok', ok: 'ng', ng: 'none' }[verifyBtn.dataset.state];
+        src.linkChecks[n.id] = next;
+        verifyBtn.dataset.state = next;
+        verifyBtn.textContent = stateLabels[next];
+        markDirty();
+      });
+      item.appendChild(verifyBtn);
+    }
+
+    outList.appendChild(item);
   });
+
+  if (all.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'link-none';
+    none.textContent = '他にページがありません';
+    outList.appendChild(none);
+  }
+
+  // ── 着リンク ────────────────────────────────
+  const inTitle = document.createElement('div');
+  inTitle.className = 'link-section-title';
+  inTitle.style.marginTop = '14px';
+  inTitle.innerHTML = '&#8592; このページへの導線（被リンク）';
+  container.appendChild(inTitle);
+
+  const inList = document.createElement('div');
+  inList.className = 'link-list';
+  container.appendChild(inList);
+
+  const incoming = getAllNodes(siteData).filter(n => n.id !== node.id && (n.links || []).includes(node.id));
+  if (incoming.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'link-none';
+    none.textContent = 'このページへ繋がる導線はまだありません';
+    inList.appendChild(none);
+  } else {
+    incoming.forEach(n => {
+      const item = document.createElement('div');
+      item.className = 'incoming-item';
+      const dot = document.createElement('span');
+      dot.className = 'incoming-dot';
+      const lbl = document.createElement('span');
+      lbl.style.flex = '1';
+      lbl.textContent = n.name;
+      const checkState = (n.linkChecks || {})[node.id] || 'none';
+      const stateLbl = { none: '', ok: '✓ OK', ng: '✗ NG' }[checkState];
+      if (stateLbl) {
+        const s = document.createElement('span');
+        s.className = 'link-verify-btn';
+        s.dataset.state = checkState;
+        s.textContent = stateLbl;
+        s.style.pointerEvents = 'none';
+        item.appendChild(dot); item.appendChild(lbl); item.appendChild(s);
+      } else {
+        item.appendChild(dot); item.appendChild(lbl);
+      }
+      const jumpBtn = document.createElement('button');
+      jumpBtn.className = 'link-open-btn';
+      jumpBtn.innerHTML = '&#128269; 選択';
+      jumpBtn.title = n.name + ' を選択';
+      jumpBtn.addEventListener('click', () => selectNode(n.id));
+      item.appendChild(jumpBtn);
+      inList.appendChild(item);
+    });
+  }
 }
 
 // ============================================================
