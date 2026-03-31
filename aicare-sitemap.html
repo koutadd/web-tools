@@ -542,6 +542,10 @@
   <button class="tb-btn accent" id="btn-export" title="JSONをエクスポート">
     &#128203; Export JSON
   </button>
+  <div class="sep"></div>
+  <button class="tb-btn primary" id="btn-flowmap" title="導線マップを表示">
+    &#128202; 導線マップ
+  </button>
   <div class="spacer"></div>
   <span id="save-indicator">未保存の変更あり</span>
 </div>
@@ -652,6 +656,39 @@
   </div>
 </div>
 
+<!-- ========== FLOW MAP OVERLAY ========== -->
+<div id="flow-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#f0f2f7;flex-direction:column;">
+  <div id="flow-toolbar" style="height:48px;background:var(--navy);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.3);">
+    <span style="font-weight:700;font-size:15px;color:#fff;margin-right:8px;">&#128202; 導線マップ</span>
+    <div style="width:1px;height:24px;background:rgba(255,255,255,.25);"></div>
+    <button class="tb-btn primary" id="fm-zoom-in">＋</button>
+    <button class="tb-btn primary" id="fm-zoom-out">－</button>
+    <button class="tb-btn primary" id="fm-fit">全体表示</button>
+    <div style="width:1px;height:24px;background:rgba(255,255,255,.25);"></div>
+    <!-- 凡例 -->
+    <div style="display:flex;align-items:center;gap:14px;font-size:11px;color:rgba(255,255,255,.75);">
+      <span style="display:flex;align-items:center;gap:4px;"><svg width="28" height="8"><line x1="2" y1="4" x2="26" y2="4" stroke="#aab8cc" stroke-width="1.5"/></svg>階層</span>
+      <span style="display:flex;align-items:center;gap:4px;"><svg width="28" height="8"><line x1="2" y1="4" x2="22" y2="4" stroke="#3b82f6" stroke-width="2"/><polygon points="22,1 28,4 22,7" fill="#3b82f6"/></svg>発リンク</span>
+      <span style="display:flex;align-items:center;gap:4px;"><svg width="28" height="8"><line x1="2" y1="4" x2="22" y2="4" stroke="#f97316" stroke-width="2" stroke-dasharray="4,2"/><polygon points="22,1 28,4 22,7" fill="#f97316"/></svg>TOPへ戻る</span>
+      <span style="display:flex;align-items:center;gap:4px;"><svg width="28" height="8"><line x1="2" y1="4" x2="22" y2="4" stroke="#8b5cf6" stroke-width="2"/><polygon points="22,1 28,4 22,7" fill="#8b5cf6"/></svg>セクション内</span>
+    </div>
+    <div style="flex:1;"></div>
+    <button class="tb-btn danger" id="fm-close">✕ 閉じる</button>
+  </div>
+  <div id="flow-canvas-wrap" style="flex:1;overflow:hidden;position:relative;cursor:grab;">
+    <svg id="flow-svg" style="width:100%;height:100%;position:absolute;top:0;left:0;">
+      <defs>
+        <marker id="arrow-blue"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0,0 0,6 8,3" fill="#3b82f6"/></marker>
+        <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0,0 0,6 8,3" fill="#f97316"/></marker>
+        <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0,0 0,6 8,3" fill="#8b5cf6"/></marker>
+        <marker id="arrow-blue-hi"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0,0 0,6 8,3" fill="#1d4ed8"/></marker>
+        <marker id="arrow-orange-hi" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0,0 0,6 8,3" fill="#ea580c"/></marker>
+      </defs>
+      <g id="flow-g"></g>
+    </svg>
+  </div>
+</div>
+
 <!-- Context Menu -->
 <div id="ctx-menu">
   <div class="ctx-item" id="ctx-rename">&#9998; 名前を変更</div>
@@ -674,7 +711,7 @@ const DEFAULT_DATA = [
   {
     id: 'top', name: 'TOP', url: 'aicare-top-prototype.html', status: 'live',
     memo: 'メインランディングページ。ヒーロースライダー3枚構成。',
-    target: '', goal: '', kpi: '', links: [],
+    target: '', goal: '', kpi: '', links: ['vision-check', 'lab365', 'stores'],
     children: [
       {id: 'about',      name: '眼の整体院とは', url: '#about',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
       {id: 'strengths',  name: '強み',          url: '#strengths', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
@@ -690,12 +727,12 @@ const DEFAULT_DATA = [
   {
     id: 'vision-check', name: 'セルフ視界チェック', url: 'aicare-vision-check.html', status: 'live',
     memo: '10問の診断ツール。5種類の結果タイプ。',
-    target: '', goal: '', kpi: '', links: [], children: []
+    target: '', goal: '', kpi: '', links: ['top', 'lab365'], children: []
   },
   {
     id: 'lab365', name: 'アイケアラボ365', url: 'aicare-lab365.html', status: 'live',
     memo: 'DMMオンラインサロン風サブスクページ。',
-    target: '', goal: '', kpi: '', links: [],
+    target: '', goal: '', kpi: '', links: ['top', 'vision-check'],
     children: [
       {id: 'lab365-content', name: 'コンテンツフィード', url: 'aicare-lab365.html#content', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
       {id: 'lab365-about',   name: '概要',             url: 'aicare-lab365.html#about',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
@@ -1506,6 +1543,280 @@ setInterval(() => {
     markClean();
   }
 }, 60000);
+
+// ============================================================
+//  FLOW MAP
+// ============================================================
+const NODE_W = 160, NODE_H = 48, H_GAP = 100, V_GAP = 18;
+let fmScale = 1, fmTx = 40, fmTy = 40;
+let fmDragging = false, fmDragStart = null;
+let fmHighlight = null; // highlighted node id
+
+function openFlowMap() {
+  const ov = document.getElementById('flow-overlay');
+  ov.style.display = 'flex';
+  renderFlowMap();
+}
+function closeFlowMap() {
+  document.getElementById('flow-overlay').style.display = 'none';
+}
+
+document.getElementById('btn-flowmap').addEventListener('click', openFlowMap);
+document.getElementById('fm-close').addEventListener('click', closeFlowMap);
+document.getElementById('fm-zoom-in').addEventListener('click', () => { fmScale = Math.min(fmScale * 1.2, 3); applyTransform(); });
+document.getElementById('fm-zoom-out').addEventListener('click', () => { fmScale = Math.max(fmScale / 1.2, 0.2); applyTransform(); });
+document.getElementById('fm-fit').addEventListener('click', fitView);
+
+// pan
+const wrap = document.getElementById('flow-canvas-wrap');
+wrap.addEventListener('mousedown', e => {
+  if (e.target.closest('.fm-node')) return;
+  fmDragging = true; fmDragStart = { x: e.clientX - fmTx, y: e.clientY - fmTy };
+  wrap.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if (!fmDragging) return;
+  fmTx = e.clientX - fmDragStart.x;
+  fmTy = e.clientY - fmDragStart.y;
+  applyTransform();
+});
+window.addEventListener('mouseup', () => { fmDragging = false; wrap.style.cursor = 'grab'; });
+wrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = wrap.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  fmTx = mx - (mx - fmTx) * delta;
+  fmTy = my - (my - fmTy) * delta;
+  fmScale = Math.min(Math.max(fmScale * delta, 0.2), 3);
+  applyTransform();
+}, { passive: false });
+
+function applyTransform() {
+  document.getElementById('flow-g').setAttribute('transform', `translate(${fmTx},${fmTy}) scale(${fmScale})`);
+}
+
+function calcPositions() {
+  const pos = {};
+  const yCounter = { v: 0 };
+  function walk(nodes, depth) {
+    nodes.forEach(node => {
+      pos[node.id] = { x: depth * (NODE_W + H_GAP), y: yCounter.v * (NODE_H + V_GAP), w: NODE_W, h: NODE_H };
+      yCounter.v++;
+      if (node.children && node.children.length) walk(node.children, depth + 1);
+    });
+  }
+  walk(siteData, 0);
+  return pos;
+}
+
+function fitView() {
+  const pos = calcPositions();
+  const ids = Object.keys(pos);
+  if (!ids.length) return;
+  const wrap = document.getElementById('flow-canvas-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const xs = ids.map(id => pos[id].x), ys = ids.map(id => pos[id].y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs) + NODE_W;
+  const minY = Math.min(...ys), maxY = Math.max(...ys) + NODE_H;
+  const contentW = maxX - minX, contentH = maxY - minY;
+  fmScale = Math.min((W - 80) / contentW, (H - 80) / contentH, 1.5);
+  fmTx = (W - contentW * fmScale) / 2 - minX * fmScale;
+  fmTy = (H - contentH * fmScale) / 2 - minY * fmScale;
+  applyTransform();
+}
+
+function statusColor(status) {
+  return { live:'#16a34a', draft:'#ea580c', planned:'#4b6896', deprecated:'#9f4040' }[status] || '#888';
+}
+
+function renderFlowMap() {
+  const g = document.getElementById('flow-g');
+  g.innerHTML = '';
+  const pos = calcPositions();
+  const allNodes = getAllNodes(siteData);
+  const topId = siteData[0]?.id || 'top';
+
+  // helper: center of node edge
+  function cx(id) { return pos[id] ? pos[id].x + pos[id].w / 2 : 0; }
+  function cy(id) { return pos[id] ? pos[id].y + pos[id].h / 2 : 0; }
+  function rightX(id) { return pos[id] ? pos[id].x + pos[id].w : 0; }
+  function leftX(id)  { return pos[id] ? pos[id].x : 0; }
+
+  // ── 1. 階層エッジ（グレー） ──────────────────────
+  function drawHierarchy(nodes) {
+    nodes.forEach(node => {
+      node.children.forEach(child => {
+        if (!pos[node.id] || !pos[child.id]) return;
+        const x1 = rightX(node.id), y1 = cy(node.id);
+        const x2 = leftX(child.id), y2 = cy(child.id);
+        const mx = (x1 + x2) / 2;
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', fmHighlight === node.id || fmHighlight === child.id ? '#94a3b8' : '#cbd5e1');
+        path.setAttribute('stroke-width', '1.5');
+        g.appendChild(path);
+      });
+      drawHierarchy(node.children);
+    });
+  }
+  drawHierarchy(siteData);
+
+  // ── 2. 発リンク矢印 ──────────────────────────────
+  allNodes.forEach(node => {
+    if (!pos[node.id]) return;
+    (node.links || []).forEach(targetId => {
+      if (!pos[targetId]) return;
+      const isToTop = targetId === topId;
+      const isSection = targetId.startsWith('#') || (findNode(targetId, siteData)?.url || '').startsWith('#');
+
+      // pick color
+      const color  = isToTop ? '#f97316' : isSection ? '#8b5cf6' : '#3b82f6';
+      const marker = isToTop ? 'arrow-orange' : isSection ? 'arrow-purple' : 'arrow-blue';
+      const dash   = isToTop ? '6,3' : 'none';
+
+      const isHi = fmHighlight === node.id || fmHighlight === targetId;
+      const finalColor  = isHi ? (isToTop ? '#ea580c' : isSection ? '#7c3aed' : '#1d4ed8') : color;
+      const finalMarker = isHi ? (isToTop ? 'arrow-orange-hi' : marker) : marker;
+      const sw = isHi ? 2.5 : 1.8;
+
+      const x1 = cx(node.id), y1 = pos[node.id].y;
+      const x2 = cx(targetId), y2 = pos[targetId].y + pos[targetId].h;
+
+      // curved path — go up/down
+      const dx = x2 - x1, dy = y2 - y1;
+      const cpOffset = Math.abs(dx) * 0.4 + 30;
+      let d;
+      if (Math.abs(x2 - x1) < 10) {
+        // vertical shortcut
+        d = `M${x1},${y1} C${x1-40},${y1+dy*0.3} ${x2-40},${y2-dy*0.3} ${x2},${y2}`;
+      } else {
+        d = `M${x1},${y1} C${x1},${y1 - cpOffset} ${x2},${y2 + cpOffset} ${x2},${y2}`;
+      }
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', finalColor);
+      path.setAttribute('stroke-width', sw);
+      if (dash !== 'none') path.setAttribute('stroke-dasharray', dash);
+      path.setAttribute('marker-end', `url(#${finalMarker})`);
+      path.setAttribute('opacity', isHi ? '1' : '0.65');
+      g.appendChild(path);
+    });
+  });
+
+  // ── 3. ノード ────────────────────────────────────
+  allNodes.forEach(node => {
+    if (!pos[node.id]) return;
+    const { x, y, w, h } = pos[node.id];
+    const isSelected  = node.id === selectedId;
+    const isHighlight = node.id === fmHighlight;
+    const isTop       = node.id === topId;
+
+    const grp = document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('transform', `translate(${x},${y})`);
+    grp.style.cursor = 'pointer';
+    grp.classList.add('fm-node');
+
+    // shadow rect
+    const shadow = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    shadow.setAttribute('x','2'); shadow.setAttribute('y','3');
+    shadow.setAttribute('width', w); shadow.setAttribute('height', h);
+    shadow.setAttribute('rx','6'); shadow.setAttribute('fill','rgba(0,0,0,.10)');
+    grp.appendChild(shadow);
+
+    // bg rect
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('width', w); rect.setAttribute('height', h); rect.setAttribute('rx','6');
+    rect.setAttribute('fill', isTop ? '#0D2B5E' : isSelected ? '#1e40af' : isHighlight ? '#dbeafe' : '#ffffff');
+    rect.setAttribute('stroke', isSelected ? '#1d4ed8' : isHighlight ? '#3b82f6' : '#d1d5db');
+    rect.setAttribute('stroke-width', isSelected || isHighlight ? '2' : '1');
+    grp.appendChild(rect);
+
+    // status bar (left edge)
+    const bar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bar.setAttribute('width','4'); bar.setAttribute('height', h - 12);
+    bar.setAttribute('x','0'); bar.setAttribute('y','6'); bar.setAttribute('rx','2');
+    bar.setAttribute('fill', statusColor(node.status));
+    grp.appendChild(bar);
+
+    // name text
+    const nameText = document.createElementNS('http://www.w3.org/2000/svg','text');
+    nameText.setAttribute('x', '16'); nameText.setAttribute('y', '20');
+    nameText.setAttribute('font-size','12'); nameText.setAttribute('font-weight','700');
+    nameText.setAttribute('font-family','system-ui,sans-serif');
+    nameText.setAttribute('fill', isTop || isSelected ? '#fff' : '#1e293b');
+    const displayName = node.name.length > 14 ? node.name.slice(0, 13) + '…' : node.name;
+    nameText.textContent = displayName;
+    grp.appendChild(nameText);
+
+    // url text
+    if (node.url) {
+      const urlText = document.createElementNS('http://www.w3.org/2000/svg','text');
+      urlText.setAttribute('x', '16'); urlText.setAttribute('y', '36');
+      urlText.setAttribute('font-size','9'); urlText.setAttribute('font-family','monospace,sans-serif');
+      urlText.setAttribute('fill', isTop || isSelected ? 'rgba(255,255,255,.6)' : '#94a3b8');
+      const shortUrl = node.url.length > 22 ? node.url.slice(0, 21) + '…' : node.url;
+      urlText.textContent = shortUrl;
+      grp.appendChild(urlText);
+    }
+
+    // link count badge
+    const linkCount = (node.links || []).length;
+    if (linkCount > 0) {
+      const badgeG = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const bx = w - 20, by = 4;
+      const bcircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      bcircle.setAttribute('cx', bx); bcircle.setAttribute('cy', by);
+      bcircle.setAttribute('r','9'); bcircle.setAttribute('fill','#3b82f6');
+      const btext = document.createElementNS('http://www.w3.org/2000/svg','text');
+      btext.setAttribute('x', bx); btext.setAttribute('y', by + 4);
+      btext.setAttribute('text-anchor','middle'); btext.setAttribute('font-size','9');
+      btext.setAttribute('font-weight','700'); btext.setAttribute('font-family','sans-serif');
+      btext.setAttribute('fill','#fff');
+      btext.textContent = linkCount;
+      badgeG.appendChild(bcircle); badgeG.appendChild(btext);
+      grp.appendChild(badgeG);
+    }
+
+    // events
+    grp.addEventListener('click', e => {
+      e.stopPropagation();
+      fmHighlight = (fmHighlight === node.id) ? null : node.id;
+      selectNode(node.id);
+      renderFlowMap();
+    });
+
+    g.appendChild(grp);
+  });
+
+  applyTransform();
+}
+
+// clear highlight when clicking canvas background
+wrap.addEventListener('click', e => {
+  if (!e.target.closest('.fm-node')) {
+    fmHighlight = null;
+    renderFlowMap();
+  }
+});
+
+// re-render flow map when data changes (if open)
+const _origMarkDirty = markDirty;
+// eslint-disable-next-line no-global-assign
+function markDirtyAndRefreshFlow() {
+  _origMarkDirty();
+  if (document.getElementById('flow-overlay').style.display !== 'none') {
+    renderFlowMap();
+  }
+}
+
+// initial fit when opened
+document.getElementById('btn-flowmap').addEventListener('click', () => {
+  setTimeout(fitView, 50);
+}, true);
 </script>
 </body>
 </html>
