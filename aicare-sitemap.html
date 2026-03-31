@@ -1781,7 +1781,34 @@ function renderFlowMap() {
       grp.appendChild(badgeG);
     }
 
-    // events
+    // 開くボタン（ノード右下）
+    if (node.url) {
+      const openG = document.createElementNS('http://www.w3.org/2000/svg','g');
+      openG.style.cursor = 'pointer';
+      const obx = w - 26, oby = h - 18;
+      const obg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      obg.setAttribute('x', obx - 2); obg.setAttribute('y', oby - 10);
+      obg.setAttribute('width','26'); obg.setAttribute('height','14');
+      obg.setAttribute('rx','3');
+      obg.setAttribute('fill', isTop || isSelected ? 'rgba(255,255,255,.2)' : '#e0e7ff');
+      const otxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      otxt.setAttribute('x', obx + 11); otxt.setAttribute('y', oby + 1);
+      otxt.setAttribute('text-anchor','middle'); otxt.setAttribute('font-size','9');
+      otxt.setAttribute('font-weight','700'); otxt.setAttribute('font-family','sans-serif');
+      otxt.setAttribute('fill', isTop || isSelected ? '#fff' : '#3730a3');
+      otxt.textContent = '↗ 開く';
+      openG.appendChild(obg); openG.appendChild(otxt);
+      openG.addEventListener('click', e => {
+        e.stopPropagation();
+        const href = node.url.startsWith('#')
+          ? 'aicare-top-prototype.html' + node.url
+          : node.url;
+        window.open(href, '_blank', 'noopener');
+      });
+      grp.appendChild(openG);
+    }
+
+    // events（ノード本体クリック = ハイライト）
     grp.addEventListener('click', e => {
       e.stopPropagation();
       fmHighlight = (fmHighlight === node.id) ? null : node.id;
