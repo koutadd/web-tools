@@ -167,23 +167,19 @@
       background: var(--navy-pale);
       border-left: 3px solid var(--navy);
     }
-    .tree-row.dragging { opacity: .4; }
-    .tree-row.drag-over-child {
+    .tree-row.dragging { opacity: .35; pointer-events: none; }
+    /* drop indicators — position-based */
+    .tree-row.dnd-before {
+      box-shadow: inset 0 3px 0 var(--drag-line);
+    }
+    .tree-row.dnd-after {
+      box-shadow: inset 0 -3px 0 var(--drag-line);
+    }
+    .tree-row.dnd-child {
       background: var(--drag-over-bg);
       outline: 2px dashed var(--drag-over-border);
       outline-offset: -2px;
     }
-
-    /* drop indicators */
-    .drop-line {
-      height: 3px;
-      margin: 0;
-      border-radius: 2px;
-      background: transparent;
-      transition: background .1s;
-      pointer-events: none;
-    }
-    .drop-line.active { background: var(--drag-line); }
 
     .drag-handle {
       flex-shrink: 0;
@@ -837,26 +833,19 @@ function renderNode(node, depth) {
   li.className = 'tree-item';
   li.dataset.id = node.id;
 
-  // drop line before
-  const lineBefore = document.createElement('div');
-  lineBefore.className = 'drop-line';
-  lineBefore.dataset.dropBefore = node.id;
-  li.appendChild(lineBefore);
-
   // row
   const row = document.createElement('div');
   row.className = 'tree-row' + (node.id === selectedId ? ' selected' : '');
   row.dataset.id = node.id;
   row.style.paddingLeft = (depth * 20 + 4) + 'px';
-  row.draggable = false; // handle-based drag
 
   // drag handle
   const handle = document.createElement('span');
   handle.className = 'drag-handle';
   handle.innerHTML = '&#8942;';
   handle.draggable = true;
-  handle.addEventListener('dragstart', e => onDragStart(e, node.id));
-  handle.addEventListener('dragend',   e => onDragEnd(e));
+  handle.addEventListener('dragstart', e => { e.stopPropagation(); onDragStart(e, node.id); });
+  handle.addEventListener('dragend',   () => onDragEnd());
   row.appendChild(handle);
 
   // toggle
@@ -885,20 +874,14 @@ function renderNode(node, depth) {
   badge.textContent = getStatusLabel(node.status);
   row.appendChild(badge);
 
-  // row events
+  // row events — click / context / position-based DnD
   row.addEventListener('click', () => selectNode(node.id));
   row.addEventListener('contextmenu', e => openCtxMenu(e, node.id));
-  row.addEventListener('dragover',  e => onDragOver(e, node.id, 'child'));
-  row.addEventListener('dragleave', e => onDragLeaveChild(e, row));
-  row.addEventListener('drop',      e => onDropChild(e, node.id));
+  row.addEventListener('dragover',  e => onRowDragOver(e, node.id));
+  row.addEventListener('dragleave', e => onRowDragLeave(e, row));
+  row.addEventListener('drop',      e => onRowDrop(e, node.id));
 
   li.appendChild(row);
-
-  // drop line after (for last child / same level)
-  const lineAfter = document.createElement('div');
-  lineAfter.className = 'drop-line';
-  lineAfter.dataset.dropAfter = node.id;
-  li.appendChild(lineAfter);
 
   // children
   if (node.children.length > 0) {
@@ -908,25 +891,6 @@ function renderNode(node, depth) {
     node.children.forEach(child => ul.appendChild(renderNode(child, depth + 1)));
     li.appendChild(ul);
   }
-
-  // drop-line events
-  [lineBefore, lineAfter].forEach((line, idx) => {
-    const position = idx === 0 ? 'before' : 'after';
-    line.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (canDrop(node.id)) {
-        line.classList.add('active');
-      }
-    });
-    line.addEventListener('dragleave', () => line.classList.remove('active'));
-    line.addEventListener('drop', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      line.classList.remove('active');
-      onDropSibling(e, node.id, position);
-    });
-  });
 
   return li;
 }
@@ -1184,7 +1148,7 @@ function bindAccordions() {
 // ============================================================
 function canDrop(targetId) {
   if (!dragSrc) return false;
-  if (dragSrc.id === targetId) return false;
+  if (dragSrc === targetId) return false;
   // prevent dropping into own descendant
   function isDescendant(ancestorId, checkId) {
     const anc = findNode(ancestorId, siteData);
@@ -1194,78 +1158,91 @@ function canDrop(targetId) {
     }
     return false;
   }
-  if (isDescendant(dragSrc.id, targetId)) return false;
+  if (isDescendant(dragSrc, targetId)) return false;
   return true;
 }
 
 function onDragStart(e, id) {
-  dragSrc = { id };
+  dragSrc = id;
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', id);
   setTimeout(() => {
-    const row = document.querySelector(`.tree-row[data-id="${id}"]`);
-    if (row) row.classList.add('dragging');
+    document.querySelector(`.tree-row[data-id="${id}"]`)?.classList.add('dragging');
   }, 0);
 }
 
-function onDragEnd(e) {
-  // clean up all highlights
-  document.querySelectorAll('.drop-line.active').forEach(l => l.classList.remove('active'));
-  document.querySelectorAll('.tree-row.drag-over-child').forEach(r => r.classList.remove('drag-over-child'));
-  document.querySelectorAll('.tree-row.dragging').forEach(r => r.classList.remove('dragging'));
+function clearDndIndicators() {
+  document.querySelectorAll('.tree-row.dnd-before,.tree-row.dnd-after,.tree-row.dnd-child,.tree-row.dragging')
+    .forEach(el => el.classList.remove('dnd-before','dnd-after','dnd-child','dragging'));
+}
+
+function onDragEnd() {
+  clearDndIndicators();
   dragSrc = null;
 }
 
-function onDragOver(e, targetId, mode) {
-  if (!canDrop(targetId)) return;
-  const target = findNode(targetId, siteData);
-  // only allow drop as child if node is open or has no children
-  if (mode === 'child') {
-    e.preventDefault();
-    e.stopPropagation();
-    const row = document.querySelector(`.tree-row[data-id="${targetId}"]`);
-    if (row) row.classList.add('drag-over-child');
-  }
-}
-
-function onDragLeaveChild(e, row) {
-  if (!row.contains(e.relatedTarget)) {
-    row.classList.remove('drag-over-child');
-  }
-}
-
-function onDropChild(e, targetId) {
+function onRowDragOver(e, targetId) {
+  if (!dragSrc || !canDrop(targetId)) return;
   e.preventDefault();
   e.stopPropagation();
-  const row = document.querySelector(`.tree-row[data-id="${targetId}"]`);
-  if (row) row.classList.remove('drag-over-child');
+
+  clearDndIndicators();
+  // restore dragging class on source
+  document.querySelector(`.tree-row[data-id="${dragSrc}"]`)?.classList.add('dragging');
+
+  const row = e.currentTarget;
+  const rect = row.getBoundingClientRect();
+  const pct  = (e.clientY - rect.top) / rect.height;
+
+  if (pct < 0.28) {
+    row.classList.add('dnd-before');
+    row._dndIntent = 'before';
+  } else if (pct > 0.72) {
+    row.classList.add('dnd-after');
+    row._dndIntent = 'after';
+  } else {
+    row.classList.add('dnd-child');
+    row._dndIntent = 'child';
+  }
+}
+
+function onRowDragLeave(e, row) {
+  if (!row.contains(e.relatedTarget)) {
+    row.classList.remove('dnd-before','dnd-after','dnd-child');
+  }
+}
+
+function onRowDrop(e, targetId) {
+  e.preventDefault();
+  e.stopPropagation();
+  const row   = e.currentTarget;
+  const intent = row._dndIntent || 'after';
+  clearDndIndicators();
 
   if (!dragSrc || !canDrop(targetId)) return;
 
-  const target = findNode(targetId, siteData);
-  if (!target) return;
-
-  // remove from source
-  const srcInfo = findParentArr(dragSrc.id, siteData, null);
-  if (!srcInfo) return;
-  const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
-
-  // add as last child of target
-  target.children.push(moved);
-  target._open = true;
+  if (intent === 'child') {
+    // add as last child of target
+    const target = findNode(targetId, siteData);
+    if (!target) return;
+    const srcInfo = findParentArr(dragSrc, siteData, null);
+    if (!srcInfo) return;
+    const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
+    target.children.push(moved);
+    target._open = true;
+  } else {
+    onDropSibling(targetId, intent);
+  }
 
   markDirty();
   renderTree();
-  if (selectedId === dragSrc.id) renderDetail();
+  renderDetail();
 }
 
-function onDropSibling(e, refId, position) {
+function onDropSibling(refId, position) {
   if (!dragSrc || !canDrop(refId)) return;
 
-  const refInfo = findParentArr(refId, siteData, null);
-  if (!refInfo) return;
-
-  const srcInfo = findParentArr(dragSrc.id, siteData, null);
+  const srcInfo = findParentArr(dragSrc, siteData, null);
   if (!srcInfo) return;
 
   const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
@@ -1273,17 +1250,12 @@ function onDropSibling(e, refId, position) {
   // recalculate refInfo after removal (index may have shifted)
   const refInfo2 = findParentArr(refId, siteData, null);
   if (!refInfo2) {
-    // re-insert at original position if not found
     srcInfo.arr.splice(srcInfo.index, 0, moved);
     return;
   }
 
   const insertIdx = position === 'before' ? refInfo2.index : refInfo2.index + 1;
   refInfo2.arr.splice(insertIdx, 0, moved);
-
-  markDirty();
-  renderTree();
-  if (selectedId === dragSrc.id) renderDetail();
 }
 
 // ============================================================
