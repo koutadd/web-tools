@@ -980,7 +980,7 @@ function loadLocal() {
         // Ensure roles exists even if missing from old data
         if (!d.roles) d.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
         if (!d.categories) d.categories = JSON.parse(JSON.stringify(CATEGORIES));
-        d.projects.forEach(p => ensureChildren(p.tasks));
+        d.projects.forEach(p => { if (!p.categoryId && p.category) p.categoryId = p.category; ensureChildren(p.tasks); });
         return d;
       }
     }
@@ -1034,6 +1034,7 @@ async function syncFromCloud() {
     if (!res.ok) return;
     const data = await res.json();
     if (!data || !data.projects || !Array.isArray(data.projects) || !data.roles) return;
+    data.projects.forEach(p => { if (!p.categoryId && p.category) p.categoryId = p.category; });
     // Use cloud data if it's newer than local (timestamp-based, cloud wins on tie)
     const cloudTs = data.updatedAt || 0;
     const localTs = APP.updatedAt || 0;
