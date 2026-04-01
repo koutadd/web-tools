@@ -239,7 +239,8 @@ body {
   padding: 20px;
   transition: border-color 0.15s;
 }
-.project-card:hover { border-color: rgba(245,158,11,0.2); }
+.project-card:hover { border-color: rgba(245,158,11,0.4); transform: translateY(-1px); }
+.project-card { cursor: pointer; }
 .project-card .proj-header {
   display: flex;
   align-items: flex-start;
@@ -665,6 +666,16 @@ body {
 
 .section-block { margin-bottom: 40px; }
 
+/* ===================== DRAG & DROP ===================== */
+.task-item { position: relative; }
+.task-drag-handle { cursor: grab; color: #6b7280; padding: 0 6px; font-size: 16px; user-select: none; flex-shrink: 0; }
+.task-item.dragging { opacity: 0.35; }
+.task-item.drop-before::before { content:''; position:absolute; top:-2px; left:0; right:0; height:3px; background:#60a5fa; border-radius:2px; z-index:10; }
+.task-item.drop-after::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:3px; background:#60a5fa; border-radius:2px; z-index:10; }
+.task-item.drop-child { border-color:#a78bfa !important; background:#2d1f4e !important; }
+.task-children { margin-left:28px; margin-top:6px; padding-left:12px; border-left:2px solid #374151; }
+.task-children .task-item { background:#16162a; }
+
 </style>
 </head>
 <body>
@@ -852,6 +863,19 @@ body {
   </div>
 </div>
 
+<!-- Categories Edit Modal -->
+<div class="modal-overlay" id="categoriesModal">
+  <div class="modal-card" style="max-width:560px;">
+    <button class="modal-close" onclick="closeCategoriesModal()">✕</button>
+    <h3>カテゴリ編集</h3>
+    <div id="categoriesFormFields"></div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeCategoriesModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveCategories()">保存する</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm Dialog -->
 <div class="confirm-overlay" id="confirmDialog">
   <div class="confirm-card">
@@ -888,14 +912,14 @@ const DEFAULT_ROLES = {
 
 function makeDefaultTasks(pid) {
   return [
-    { id: `${pid}-1`, name: '目的整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-2`, name: '要件整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-3`, name: '構成作成',         status: '未着手', priority: '中', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-4`, name: 'デザイン方針作成', status: '未着手', priority: '中', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-5`, name: '制作',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-6`, name: '確認',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-7`, name: '修正',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '' },
-    { id: `${pid}-8`, name: '完了',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '' },
+    { id: `${pid}-1`, name: '目的整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-2`, name: '要件整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-3`, name: '構成作成',         status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-4`, name: 'デザイン方針作成', status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-5`, name: '制作',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-6`, name: '確認',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-7`, name: '修正',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-8`, name: '完了',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '', children: [] },
   ];
 }
 
@@ -931,11 +955,35 @@ const DEFAULT_PROJECTS = [
 
 // ===================== STORAGE =====================
 const STORAGE_KEY = 'aicare-projects-v1';
+const API_URL     = '/api/data';
 
-function loadData() {
+function showSaveIndicator(msg, color) {
+  let el = document.getElementById('saveIndicator');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || '#4ade80';
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
+
+function ensureChildren(tasks) {
+  (tasks||[]).forEach(t => { if (!t.children) t.children = []; ensureChildren(t.children); });
+}
+
+function loadLocal() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d && d.projects && Array.isArray(d.projects)) {
+        // Ensure roles exists even if missing from old data
+        if (!d.roles) d.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+        if (!d.categories) d.categories = JSON.parse(JSON.stringify(CATEGORIES));
+        d.projects.forEach(p => ensureChildren(p.tasks));
+        return d;
+      }
+    }
   } catch(e) {}
   return null;
 }
@@ -945,24 +993,64 @@ function initData() {
     ...p,
     tasks: makeDefaultTasks(p.id)
   }));
-  const data = {
-    projects,
-    roles: JSON.parse(JSON.stringify(DEFAULT_ROLES))
-  };
-  saveData(data);
+  const data = { projects, roles: JSON.parse(JSON.stringify(DEFAULT_ROLES)), categories: JSON.parse(JSON.stringify(CATEGORIES)), updatedAt: 0 };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   return data;
 }
 
+let _saveTimer = null;
 function saveData(data) {
+  data.updatedAt = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  showSaveIndicator('💾 保存中…', '#facc15');
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(r => r.ok ? showSaveIndicator('☁️ 保存済み', '#4ade80') : showSaveIndicator('⚠️ 保存失敗', '#f87171'))
+      .catch(() => showSaveIndicator('⚠️ 保存失敗', '#f87171'));
+  }, 500);
 }
 
-let APP = loadData() || initData();
+let APP = null;
+
+function initializeApp() {
+  // Render immediately from localStorage (no waiting)
+  APP = loadLocal() || initData();
+  if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
+  render();
+  // Background cloud sync (doesn't block rendering)
+  syncFromCloud();
+}
+
+async function syncFromCloud() {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(API_URL + '?t=' + Date.now(), { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.projects || !Array.isArray(data.projects) || !data.roles) return;
+    // Use cloud data if it's newer than local (timestamp-based, cloud wins on tie)
+    const cloudTs = data.updatedAt || 0;
+    const localTs = APP.updatedAt || 0;
+    if (cloudTs < localTs) return;
+    const cloudJson = JSON.stringify(data);
+    if (JSON.stringify(APP) !== cloudJson) {
+      APP = data;
+      localStorage.setItem(STORAGE_KEY, cloudJson);
+      render();
+      showSaveIndicator('☁️ 同期完了', '#60a5fa');
+    }
+  } catch(e) { /* cloud sync failed silently */ }
+}
 
 function getProjects() { return APP.projects; }
-function getRoles() { return APP.roles; }
-
-function save() { saveData(APP); }
+function getRoles()    { return APP.roles || DEFAULT_ROLES; }
+function save()        { saveData(APP); }
 
 // ===================== ROUTING =====================
 function getHash() {
@@ -995,23 +1083,29 @@ function parseRoute(hash) {
 function render() {
   const route = parseRoute(getHash());
   const app = document.getElementById('app');
-  closeAllDropdowns();
-
-  if (route.view === 'dashboard') {
-    app.innerHTML = renderDashboard();
-  } else if (route.view === 'category') {
-    app.innerHTML = renderCategory(route.slug);
-  } else if (route.view === 'project') {
-    app.innerHTML = renderProject(route.id, route.tab);
-    initProjectTabs(route.id);
-  } else if (route.view === 'members') {
-    app.innerHTML = renderMembers();
+  if (!app) return;
+  try {
+    closeAllDropdowns();
+    if (route.view === 'dashboard') {
+      app.innerHTML = renderDashboard();
+    } else if (route.view === 'category') {
+      app.innerHTML = renderCategory(route.slug);
+    } else if (route.view === 'project') {
+      app.innerHTML = renderProject(route.id, route.tab);
+      initProjectTabs(route.id);
+    } else if (route.view === 'members') {
+      app.innerHTML = renderMembers();
+    }
+  } catch(e) {
+    app.innerHTML = `<div style="padding:40px;color:#f87171;font-size:13px;"><b>描画エラー:</b> ${e.message}<br><pre style="margin-top:8px;font-size:11px;color:#9ca3af;">${e.stack}</pre></div>`;
+    console.error('render error:', e);
   }
 }
 
 // ===================== HELPERS =====================
+function getCategories() { return (APP && APP.categories) ? APP.categories : CATEGORIES; }
 function getCategoryById(id) {
-  return CATEGORIES.find(c => c.id === id) || { name: id, icon: '📁', color: '#6b7280', desc: '' };
+  return getCategories().find(c => c.id === id) || { name: id, icon: '📁', color: '#6b7280', desc: '' };
 }
 
 function getProjectById(id) {
@@ -1112,13 +1206,22 @@ function renderMembers() {
           </div>`).join('')}
       </div>` : '';
 
+    // この人が担当しているロールを取得
+    const roles = getRoles();
+    const personRoles = Object.values(roles).filter(r =>
+      (r.person || '').split(/[、,，\s]+/).map(s => s.trim()).includes(person)
+    );
+
     return `
     <div class="card" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4f7cff,#7c4fff);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">${person.slice(0,1)}</div>
         <div style="flex:1;">
-          <div style="font-size:16px;font-weight:700;">${person}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">プロジェクト ${projs.length}件 &nbsp;·&nbsp; 進行中 ${doing} &nbsp;·&nbsp; 完了 ${done} &nbsp;·&nbsp; 未着手 ${todo}</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="font-size:16px;font-weight:700;">${person}</div>
+            ${personRoles.map(r => `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#3b4f8422;color:#93c5fd;border:1px solid #3b4f8444;">${r.label}</span>`).join('')}
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">プロジェクト ${projs.length}件 &nbsp;·&nbsp; 進行中 ${doing} &nbsp;·&nbsp; 完了 ${done} &nbsp;·&nbsp; 未着手 ${todo}</div>
         </div>
       </div>
       ${rows}
@@ -1138,6 +1241,40 @@ function renderMembers() {
 }
 
 // ===================== DASHBOARD =====================
+// ===================== CSV EXPORT =====================
+function exportCSV() {
+  const projects = getProjects();
+  const rows = [
+    ['ID','カテゴリ','プロジェクト名','目的','ステータス','優先度','締切','担当者','メンバー','成果物','概要','備考']
+  ];
+  projects.forEach(p => {
+    const cat = getCategoryById(p.categoryId);
+    rows.push([
+      p.id,
+      cat.name,
+      p.name,
+      p.purpose || '',
+      p.status,
+      p.priority,
+      p.deadline || '',
+      p.assignee || '',
+      p.members || '',
+      p.deliverables || '',
+      p.overview || '',
+      p.notes || ''
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aicare-projects-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function renderDashboard() {
   const projects = getProjects();
   const roles = getRoles();
@@ -1182,8 +1319,11 @@ function renderDashboard() {
       <p class="page-desc">アイケアラボ 全プロジェクトの一覧・進捗・タスク管理</p>
     </div>
     <div style="display:flex;gap:8px;">
+      <span id="saveIndicator" style="font-size:12px;color:#4ade80;opacity:0;transition:opacity 0.5s;align-self:center;"></span>
       <button class="btn btn-secondary btn-sm" onclick="navigate('#/members')">👤 担当者別</button>
       <button class="btn btn-secondary btn-sm" onclick="openRolesModal()">👥 役割を編集</button>
+      <button class="btn btn-secondary btn-sm" onclick="openCategoriesModal()">🏷 カテゴリ編集</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="background:#16a34a22;color:#4ade80;border-color:#16a34a44;">📊 CSV書き出し</button>
     </div>
   </div>
 
@@ -1217,7 +1357,7 @@ function renderDashboard() {
   <div class="section-block">
     <div class="section-title">カテゴリ一覧</div>
     <div class="grid-3">
-      ${CATEGORIES.map(cat => {
+      ${getCategories().map(cat => {
         const count = projects.filter(p => p.categoryId === cat.id).length;
         const done = projects.filter(p => p.categoryId === cat.id && p.status === '完了').length;
         return `
@@ -1363,7 +1503,7 @@ function renderProjectCard(p) {
   const roles = getRoles();
   const leadRole = roles[p.leadRole];
   return `
-<div class="project-card" id="proj-card-${p.id}">
+<div class="project-card" id="proj-card-${p.id}" onclick="navigate('#/project/${p.id}')" >
   <div class="proj-header">
     <div class="proj-name">${p.name}</div>
   </div>
@@ -1379,9 +1519,8 @@ function renderProjectCard(p) {
     ${p.members ? `<span>👥 ${p.members}</span>` : ''}
   </div>
   ${p.deliverables ? `<div class="proj-deliverables">📦 ${truncate(p.deliverables, 80)}</div>` : ''}
-  <div class="proj-actions">
-    <button class="btn btn-primary btn-sm" onclick="navigate('#/project/${p.id}')">詳細を見る</button>
-    <button class="btn btn-secondary btn-sm" onclick="navigate('#/project/${p.id}/tasks')">タスクを見る</button>
+  <div class="proj-actions" onclick="event.stopPropagation()">
+    <button class="btn btn-secondary btn-sm" onclick="navigate('#/project/${p.id}/tasks')">タスク</button>
     <button class="btn btn-ghost btn-sm" onclick="openProjectModal(${p.id})">編集</button>
     <button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">削除</button>
   </div>
@@ -1391,7 +1530,7 @@ function renderProjectCard(p) {
 function statusDropdownHtml(p) {
   const statuses = ['未着手','進行中','完了','要確認','保留'];
   return `
-  <div class="status-dropdown-wrap" id="sdw-${p.id}">
+  <div class="status-dropdown-wrap" id="sdw-${p.id}" onclick="event.stopPropagation()">
     <span class="badge status-${p.status}" style="cursor:pointer;" onclick="toggleStatusDropdown(event,${p.id})">${p.status} ▾</span>
     <div class="status-menu">
       ${statuses.map(s => `<button onclick="quickChangeStatus(${p.id},'${s}')">${s}</button>`).join('')}
@@ -1431,7 +1570,7 @@ function renderProject(id, tab) {
     </div>
     <div class="phb-meta">
       ${p.assignee ? `<span>👤 担当: <strong>${p.assignee}</strong></span>` : ''}
-      ${p.members ? `<span>👥 メンバー: ${p.members}</span>` : ''}
+      ${p.members ? `<span>👥 メンバー: ${p.members.split(/[、,，]+/).map(n => { const name = n.trim(); const role = Object.values(getRoles()).find(r => r.person.split(/[、,，\s]+/).map(s=>s.trim()).includes(name)); return role ? `${name}<span style="font-size:10px;color:var(--muted);"> (${role.label})</span>` : name; }).join('、')}</span>` : ''}
       ${leadRole ? `<span>🎯 リード: ${leadRole.label} (${leadRole.person})</span>` : ''}
       ${p.deadline ? `<span>📅 期限: <strong>${formatDate(p.deadline)}</strong></span>` : '<span>📅 期限: 未設定</span>'}
     </div>
@@ -1523,11 +1662,23 @@ function renderTaskTab(p) {
   </div>`;
 }
 
-function renderTaskItem(projectId, t) {
+function renderTaskItem(projectId, t, isChild) {
+  const children = t.children || [];
+  const childrenHtml = children.length > 0
+    ? `<div class="task-children">${children.map(c => renderTaskItem(projectId, c, true)).join('')}</div>`
+    : '';
   return `
-  <div class="task-item" id="task-item-${t.id}">
+  <div class="task-item" data-task-id="${t.id}" data-project-id="${projectId}"
+       id="task-item-${t.id.replace(/\W/g,'_')}"
+       draggable="true"
+       ondragstart="taskDragStart(event,${projectId},'${t.id}')"
+       ondragover="taskDragOver(event,${projectId},'${t.id}')"
+       ondragleave="taskDragLeave(event,'${t.id}')"
+       ondrop="taskDrop(event,${projectId},'${t.id}')"
+       ondragend="taskDragEnd()">
+    <span class="task-drag-handle">⠿</span>
     <div>
-      <div class="status-dropdown-wrap" id="tsdw-${t.id.replace(/[^a-z0-9]/gi,'_')}">
+      <div class="status-dropdown-wrap" id="tsdw-${t.id.replace(/\W/g,'_')}">
         <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}',${projectId})">${t.status} ▾</span>
         <div class="status-menu">
           ${['未着手','進行中','完了','要確認','保留'].map(s => `<button onclick="quickChangeTaskStatus('${t.id}',${projectId},'${s}')">${s}</button>`).join('')}
@@ -1544,7 +1695,7 @@ function renderTaskItem(projectId, t) {
       <button class="btn btn-ghost btn-sm" onclick="openTaskModal(${projectId},'${t.id}')">✏️</button>
       <button class="btn btn-danger btn-sm" onclick="deleteTask(${projectId},'${t.id}')">🗑</button>
     </div>
-  </div>`;
+  </div>${childrenHtml}`;
 }
 
 function renderDeliverablesTab(p) {
@@ -1627,7 +1778,7 @@ function quickChangeStatus(projectId, newStatus) {
 function quickChangeTaskStatus(taskId, projectId, newStatus) {
   const p = APP.projects.find(p => p.id === projectId);
   if (!p) return;
-  const t = (p.tasks||[]).find(t => t.id === taskId);
+  const t = taskTreeFind(p.tasks||[], taskId);
   if (t) { t.status = newStatus; save(); }
   closeAllDropdowns();
   // Re-render task tab
@@ -1723,7 +1874,7 @@ function openTaskModal(projectId, taskId) {
 
   if (taskId) {
     const p = getProjectById(projectId);
-    const t = (p.tasks||[]).find(t => t.id === taskId);
+    const t = taskTreeFind(p.tasks||[], taskId);
     if (!t) return;
     title.textContent = 'タスク編集';
     document.getElementById('tf-name').value = t.name || '';
@@ -1764,11 +1915,11 @@ function saveTask(e) {
   if (!p.tasks) p.tasks = [];
 
   if (taskId) {
-    const idx = p.tasks.findIndex(t => t.id === taskId);
-    if (idx !== -1) Object.assign(p.tasks[idx], data);
+    const t = taskTreeFind(p.tasks, taskId);
+    if (t) Object.assign(t, data);
   } else {
     const newTaskId = `${projectId}-${Date.now()}`;
-    p.tasks.push({ id: newTaskId, ...data });
+    p.tasks.push({ id: newTaskId, ...data, children: [] });
   }
 
   save();
@@ -1822,6 +1973,52 @@ document.getElementById('rolesModal').addEventListener('click', function(e) {
   if (e.target === this) closeRolesModal();
 });
 
+// ===================== CATEGORIES EDIT =====================
+function openCategoriesModal() {
+  const cats = getCategories();
+  document.getElementById('categoriesFormFields').innerHTML = cats.map(c => `
+    <div class="form-row" style="align-items:center;">
+      <div class="form-group" style="flex:0 0 60px;">
+        <label>アイコン</label>
+        <input type="text" name="cat-icon-${c.id}" value="${c.icon}" style="text-align:center;font-size:18px;">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>カテゴリ名</label>
+        <input type="text" name="cat-name-${c.id}" value="${c.name}">
+      </div>
+      <div class="form-group" style="flex:2;">
+        <label>説明</label>
+        <input type="text" name="cat-desc-${c.id}" value="${c.desc}">
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('categoriesModal').classList.add('open');
+}
+
+function closeCategoriesModal() {
+  document.getElementById('categoriesModal').classList.remove('open');
+}
+
+function saveCategories() {
+  const cats = getCategories();
+  cats.forEach(c => {
+    const nameEl = document.querySelector(`[name="cat-name-${c.id}"]`);
+    const iconEl = document.querySelector(`[name="cat-icon-${c.id}"]`);
+    const descEl = document.querySelector(`[name="cat-desc-${c.id}"]`);
+    if (nameEl) c.name = nameEl.value.trim() || c.name;
+    if (iconEl) c.icon = iconEl.value.trim() || c.icon;
+    if (descEl) c.desc = descEl.value.trim();
+  });
+  APP.categories = cats;
+  save();
+  closeCategoriesModal();
+  render();
+}
+
+document.getElementById('categoriesModal').addEventListener('click', function(e) {
+  if (e.target === this) closeCategoriesModal();
+});
+
 // ===================== DELETE =====================
 let confirmCallback = null;
 
@@ -1859,13 +2056,100 @@ function deleteProject(id) {
 function deleteTask(projectId, taskId) {
   const p = getProjectById(projectId);
   if (!p) return;
-  const t = (p.tasks||[]).find(t => t.id === taskId);
+  const t = taskTreeFind(p.tasks||[], taskId);
   if (!t) return;
   showConfirm('タスクを削除しますか？', `「${t.name}」を削除します。`, () => {
-    p.tasks = p.tasks.filter(t => t.id !== taskId);
+    taskTreeRemove(p.tasks, taskId);
     save();
     document.getElementById('tab-content').innerHTML = renderTabContent(p, 'tasks');
   });
+}
+
+// ===================== DRAG & DROP =====================
+let _dragTaskId = null;
+
+function taskDragStart(e, projectId, taskId) {
+  _dragTaskId = taskId;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const el = document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+function taskDragEnd() {
+  _dragTaskId = null;
+  document.querySelectorAll('.task-item').forEach(el =>
+    el.classList.remove('dragging','drop-before','drop-after','drop-child'));
+}
+
+function taskDragOver(e, projectId, taskId) {
+  if (taskId === _dragTaskId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const el = document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+  if (!el) return;
+  el.classList.remove('drop-before','drop-after','drop-child');
+  const rect = el.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const h = rect.height;
+  if (y < h * 0.3)       { el.classList.add('drop-before'); el.dataset.dz = 'before'; }
+  else if (y > h * 0.7)  { el.classList.add('drop-after');  el.dataset.dz = 'after'; }
+  else                   { el.classList.add('drop-child');   el.dataset.dz = 'child'; }
+}
+
+function taskDragLeave(e, taskId) {
+  const el = document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+  if (el && !el.contains(e.relatedTarget))
+    el.classList.remove('drop-before','drop-after','drop-child');
+}
+
+function taskDrop(e, projectId, taskId) {
+  e.preventDefault();
+  const src = _dragTaskId;
+  const el = document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+  const dz = el ? el.dataset.dz : 'after';
+  taskDragEnd();
+  if (!src || src === taskId) return;
+
+  const p = getProjectById(projectId);
+  const dragged = taskTreeRemove(p.tasks, src);
+  if (!dragged) return;
+
+  if (dz === 'child') {
+    const target = taskTreeFind(p.tasks, taskId);
+    if (target) { if (!target.children) target.children = []; target.children.push(dragged); }
+  } else {
+    taskTreeInsert(p.tasks, taskId, dragged, dz === 'before');
+  }
+  save();
+  document.getElementById('tab-content').innerHTML = renderTabContent(p, 'tasks');
+}
+
+function taskTreeFind(tasks, id) {
+  for (const t of tasks) {
+    if (t.id === id) return t;
+    const f = taskTreeFind(t.children||[], id);
+    if (f) return f;
+  }
+  return null;
+}
+
+function taskTreeRemove(tasks, id) {
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].id === id) return tasks.splice(i, 1)[0];
+    const f = taskTreeRemove(tasks[i].children||[], id);
+    if (f) return f;
+  }
+  return null;
+}
+
+function taskTreeInsert(tasks, targetId, node, before) {
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].id === targetId) { tasks.splice(before ? i : i+1, 0, node); return true; }
+    if (taskTreeInsert(tasks[i].children||[], targetId, node, before)) return true;
+  }
+  return false;
 }
 
 // ===================== INIT =====================
@@ -1874,13 +2158,14 @@ window.addEventListener('hashchange', () => {
   render();
 });
 
-// Initial render
-if (!window.location.hash || window.location.hash === '#') {
-  window.location.hash = '#/';
-  // hashchange event will fire and call render()
-} else {
-  render();
-}
+// Initial load (async for GAS support)
+initializeApp();
+
+// ── リアルタイム自動保存 ──────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { try { save(); } catch(e) {} }
+});
+window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 </script>
 </body>
 </html>
