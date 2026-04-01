@@ -954,7 +954,7 @@ const DEFAULT_PROJECTS = [
 ];
 
 // ===================== STORAGE =====================
-const STORAGE_KEY = 'aicare-projects-v2';
+const STORAGE_KEY = 'aicare-projects-v3';
 const API_URL     = '/api/data';
 
 function showSaveIndicator(msg, color) {
@@ -1104,7 +1104,10 @@ function render() {
 }
 
 // ===================== HELPERS =====================
-function getCategories() { return (APP && APP.categories) ? APP.categories : CATEGORIES; }
+function getCategories() {
+  const cats = (APP && APP.categories) ? APP.categories : CATEGORIES;
+  return cats.map(c => ({ icon: '📁', desc: '', ...c, name: c.name || c.label || c.id }));
+}
 function getCategoryById(id) {
   return getCategories().find(c => c.id === id) || { name: id, icon: '📁', color: '#6b7280', desc: '' };
 }
