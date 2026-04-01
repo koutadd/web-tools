@@ -31,12 +31,12 @@
 
 /* ===================== DESIGN SYSTEM ===================== */
 :root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface2: #22263a;
-  --border: #2e3350;
-  --text: #e8eaf0;
-  --muted: #6b7280;
+  --bg: #080c14;
+  --surface: #111827;
+  --surface2: #1e2740;
+  --border: #253047;
+  --text: #f0f4ff;
+  --muted: #7c8fa8;
   --accent: #f59e0b;
   --radius: 10px;
 }
@@ -78,11 +78,10 @@ body {
 }
 
 .section-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #94a3b8;
+  letter-spacing: 0.04em;
+  color: #cbd5e1;
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
@@ -117,24 +116,24 @@ body {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
-.status-未着手 { background: rgba(107,114,128,0.18); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
-.status-進行中 { background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-.status-完了   { background: rgba(16,185,129,0.18); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-.status-要確認 { background: rgba(245,158,11,0.18); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-.status-保留   { background: rgba(139,92,246,0.18); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+.status-未着手 { background: rgba(107,114,128,0.15); color: #a1adc0; border: 1px solid rgba(107,114,128,0.35); }
+.status-進行中 { background: rgba(59,130,246,0.2);  color: #7db8ff; border: 1px solid rgba(59,130,246,0.4); }
+.status-完了   { background: rgba(16,185,129,0.15); color: #4ade80; border: 1px solid rgba(16,185,129,0.35); }
+.status-要確認 { background: rgba(245,158,11,0.22); color: #fcd34d; border: 1px solid rgba(245,158,11,0.5); }
+.status-保留   { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.35); }
 
-.priority-最優先 { background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-.priority-高     { background: rgba(249,115,22,0.18); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
-.priority-中     { background: rgba(245,158,11,0.18); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-.priority-低     { background: rgba(107,114,128,0.18); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+.priority-最優先 { background: rgba(239,68,68,0.22);  color: #fc8181; border: 1px solid rgba(239,68,68,0.5); }
+.priority-高     { background: rgba(249,115,22,0.22); color: #fdba74; border: 1px solid rgba(249,115,22,0.5); }
+.priority-中     { background: rgba(245,158,11,0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); }
+.priority-低     { background: rgba(107,114,128,0.15); color: #a1adc0; border: 1px solid rgba(107,114,128,0.3); }
 
 /* ===================== BUTTONS ===================== */
 .btn {
@@ -682,64 +681,64 @@ body {
 
 /* ===================== PROJECT TABLE ROW ===================== */
 .proj-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--border);
-  border-radius: 10px; margin-bottom: 4px;
-  transition: background 0.12s;
-  min-height: 44px;
+  border-left: 5px solid var(--border);
+  border-radius: 10px; margin-bottom: 5px;
+  transition: background 0.12s, border-color 0.12s;
+  min-height: 52px;
 }
-.proj-row:hover { background: #1e2236; }
-.proj-row.dim { opacity: 0.5; }
+.proj-row:hover { background: #161d2e; border-color: #3a4a6a; }
+.proj-row.dim { opacity: 0.42; }
 .proj-row .proj-row-name {
-  flex: 1; font-size: 13px; font-weight: 600;
+  flex: 1; font-size: 14px; font-weight: 600;
   cursor: pointer; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  line-height: 1.4;
+  color: #e8f0ff;
 }
-.proj-row .proj-row-name:hover { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(245,158,11,0.4); }
+.proj-row .proj-row-name:hover { color: #fbbf24; }
 .proj-row-waiting {
-  font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap;
-  background: rgba(249,115,22,0.12); color: #fb923c;
-  border: 1px solid rgba(249,115,22,0.25); cursor: pointer;
-  min-width: 72px; text-align: center;
+  font-size: 11px; padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  background: rgba(249,115,22,0.15); color: #fdba74;
+  border: 1px solid rgba(249,115,22,0.35); cursor: pointer;
+  min-width: 72px; text-align: center; font-weight: 600;
 }
 .proj-row-waiting.empty {
-  background: transparent; color: #4b5563; border: 1px dashed #374151; font-style: italic;
+  background: transparent; color: #3d4f66; border: 1px dashed #2a3a52; font-style: italic; font-weight: 400;
 }
-.proj-row-waiting:hover { border-color: #fb923c; background: rgba(249,115,22,0.2); }
+.proj-row-waiting:hover { border-color: #fb923c; background: rgba(249,115,22,0.25); color: #fb923c; }
 .proj-row-next {
-  font-size: 11px; color: #6b7280; width: 140px;
+  font-size: 12px; color: #5a7090; width: 150px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  cursor: pointer; padding: 3px 7px; border-radius: 5px;
-  border: 1px dashed #374151;
+  cursor: pointer; padding: 4px 8px; border-radius: 6px;
+  border: 1px dashed #2a3a52;
 }
-.proj-row-next:hover { border-color: var(--accent); color: var(--text); background: rgba(245,158,11,0.05); }
+.proj-row-next:hover { border-color: #f59e0b; color: #e8f0ff; background: rgba(245,158,11,0.06); }
 .proj-row-deadline {
-  font-size: 11px; color: #6b7280; cursor: pointer; white-space: nowrap;
-  padding: 3px 6px; border-radius: 4px; border: 1px dashed transparent;
-  width: 84px; text-align: center;
+  font-size: 12px; color: #5a7090; cursor: pointer; white-space: nowrap;
+  padding: 4px 8px; border-radius: 6px; border: 1px dashed transparent;
+  width: 90px; text-align: center;
 }
-.proj-row-deadline:hover { border-color: var(--accent); background: rgba(245,158,11,0.05); }
-@media (max-width: 960px) {
+.proj-row-deadline:hover { border-color: #f59e0b; background: rgba(245,158,11,0.06); }
+@media (max-width: 1000px) {
   .proj-row-next { display: none; }
 }
 @media (max-width: 768px) {
-  .proj-row-deadline { display: none; }
-  .proj-row-waiting { display: none; }
+  .proj-row-deadline, .proj-row-waiting { display: none; }
 }
 
 /* ===================== PRIORITY ITEMS (today panel) ===================== */
 .priority-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; background: var(--surface);
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: rgba(255,255,255,0.03);
   border-radius: 8px; margin-bottom: 4px;
-  border-left: 3px solid; cursor: pointer; transition: opacity 0.15s;
+  border-left: 3px solid; cursor: pointer;
+  transition: background 0.12s;
 }
-.priority-item:hover { opacity: 0.85; }
-.priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.priority-item:hover { background: rgba(255,255,255,0.07); }
+.priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e8f0ff; }
 .priority-item .pi-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11px; }
 
 /* ===================== BLOCKER FILTER ===================== */
@@ -771,11 +770,11 @@ body {
 
 /* ===================== TODAY PANEL ===================== */
 .today-panel {
-  background: var(--surface); border: 1px solid var(--border);
   border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
+  border: 1px solid;
 }
 .today-panel-title {
-  font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+  font-size: 13px; font-weight: 700;
   margin-bottom: 10px;
   display: flex; align-items: center; gap: 6px;
 }
@@ -1491,31 +1490,32 @@ function renderDashboard() {
   const waitMe = active.filter(p => (p.waitingFor||'').includes('こうた'));
   const waitOther = active.filter(p => { const w = p.waitingFor||''; return w && !w.includes('こうた'); });
 
-  function todayGroup(label, color, emoji, items, labelFn) {
+  function todayGroup(label, color, bgAlpha, emoji, items, labelFn) {
     if (!items.length) return '';
+    const r = parseInt(color.slice(1,3),16), g = parseInt(color.slice(3,5),16), b = parseInt(color.slice(5,7),16);
     return `
-    <div class="today-panel" style="border-left:3px solid ${color};margin-bottom:8px;">
-      <div class="today-panel-title" style="color:${color};">${emoji} ${label} <span style="color:var(--muted);font-weight:400;">(${items.length}件)</span></div>
+    <div class="today-panel" style="background:rgba(${r},${g},${b},${bgAlpha});border-color:rgba(${r},${g},${b},0.35);border-left:3px solid ${color};margin-bottom:8px;">
+      <div class="today-panel-title" style="color:${color};">${emoji} ${label} <span style="opacity:0.65;font-weight:500;font-size:12px;">${items.length}件</span></div>
       ${items.map(p => `
-        <div class="priority-item" style="border-left-color:${color};margin-bottom:3px;" onclick="navigate('#/project/${p.id}')">
+        <div class="priority-item" style="border-left-color:rgba(${r},${g},${b},0.6);" onclick="navigate('#/project/${p.id}')">
           <span class="pi-name">${p.name}</span>
           <div class="pi-meta">
             ${statusBadge(p.status)}
-            ${p.waitingFor ? `<span style="color:#fb923c;">⏳ ${p.waitingFor}</span>` : ''}
+            ${p.waitingFor ? `<span style="color:#fdba74;font-size:11px;">⏳ ${p.waitingFor}</span>` : ''}
             ${labelFn ? labelFn(p) : ''}
-            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();navigate('#/project/${p.id}')">今見る</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();navigate('#/project/${p.id}')">今見る →</button>
           </div>
         </div>`).join('')}
     </div>`;
   }
 
-  const d3Html = todayGroup('期限3日以内', '#ef4444', '🔴', deadline3, p => {
+  const d3Html = todayGroup('期限3日以内', '#ef4444', 0.08, '🔴', deadline3, p => {
     const d = daysUntil(p.deadline);
-    return `<span style="color:${d < 0 ? '#ef4444' : '#fb923c'};">${d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`}</span>`;
+    return `<span style="color:${d < 0 ? '#f87171' : '#fb923c'};font-weight:700;">${d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`}</span>`;
   });
-  const revHtml = todayGroup('要確認', '#f59e0b', '🟡', review, null);
-  const meHtml = todayGroup('こうた待ち', '#fb923c', '👤', waitMe, p => `<span style="color:var(--muted);">${p.waitingFor}</span>`);
-  const otherHtml = todayGroup('他メンバー待ち', '#60a5fa', '👥', waitOther, p => `<span style="color:#93c5fd;">${p.waitingFor}</span>`);
+  const revHtml = todayGroup('要確認', '#f59e0b', 0.07, '🟡', review, null);
+  const meHtml = todayGroup('こうた待ち', '#fb923c', 0.06, '👤', waitMe, p => `<span style="color:#fdba74;">${p.waitingFor}</span>`);
+  const otherHtml = todayGroup('他メンバー待ち', '#3b82f6', 0.07, '👥', waitOther, p => `<span style="color:#93c5fd;">${p.waitingFor}</span>`);
   const todayContent = d3Html + revHtml + meHtml + otherHtml ||
     `<div style="color:var(--muted);padding:12px;font-size:13px;">✅ 本日の緊急対応なし</div>`;
 
@@ -1542,10 +1542,10 @@ function renderDashboard() {
   });
 
   const sectionHead = (emoji, label, sub) => `
-    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
-      <span style="font-size:16px;">${emoji}</span>
-      <span style="font-size:14px;font-weight:700;color:var(--text);">${label}</span>
-      ${sub ? `<span style="font-size:12px;color:var(--muted);margin-left:auto;">${sub}</span>` : ''}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1e2a40;">
+      <span style="font-size:18px;line-height:1;">${emoji}</span>
+      <span style="font-size:15px;font-weight:800;color:#e8f0ff;letter-spacing:-0.2px;">${label}</span>
+      ${sub ? `<span style="font-size:11px;color:var(--muted);margin-left:auto;background:#1a2235;padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
     </div>`;
 
   return `
@@ -1568,20 +1568,32 @@ function renderDashboard() {
     </div>
   </div>
 
-  <!-- Stats bar -->
-  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:28px;">
-    ${[
-      ['全体',   total,                    '#e8eaf0', ''],
-      ['進行中', byStatus['進行中']||0,    '#60a5fa', 'border-bottom:2px solid #3b82f6;'],
-      ['未着手', byStatus['未着手']||0,    '#9ca3af', ''],
-      ['完了',   byStatus['完了']||0,      '#34d399', 'border-bottom:2px solid #10b981;'],
-      ['要確認', byStatus['要確認']||0,    '#fbbf24', 'border-bottom:2px solid #f59e0b;'],
-      ['保留',   byStatus['保留']||0,      '#a78bfa', ''],
-    ].map(([label, num, color, extra]) => `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;${extra}">
-        <div style="font-size:26px;font-weight:800;color:${color};line-height:1;">${num}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${label}</div>
-      </div>`).join('')}
+  <!-- Stats bar: 3 big + 3 small -->
+  <div style="display:flex;gap:10px;margin-bottom:28px;align-items:stretch;flex-wrap:wrap;">
+    <!-- Big 3 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-width:300px;">
+      ${[
+        ['進行中', byStatus['進行中']||0, '#3b82f6', '#1e3a5a', 'border-bottom:3px solid #3b82f6;'],
+        ['要確認', byStatus['要確認']||0, '#f59e0b', '#3a2c00', 'border-bottom:3px solid #f59e0b;'],
+        ['未着手', byStatus['未着手']||0, '#6b7280', '#1a1d27', ''],
+      ].map(([label, num, color, bg, extra]) => `
+        <div style="background:${bg};border:1px solid ${color}44;border-radius:12px;padding:16px 18px;${extra}">
+          <div style="font-size:32px;font-weight:900;color:${color};line-height:1;">${num}</div>
+          <div style="font-size:12px;color:${color};opacity:0.8;margin-top:6px;font-weight:600;">${label}</div>
+        </div>`).join('')}
+    </div>
+    <!-- Small 3 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;">
+      ${[
+        ['完了', byStatus['完了']||0,  '#10b981'],
+        ['保留', byStatus['保留']||0,  '#7c3aed'],
+        ['全体', total,                '#475569'],
+      ].map(([label, num, color]) => `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:${color};line-height:1;">${num}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">${label}</div>
+        </div>`).join('')}
+    </div>
   </div>
 
   <!-- ① 今日の優先対応 -->
@@ -1603,13 +1615,13 @@ function renderDashboard() {
   <div class="section-block">
     ${sectionHead('📋','全プロジェクト一覧',`${total}件 — 各項目をクリックで直接編集`)}
     <!-- 列ヘッダー -->
-    <div style="display:flex;align-items:center;gap:8px;padding:0 14px 6px;font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 21px 8px;font-size:10px;color:#3d5070;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;">
       <span style="flex:1;">プロジェクト名</span>
       <span style="width:72px;text-align:center;">状態</span>
       <span style="width:60px;text-align:center;">優先度</span>
       <span style="width:84px;text-align:center;">誰待ち</span>
-      <span style="width:84px;text-align:center;">期限</span>
-      <span style="width:140px;">次アクション</span>
+      <span style="width:90px;text-align:center;">期限</span>
+      <span style="width:150px;">次アクション</span>
       <span style="width:88px;"></span>
     </div>
     <div id="proj-list">
@@ -1746,11 +1758,11 @@ function renderProjectRow(p) {
   <div style="width:72px;flex-shrink:0;" onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
   <div style="width:60px;flex-shrink:0;" onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
   <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
-  <span class="proj-row-deadline" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
-  <span class="proj-row-next" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 28) : '<i>次アクション未設定</i>'}</span>
+  <span class="proj-row-deadline" style="width:90px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
+  <span class="proj-row-next" style="width:150px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 26) : '<i style="color:#2a3a52;">次アクション未設定</i>'}</span>
   <div style="display:flex;gap:4px;flex-shrink:0;width:88px;" onclick="event.stopPropagation()">
-    <button class="btn btn-ghost btn-sm" onclick="navigate('#/project/${p.id}')">今見る</button>
-    <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${p.id}')">編集</button>
+    <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px;" onclick="navigate('#/project/${p.id}')">今見る</button>
+    <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px;" onclick="openProjectModal('${p.id}')">編集</button>
   </div>
 </div>`;
 }
