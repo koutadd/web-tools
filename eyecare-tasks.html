@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイケア タスク管理</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #4f7cff;
+    --accent2: #7c4fff;
+    --green: #2ecc71;
+    --yellow: #f1c40f;
+    --red: #e74c3c;
+    --text: #e8eaf0;
+    --text-muted: #7a8099;
+    --outsource: #ff6b9d;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 24px 80px;
+  }
+
+  .header {
+    max-width: 900px; margin: 0 auto 32px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .header-left h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .header-left p { color: var(--text-muted); font-size: 13px; }
+  .back-link { font-size: 12px; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+  .back-link:hover { color: var(--accent); }
+
+  .countdown { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 24px; text-align: center; min-width: 170px; }
+  .countdown-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 6px; }
+  .countdown-days { font-size: 40px; font-weight: 800; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .countdown-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  .overall { max-width: 900px; margin: 0 auto 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; }
+  .overall-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .overall-top span { font-size: 12px; color: var(--text-muted); }
+  .overall-top strong { font-size: 18px; font-weight: 700; color: var(--accent); }
+  .progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; }
+  .milestone-progress { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .mp-item { font-size: 11px; color: var(--text-muted); }
+  .mp-item span { color: var(--text); font-weight: 600; }
+
+  .phases { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .phase-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+  .phase-number { width: 26px; height: 26px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+  .phase-title { font-size: 14px; font-weight: 600; flex: 1; }
+  .phase-count { font-size: 11px; color: var(--text-muted); }
+  .phase-chevron { color: var(--text-muted); transition: transform 0.2s; font-size: 11px; }
+  .phase.collapsed .phase-chevron { transform: rotate(-90deg); }
+  .phase.collapsed .task-list { display: none; }
+
+  .task-list { padding: 8px; }
+  .task-item { border-radius: 10px; margin-bottom: 4px; border: 1px solid transparent; transition: border-color 0.15s; }
+  .task-item.expanded { border-color: var(--border); background: var(--surface2); }
+  .task-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; border-radius: 10px; transition: background 0.15s; }
+  .task-item:not(.expanded) .task-row:hover { background: var(--surface2); }
+  .task-expand-icon { font-size: 10px; color: var(--text-muted); transition: transform 0.2s; width: 14px; text-align: center; flex-shrink: 0; }
+  .task-item.expanded .task-expand-icon,
+  .person-task-item.expanded .task-expand-icon { transform: rotate(90deg); }
+  .task-check { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 10px; }
+  .task-item[data-status="done"] .task-check,
+  .person-task-item[data-status="done"] .task-check { background: var(--green); border-color: var(--green); color: white; }
+  .task-item[data-status="doing"] .task-check,
+  .person-task-item[data-status="doing"] .task-check { border-color: var(--yellow); background: rgba(241,196,15,0.15); }
+  .task-main { flex: 1; min-width: 0; }
+  .task-name { font-size: 13px; font-weight: 600; }
+  .task-item[data-status="done"] .task-name,
+  .person-task-item[data-status="done"] .task-name { color: var(--text-muted); text-decoration: line-through; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+  .badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .badge-self { background: rgba(79,124,255,0.15); color: var(--accent); border: 1px solid rgba(79,124,255,0.3); }
+  .badge-outsource { background: rgba(255,107,157,0.15); color: var(--outsource); border: 1px solid rgba(255,107,157,0.3); }
+  .ms-summary { font-size: 11px; color: var(--text-muted); }
+  .status-btn { display: flex; gap: 4px; flex-shrink: 0; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; cursor: pointer; opacity: 0.3; transition: opacity 0.15s, transform 0.15s; }
+  .status-dot:hover { opacity: 0.8; transform: scale(1.3); }
+  .status-dot.active { opacity: 1; }
+  .dot-todo { background: var(--text-muted); }
+  .dot-doing { background: var(--yellow); }
+  .dot-done { background: var(--green); }
+
+  .milestone-panel { padding: 0 14px 14px 14px; display: none; }
+  .task-item.expanded .milestone-panel,
+  .person-task-item.expanded .milestone-panel { display: block; }
+  .milestone-section { margin-bottom: 14px; }
+  .milestone-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .milestone-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 10px; border-radius: 8px; cursor: pointer; transition: background 0.12s; }
+  .milestone-item:hover { background: rgba(255,255,255,0.04); }
+  .ms-check { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.12s; font-size: 9px; }
+  .milestone-item.done .ms-check { background: var(--green); border-color: var(--green); color: white; }
+  .ms-content { flex: 1; }
+  .ms-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .milestone-item.done .ms-text { color: var(--text-muted); text-decoration: line-through; }
+  .ms-hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+  .ms-deliverable { display: inline-block; font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: rgba(79,124,255,0.12); color: var(--accent); border: 1px solid rgba(79,124,255,0.2); margin-top: 3px; }
+
+  .deadline-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; letter-spacing: 0.3px; flex-shrink: 0; }
+  .dl-ok      { background: rgba(122,128,153,0.15); color: var(--text-muted); border: 1px solid rgba(122,128,153,0.25); }
+  .dl-soon    { background: rgba(241,196,15,0.15);  color: var(--yellow);     border: 1px solid rgba(241,196,15,0.35); }
+  .dl-urgent  { background: rgba(231,76,60,0.15);   color: #e74c3c;           border: 1px solid rgba(231,76,60,0.35); }
+  .dl-done    { background: rgba(46,204,113,0.12);  color: var(--green);      border: 1px solid rgba(46,204,113,0.25); }
+
+  .deadline-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 14px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+  .deadline-row label { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .deadline-row input[type=date] { background: transparent; border: none; color: var(--text); font-size: 12px; font-family: inherit; outline: none; cursor: pointer; flex: 1; }
+  .deadline-row input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+  .task-notes-area { margin-top: 10px; }
+  .task-notes-area textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 12px; padding: 10px; resize: vertical; min-height: 70px; outline: none; transition: border-color 0.15s; }
+  .task-notes-area textarea:focus { border-color: var(--accent); }
+  .task-notes-area textarea::placeholder { color: var(--text-muted); }
+
+  /* ── ビュータブ ── */
+  .view-tabs { max-width: 900px; margin: 0 auto 20px; display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; }
+  .view-tab { font-size: 12px; font-weight: 600; padding: 7px 18px; border-radius: 8px; cursor: pointer; color: var(--text-muted); transition: all 0.15s; user-select: none; }
+  .view-tab:hover { color: var(--text); }
+  .view-tab.active { background: var(--accent); color: #fff; }
+
+  /* ── 担当者別ビュー ── */
+  .person-sections { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .person-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .person-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .person-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .person-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .person-count { font-size: 11px; color: var(--text-muted); }
+  .person-task-list { padding: 8px; }
+  .person-task-item { border-radius: 10px; margin-bottom: 4px; border: 1px solid transparent; transition: border-color 0.15s; }
+  .person-task-item.expanded { border-color: var(--border); background: var(--surface2); }
+  .person-task-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; cursor: pointer; border-radius: 10px; transition: background 0.15s; }
+  .person-task-item:not(.expanded) .person-task-row:hover { background: var(--surface2); }
+  .person-phase-tag { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); flex-shrink: 0; white-space: nowrap; }
+
+  /* ── 担当者フィルター（フェーズビュー用） ── */
+  .badge-assignee { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: rgba(124,79,255,0.15); color: var(--accent2); border: 1px solid rgba(124,79,255,0.3); }
+  .assignee-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 14px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+  .assignee-row label { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .assignee-row input[type=text] { background: transparent; border: none; color: var(--text); font-size: 12px; font-family: inherit; outline: none; flex: 1; }
+  .assignee-row input[type=text]::placeholder { color: var(--text-muted); }
+
+  footer { max-width: 900px; margin: 40px auto 0; text-align: center; font-size: 11px; color: var(--text-muted); }
+  footer a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <a class="back-link" href="/project-hub.html">← Project Hub</a>
+    <h1>アイケア ブランディング進捗</h1>
+    <p>論文発表 5月24日 に向けた全面リフレッシュ</p>
+  </div>
+  <div class="countdown">
+    <div class="countdown-label">締め切りまで</div>
+    <div class="countdown-days" id="countdown-days">—</div>
+    <div class="countdown-date">2026年 5月24日</div>
+  </div>
+</div>
+
+<div class="overall">
+  <div class="overall-top">
+    <span>全体進捗（マイルストーン）</span>
+    <strong id="overall-pct">0%</strong>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="overall-bar" style="width:0%"></div></div>
+  <div class="milestone-progress">
+    <div class="mp-item">完了 <span id="ms-done">0</span></div>
+    <div class="mp-item">タスク進行中 <span id="ms-doing">0</span></div>
+    <div class="mp-item">タスク未着手 <span id="ms-todo">0</span></div>
+    <div class="mp-item">全マイルストーン <span id="ms-total">0</span></div>
+  </div>
+</div>
+
+<div class="view-tabs">
+  <div class="view-tab active" id="tab-phase" onclick="switchView('phase')">フェーズ別</div>
+  <div class="view-tab" id="tab-person" onclick="switchView('person')">担当者別</div>
+</div>
+
+<div id="view-phase">
+  <div class="phases" id="phases-container"></div>
+</div>
+
+<div id="view-person" style="display:none">
+  <div class="person-sections" id="person-container"></div>
+</div>
+
+<footer>タスク行をクリックしてマイルストーンを展開 / ●●● でステータス上書き | <a href="/project-hub.html">← Hub</a></footer>
+
+<script>
+const DEADLINE = new Date('2026-05-24T00:00:00');
+const STORAGE_KEY = 'eyecare_tasks_v5';
+
+const defaultData = {
+  phases: [
+    {
+      id: 'p1', title: 'フェーズ 1 — 全体の基盤', collapsed: false,
+      tasks: [
+        {
+          id: 't1', name: '全体のブランディング', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-04-14',
+          milestones: [
+            { id: 'ms1a', type: 'section', title: '調査・戦略', items: [
+              { id: 'm1a', text: '競合ブランド調査', hint: '国内外のアイケア・メガネブランドを5〜10社調査。ポジショニングマップを作成', deliverable: '競合調査シート', done: false },
+              { id: 'm1b', text: 'ターゲット顧客の定義', hint: 'ペルソナ（年齢・職業・悩み・価値観）を2〜3パターン作成', deliverable: 'ペルソナシート', done: false },
+              { id: 'm1c', text: 'ブランドポジショニング定義', hint: '「誰に」「何を」「どう違うか」の3点を言語化', deliverable: 'ポジショニング文書', done: false },
+              { id: 'm1d', text: 'ブランドコンセプト・ミッション策定', hint: 'ブランドの存在意義・世界観を1〜2文で定義', deliverable: 'ブランドステートメント', done: false },
+            ]},
+            { id: 'ms1b', type: 'section', title: 'ビジュアルアイデンティティ', items: [
+              { id: 'm1e', text: 'カラーパレット決定', hint: 'メインカラー・サブカラー・アクセントカラーをHEX値で確定', deliverable: 'カラーパレット', done: false },
+              { id: 'm1f', text: 'タイポグラフィ選定', hint: '日本語・英語フォントを決定。見出し／本文／UIの3用途', deliverable: 'フォントガイド', done: false },
+              { id: 'm1g', text: 'トーン＆マナー定義', hint: '写真・イラスト・コピーの雰囲気ルール。NG例も含める', deliverable: 'トーン&マナーシート', done: false },
+              { id: 'm1h', text: 'ブランドガイドライン文書化', hint: '上記をまとめた全体ガイドライン。外注先に渡せる形に整理', deliverable: 'ブランドガイドラインPDF', done: false },
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      id: 'p2', title: 'フェーズ 2 — プロダクト別ブランディング', collapsed: false,
+      tasks: [
+        {
+          id: 't2', name: 'アイケアグラス ブランディング', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-04-21',
+          milestones: [
+            { id: 'ms2a', type: 'section', title: '用意するもの', items: [
+              { id: 'm2a', text: 'プロダクトコンセプト定義', hint: '「何を解決するか」「誰のためか」を1枚で整理', deliverable: 'コンセプトシート', done: false },
+              { id: 'm2b', text: 'ターゲットユーザー絞り込み', hint: '全体ペルソナからグラス専用のユーザー像を派生', deliverable: 'ターゲット定義', done: false },
+              { id: 'm2c', text: 'タグライン・キャッチコピー作成', hint: '製品を一言で表すフレーズを3〜5案作成し絞り込む', deliverable: 'タグライン', done: false },
+              { id: 'm2d', text: 'ビジュアルディレクション（全体ブランドからの派生）', hint: '全体ガイドラインをベースにグラスらしいビジュアルトーンを補足', deliverable: 'ビジュアル方針', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't3', name: 'アイケアグラス ロゴ制作', type: 'self', status: 'todo', notes: '※ブランディング完了後に着手', expanded: false, deadline: '2026-04-28',
+          milestones: [
+            { id: 'ms3a', type: 'section', title: '制作フロー', items: [
+              { id: 'm3a', text: 'ロゴコンセプト・方向性を言語化', hint: '「こういうロゴにしたい」の要件をA4 1枚に整理（シンプル／洗練／医療感 など）', deliverable: 'ロゴブリーフ', done: false },
+              { id: 'm3b', text: 'ラフスケッチ・方向性3案', hint: '文字系／マーク系／組み合わせの3方向で検討', deliverable: 'ラフ案', done: false },
+              { id: 'm3c', text: 'デジタル化・ブラッシュアップ', hint: 'Figma等で清書。カラー・モノクロ両対応を確認', deliverable: 'ロゴデータ（SVG）', done: false },
+              { id: 'm3d', text: '各フォーマット書き出し', hint: 'PNG（透過）・SVG・PDF・ファビコン用サイズ', deliverable: 'ロゴアセット一式', done: false },
+              { id: 'm3e', text: 'ロゴ使用ガイドライン追記', hint: '余白ルール・NG例をブランドガイドラインに追記', deliverable: 'ロゴガイドライン', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't4', name: 'アイケア365 ブランディング', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-04-28',
+          milestones: [
+            { id: 'ms4a', type: 'section', title: '用意するもの', items: [
+              { id: 'm4a', text: 'サービス概要の整理', hint: '365とは何か（定期ケア？サブスク？）をサービス仕様として文書化', deliverable: 'サービス定義書', done: false },
+              { id: 'm4b', text: 'ネーミングの意味・訴求ポイント定義', hint: '「365」が持つメッセージ（毎日・継続・習慣）を言語化', deliverable: 'ネーミング解説', done: false },
+              { id: 'm4c', text: 'タグライン・キャッチコピー作成', hint: '定期ケアの価値を伝えるフレーズを作成', deliverable: 'タグライン', done: false },
+              { id: 'm4d', text: 'ブランド内ポジション整理', hint: 'アイケアグラスとの違い・共通点を整理し立ち位置を確認', deliverable: 'ブランド内ポジション', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't5', name: 'アイケアラボ アプリ ブランディング', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-05-01',
+          milestones: [
+            { id: 'ms5a', type: 'section', title: 'デザイナーに渡すために必要なもの', items: [
+              { id: 'm5a', text: 'アプリのコアバリュー定義', hint: 'ユーザーがアプリを使うと何が解決されるか、3点以内で整理', deliverable: 'コアバリュー文書', done: false },
+              { id: 'm5b', text: '主要機能リストアップ', hint: '画面一覧・機能一覧を箇条書きで整理。デザイナーへの説明資料になる', deliverable: '機能一覧', done: false },
+              { id: 'm5c', text: 'UXの基本方針（ムードボード）', hint: '参考アプリ3〜5個のスクショを収集し世界観・テイストを共有', deliverable: 'ムードボード', done: false },
+              { id: 'm5d', text: 'ブランドガイドラインのアプリUI向け補足', hint: '全体のカラー・フォントをUIに適用する際の指針を追記', deliverable: 'UIブランド補足資料', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't6', name: 'アイケアラボ フラッグシップ店 ブランディング', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-05-07',
+          milestones: [
+            { id: 'ms6a', type: 'section', title: '用意するもの', items: [
+              { id: 'm6a', text: '店舗コンセプト定義', hint: '「店に入ったときに感じてほしいこと」を言語化した体験設計', deliverable: '店舗コンセプトシート', done: false },
+              { id: 'm6b', text: 'ターゲット客層・来店動機の整理', hint: 'どんな人が来て何を求めるかを定義', deliverable: 'ターゲット定義', done: false },
+              { id: 'm6c', text: '空間・什器・サインageテイストの方針', hint: '内装・看板・什器デザインの方向性（ムードボード参考画像5〜10枚）', deliverable: '空間ムードボード', done: false },
+              { id: 'm6d', text: 'スタッフユニフォーム・接客トーンの方針', hint: 'ブランドらしい接客スタイル・服装の方向性を定義', deliverable: 'サービスデザイン方針', done: false },
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      id: 'p3', title: 'フェーズ 3 — 外注手配', collapsed: false,
+      tasks: [
+        {
+          id: 't9', name: 'サイト製作者の採用・選定', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-04-28',
+          milestones: [
+            { id: 'ms9a', type: 'section', title: 'やること', items: [
+              { id: 'm9a', text: '発注仕様書（RFP）作成', hint: 'ページ数・必要機能・技術スタック・予算・納期・役割分担を整理', deliverable: '発注仕様書', done: false },
+              { id: 'm9b', text: '候補者・制作会社リストアップ', hint: 'クラウドワークス/ランサーズ/知人紹介など3〜5候補を選定', deliverable: '候補者リスト', done: false },
+              { id: 'm9c', text: 'ポートフォリオ確認・絞り込み', hint: '過去実績を確認しアイケアのトーンに合うか判断', done: false },
+              { id: 'm9d', text: 'ヒアリング・見積り取得', hint: '候補者2〜3名に仕様書を送り見積り・スケジュール確認', done: false },
+              { id: 'm9e', text: '契約・キックオフ', hint: '契約書締結。ブランドガイドライン・素材を引き渡す', deliverable: '契約書', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't10', name: 'アプリデザイナーの採用・選定', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-05-01',
+          milestones: [
+            { id: 'ms10a', type: 'section', title: 'やること', items: [
+              { id: 'm10a', text: 'デザイン発注仕様書作成', hint: '画面数・OS（iOS/Android）・デザインツール・予算・スケジュールを整理', deliverable: 'デザイン仕様書', done: false },
+              { id: 'm10b', text: '候補デザイナーリストアップ', hint: 'Behance/Dribbble/クラウドワークスで医療・ヘルスケアUI経験者を優先', deliverable: '候補者リスト', done: false },
+              { id: 'm10c', text: 'ポートフォリオ確認・絞り込み', hint: 'UIの質・医療系アプリの実績があるか確認', done: false },
+              { id: 'm10d', text: 'ヒアリング・見積り取得', done: false },
+              { id: 'm10e', text: '契約・ブリーフィング', hint: 'ブランドガイドライン・機能一覧・ムードボードを渡してキックオフ', deliverable: '契約書', done: false },
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      id: 'p4', title: 'フェーズ 4 — 外注制作物（進捗管理）', collapsed: false,
+      tasks: [
+        {
+          id: 't7', name: 'コーポレートサイト デザイン・制作', type: 'outsource', status: 'todo', notes: '5/24 論文発表と同時公開', expanded: false, deadline: '2026-05-24',
+          milestones: [
+            { id: 'ms7a', type: 'section', title: '自分が用意するもの（発注前）', items: [
+              { id: 'm7a', text: 'サイト構成・ページ一覧の確定', hint: 'トップ・会社概要・製品・論文研究・ニュース・お問い合わせ など', deliverable: 'サイト構成表', done: false },
+              { id: 'm7b', text: 'コンテンツ原稿（テキスト）作成', hint: '各ページのキャッチコピー・本文テキストを自分で用意', deliverable: 'テキスト原稿', done: false },
+              { id: 'm7c', text: '画像・写真素材の調達', hint: '製品写真・チーム写真・施設写真など必要素材をリストアップし調達', deliverable: '素材フォルダ', done: false },
+            ]},
+            { id: 'ms7b', type: 'section', title: '制作中の管理', items: [
+              { id: 'm7d', text: 'ワイヤーフレームレビュー', hint: '製作者から提出されたワイヤーへフィードバック', done: false },
+              { id: 'm7e', text: 'デザインカンプレビュー（PC・SP）', hint: 'ブランドガイドラインに沿っているか確認', done: false },
+              { id: 'm7f', text: '実装・コーディング確認', hint: '表示・速度・スマホ対応を確認', done: false },
+              { id: 'm7g', text: '最終チェック・公開承認', hint: '誤字・リンク・SEO設定などを最終確認し公開GO', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't8', name: 'アイケアラボ アプリ デザイン制作', type: 'outsource', status: 'todo', notes: '', expanded: false, deadline: '2026-05-24',
+          milestones: [
+            { id: 'ms8a', type: 'section', title: '自分が用意するもの（発注前）', items: [
+              { id: 'm8a', text: '画面フロー・ユーザーストーリー作成', hint: 'ユーザーがアプリでどう動くかの流れを図で整理（紙でも可）', deliverable: '画面フロー図', done: false },
+              { id: 'm8b', text: '機能要件の文書化', hint: '各画面で何ができるかを箇条書きで整理', deliverable: '機能要件書', done: false },
+              { id: 'm8c', text: '参考デザインのムードボード', hint: 'Pinterestなどで「こんな感じ」の参考画像を10〜20枚収集', deliverable: 'ムードボード', done: false },
+            ]},
+            { id: 'ms8b', type: 'section', title: '制作中の管理', items: [
+              { id: 'm8d', text: 'ワイヤーフレームレビュー', done: false },
+              { id: 'm8e', text: 'UIデザイン（Figma等）レビュー', hint: 'ブランドカラー・フォント適用を確認', done: false },
+              { id: 'm8f', text: 'プロトタイプ動作確認', hint: 'インタラクション・アニメーションを確認', done: false },
+              { id: 'm8g', text: 'デザインデータ最終納品確認', hint: 'デザインデータ・素材書き出しが揃っているか確認', done: false },
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      id: 'p5', title: 'フェーズ 5 — 本部', collapsed: false,
+      tasks: [
+        {
+          id: 't11', name: 'Zoom背景を精査する', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-04-21',
+          milestones: [
+            { id: 'ms11a', type: 'section', title: 'やること', items: [
+              { id: 'm11a', text: '現在使用中のZoom背景を一覧化', hint: '全スタッフが使っている背景をスクショで収集', done: false },
+              { id: 'm11b', text: 'ブランドガイドラインとの整合性チェック', hint: 'カラー・ロゴ・フォントがブランドに沿っているか確認', done: false },
+              { id: 'm11c', text: '新しいZoom背景のデザイン方針決定', hint: '統一デザインのルールを定義（背景色・ロゴ配置・テキストの有無）', deliverable: 'Zoom背景デザイン仕様', done: false },
+              { id: 'm11d', text: '背景データ制作・配布', hint: '全スタッフに配布できる形式（PNG推奨）で書き出し', deliverable: 'Zoom背景画像一式', done: false },
+            ]}
+          ]
+        },
+        {
+          id: 't12', name: '本部ロゴを作る', type: 'self', status: 'todo', notes: '', expanded: false, deadline: '2026-05-07',
+          milestones: [
+            { id: 'ms12a', type: 'section', title: '制作フロー', items: [
+              { id: 'm12a', text: '本部ロゴのコンセプト・役割を定義', hint: '「本部」ロゴが何を表すか（管理部門？コーポレート？）を言語化', deliverable: 'ロゴブリーフ', done: false },
+              { id: 'm12b', text: '全体ブランドとの関係性を整理', hint: 'アイケアラボのメインロゴとの親子関係・使い分けを決める', done: false },
+              { id: 'm12c', text: 'ラフ案作成（3方向）', hint: '文字系／マーク系／組み合わせで3案スケッチ', deliverable: 'ラフ案', done: false },
+              { id: 'm12d', text: 'デジタル化・ブラッシュアップ', hint: 'Figma等で清書。カラー・モノクロ両対応を確認', deliverable: 'ロゴデータ（SVG）', done: false },
+              { id: 'm12e', text: '各フォーマット書き出し', hint: 'PNG（透過）・SVG・PDF・ファビコン用サイズ', deliverable: 'ロゴアセット一式', done: false },
+            ]}
+          ]
+        }
+      ]
+    }
+      ,{
+      id: 'p6', title: 'フェーズ 6 — コーポレートサイト ページ制作', collapsed: false,
+      tasks: [
+        { id: 'tp01', name: '眼の整体院とは', type: 'outsource', status: 'todo', notes: 'about.html', expanded: false, deadline: '2026-04-21',
+          milestones: [{ id: 'msp01', type: 'section', title: '作業', items: [
+            { id: 'msp01a', text: 'コンテンツ原稿・テキスト確定', done: false },
+            { id: 'msp01b', text: 'デザインカンプ確認', done: false },
+            { id: 'msp01c', text: '実装・表示チェック', done: false },
+            { id: 'msp01d', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp02', name: '強み', type: 'outsource', status: 'todo', notes: 'about-strength.html', expanded: false, deadline: '2026-04-21',
+          milestones: [{ id: 'msp02', type: 'section', title: '作業', items: [
+            { id: 'msp02a', text: 'コンテンツ原稿・テキスト確定', done: false },
+            { id: 'msp02b', text: 'デザインカンプ確認', done: false },
+            { id: 'msp02c', text: '実装・表示チェック', done: false },
+            { id: 'msp02d', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp03', name: 'メニュー・料金', type: 'outsource', status: 'todo', notes: 'menu.html', expanded: false, deadline: '2026-04-28',
+          milestones: [{ id: 'msp03', type: 'section', title: '作業', items: [
+            { id: 'msp03a', text: '料金・メニュー情報の確定', done: false },
+            { id: 'msp03b', text: 'デザインカンプ確認', done: false },
+            { id: 'msp03c', text: '実装・表示チェック', done: false },
+            { id: 'msp03d', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp04', name: 'よくある質問', type: 'self', status: 'todo', notes: 'faq.html', expanded: false, deadline: '2026-04-28',
+          milestones: [{ id: 'msp04', type: 'section', title: '作業', items: [
+            { id: 'msp04a', text: 'FAQ項目の収集・整理', done: false },
+            { id: 'msp04b', text: 'デザイン確認', done: false },
+            { id: 'msp04c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp05', name: '専門機関・実績', type: 'outsource', status: 'todo', notes: 'achievements.html', expanded: false, deadline: '2026-05-01',
+          milestones: [{ id: 'msp05', type: 'section', title: '作業', items: [
+            { id: 'msp05a', text: '掲載実績・監修情報の収集', done: false },
+            { id: 'msp05b', text: 'デザイン確認', done: false },
+            { id: 'msp05c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp06', name: 'お客様の声', type: 'outsource', status: 'todo', notes: 'voices.html', expanded: false, deadline: '2026-05-07',
+          milestones: [{ id: 'msp06', type: 'section', title: '作業', items: [
+            { id: 'msp06a', text: '口コミ・体験談素材の収集', done: false },
+            { id: 'msp06b', text: 'デザイン確認', done: false },
+            { id: 'msp06c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp07', name: '公式メディア', type: 'self', status: 'todo', notes: 'media.html', expanded: false, deadline: '2026-05-07',
+          milestones: [{ id: 'msp07', type: 'section', title: '作業', items: [
+            { id: 'msp07a', text: 'SNS各チャンネルURL・フォロワー数の確認', done: false },
+            { id: 'msp07b', text: 'デザイン確認', done: false },
+            { id: 'msp07c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp08', name: '取り扱い商品一覧 + 各商品ページ', type: 'outsource', status: 'todo', notes: 'products.html 他', expanded: false, deadline: '2026-05-14',
+          milestones: [{ id: 'msp08', type: 'section', title: '作業', items: [
+            { id: 'msp08a', text: '商品情報・価格・写真の確定', done: false },
+            { id: 'msp08b', text: 'アイケアグラス / メリンジョール / メドリック 各ページ確認', done: false },
+            { id: 'msp08c', text: '実装・表示チェック', done: false },
+            { id: 'msp08d', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp09', name: 'アイケアラボ365', type: 'outsource', status: 'todo', notes: 'lab365.html', expanded: false, deadline: '2026-05-10',
+          milestones: [{ id: 'msp09', type: 'section', title: '作業', items: [
+            { id: 'msp09a', text: 'サービス内容・料金プランの確定', done: false },
+            { id: 'msp09b', text: 'デザイン確認', done: false },
+            { id: 'msp09c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp10', name: 'お問い合わせ', type: 'outsource', status: 'todo', notes: 'contact.html', expanded: false, deadline: '2026-05-10',
+          milestones: [{ id: 'msp10', type: 'section', title: '作業', items: [
+            { id: 'msp10a', text: 'フォーム項目・送信先の確定', done: false },
+            { id: 'msp10b', text: 'フォーム実装・テスト送信', done: false },
+            { id: 'msp10c', text: '公開承認', done: false }
+          ]}]
+        },
+        { id: 'tp11', name: 'お知らせ一覧・詳細', type: 'outsource', status: 'todo', notes: 'news.html / news-detail.html', expanded: false, deadline: '2026-05-14',
+          milestones: [{ id: 'msp11', type: 'section', title: '作業', items: [
+            { id: 'msp11a', text: 'お知らせCMS構成の決定', done: false },
+            { id: 'msp11b', text: '初期コンテンツ3〜5件の用意', done: false },
+            { id: 'msp11c', text: '実装・表示チェック', done: false },
+            { id: 'msp11d', text: '公開承認', done: false }
+          ]}]
+        }
+      ]
+    }
+  ]
+};
+
+function loadData() {
+  // v5 データがあればそのまま使う
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) return JSON.parse(s); } catch(e) {}
+
+  // v5 がなければ旧 v4 データを読み込んで移行
+  const base = JSON.parse(JSON.stringify(defaultData));
+  try {
+    const old = localStorage.getItem('eyecare_tasks_v4');
+    if (old) {
+      const oldData = JSON.parse(old);
+      // 旧データのタスク状態（notes / deadline / milestone.done / expanded）を引き継ぐ
+      const oldTaskMap = {};
+      for (const p of (oldData.phases || [])) {
+        for (const t of (p.tasks || [])) oldTaskMap[t.id] = t;
+      }
+      for (const p of base.phases) {
+        if (oldData.phases) {
+          const oldPhase = oldData.phases.find(op => op.id === p.id);
+          if (oldPhase) p.collapsed = oldPhase.collapsed;
+        }
+        for (const t of p.tasks) {
+          const ot = oldTaskMap[t.id];
+          if (!ot) continue;
+          t.notes    = ot.notes    ?? t.notes;
+          t.deadline = ot.deadline ?? t.deadline;
+          t.expanded = ot.expanded ?? false;
+          // milestone done 状態を引き継ぐ
+          const oldMsMap = {};
+          for (const ms of (ot.milestones || [])) {
+            if (ms.type === 'section') for (const item of ms.items) oldMsMap[item.id] = item.done;
+          }
+          for (const ms of (t.milestones || [])) {
+            if (ms.type === 'section') for (const item of ms.items) {
+              if (item.id in oldMsMap) item.done = oldMsMap[item.id];
+            }
+          }
+        }
+      }
+    }
+  } catch(e) {}
+  return base;
+}
+function saveData(d) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  // v4 も同期して上書き（移行完了済みにする）
+  localStorage.setItem('eyecare_tasks_v4', JSON.stringify(d));
+}
+
+let data = loadData();
+
+function updateCountdown() {
+  const days = Math.ceil((DEADLINE - new Date()) / 86400000);
+  const el = document.getElementById('countdown-days');
+  el.textContent = days > 0 ? days : '0';
+  if (days <= 14) el.style.background = 'linear-gradient(135deg,#e74c3c,#ff6b9d)';
+  else if (days <= 30) el.style.background = 'linear-gradient(135deg,#f1c40f,#ff9d00)';
+}
+
+function allMilestoneItems() {
+  return data.phases.flatMap(p => p.tasks.flatMap(t =>
+    (t.milestones || []).flatMap(ms => ms.type === 'section' ? ms.items : [])
+  ));
+}
+
+function updateProgress() {
+  const all = allMilestoneItems();
+  const done = all.filter(m => m.done).length;
+  const pct = all.length ? Math.round(done / all.length * 100) : 0;
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-bar').style.width = pct + '%';
+  document.getElementById('ms-done').textContent = done;
+  document.getElementById('ms-total').textContent = all.length;
+  const tasks = data.phases.flatMap(p => p.tasks);
+  document.getElementById('ms-doing').textContent = tasks.filter(t => deriveStatus(t) === 'doing').length;
+  document.getElementById('ms-todo').textContent = tasks.filter(t => deriveStatus(t) === 'todo').length;
+}
+
+function deadlineBadge(task) {
+  if (!task.deadline) return '';
+  const status = deriveStatus(task);
+  const dl = new Date(task.deadline + 'T00:00:00');
+  const days = Math.ceil((dl - new Date()) / 86400000);
+  const label = task.deadline.slice(5).replace('-', '/');
+  if (status === 'done') return `<span class="deadline-badge dl-done">✓ ${label}</span>`;
+  if (days < 0)   return `<span class="deadline-badge dl-urgent">⚑ ${label} 超過${Math.abs(days)}日</span>`;
+  if (days <= 7)  return `<span class="deadline-badge dl-urgent">⚑ ${label} あと${days}日</span>`;
+  if (days <= 14) return `<span class="deadline-badge dl-soon">⚑ ${label} あと${days}日</span>`;
+  return `<span class="deadline-badge dl-ok">⚑ ${label}</span>`;
+}
+
+function deriveStatus(task) {
+  const items = (task.milestones || []).flatMap(ms => ms.type === 'section' ? ms.items : []);
+  if (!items.length) return task.status || 'todo';
+  const done = items.filter(m => m.done).length;
+  if (done === 0) return 'todo';
+  if (done === items.length) return 'done';
+  return 'doing';
+}
+
+function findTask(id) {
+  for (const p of data.phases) for (const t of p.tasks) if (t.id === id) return t;
+  return null;
+}
+function findMsItem(taskId, msId) {
+  const t = findTask(taskId);
+  if (!t) return null;
+  for (const ms of (t.milestones || [])) {
+    if (ms.type === 'section') { const m = ms.items.find(i => i.id === msId); if (m) return m; }
+  }
+  return null;
+}
+
+function render() {
+  const container = document.getElementById('phases-container');
+  container.innerHTML = '';
+  data.phases.forEach((phase, pi) => {
+    const filteredTasks = phase.tasks;
+    if (filteredTasks.length === 0) return;
+    const done = filteredTasks.filter(t => deriveStatus(t) === 'done').length;
+    const phaseEl = document.createElement('div');
+    phaseEl.className = 'phase' + (phase.collapsed ? ' collapsed' : '');
+    const tasksHtml = filteredTasks.map(task => {
+      const status = deriveStatus(task);
+      const items = (task.milestones || []).flatMap(ms => ms.type === 'section' ? ms.items : []);
+      const doneCount = items.filter(m => m.done).length;
+      const checkIcon = status === 'done' ? '✓' : status === 'doing' ? '…' : '';
+
+      const sectionsHtml = (task.milestones || []).map(ms => {
+        if (ms.type !== 'section') return '';
+        return `<div class="milestone-section">
+          <div class="milestone-section-title">${esc(ms.title)}</div>
+          ${ms.items.map(item => `
+            <div class="milestone-item ${item.done ? 'done' : ''}" onclick="toggleMs('${task.id}','${item.id}')">
+              <div class="ms-check">${item.done ? '✓' : ''}</div>
+              <div class="ms-content">
+                <div class="ms-text">${esc(item.text)}</div>
+                ${item.hint ? `<div class="ms-hint">${esc(item.hint)}</div>` : ''}
+                ${item.deliverable ? `<div class="ms-deliverable">成果物: ${esc(item.deliverable)}</div>` : ''}
+              </div>
+            </div>`).join('')}
+        </div>`;
+      }).join('');
+
+      return `<div class="task-item ${task.expanded ? 'expanded' : ''}" data-status="${status}" id="task-${task.id}">
+        <div class="task-row" onclick="toggleTask('${task.id}')">
+          <div class="task-expand-icon">▶</div>
+          <div class="task-check">${checkIcon}</div>
+          <div class="task-main">
+            <div class="task-name">${esc(task.name)}</div>
+            <div class="task-meta">
+              <span class="badge ${task.type === 'outsource' ? 'badge-outsource' : 'badge-self'}">${task.type === 'outsource' ? '外注' : '自分'}</span>
+              <span class="badge-assignee">${esc(getAssignee(task))}</span>
+              ${deadlineBadge(task)}
+              <span class="ms-summary">${doneCount}/${items.length} 完了</span>
+              ${task.notes ? `<span class="ms-summary">— ${esc(task.notes.substring(0,50))}</span>` : ''}
+            </div>
+          </div>
+          <div class="status-btn" onclick="event.stopPropagation()">
+            <div class="status-dot dot-todo ${status==='todo'?'active':''}" title="未着手" onclick="forceStatus('${task.id}','todo')"></div>
+            <div class="status-dot dot-doing ${status==='doing'?'active':''}" title="進行中" onclick="forceStatus('${task.id}','doing')"></div>
+            <div class="status-dot dot-done ${status==='done'?'active':''}" title="完了" onclick="forceStatus('${task.id}','done')"></div>
+          </div>
+        </div>
+        <div class="milestone-panel">
+          ${sectionsHtml}
+          <div class="assignee-row">
+            <label>担当者</label>
+            <input type="text" placeholder="名前を入力..." value="${esc(task.assignee || '')}"
+              onchange="saveAssignee('${task.id}',this.value)" onclick="event.stopPropagation()">
+          </div>
+          <div class="deadline-row">
+            <label>⚑ 締切日</label>
+            <input type="date" value="${task.deadline||''}" onchange="saveDeadline('${task.id}',this.value)" onclick="event.stopPropagation()">
+          </div>
+          <div class="task-notes-area">
+            <textarea placeholder="メモ..." oninput="saveNotes('${task.id}',this.value)">${esc(task.notes||'')}</textarea>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    phaseEl.innerHTML = `
+      <div class="phase-header" onclick="togglePhase('${phase.id}')">
+        <div class="phase-number">${pi+1}</div>
+        <div class="phase-title">${esc(phase.title)}</div>
+        <div class="phase-count">${done}/${filteredTasks.length}</div>
+        <div class="phase-chevron">▼</div>
+      </div>
+      <div class="task-list">${tasksHtml}</div>`;
+    container.appendChild(phaseEl);
+  });
+  updateProgress();
+}
+
+function toggleTask(id) {
+  const t = findTask(id); if (t) { t.expanded = !t.expanded; saveData(data); render(); }
+}
+function togglePhase(id) {
+  const p = data.phases.find(ph => ph.id === id); if (p) { p.collapsed = !p.collapsed; saveData(data); render(); }
+}
+function toggleMs(taskId, msId) {
+  const m = findMsItem(taskId, msId); if (m) { m.done = !m.done; saveData(data); render(); }
+}
+function forceStatus(taskId, status) {
+  const t = findTask(taskId); if (!t) return;
+  const items = (t.milestones || []).flatMap(ms => ms.type === 'section' ? ms.items : []);
+  if (status === 'done') items.forEach(m => m.done = true);
+  else if (status === 'todo') items.forEach(m => m.done = false);
+  saveData(data); render();
+}
+function saveNotes(taskId, val) {
+  const t = findTask(taskId); if (t) { t.notes = val; saveData(data); }
+}
+function saveDeadline(taskId, val) {
+  const t = findTask(taskId); if (t) { t.deadline = val; saveData(data); render(); }
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── ビュー切替 ────────────────────────────────────
+let currentView = 'phase';
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('view-phase').style.display = v === 'phase' ? '' : 'none';
+  document.getElementById('view-person').style.display = v === 'person' ? '' : 'none';
+  document.getElementById('tab-phase').classList.toggle('active', v === 'phase');
+  document.getElementById('tab-person').classList.toggle('active', v === 'person');
+  if (v === 'person') renderPersonView();
+}
+
+// ── 担当者ヘルパー ────────────────────────────────
+function getAssignee(task) {
+  if (task.assignee) return task.assignee;
+  return task.type === 'outsource' ? '外注' : '自分';
+}
+
+function getAllAssignees() {
+  const set = new Set();
+  data.phases.flatMap(p => p.tasks).forEach(t => set.add(getAssignee(t)));
+  return Array.from(set).sort();
+}
+
+function saveAssignee(taskId, val) {
+  const t = findTask(taskId);
+  if (t) { t.assignee = val.trim(); saveData(data); }
+}
+
+// ── 担当者別ビュー ────────────────────────────────
+function renderPersonView() {
+  const container = document.getElementById('person-container');
+  container.innerHTML = '';
+
+  // Collect all tasks with their phase label
+  const allTasks = data.phases.flatMap(p =>
+    p.tasks.map(t => ({ task: t, phaseTitle: p.title.replace(/フェーズ \d+ — /, '') }))
+  );
+
+  // Group by assignee
+  const grouped = {};
+  allTasks.forEach(({ task, phaseTitle }) => {
+    const name = getAssignee(task);
+    if (!grouped[name]) grouped[name] = [];
+    grouped[name].push({ task, phaseTitle });
+  });
+
+  Object.keys(grouped).sort().forEach(name => {
+    const entries = grouped[name];
+    const doneCount = entries.filter(({ task }) => deriveStatus(task) === 'done').length;
+    const initial = name.slice(0, 1).toUpperCase() || '?';
+
+    const tasksHtml = entries.map(({ task, phaseTitle }) => {
+      const status = deriveStatus(task);
+      const items = (task.milestones || []).flatMap(ms => ms.type === 'section' ? ms.items : []);
+      const msDone = items.filter(m => m.done).length;
+      const checkIcon = status === 'done' ? '✓' : status === 'doing' ? '…' : '';
+
+      const sectionsHtml = (task.milestones || []).map(ms => {
+        if (ms.type !== 'section') return '';
+        return `<div class="milestone-section">
+          <div class="milestone-section-title">${esc(ms.title)}</div>
+          ${ms.items.map(item => `
+            <div class="milestone-item ${item.done ? 'done' : ''}" onclick="toggleMs('${task.id}','${item.id}');renderPersonView()">
+              <div class="ms-check">${item.done ? '✓' : ''}</div>
+              <div class="ms-content">
+                <div class="ms-text">${esc(item.text)}</div>
+                ${item.hint ? `<div class="ms-hint">${esc(item.hint)}</div>` : ''}
+                ${item.deliverable ? `<div class="ms-deliverable">成果物: ${esc(item.deliverable)}</div>` : ''}
+              </div>
+            </div>`).join('')}
+        </div>`;
+      }).join('');
+
+      return `<div class="person-task-item ${task.expanded ? 'expanded' : ''}" data-status="${status}">
+        <div class="person-task-row" onclick="toggleTask('${task.id}');renderPersonView()">
+          <div class="task-expand-icon">▶</div>
+          <div class="task-check">${checkIcon}</div>
+          <div class="task-main">
+            <div class="task-name">${esc(task.name)}</div>
+            <div class="task-meta">
+              <span class="person-phase-tag">${esc(phaseTitle)}</span>
+              <span class="badge ${task.type === 'outsource' ? 'badge-outsource' : 'badge-self'}">${task.type === 'outsource' ? '外注' : '自分'}</span>
+              ${deadlineBadge(task)}
+              <span class="ms-summary">${msDone}/${items.length} 完了</span>
+            </div>
+          </div>
+          <div class="status-btn" onclick="event.stopPropagation()">
+            <div class="status-dot dot-todo ${status==='todo'?'active':''}" onclick="forceStatus('${task.id}','todo');renderPersonView()"></div>
+            <div class="status-dot dot-doing ${status==='doing'?'active':''}" onclick="forceStatus('${task.id}','doing');renderPersonView()"></div>
+            <div class="status-dot dot-done ${status==='done'?'active':''}" onclick="forceStatus('${task.id}','done');renderPersonView()"></div>
+          </div>
+        </div>
+        <div class="milestone-panel">
+          ${sectionsHtml}
+          <div class="assignee-row">
+            <label>担当者</label>
+            <input type="text" placeholder="名前を入力..." value="${esc(task.assignee || '')}"
+              onchange="saveAssignee('${task.id}',this.value);renderPersonView()" onclick="event.stopPropagation()">
+          </div>
+          <div class="deadline-row">
+            <label>⚑ 締切日</label>
+            <input type="date" value="${task.deadline||''}" onchange="saveDeadline('${task.id}',this.value);renderPersonView()" onclick="event.stopPropagation()">
+          </div>
+          <div class="task-notes-area">
+            <textarea placeholder="メモ..." oninput="saveNotes('${task.id}',this.value)">${esc(task.notes||'')}</textarea>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const pct = entries.length ? Math.round(doneCount / entries.length * 100) : 0;
+    const secEl = document.createElement('div');
+    secEl.className = 'person-section';
+    secEl.innerHTML = `
+      <div class="person-header">
+        <div class="person-avatar">${esc(initial)}</div>
+        <div class="person-name">${esc(name)}</div>
+        <div class="person-count">${doneCount}/${entries.length} 完了 &nbsp;·&nbsp; ${pct}%</div>
+      </div>
+      <div class="person-task-list">${tasksHtml}</div>`;
+    container.appendChild(secEl);
+  });
+}
+
+updateCountdown();
+render();
+</script>
+</body>
+</html>
