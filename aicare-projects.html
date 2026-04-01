@@ -664,7 +664,114 @@ body {
 #app { animation: fadeIn 0.18s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.section-block { margin-bottom: 40px; }
+.section-block { margin-bottom: 32px; }
+
+/* ===================== COMPACT CATEGORY CARDS ===================== */
+.compact-cat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid;
+  border-radius: 10px;
+  padding: 9px 14px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: background 0.15s;
+}
+.compact-cat-card:hover { background: var(--surface2); }
+.compact-cat-card .ccc-name { font-size: 13px; font-weight: 600; flex: 1; }
+.compact-cat-card .ccc-count { font-size: 11px; color: var(--muted); }
+
+/* ===================== PROJECT TABLE ROW ===================== */
+.proj-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: 10px; margin-bottom: 5px;
+  transition: opacity 0.15s;
+  min-height: 42px;
+}
+.proj-row:hover { background: var(--surface2); }
+.proj-row.dim { opacity: 0.55; }
+.proj-row .proj-row-name {
+  flex: 1; font-size: 13px; font-weight: 600;
+  cursor: pointer; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.proj-row .proj-row-name:hover { color: var(--accent); }
+.proj-row-waiting {
+  font-size: 11px; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+  background: rgba(249,115,22,0.15); color: #fb923c;
+  border: 1px solid rgba(249,115,22,0.3); cursor: pointer;
+}
+.proj-row-waiting.empty {
+  background: transparent; color: var(--muted); border: 1px dashed var(--border);
+}
+.proj-row-waiting:hover { border-color: var(--accent); }
+.proj-row-next {
+  font-size: 11px; color: var(--muted); max-width: 160px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  cursor: pointer; padding: 2px 6px; border-radius: 4px;
+  border: 1px dashed var(--border);
+}
+.proj-row-next:hover { border-color: var(--accent); color: var(--text); }
+.proj-row-deadline {
+  font-size: 11px; color: var(--muted); cursor: pointer; white-space: nowrap;
+  padding: 2px 6px; border-radius: 4px; border: 1px dashed transparent;
+}
+.proj-row-deadline:hover { border-color: var(--accent); }
+@media (max-width: 900px) {
+  .proj-row-next, .proj-row-deadline { display: none; }
+}
+
+/* ===================== PRIORITY ITEMS (today panel) ===================== */
+.priority-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--surface);
+  border-radius: 8px; margin-bottom: 4px;
+  border-left: 3px solid; cursor: pointer; transition: opacity 0.15s;
+}
+.priority-item:hover { opacity: 0.85; }
+.priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.priority-item .pi-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11px; }
+
+/* ===================== BLOCKER FILTER ===================== */
+.blocker-filter { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.blocker-btn {
+  padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); transition: all 0.15s;
+}
+.blocker-btn:hover { color: var(--text); background: var(--surface2); }
+.blocker-btn.active { background: rgba(249,115,22,0.18); color: #fb923c; border-color: rgba(249,115,22,0.4); }
+
+/* ===================== PERSON SHORTCUTS ===================== */
+.person-shortcuts { display: flex; gap: 8px; flex-wrap: wrap; }
+.person-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.person-btn:hover { background: var(--surface2); border-color: rgba(245,158,11,0.3); }
+.person-btn .pcount { font-size: 10px; padding: 1px 5px; border-radius: 10px; background: var(--surface2); color: var(--muted); }
+
+/* ===================== NEXT ACTION BAR ===================== */
+.next-action-bar {
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 8px; padding: 8px 14px; font-size: 13px; color: var(--accent); margin-top: 10px;
+}
+
+/* ===================== TODAY PANEL ===================== */
+.today-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 8px;
+}
+.today-panel-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
 
 /* ===================== DRAG & DROP ===================== */
 .task-item { position: relative; }
@@ -761,6 +868,44 @@ body {
         <label>メンバー</label>
         <input type="text" id="pf-members" placeholder="例: がく、ちなり、鷲巣">
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>誰待ち</label>
+          <input type="text" id="pf-waitingFor" placeholder="例: がく、開発" list="waitingFor-datalist">
+        </div>
+        <div class="form-group">
+          <label>次アクション</label>
+          <input type="text" id="pf-nextAction" placeholder="例: デザイン確認依頼">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>緊急度</label>
+          <select id="pf-urgency">
+            <option value="">—</option>
+            <option>高</option>
+            <option>中</option>
+            <option>低</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>重要度</label>
+          <select id="pf-importance">
+            <option value="">—</option>
+            <option>高</option>
+            <option>中</option>
+            <option>低</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>今週やること</label>
+        <textarea id="pf-thisWeek" rows="2" placeholder="今週中に進めること"></textarea>
+      </div>
+      <div class="form-group">
+        <label>今の詰まり</label>
+        <input type="text" id="pf-blockedBy" placeholder="例: デザイン素材待ち、開発リソース不足">
+      </div>
       <div class="form-group">
         <label>目的</label>
         <textarea id="pf-purpose" rows="2"></textarea>
@@ -770,15 +915,7 @@ body {
         <textarea id="pf-deliverables" rows="2"></textarea>
       </div>
       <div class="form-group">
-        <label>概要</label>
-        <textarea id="pf-overview" rows="2"></textarea>
-      </div>
-      <div class="form-group">
-        <label>背景</label>
-        <textarea id="pf-background" rows="2"></textarea>
-      </div>
-      <div class="form-group">
-        <label>完了条件</label>
+        <label>完了条件 / KGI</label>
         <textarea id="pf-completionCriteria" rows="2"></textarea>
       </div>
       <div class="form-group">
@@ -834,6 +971,16 @@ body {
         <div class="form-group">
           <label>期限</label>
           <input type="date" id="tf-deadline">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>誰待ち</label>
+          <input type="text" id="tf-waitingFor" list="waitingFor-datalist">
+        </div>
+        <div class="form-group">
+          <label>次アクション</label>
+          <input type="text" id="tf-nextAction">
         </div>
       </div>
       <div class="form-group">
@@ -1120,7 +1267,7 @@ function getCategoryById(id) {
 }
 
 function getProjectById(id) {
-  return APP.projects.find(p => p.id === id);
+  return APP.projects.find(p => String(p.id) === String(id));
 }
 
 function statusBadge(status) {
@@ -1286,185 +1433,187 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
+function setBlockerFilter(val) {
+  blockerFilter = val;
+  const el = document.getElementById('blocker-list');
+  if (el) el.innerHTML = renderBlockerListInner(getProjects());
+  document.querySelectorAll('.blocker-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.bf === val);
+  });
+}
+
+function renderBlockerListInner(projects) {
+  const active = projects.filter(p => p.status !== '完了' && p.status !== '保留');
+  let filtered;
+  if (blockerFilter === '全て') {
+    filtered = active.filter(p => p.waitingFor || p.blockedBy);
+  } else {
+    const keyword = blockerFilter.replace('待ち', '').replace('確認', '').toLowerCase();
+    filtered = active.filter(p => {
+      const w = (p.waitingFor || '').toLowerCase();
+      const b = (p.blockedBy || '').toLowerCase();
+      const label = blockerFilter.toLowerCase();
+      return w.includes(keyword) || b.includes(keyword) || w.includes(label) || b.includes(label);
+    });
+  }
+  if (filtered.length === 0) return `<div style="color:var(--muted);padding:10px;font-size:13px;">該当なし</div>`;
+  return filtered.map(p => {
+    const waiting = p.waitingFor || '';
+    const blocked = p.blockedBy || '';
+    return `<div class="priority-item" style="border-left-color:#f97316;" onclick="navigate('#/project/${p.id}')">
+      <span class="pi-name">${p.name}</span>
+      <div class="pi-meta">
+        ${waiting ? `<span style="background:rgba(249,115,22,0.15);color:#fb923c;padding:1px 7px;border-radius:12px;border:1px solid rgba(249,115,22,0.3);">⏳ ${waiting}</span>` : ''}
+        ${blocked ? `<span style="color:#9ca3af;">詰まり: ${truncate(blocked, 20)}</span>` : ''}
+        ${statusBadge(p.status)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderDashboard() {
   const projects = getProjects();
-  const roles = getRoles();
-
   const total = projects.length;
   const byStatus = {};
   projects.forEach(p => { byStatus[p.status] = (byStatus[p.status]||0)+1; });
 
-  const statuses = ['進行中','未着手','完了','要確認','保留'];
+  // ① 今日の優先対応
+  const active = projects.filter(p => p.status !== '完了' && p.status !== '保留');
+  const deadline3 = active.filter(p => { const d = daysUntil(p.deadline); return d !== null && d <= 3; });
+  const review = active.filter(p => p.status === '要確認');
+  const waitMe = active.filter(p => (p.waitingFor||'').includes('こうた'));
+  const waitOther = active.filter(p => { const w = p.waitingFor||''; return w && !w.includes('こうた'); });
 
-  // Top 10 by priority
-  const prioritized = [...projects].sort((a,b) => priorityOrder(a.priority)-priorityOrder(b.priority)).slice(0,10);
+  function todayGroup(label, color, emoji, items, labelFn) {
+    if (!items.length) return '';
+    return `
+    <div class="today-panel" style="border-left:3px solid ${color};margin-bottom:8px;">
+      <div class="today-panel-title" style="color:${color};">${emoji} ${label} <span style="color:var(--muted);font-weight:400;">(${items.length}件)</span></div>
+      ${items.map(p => `
+        <div class="priority-item" style="border-left-color:${color};margin-bottom:3px;" onclick="navigate('#/project/${p.id}')">
+          <span class="pi-name">${p.name}</span>
+          <div class="pi-meta">
+            ${statusBadge(p.status)}
+            ${p.waitingFor ? `<span style="color:#fb923c;">⏳ ${p.waitingFor}</span>` : ''}
+            ${labelFn ? labelFn(p) : ''}
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();navigate('#/project/${p.id}')">今見る</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }
 
-  // Urgent: deadline within 7 days (projects)
-  const urgentProjects = projects.filter(p => {
-    if (p.status === '完了') return false;
+  const d3Html = todayGroup('期限3日以内', '#ef4444', '🔴', deadline3, p => {
     const d = daysUntil(p.deadline);
-    return d !== null && d <= 7;
+    return `<span style="color:${d < 0 ? '#ef4444' : '#fb923c'};">${d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`}</span>`;
+  });
+  const revHtml = todayGroup('要確認', '#f59e0b', '🟡', review, null);
+  const meHtml = todayGroup('こうた待ち', '#fb923c', '👤', waitMe, p => `<span style="color:var(--muted);">${p.waitingFor}</span>`);
+  const otherHtml = todayGroup('他メンバー待ち', '#60a5fa', '👥', waitOther, p => `<span style="color:#93c5fd;">${p.waitingFor}</span>`);
+  const todayContent = d3Html + revHtml + meHtml + otherHtml ||
+    `<div style="color:var(--muted);padding:12px;font-size:13px;">✅ 本日の緊急対応なし</div>`;
+
+  // ② 詰まり
+  const blockerKeys = ['全て','こうた待ち','がく待ち','開発待ち','ちなり待ち','鷲巣待ち','ささじま待ち','素材待ち','確認待ち'];
+
+  // ③ プロジェクト一覧 sorted
+  const sorted = [...projects].sort((a, b) => {
+    const statusOrd = {'進行中':0,'要確認':1,'未着手':2,'完了':3,'保留':4};
+    const sA = statusOrd[a.status] ?? 5;
+    const sB = statusOrd[b.status] ?? 5;
+    if (sA !== sB) return sA - sB;
+    return priorityOrder(a.priority) - priorityOrder(b.priority);
   });
 
-  // 要確認 projects
-  const needsReview = projects.filter(p => p.status === '要確認');
-
-  // 未着手 最優先
-  const unstarted = projects.filter(p => p.status === '未着手' && p.priority === '最優先');
-
-  // Urgent tasks
-  const urgentTasks = [];
-  projects.forEach(p => {
-    (p.tasks||[]).forEach(t => {
-      if (t.status === '完了') return;
-      const d = daysUntil(t.deadline);
-      if (d !== null && d <= 7) urgentTasks.push({ task: t, project: p });
-    });
+  // ④ 担当者ショートカット
+  const people = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
+  const personCounts = {};
+  people.forEach(person => {
+    personCounts[person] = projects.filter(p =>
+      (p.assignee||'').split(/[、,，\s]+/).map(s=>s.trim()).includes(person) ||
+      (p.members||'').split(/[、,，\s]+/).map(s=>s.trim()).includes(person)
+    ).length;
   });
 
   return `
 <div class="page-container">
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
-    <div>
-      <h1 class="page-title">プロジェクト管理</h1>
-      <p class="page-desc">アイケアラボ 全プロジェクトの一覧・進捗・タスク管理</p>
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <h1 style="font-size:20px;font-weight:800;">プロジェクト管理</h1>
+      <span id="saveIndicator" style="font-size:12px;color:#4ade80;opacity:0;transition:opacity 0.5s;"></span>
     </div>
-    <div style="display:flex;gap:8px;">
-      <span id="saveIndicator" style="font-size:12px;color:#4ade80;opacity:0;transition:opacity 0.5s;align-self:center;"></span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
       <button class="btn btn-secondary btn-sm" onclick="navigate('#/members')">👤 担当者別</button>
-      <button class="btn btn-secondary btn-sm" onclick="openRolesModal()">👥 役割を編集</button>
+      <button class="btn btn-secondary btn-sm" onclick="openRolesModal()">👥 役割編集</button>
       <button class="btn btn-secondary btn-sm" onclick="openCategoriesModal()">🏷 カテゴリ編集</button>
-      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="background:#16a34a22;color:#4ade80;border-color:#16a34a44;">📊 CSV書き出し</button>
+      <button class="btn btn-primary btn-sm" onclick="openProjectModal(null)">＋ 追加</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="color:#4ade80;border-color:#16a34a44;">📊 CSV</button>
     </div>
   </div>
 
-  <!-- Stats -->
+  <!-- Stats bar (compact) -->
+  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+    ${[['全体',total,'#e8eaf0'],['進行中',byStatus['進行中']||0,'#60a5fa'],['未着手',byStatus['未着手']||0,'#9ca3af'],['完了',byStatus['完了']||0,'#34d399'],['要確認',byStatus['要確認']||0,'#fbbf24'],['保留',byStatus['保留']||0,'#a78bfa']].map(([label,num,color]) => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;font-weight:700;color:${color};">${num}</span>
+        <span style="font-size:11px;color:var(--muted);">${label}</span>
+      </div>`).join('')}
+  </div>
+
+  <!-- ① 今日の優先対応 -->
   <div class="section-block">
-    <div class="grid-5">
-      <div class="stat-card">
-        <div class="stat-num" style="color:#e8eaf0;">${total}</div>
-        <div class="stat-label">全プロジェクト</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:#60a5fa;">${byStatus['進行中']||0}</div>
-        <div class="stat-label">進行中</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:#9ca3af;">${byStatus['未着手']||0}</div>
-        <div class="stat-label">未着手</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:#34d399;">${byStatus['完了']||0}</div>
-        <div class="stat-label">完了</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:#fbbf24;">${byStatus['要確認']||0}</div>
-        <div class="stat-label">要確認</div>
-      </div>
+    <div class="section-title">① 今日の優先対応</div>
+    ${todayContent}
+  </div>
+
+  <!-- ② 詰まり一覧 -->
+  <div class="section-block">
+    <div class="section-title">② 詰まり一覧</div>
+    <div class="blocker-filter">
+      ${blockerKeys.map(k => `<button class="blocker-btn${blockerFilter===k?' active':''}" data-bf="${k}" onclick="setBlockerFilter('${k}')">${k}</button>`).join('')}
+    </div>
+    <div id="blocker-list">${renderBlockerListInner(projects)}</div>
+  </div>
+
+  <!-- ③ プロジェクト一覧 -->
+  <div class="section-block">
+    <div class="section-title" style="margin-bottom:8px;">③ 全プロジェクト一覧 <span style="font-weight:400;color:var(--muted);">${total}件</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;gap:12px;">
+      <span>状態 / 優先度 / 誰待ち / 期限 / 次アクション をクリックで編集</span>
+    </div>
+    <div id="proj-list">
+      ${sorted.map(p => renderProjectRow(p)).join('')}
     </div>
   </div>
 
-  <!-- Categories -->
+  <!-- ④ 担当者ショートカット -->
   <div class="section-block">
-    <div class="section-title">カテゴリ一覧</div>
-    <div class="grid-3">
+    <div class="section-title">④ 担当者ショートカット</div>
+    <div class="person-shortcuts">
+      ${people.map(person => `
+        <button class="person-btn" onclick="navigate('#/members')">
+          ${person}
+          <span class="pcount">${personCounts[person]}件</span>
+        </button>`).join('')}
+    </div>
+  </div>
+
+  <!-- ⑤ カテゴリ一覧 -->
+  <div class="section-block">
+    <div class="section-title">⑤ カテゴリ一覧</div>
+    <div class="grid-4" style="gap:8px;">
       ${getCategories().map(cat => {
         const count = projects.filter(p => p.categoryId === cat.id).length;
-        const done = projects.filter(p => p.categoryId === cat.id && p.status === '完了').length;
+        const doing = projects.filter(p => p.categoryId === cat.id && p.status === '進行中').length;
         return `
-        <div class="category-card" onclick="navigate('#/category/${cat.id}')">
-          <div class="cat-accent" style="background:${cat.color};"></div>
-          <div class="cat-icon">${cat.icon}</div>
-          <div class="cat-name">${cat.name}</div>
-          <div class="cat-desc">${cat.desc}</div>
-          <div class="cat-count"><span>${count}</span> プロジェクト${done > 0 ? ` · 完了 ${done}` : ''}</div>
-          <button class="btn btn-secondary btn-sm" style="pointer-events:none;">このカテゴリを見る →</button>
+        <div class="compact-cat-card" style="border-left-color:${cat.color};" onclick="navigate('#/category/${cat.id}')">
+          <span style="font-size:16px;">${cat.icon}</span>
+          <span class="ccc-name">${cat.name}</span>
+          <span class="ccc-count">${count}件${doing ? ` / 進行中${doing}` : ''}</span>
+          <button class="btn btn-ghost btn-sm" style="pointer-events:none;">今見る</button>
         </div>`;
       }).join('')}
     </div>
-  </div>
-
-  <!-- Roles -->
-  <div class="section-block">
-    <div class="section-title">現在の役割分担</div>
-    <div class="roles-grid">
-      ${Object.entries(roles).map(([k,v]) => `
-        <div class="role-item">
-          <div class="role-label">${v.label}</div>
-          <div class="role-person">${v.person||'—'}</div>
-        </div>
-      `).join('')}
-    </div>
-  </div>
-
-  <!-- Priority Projects -->
-  <div class="section-block">
-    <div class="section-title">優先度の高いプロジェクト TOP10</div>
-    ${prioritized.map(p => {
-      const cat = getCategoryById(p.categoryId);
-      return `
-      <div class="priority-row" onclick="navigate('#/project/${p.id}')">
-        <div class="pr-name">${p.name}</div>
-        <div class="pr-meta">
-          ${priorityBadge(p.priority)}
-          ${statusBadge(p.status)}
-          <span class="pr-cat" style="color:${cat.color};">${cat.icon} ${cat.name}</span>
-          ${p.assignee ? `<span style="font-size:12px;color:var(--muted);">👤 ${p.assignee}</span>` : ''}
-        </div>
-      </div>`;
-    }).join('')}
-  </div>
-
-  <!-- Urgent Section -->
-  <div class="section-block">
-    <div class="section-title">今すぐ見るべきもの</div>
-    ${urgentProjects.length === 0 && urgentTasks.length === 0 && needsReview.length === 0 && unstarted.length === 0 ? `
-      <div class="empty-state"><div class="empty-icon">✅</div><p>今すぐ対応が必要な項目はありません</p></div>
-    ` : ''}
-
-    ${urgentProjects.map(p => {
-      const d = daysUntil(p.deadline);
-      const label = d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`;
-      return `
-      <div class="urgent-item" onclick="navigate('#/project/${p.id}')">
-        <div class="urgent-icon">⚠️</div>
-        <div class="urgent-content">
-          <div class="urgent-title">${p.name}</div>
-          <div class="urgent-meta">期限 ${formatDate(p.deadline)} — ${label} · ${statusBadge(p.status)}</div>
-        </div>
-      </div>`;
-    }).join('')}
-
-    ${urgentTasks.map(({task, project}) => {
-      const d = daysUntil(task.deadline);
-      const label = d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`;
-      return `
-      <div class="urgent-item" onclick="navigate('#/project/${project.id}')">
-        <div class="urgent-icon">📌</div>
-        <div class="urgent-content">
-          <div class="urgent-title">[タスク] ${task.name} — ${project.name}</div>
-          <div class="urgent-meta">期限 ${formatDate(task.deadline)} — ${label}</div>
-        </div>
-      </div>`;
-    }).join('')}
-
-    ${needsReview.map(p => `
-      <div class="urgent-item" onclick="navigate('#/project/${p.id}')">
-        <div class="urgent-icon">🔍</div>
-        <div class="urgent-content">
-          <div class="urgent-title">${p.name}</div>
-          <div class="urgent-meta">ステータス: 要確認 · 確認・承認が必要です</div>
-        </div>
-      </div>`).join('')}
-
-    ${unstarted.map(p => `
-      <div class="urgent-item" onclick="navigate('#/project/${p.id}')">
-        <div class="urgent-icon">🚀</div>
-        <div class="urgent-content">
-          <div class="urgent-title">${p.name}</div>
-          <div class="urgent-meta">最優先・未着手 — 早急に着手が必要です</div>
-        </div>
-      </div>`).join('')}
   </div>
 </div>`;
 }
@@ -1531,9 +1680,42 @@ function renderProjectCard(p) {
   </div>
   ${p.deliverables ? `<div class="proj-deliverables">📦 ${truncate(p.deliverables, 80)}</div>` : ''}
   <div class="proj-actions" onclick="event.stopPropagation()">
-    <button class="btn btn-secondary btn-sm" onclick="navigate('#/project/${p.id}/tasks')">タスク</button>
-    <button class="btn btn-ghost btn-sm" onclick="openProjectModal(${p.id})">編集</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">削除</button>
+    <button class="btn btn-secondary btn-sm" onclick="navigate('#/project/${p.id}/tasks')">タスクを見る</button>
+    <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${p.id}')">編集</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">削除</button>
+  </div>
+</div>`;
+}
+
+// ===================== PROJECT ROW (inline edit table row) =====================
+function projectRowBorderColor(p) {
+  if (p.status === '完了' || p.status === '保留') return '#6b7280';
+  const d = daysUntil(p.deadline);
+  if (d !== null && d <= 3) return '#ef4444';
+  if (p.status === '要確認') return '#f59e0b';
+  if (p.status === '進行中') return '#3b82f6';
+  return '#2e3350';
+}
+
+function renderProjectRow(p) {
+  const d = daysUntil(p.deadline);
+  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fb923c' : 'var(--muted)';
+  const dlText = p.deadline ? `<span style="color:${dlColor};">${formatDate(p.deadline)}</span>` : '<span style="color:var(--muted);">—</span>';
+  const dim = (p.status === '完了' || p.status === '保留') ? ' dim' : '';
+  const borderColor = projectRowBorderColor(p);
+  const waitingVal = p.waitingFor || '';
+  const nextVal = p.nextAction || '';
+  return `
+<div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
+  <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
+  <div onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
+  <div onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
+  <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
+  <span class="proj-row-deadline" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
+  <span class="proj-row-next" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 28) : '<i>次アクション</i>'}</span>
+  <div style="display:flex;gap:4px;flex-shrink:0;" onclick="event.stopPropagation()">
+    <button class="btn btn-ghost btn-sm" onclick="navigate('#/project/${p.id}')">今見る</button>
+    <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${p.id}')">編集</button>
   </div>
 </div>`;
 }
@@ -1542,9 +1724,20 @@ function statusDropdownHtml(p) {
   const statuses = ['未着手','進行中','完了','要確認','保留'];
   return `
   <div class="status-dropdown-wrap" id="sdw-${p.id}" onclick="event.stopPropagation()">
-    <span class="badge status-${p.status}" style="cursor:pointer;" onclick="toggleStatusDropdown(event,${p.id})">${p.status} ▾</span>
+    <span class="badge status-${p.status}" style="cursor:pointer;" onclick="toggleStatusDropdown(event,'${p.id}')">${p.status} ▾</span>
     <div class="status-menu">
-      ${statuses.map(s => `<button onclick="quickChangeStatus(${p.id},'${s}')">${s}</button>`).join('')}
+      ${statuses.map(s => `<button onclick="quickChangeStatus('${p.id}','${s}')">${s}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function priorityDropdownHtml(p) {
+  const priorities = ['最優先','高','中','低'];
+  return `
+  <div class="status-dropdown-wrap" id="pdw-${p.id}" onclick="event.stopPropagation()">
+    <span class="badge priority-${p.priority}" style="cursor:pointer;" onclick="togglePriorityDropdown(event,'${p.id}')">${p.priority} ▾</span>
+    <div class="status-menu">
+      ${priorities.map(v => `<button onclick="quickChangePriority('${p.id}','${v}')">${v}</button>`).join('')}
     </div>
   </div>`;
 }
@@ -1560,55 +1753,68 @@ function renderProject(id, tab) {
   const cat = getCategoryById(p.categoryId);
   const roles = getRoles();
   const leadRole = roles[p.leadRole];
+  const d = daysUntil(p.deadline);
+  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fb923c' : 'var(--muted)';
+  const taskCount = (p.tasks||[]).length;
 
   return `
 <div class="page-container">
-  <button class="back-btn" onclick="navigate('#/category/${p.categoryId}')">← ${cat.icon} ${cat.name} へ戻る</button>
+  <!-- Back + Actions row -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+    <button class="back-btn" style="margin:0;" onclick="navigate('#/')">← ダッシュボードへ</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-secondary btn-sm" onclick="openProjectModal('${p.id}')">✏️ 編集</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">削除</button>
+    </div>
+  </div>
 
   <!-- Project Header -->
-  <div class="proj-header-bar">
+  <div class="proj-header-bar" style="margin-bottom:16px;border-left:4px solid ${projectRowBorderColor(p)};">
     <div class="phb-top">
       <div class="phb-name">${p.name}</div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="openProjectModal(${p.id})">✏️ 編集</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">削除</button>
-      </div>
     </div>
     <div class="phb-badges">
       ${catBadge(p.categoryId)}
-      ${statusBadge(p.status)}
-      ${priorityBadge(p.priority)}
+      ${statusDropdownHtml(p)}
+      ${priorityDropdownHtml(p)}
+      ${p.urgency ? `<span class="badge" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);">緊急度: ${p.urgency}</span>` : ''}
+      ${p.importance ? `<span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);">重要度: ${p.importance}</span>` : ''}
     </div>
-    <div class="phb-meta">
-      ${p.assignee ? `<span>👤 担当: <strong>${p.assignee}</strong></span>` : ''}
-      ${p.members ? `<span>👥 メンバー: ${p.members.split(/[、,，]+/).map(n => { const name = n.trim(); const role = Object.values(getRoles()).find(r => r.person.split(/[、,，\s]+/).map(s=>s.trim()).includes(name)); return role ? `${name}<span style="font-size:10px;color:var(--muted);"> (${role.label})</span>` : name; }).join('、')}</span>` : ''}
-      ${leadRole ? `<span>🎯 リード: ${leadRole.label} (${leadRole.person})</span>` : ''}
-      ${p.deadline ? `<span>📅 期限: <strong>${formatDate(p.deadline)}</strong></span>` : '<span>📅 期限: 未設定</span>'}
+    <div class="phb-meta" style="margin-top:10px;">
+      ${p.assignee ? `<span>👤 <strong>${p.assignee}</strong></span>` : ''}
+      ${p.deadline ? `<span style="color:${dlColor};">📅 ${formatDate(p.deadline)}${d !== null ? (d < 0 ? ` (${Math.abs(d)}日超過)` : d === 0 ? ' (今日!)' : ` (あと${d}日)`) : ''}</span>` : '<span style="color:var(--muted);">📅 期限未設定</span>'}
+      ${p.waitingFor ? `<span style="color:#fb923c;">⏳ ${p.waitingFor}待ち</span>` : ''}
+      ${leadRole ? `<span>🎯 ${leadRole.label}</span>` : ''}
+    </div>
+    ${p.nextAction ? `<div class="next-action-bar">▶ 次アクション: ${p.nextAction}</div>` : ''}
+  </div>
+
+  <!-- Info grid -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div class="card">
+      ${p.purpose ? `<div class="info-item" style="margin-bottom:12px;"><div class="info-label">目的</div><div class="info-value" style="font-size:13px;">${p.purpose}</div></div>` : ''}
+      ${p.deliverables ? `<div class="info-item"><div class="info-label">成果物</div><div class="info-value" style="font-size:12px;color:var(--muted);">${p.deliverables}</div></div>` : ''}
+      ${p.completionCriteria ? `<div class="info-item" style="margin-top:12px;"><div class="info-label">KGI / 完了条件</div><div class="info-block" style="font-size:12px;">${p.completionCriteria}</div></div>` : ''}
+    </div>
+    <div class="card">
+      ${p.thisWeek ? `<div class="info-item" style="margin-bottom:12px;"><div class="info-label" style="color:#60a5fa;">今週やること</div><div class="info-block" style="font-size:13px;border-left:3px solid #3b82f6;">${p.thisWeek}</div></div>` : ''}
+      ${p.blockedBy ? `<div class="info-item" style="margin-bottom:12px;"><div class="info-label" style="color:#f87171;">今の詰まり</div><div class="info-block" style="font-size:13px;border-left:3px solid #ef4444;">${p.blockedBy}</div></div>` : ''}
+      ${p.notes ? `<div class="info-item"><div class="info-label">メモ</div><div class="info-block" style="font-size:12px;">${p.notes}</div></div>` : ''}
     </div>
   </div>
 
-  <!-- Info Section -->
-  <div class="card" style="margin-bottom:24px;">
-    <div class="info-grid">
-      <div class="info-item full">
-        <div class="info-label">目的</div>
-        <div class="info-value">${p.purpose || '—'}</div>
-      </div>
-      ${p.overview ? `<div class="info-item full"><div class="info-label">概要</div><div class="info-block">${p.overview}</div></div>` : ''}
-      ${p.background ? `<div class="info-item full"><div class="info-label">背景</div><div class="info-block">${p.background}</div></div>` : ''}
-      <div class="info-item full">
-        <div class="info-label">成果物</div>
-        <div class="info-value">${p.deliverables || '—'}</div>
-      </div>
-      ${p.completionCriteria ? `<div class="info-item full"><div class="info-label">完了条件</div><div class="info-block">${p.completionCriteria}</div></div>` : ''}
-      ${p.notes ? `<div class="info-item full"><div class="info-label">備考・メモ</div><div class="info-block">${p.notes}</div></div>` : ''}
+  ${p.members ? `
+  <div class="card" style="margin-bottom:16px;padding:14px 20px;">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">関係者</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${p.members.split(/[、,，]+/).map(n => { const name = n.trim(); if (!name) return ''; const role = Object.values(getRoles()).find(r => r.person.split(/[、,，\s]+/).map(s=>s.trim()).includes(name)); return `<span style="padding:3px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);font-size:12px;">${name}${role ? `<span style="font-size:10px;color:var(--muted);"> ${role.label}</span>` : ''}</span>`; }).join('')}
     </div>
-  </div>
+  </div>` : ''}
 
   <!-- Tab Bar -->
   <div class="tab-bar">
-    <button class="tab-btn ${currentTab==='tasks'?'active':''}" onclick="switchTab(${id},'tasks')">タスク一覧</button>
-    <button class="tab-btn ${currentTab==='deliverables'?'active':''}" onclick="switchTab(${id},'deliverables')">成果物</button>
+    <button class="tab-btn ${currentTab==='tasks'?'active':''}" onclick="switchTab('${id}','tasks')">タスクを見る (${taskCount})</button>
+    <button class="tab-btn ${currentTab==='deliverables'?'active':''}" onclick="switchTab('${id}','deliverables')">成果物</button>
   </div>
 
   <!-- Tab Content -->
@@ -1626,8 +1832,8 @@ function switchTab(id, tab) {
   currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-  const p = getProjectById(id);
-  document.getElementById('tab-content').innerHTML = renderTabContent(p, tab);
+  const p = getProjectById(id) || APP.projects.find(x => String(x.id) === String(id));
+  if (p) document.getElementById('tab-content').innerHTML = renderTabContent(p, tab);
 }
 
 function renderTabContent(p, tab) {
@@ -1638,6 +1844,7 @@ function renderTabContent(p, tab) {
 
 let taskFilter = '全て';
 let taskSort = '優先度順';
+let blockerFilter = '全て';
 
 function renderTaskTab(p) {
   const statuses = ['全て','未着手','進行中','完了','要確認','保留'];
@@ -1657,14 +1864,14 @@ function renderTaskTab(p) {
   <div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
       <div class="filter-bar" style="margin-bottom:0;">
-        ${statuses.map(s => `<button class="filter-btn ${taskFilter===s?'active':''}" onclick="setTaskFilter(${p.id},'${s}')">${s}</button>`).join('')}
+        ${statuses.map(s => `<button class="filter-btn ${taskFilter===s?'active':''}" onclick="setTaskFilter('${p.id}','${s}')">${s}</button>`).join('')}
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <select onchange="setTaskSort(${p.id},this.value)" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;">
+        <select onchange="setTaskSort('${p.id}',this.value)" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;">
           <option ${taskSort==='優先度順'?'selected':''}>優先度順</option>
           <option ${taskSort==='期限順'?'selected':''}>期限順</option>
         </select>
-        <button class="btn btn-primary btn-sm" onclick="openTaskModal(${p.id}, null)">＋ タスク追加</button>
+        <button class="btn btn-primary btn-sm" onclick="openTaskModal('${p.id}', null)">＋ タスク追加</button>
       </div>
     </div>
     ${tasks.length === 0 ? `<div class="empty-state"><div class="empty-icon">📋</div><p>タスクがありません</p></div>` :
@@ -1682,17 +1889,17 @@ function renderTaskItem(projectId, t, isChild) {
   <div class="task-item" data-task-id="${t.id}" data-project-id="${projectId}"
        id="task-item-${t.id.replace(/\W/g,'_')}"
        draggable="true"
-       ondragstart="taskDragStart(event,${projectId},'${t.id}')"
-       ondragover="taskDragOver(event,${projectId},'${t.id}')"
+       ondragstart="taskDragStart(event,'${projectId}','${t.id}')"
+       ondragover="taskDragOver(event,'${projectId}','${t.id}')"
        ondragleave="taskDragLeave(event,'${t.id}')"
-       ondrop="taskDrop(event,${projectId},'${t.id}')"
+       ondrop="taskDrop(event,'${projectId}','${t.id}')"
        ondragend="taskDragEnd()">
     <span class="task-drag-handle">⠿</span>
     <div>
       <div class="status-dropdown-wrap" id="tsdw-${t.id.replace(/\W/g,'_')}">
-        <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}',${projectId})">${t.status} ▾</span>
+        <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}','${projectId}')">${t.status} ▾</span>
         <div class="status-menu">
-          ${['未着手','進行中','完了','要確認','保留'].map(s => `<button onclick="quickChangeTaskStatus('${t.id}',${projectId},'${s}')">${s}</button>`).join('')}
+          ${['未着手','進行中','完了','要確認','保留'].map(s => `<button onclick="quickChangeTaskStatus('${t.id}','${projectId}','${s}')">${s}</button>`).join('')}
         </div>
       </div>
     </div>
@@ -1700,11 +1907,13 @@ function renderTaskItem(projectId, t, isChild) {
     <div class="task-meta">
       ${priorityBadge(t.priority)}
       ${t.assignee ? `<span>👤 ${t.assignee}</span>` : ''}
+      ${t.waitingFor ? `<span style="color:#fb923c;">⏳ ${t.waitingFor}</span>` : ''}
+      ${t.nextAction ? `<span style="color:var(--accent);">▶ ${truncate(t.nextAction,20)}</span>` : ''}
       ${t.deadline ? `<span>📅 ${formatDate(t.deadline)}</span>` : ''}
     </div>
     <div class="task-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openTaskModal(${projectId},'${t.id}')">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteTask(${projectId},'${t.id}')">🗑</button>
+      <button class="btn btn-ghost btn-sm" onclick="openTaskModal('${projectId}','${t.id}')">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteTask('${projectId}','${t.id}')">🗑</button>
     </div>
   </div>${childrenHtml}`;
 }
@@ -1765,29 +1974,106 @@ function toggleTaskStatusDropdown(e, taskId, projectId) {
 
 document.addEventListener('click', () => closeAllDropdowns());
 
+function togglePriorityDropdown(e, projId) {
+  e.stopPropagation();
+  const el = document.getElementById(`pdw-${projId}`);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  closeAllDropdowns();
+  if (!wasOpen) { el.classList.add('open'); openDropdown = el; }
+}
+
+function quickChangePriority(projId, newPriority) {
+  const p = APP.projects.find(p => String(p.id) === String(projId));
+  if (p) { p.priority = newPriority; save(); }
+  closeAllDropdowns();
+  const rowEl = document.getElementById('proj-row-' + projId);
+  if (rowEl) {
+    const rp = APP.projects.find(x => String(x.id) === String(projId));
+    if (rp) rowEl.outerHTML = renderProjectRow(rp);
+  }
+  // also update in-place for detail view
+  const pdw = document.getElementById(`pdw-${projId}`);
+  if (pdw) {
+    const badge = pdw.querySelector('.badge');
+    if (badge) { badge.className = `badge priority-${newPriority}`; badge.textContent = `${newPriority} ▾`; }
+  }
+}
+
 function quickChangeStatus(projectId, newStatus) {
-  const p = APP.projects.find(p => p.id === projectId);
+  const p = APP.projects.find(p => String(p.id) === String(projectId));
   if (p) { p.status = newStatus; save(); }
   closeAllDropdowns();
-  // Re-render current view
+  // Re-render row if on dashboard
+  const rowEl = document.getElementById('proj-row-' + projectId);
+  if (rowEl) {
+    const rp = APP.projects.find(x => String(x.id) === String(projectId));
+    if (rp) rowEl.outerHTML = renderProjectRow(rp);
+    return;
+  }
+  // Re-render current view for category page
   const route = parseRoute(getHash());
   if (route.view === 'category') {
     render();
   } else {
-    // update badge in place
     const sdw = document.getElementById(`sdw-${projectId}`);
     if (sdw) {
       const badge = sdw.querySelector('.badge');
-      if (badge) {
-        badge.className = `badge status-${newStatus}`;
-        badge.textContent = `${newStatus} ▾`;
-      }
+      if (badge) { badge.className = `badge status-${newStatus}`; badge.textContent = `${newStatus} ▾`; }
     }
   }
 }
 
+// ===================== INLINE EDIT =====================
+let _inlineEl = null;
+
+function startInlineEdit(projId, field, displayEl) {
+  if (_inlineEl) { try { _inlineEl.blur(); } catch(e) {} }
+
+  const p = APP.projects.find(x => String(x.id) === String(projId));
+  if (!p) return;
+  const val = p[field] || '';
+
+  const onSave = (newVal) => {
+    p[field] = newVal;
+    save();
+    _inlineEl = null;
+    const rowEl = document.getElementById('proj-row-' + projId);
+    if (rowEl) rowEl.outerHTML = renderProjectRow(p);
+  };
+
+  const inputStyle = 'background:#22263a;border:1px solid #f59e0b;border-radius:6px;color:#e8eaf0;padding:3px 8px;font-size:12px;outline:none;';
+  let input;
+
+  if (field === 'deadline') {
+    input = document.createElement('input');
+    input.type = 'date'; input.value = val;
+    input.style.cssText = inputStyle + 'width:130px;';
+    input.onchange = () => onSave(input.value);
+    input.onblur = () => setTimeout(() => { if (_inlineEl === input) onSave(input.value); }, 200);
+  } else if (field === 'waitingFor') {
+    input = document.createElement('input');
+    input.type = 'text'; input.value = val;
+    input.placeholder = 'がく / 開発 / 鷲巣...';
+    input.setAttribute('list', 'waitingFor-datalist');
+    input.style.cssText = inputStyle + 'width:110px;';
+    input.onblur = () => setTimeout(() => { if (_inlineEl === input) onSave(input.value); }, 200);
+    input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); onSave(input.value); } };
+  } else {
+    input = document.createElement('input');
+    input.type = 'text'; input.value = val;
+    input.style.cssText = inputStyle + 'min-width:120px;max-width:200px;';
+    input.onblur = () => setTimeout(() => { if (_inlineEl === input) onSave(input.value); }, 200);
+    input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); onSave(input.value); } };
+  }
+
+  _inlineEl = input;
+  displayEl.replaceWith(input);
+  input.focus();
+}
+
 function quickChangeTaskStatus(taskId, projectId, newStatus) {
-  const p = APP.projects.find(p => p.id === projectId);
+  const p = APP.projects.find(p => String(p.id) === String(projectId));
   if (!p) return;
   const t = taskTreeFind(p.tasks||[], taskId);
   if (t) { t.status = newStatus; save(); }
@@ -1818,10 +2104,14 @@ function openProjectModal(id, defaultCat) {
     document.getElementById('pf-deadline').value = p.deadline || '';
     document.getElementById('pf-assignee').value = p.assignee || '';
     document.getElementById('pf-members').value = p.members || '';
+    document.getElementById('pf-waitingFor').value = p.waitingFor || '';
+    document.getElementById('pf-nextAction').value = p.nextAction || '';
+    document.getElementById('pf-urgency').value = p.urgency || '';
+    document.getElementById('pf-importance').value = p.importance || '';
+    document.getElementById('pf-thisWeek').value = p.thisWeek || '';
+    document.getElementById('pf-blockedBy').value = p.blockedBy || '';
     document.getElementById('pf-purpose').value = p.purpose || '';
     document.getElementById('pf-deliverables').value = p.deliverables || '';
-    document.getElementById('pf-overview').value = p.overview || '';
-    document.getElementById('pf-background').value = p.background || '';
     document.getElementById('pf-completionCriteria').value = p.completionCriteria || '';
     document.getElementById('pf-notes').value = p.notes || '';
   } else {
@@ -1849,19 +2139,24 @@ function saveProject(e) {
     deadline: document.getElementById('pf-deadline').value,
     assignee: document.getElementById('pf-assignee').value.trim(),
     members: document.getElementById('pf-members').value.trim(),
+    waitingFor: document.getElementById('pf-waitingFor').value.trim(),
+    nextAction: document.getElementById('pf-nextAction').value.trim(),
+    urgency: document.getElementById('pf-urgency').value,
+    importance: document.getElementById('pf-importance').value,
+    thisWeek: document.getElementById('pf-thisWeek').value.trim(),
+    blockedBy: document.getElementById('pf-blockedBy').value.trim(),
     purpose: document.getElementById('pf-purpose').value.trim(),
     deliverables: document.getElementById('pf-deliverables').value.trim(),
-    overview: document.getElementById('pf-overview').value.trim(),
-    background: document.getElementById('pf-background').value.trim(),
     completionCriteria: document.getElementById('pf-completionCriteria').value.trim(),
     notes: document.getElementById('pf-notes').value.trim(),
   };
 
   if (id) {
-    const idx = APP.projects.findIndex(p => p.id === id);
+    const idx = APP.projects.findIndex(p => String(p.id) === String(id));
     if (idx !== -1) Object.assign(APP.projects[idx], data);
   } else {
-    const newId = Math.max(0, ...APP.projects.map(p => p.id)) + 1;
+    const ids = APP.projects.map(p => p.id).filter(x => typeof x === 'number');
+    const newId = ids.length > 0 ? Math.max(...ids) + 1 : APP.projects.length + 1;
     APP.projects.push({ id: newId, leadRole: 'brand', ...data, tasks: makeDefaultTasks(newId) });
   }
 
@@ -1893,6 +2188,8 @@ function openTaskModal(projectId, taskId) {
     document.getElementById('tf-priority').value = t.priority || '中';
     document.getElementById('tf-assignee').value = t.assignee || '';
     document.getElementById('tf-deadline').value = t.deadline || '';
+    document.getElementById('tf-waitingFor').value = t.waitingFor || '';
+    document.getElementById('tf-nextAction').value = t.nextAction || '';
     document.getElementById('tf-notes').value = t.notes || '';
   } else {
     title.textContent = 'タスク追加';
@@ -1918,10 +2215,12 @@ function saveTask(e) {
     priority: document.getElementById('tf-priority').value,
     assignee: document.getElementById('tf-assignee').value.trim(),
     deadline: document.getElementById('tf-deadline').value,
+    waitingFor: document.getElementById('tf-waitingFor').value.trim(),
+    nextAction: document.getElementById('tf-nextAction').value.trim(),
     notes: document.getElementById('tf-notes').value.trim(),
   };
 
-  const p = APP.projects.find(p => p.id === projectId);
+  const p = APP.projects.find(p => String(p.id) === String(projectId));
   if (!p) return;
   if (!p.tasks) p.tasks = [];
 
@@ -2052,20 +2351,19 @@ function confirmCancel() {
 }
 
 function deleteProject(id) {
-  const p = getProjectById(id);
+  const p = APP.projects.find(x => String(x.id) === String(id));
   if (!p) return;
   showConfirm('プロジェクトを削除しますか？', `「${p.name}」を削除します。この操作は取り消せません。`, () => {
-    APP.projects = APP.projects.filter(proj => proj.id !== id);
+    APP.projects = APP.projects.filter(proj => String(proj.id) !== String(id));
     save();
-    // Navigate to category or dashboard
     const route = parseRoute(getHash());
-    if (route.view === 'project') navigate(`#/category/${p.categoryId}`);
+    if (route.view === 'project') navigate('#/');
     else render();
   });
 }
 
 function deleteTask(projectId, taskId) {
-  const p = getProjectById(projectId);
+  const p = APP.projects.find(x => String(x.id) === String(projectId));
   if (!p) return;
   const t = taskTreeFind(p.tasks||[], taskId);
   if (!t) return;
@@ -2178,5 +2476,17 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 </script>
+<datalist id="waitingFor-datalist">
+  <option value="こうた">
+  <option value="がく">
+  <option value="ささじま">
+  <option value="ワーカー">
+  <option value="鷲巣">
+  <option value="ちなり">
+  <option value="開発">
+  <option value="外部">
+  <option value="確認待ち">
+  <option value="素材待ち">
+</datalist>
 </body>
 </html>
