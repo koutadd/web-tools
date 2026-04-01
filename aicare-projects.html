@@ -78,12 +78,12 @@ body {
 }
 
 .section-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 16px;
+  color: #94a3b8;
+  margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -683,45 +683,52 @@ body {
 /* ===================== PROJECT TABLE ROW ===================== */
 .proj-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 14px;
+  padding: 10px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 4px solid var(--border);
-  border-radius: 10px; margin-bottom: 5px;
-  transition: opacity 0.15s;
-  min-height: 42px;
+  border-radius: 10px; margin-bottom: 4px;
+  transition: background 0.12s;
+  min-height: 44px;
 }
-.proj-row:hover { background: var(--surface2); }
-.proj-row.dim { opacity: 0.55; }
+.proj-row:hover { background: #1e2236; }
+.proj-row.dim { opacity: 0.5; }
 .proj-row .proj-row-name {
   flex: 1; font-size: 13px; font-weight: 600;
   cursor: pointer; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  line-height: 1.4;
 }
-.proj-row .proj-row-name:hover { color: var(--accent); }
+.proj-row .proj-row-name:hover { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(245,158,11,0.4); }
 .proj-row-waiting {
-  font-size: 11px; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
-  background: rgba(249,115,22,0.15); color: #fb923c;
-  border: 1px solid rgba(249,115,22,0.3); cursor: pointer;
+  font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+  background: rgba(249,115,22,0.12); color: #fb923c;
+  border: 1px solid rgba(249,115,22,0.25); cursor: pointer;
+  min-width: 72px; text-align: center;
 }
 .proj-row-waiting.empty {
-  background: transparent; color: var(--muted); border: 1px dashed var(--border);
+  background: transparent; color: #4b5563; border: 1px dashed #374151; font-style: italic;
 }
-.proj-row-waiting:hover { border-color: var(--accent); }
+.proj-row-waiting:hover { border-color: #fb923c; background: rgba(249,115,22,0.2); }
 .proj-row-next {
-  font-size: 11px; color: var(--muted); max-width: 160px;
+  font-size: 11px; color: #6b7280; width: 140px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  cursor: pointer; padding: 2px 6px; border-radius: 4px;
-  border: 1px dashed var(--border);
+  cursor: pointer; padding: 3px 7px; border-radius: 5px;
+  border: 1px dashed #374151;
 }
-.proj-row-next:hover { border-color: var(--accent); color: var(--text); }
+.proj-row-next:hover { border-color: var(--accent); color: var(--text); background: rgba(245,158,11,0.05); }
 .proj-row-deadline {
-  font-size: 11px; color: var(--muted); cursor: pointer; white-space: nowrap;
-  padding: 2px 6px; border-radius: 4px; border: 1px dashed transparent;
+  font-size: 11px; color: #6b7280; cursor: pointer; white-space: nowrap;
+  padding: 3px 6px; border-radius: 4px; border: 1px dashed transparent;
+  width: 84px; text-align: center;
 }
-.proj-row-deadline:hover { border-color: var(--accent); }
-@media (max-width: 900px) {
-  .proj-row-next, .proj-row-deadline { display: none; }
+.proj-row-deadline:hover { border-color: var(--accent); background: rgba(245,158,11,0.05); }
+@media (max-width: 960px) {
+  .proj-row-next { display: none; }
+}
+@media (max-width: 768px) {
+  .proj-row-deadline { display: none; }
+  .proj-row-waiting { display: none; }
 }
 
 /* ===================== PRIORITY ITEMS (today panel) ===================== */
@@ -765,11 +772,11 @@ body {
 /* ===================== TODAY PANEL ===================== */
 .today-panel {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px 20px; margin-bottom: 8px;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
 }
 .today-panel-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; margin-bottom: 8px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+  margin-bottom: 10px;
   display: flex; align-items: center; gap: 6px;
 }
 
@@ -1534,41 +1541,58 @@ function renderDashboard() {
     ).length;
   });
 
+  const sectionHead = (emoji, label, sub) => `
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      <span style="font-size:16px;">${emoji}</span>
+      <span style="font-size:14px;font-weight:700;color:var(--text);">${label}</span>
+      ${sub ? `<span style="font-size:12px;color:var(--muted);margin-left:auto;">${sub}</span>` : ''}
+    </div>`;
+
   return `
 <div class="page-container">
   <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <h1 style="font-size:20px;font-weight:800;">プロジェクト管理</h1>
-      <span id="saveIndicator" style="font-size:12px;color:#4ade80;opacity:0;transition:opacity 0.5s;"></span>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">プロジェクト管理</h1>
+        <span id="saveIndicator" style="font-size:11px;color:#4ade80;opacity:0;transition:opacity 0.5s;padding:2px 8px;border-radius:4px;background:rgba(74,222,128,0.1);"></span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px;">アイケアラボ — ${total}プロジェクト</div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
       <button class="btn btn-secondary btn-sm" onclick="navigate('#/members')">👤 担当者別</button>
       <button class="btn btn-secondary btn-sm" onclick="openRolesModal()">👥 役割編集</button>
-      <button class="btn btn-secondary btn-sm" onclick="openCategoriesModal()">🏷 カテゴリ編集</button>
+      <button class="btn btn-secondary btn-sm" onclick="openCategoriesModal()">🏷 カテゴリ</button>
       <button class="btn btn-primary btn-sm" onclick="openProjectModal(null)">＋ 追加</button>
       <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="color:#4ade80;border-color:#16a34a44;">📊 CSV</button>
     </div>
   </div>
 
-  <!-- Stats bar (compact) -->
-  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
-    ${[['全体',total,'#e8eaf0'],['進行中',byStatus['進行中']||0,'#60a5fa'],['未着手',byStatus['未着手']||0,'#9ca3af'],['完了',byStatus['完了']||0,'#34d399'],['要確認',byStatus['要確認']||0,'#fbbf24'],['保留',byStatus['保留']||0,'#a78bfa']].map(([label,num,color]) => `
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:18px;font-weight:700;color:${color};">${num}</span>
-        <span style="font-size:11px;color:var(--muted);">${label}</span>
+  <!-- Stats bar -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:28px;">
+    ${[
+      ['全体',   total,                    '#e8eaf0', ''],
+      ['進行中', byStatus['進行中']||0,    '#60a5fa', 'border-bottom:2px solid #3b82f6;'],
+      ['未着手', byStatus['未着手']||0,    '#9ca3af', ''],
+      ['完了',   byStatus['完了']||0,      '#34d399', 'border-bottom:2px solid #10b981;'],
+      ['要確認', byStatus['要確認']||0,    '#fbbf24', 'border-bottom:2px solid #f59e0b;'],
+      ['保留',   byStatus['保留']||0,      '#a78bfa', ''],
+    ].map(([label, num, color, extra]) => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;${extra}">
+        <div style="font-size:26px;font-weight:800;color:${color};line-height:1;">${num}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${label}</div>
       </div>`).join('')}
   </div>
 
   <!-- ① 今日の優先対応 -->
   <div class="section-block">
-    <div class="section-title">① 今日の優先対応</div>
+    ${sectionHead('🔥','今日の優先対応','画面を開いたら最初に確認')}
     ${todayContent}
   </div>
 
   <!-- ② 詰まり一覧 -->
   <div class="section-block">
-    <div class="section-title">② 詰まり一覧</div>
+    ${sectionHead('⛔','詰まり一覧','誰待ち / 何待ちで絞り込み')}
     <div class="blocker-filter">
       ${blockerKeys.map(k => `<button class="blocker-btn${blockerFilter===k?' active':''}" data-bf="${k}" onclick="setBlockerFilter('${k}')">${k}</button>`).join('')}
     </div>
@@ -1577,9 +1601,16 @@ function renderDashboard() {
 
   <!-- ③ プロジェクト一覧 -->
   <div class="section-block">
-    <div class="section-title" style="margin-bottom:8px;">③ 全プロジェクト一覧 <span style="font-weight:400;color:var(--muted);">${total}件</span></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;gap:12px;">
-      <span>状態 / 優先度 / 誰待ち / 期限 / 次アクション をクリックで編集</span>
+    ${sectionHead('📋','全プロジェクト一覧',`${total}件 — 各項目をクリックで直接編集`)}
+    <!-- 列ヘッダー -->
+    <div style="display:flex;align-items:center;gap:8px;padding:0 14px 6px;font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="flex:1;">プロジェクト名</span>
+      <span style="width:72px;text-align:center;">状態</span>
+      <span style="width:60px;text-align:center;">優先度</span>
+      <span style="width:84px;text-align:center;">誰待ち</span>
+      <span style="width:84px;text-align:center;">期限</span>
+      <span style="width:140px;">次アクション</span>
+      <span style="width:88px;"></span>
     </div>
     <div id="proj-list">
       ${sorted.map(p => renderProjectRow(p)).join('')}
@@ -1588,29 +1619,33 @@ function renderDashboard() {
 
   <!-- ④ 担当者ショートカット -->
   <div class="section-block">
-    <div class="section-title">④ 担当者ショートカット</div>
+    ${sectionHead('👥','担当者ショートカット','クリックで担当者別ページへ')}
     <div class="person-shortcuts">
-      ${people.map(person => `
-        <button class="person-btn" onclick="navigate('#/members')">
-          ${person}
-          <span class="pcount">${personCounts[person]}件</span>
-        </button>`).join('')}
+      ${people.map((person, i) => {
+        const colors = ['#818cf8','#34d399','#60a5fa','#a78bfa','#fb923c','#f472b6','#94a3b8'];
+        const c = colors[i % colors.length];
+        return `<button class="person-btn" onclick="navigate('#/members')" style="border-color:${c}33;">
+          <span style="width:26px;height:26px;border-radius:50%;background:${c}22;color:${c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${person.slice(0,2)}</span>
+          <span>${person}</span>
+          <span class="pcount" style="background:${c}18;color:${c};">${personCounts[person]}</span>
+        </button>`;
+      }).join('')}
     </div>
   </div>
 
   <!-- ⑤ カテゴリ一覧 -->
   <div class="section-block">
-    <div class="section-title">⑤ カテゴリ一覧</div>
-    <div class="grid-4" style="gap:8px;">
+    ${sectionHead('🏷','カテゴリ一覧','カテゴリ別の一覧ページへ')}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">
       ${getCategories().map(cat => {
         const count = projects.filter(p => p.categoryId === cat.id).length;
         const doing = projects.filter(p => p.categoryId === cat.id && p.status === '進行中').length;
+        const done  = projects.filter(p => p.categoryId === cat.id && p.status === '完了').length;
         return `
         <div class="compact-cat-card" style="border-left-color:${cat.color};" onclick="navigate('#/category/${cat.id}')">
-          <span style="font-size:16px;">${cat.icon}</span>
+          <span style="font-size:15px;">${cat.icon}</span>
           <span class="ccc-name">${cat.name}</span>
-          <span class="ccc-count">${count}件${doing ? ` / 進行中${doing}` : ''}</span>
-          <button class="btn btn-ghost btn-sm" style="pointer-events:none;">今見る</button>
+          <span class="ccc-count" style="margin-left:auto;">${count}件${doing ? `・進行${doing}` : ''}</span>
         </div>`;
       }).join('')}
     </div>
@@ -1708,12 +1743,12 @@ function renderProjectRow(p) {
   return `
 <div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
   <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
-  <div onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
-  <div onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
-  <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
-  <span class="proj-row-deadline" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
-  <span class="proj-row-next" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 28) : '<i>次アクション</i>'}</span>
-  <div style="display:flex;gap:4px;flex-shrink:0;" onclick="event.stopPropagation()">
+  <div style="width:72px;flex-shrink:0;" onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
+  <div style="width:60px;flex-shrink:0;" onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
+  <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
+  <span class="proj-row-deadline" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
+  <span class="proj-row-next" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 28) : '<i>次アクション未設定</i>'}</span>
+  <div style="display:flex;gap:4px;flex-shrink:0;width:88px;" onclick="event.stopPropagation()">
     <button class="btn btn-ghost btn-sm" onclick="navigate('#/project/${p.id}')">今見る</button>
     <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${p.id}')">編集</button>
   </div>
