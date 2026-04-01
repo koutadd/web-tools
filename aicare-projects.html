@@ -1050,7 +1050,14 @@ async function syncFromCloud() {
 }
 
 function getProjects() { return APP.projects; }
-function getRoles()    { return APP.roles || DEFAULT_ROLES; }
+function getRoles() {
+  const roles = (APP && APP.roles) ? APP.roles : DEFAULT_ROLES;
+  const out = {};
+  Object.entries(roles).forEach(([k, v]) => {
+    out[k] = { ...v, label: v.label || (DEFAULT_ROLES[k] && DEFAULT_ROLES[k].label) || k };
+  });
+  return out;
+}
 function save()        { saveData(APP); }
 
 // ===================== ROUTING =====================
@@ -1069,11 +1076,11 @@ function parseRoute(hash) {
   const catMatch = h.match(/^\/category\/([^/]+)$/);
   if (catMatch) return { view: 'category', slug: catMatch[1] };
 
-  const projTaskMatch = h.match(/^\/project\/(\d+)\/tasks$/);
-  if (projTaskMatch) return { view: 'project', id: parseInt(projTaskMatch[1]), tab: 'tasks' };
+  const projTaskMatch = h.match(/^\/project\/([^\/]+)\/tasks$/);
+  if (projTaskMatch) return { view: 'project', id: projTaskMatch[1], tab: 'tasks' };
 
-  const projMatch = h.match(/^\/project\/(\d+)$/);
-  if (projMatch) return { view: 'project', id: parseInt(projMatch[1]), tab: 'tasks' };
+  const projMatch = h.match(/^\/project\/([^\/]+)$/);
+  if (projMatch) return { view: 'project', id: projMatch[1], tab: 'tasks' };
 
   if (h === '/members') return { view: 'members' };
 
@@ -1902,7 +1909,7 @@ function closeTaskModal() {
 
 function saveTask(e) {
   e.preventDefault();
-  const projectId = parseInt(document.getElementById('tf-projectId').value);
+  const projectId = document.getElementById('tf-projectId').value;
   const taskId = document.getElementById('tf-taskId').value;
 
   const data = {
