@@ -1039,22 +1039,22 @@ async function syncFromCloud() {
     const cloudTs = data.updatedAt || 0;
     const localTs = APP.updatedAt || 0;
     if (cloudTs < localTs) return;
-    const cloudJson = JSON.stringify(data);
-    if (JSON.stringify(APP) !== cloudJson) {
-      APP = data;
-      localStorage.setItem(STORAGE_KEY, cloudJson);
-      render();
-      showSaveIndicator('☁️ 同期完了', '#60a5fa');
-    }
+    data.projects.forEach(p => ensureChildren(p.tasks));
+    APP = data;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    render();
+    showSaveIndicator('☁️ 同期完了', '#60a5fa');
   } catch(e) { /* cloud sync failed silently */ }
 }
 
 function getProjects() { return APP.projects; }
 function getRoles() {
-  const roles = (APP && APP.roles) ? APP.roles : DEFAULT_ROLES;
+  let roles = (APP && APP.roles) ? APP.roles : DEFAULT_ROLES;
+  if (Array.isArray(roles)) roles = DEFAULT_ROLES;
   const out = {};
   Object.entries(roles).forEach(([k, v]) => {
-    out[k] = { ...v, label: v.label || (DEFAULT_ROLES[k] && DEFAULT_ROLES[k].label) || k };
+    const def = DEFAULT_ROLES[k];
+    out[k] = { ...v, label: v.label || (def && def.label) || k, person: v.person || (def && def.person) || '' };
   });
   return out;
 }
