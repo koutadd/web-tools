@@ -1986,10 +1986,19 @@ function renderDashboard() {
   const people = getPeople();
   const personCounts = {};
   people.forEach(person => {
-    personCounts[person] = projects.filter(p =>
+    const projCount = projects.filter(p =>
       (p.assignee||'').split(/[、,，\s]+/).map(s=>s.trim()).includes(person) ||
       (p.members||'').split(/[、,，\s]+/).map(s=>s.trim()).includes(person)
     ).length;
+    let taskCount = 0;
+    function countAssignedTasks(tasks) {
+      (tasks||[]).forEach(t => {
+        if ((t.assignee||'').split(/[、,，\s]+/).map(s=>s.trim()).includes(person)) taskCount++;
+        countAssignedTasks(t.children);
+      });
+    }
+    projects.forEach(p => countAssignedTasks(p.tasks));
+    personCounts[person] = projCount + taskCount;
   });
 
   const sectionHead = (emoji, label, sub) => `
