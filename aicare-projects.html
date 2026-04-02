@@ -2411,9 +2411,10 @@ function renderTaskTab(p) {
     <span class="bulk-count" id="bulk-count-${p.id}">${selectedTaskIds.size}件選択中</span>
     <div style="flex:1;"></div>
     <span style="font-size:12px;color:var(--muted);">担当者を変更:</span>
-    <select class="bulk-assignee-sel" id="bulk-assignee-sel">
+    <select class="bulk-assignee-sel" id="bulk-assignee-sel" onchange="bulkAssigneeSelChange(this)">
       <option value="">選択してください</option>
-      ${['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'].map(person => `<option value="${person}">${person}</option>`).join('')}
+      ${getPeople().map(person => `<option value="${person}">${person}</option>`).join('')}
+      <option value="__new__">＋ 新しく追加…</option>
     </select>
     <button class="btn btn-primary btn-sm" onclick="bulkChangeAssignee('${p.id}')">変更する</button>
     <button class="btn btn-secondary btn-sm" onclick="toggleBulkMode('${p.id}')">キャンセル</button>
@@ -2545,6 +2546,23 @@ function startKpiEdit(pid, el) {
   ta.addEventListener('keydown', e => { if (e.key === 'Escape') { saved = true; navigate('#/project/'+pid); } });
   el.replaceWith(ta);
   ta.focus(); ta.select();
+}
+
+function bulkAssigneeSelChange(sel) {
+  if (sel.value !== '__new__') return;
+  const name = prompt('新しい担当者名を入力してください:');
+  if (!name || !name.trim()) { sel.value = ''; return; }
+  const trimmed = name.trim();
+  if (!APP.people) APP.people = [...getPeople()];
+  if (!APP.people.includes(trimmed)) {
+    APP.people.push(trimmed);
+    saveData(APP);
+    // Add to select
+    const opt = document.createElement('option');
+    opt.value = trimmed; opt.textContent = trimmed;
+    sel.insertBefore(opt, sel.querySelector('option[value="__new__"]'));
+  }
+  sel.value = trimmed;
 }
 
 function bulkChangeAssignee(projectId) {
