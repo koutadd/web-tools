@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイケアラボ 本部ロゴ | ロゴデザインブリーフ</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #20243a;
+  --border: #2e3350;
+  --text: #e8eaf0;
+  --text-muted: #8b90a8;
+  --accent: #2563eb;
+  --gold: #f59e0b;
+  --green: #22c55e;
+  --red: #ef4444;
+  --gray-badge: #4b5563;
+  --yellow-badge: #d97706;
+  --green-badge: #16a34a;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: linear-gradient(135deg, #0a1628 0%, #111827 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 40px 28px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f1f3f8;
+  margin-bottom: 4px;
+}
+.page-header .subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+.page-header .badge-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 99px;
+  border: 1px solid;
+  letter-spacing: 0.04em;
+}
+.badge-gold { color: var(--gold); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.08); }
+.badge-blue { color: #60a5fa; border-color: rgba(96,165,250,0.4); background: rgba(96,165,250,0.08); }
+
+/* ── LAYOUT ── */
+.main-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── SECTION CARD ── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.section-header:hover { background: rgba(255,255,255,0.03); }
+
+.section-header .icon { font-size: 16px; }
+.section-header .title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #c9cde0;
+  flex: 1;
+}
+.section-header .chevron {
+  color: var(--text-muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.section-card.collapsed .chevron { transform: rotate(-90deg); }
+.section-card.collapsed .section-body { display: none; }
+
+.section-body {
+  padding: 18px;
+}
+
+/* ── TEXTAREA ── */
+.edit-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  padding: 10px 12px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.edit-textarea:focus { border-color: rgba(37,99,235,0.6); }
+
+/* ── TAGS ── */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(37,99,235,0.15);
+  border: 1px solid rgba(37,99,235,0.35);
+  border-radius: 99px;
+  padding: 3px 10px 3px 12px;
+  font-size: 12px;
+  color: #93c5fd;
+}
+.tag-item .tag-text {
+  outline: none;
+  min-width: 20px;
+  cursor: text;
+}
+.tag-delete {
+  background: none;
+  border: none;
+  color: rgba(147,197,253,0.5);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.tag-delete:hover { color: var(--red); }
+.tag-add-row {
+  display: flex;
+  gap: 8px;
+}
+.tag-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 5px 10px;
+  outline: none;
+  width: 140px;
+  transition: border-color 0.15s;
+}
+.tag-input:focus { border-color: rgba(37,99,235,0.6); }
+
+/* ── RADIO OPTIONS ── */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.radio-option:hover { background: rgba(255,255,255,0.04); }
+.radio-option.selected {
+  border-color: rgba(37,99,235,0.5);
+  background: rgba(37,99,235,0.1);
+}
+.radio-option input[type=radio] { display: none; }
+.radio-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.15s;
+}
+.radio-option.selected .radio-dot { border-color: var(--accent); }
+.radio-option.selected .radio-dot::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.radio-label { font-size: 13px; color: var(--text); }
+
+/* ── COLOR SWATCHES ── */
+.color-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.color-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.color-swatch-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  display: block;
+}
+.color-input-hidden {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.color-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.color-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  cursor: text;
+}
+.color-use {
+  font-size: 11px;
+  color: var(--text-muted);
+  outline: none;
+  cursor: text;
+}
+.color-hex-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.05em;
+}
+.color-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.color-delete:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+
+/* ── REFERENCE CARDS ── */
+.ref-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ref-card {
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ref-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ref-body { flex: 1; }
+.ref-brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f3f8;
+  outline: none;
+  cursor: text;
+  margin-bottom: 2px;
+}
+.ref-point {
+  font-size: 12px;
+  color: var(--text-muted);
+  outline: none;
+  cursor: text;
+  line-height: 1.5;
+}
+.ref-url {
+  font-size: 11px;
+  color: #60a5fa;
+  outline: none;
+  cursor: text;
+  font-family: 'SF Mono', monospace;
+  margin-top: 4px;
+  display: block;
+}
+.ref-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.ref-delete:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+
+/* ── BULLET LIST ── */
+.bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.bullet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.bullet-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+}
+.bullet-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  cursor: text;
+}
+.bullet-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.bullet-delete:hover { color: var(--red); }
+
+/* ── STEP LIST ── */
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.step-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  cursor: text;
+}
+.step-status-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--text);
+  font-size: 11px;
+  padding: 3px 8px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+}
+.step-status-select.status-미착수,
+.step-status-select.status-未着手 {
+  color: #9ca3af;
+  border-color: rgba(156,163,175,0.4);
+  background: rgba(156,163,175,0.08);
+}
+.step-status-select.status-進行中 {
+  color: #fbbf24;
+  border-color: rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.08);
+}
+.step-status-select.status-完了 {
+  color: #4ade80;
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.08);
+}
+.step-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.step-delete:hover { color: var(--red); }
+
+/* ── BUTTONS ── */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(37,99,235,0.12);
+  border: 1px solid rgba(37,99,235,0.3);
+  border-radius: 6px;
+  color: #60a5fa;
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-add:hover { background: rgba(37,99,235,0.2); border-color: rgba(37,99,235,0.5); }
+
+/* ── LABEL ABOVE TEXTAREA ── */
+.field-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: #1e2a1e;
+  border: 1px solid rgba(74,222,128,0.4);
+  color: #4ade80;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'SF Mono', monospace;
+  letter-spacing: 0.05em;
+  z-index: 99999;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── ADD ROW ── */
+.add-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.add-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.add-input:focus { border-color: rgba(37,99,235,0.6); }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<div class="page-header">
+  <h1>アイケアラボ 本部ロゴ</h1>
+  <div class="subtitle">HQ Logo Design Brief — ロゴデザイン計画・要件定義</div>
+  <div class="badge-row">
+    <span class="badge badge-gold">本部ロゴ</span>
+    <span class="badge badge-blue">ブランドアイデンティティ</span>
+    <span class="badge badge-blue">進行中</span>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <!-- 1. ロゴ概要・方向性 -->
+  <div class="section-card" id="sec-overview">
+    <div class="section-header" onclick="toggleSection('sec-overview')">
+      <span class="icon">🎯</span>
+      <span class="title">ロゴ概要・方向性</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-label">概要・方針メモ</div>
+      <textarea class="edit-textarea" id="overview-text" rows="4" oninput="debounceSave()" onblur="saveAll()">アイケアラボ本部の公式ロゴ。院・グラス・365・アプリ全プロダクトの親ブランドとして機能する。医療の信頼性とモダンなデザイン性を両立させる。</textarea>
+    </div>
+  </div>
+
+  <!-- 2. ブランドキーワード -->
+  <div class="section-card" id="sec-keywords">
+    <div class="section-header" onclick="toggleSection('sec-keywords')">
+      <span class="icon">💬</span>
+      <span class="title">ブランドキーワード</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="tag-container" id="tag-container"></div>
+      <div class="tag-add-row">
+        <input class="tag-input" id="tag-input" type="text" placeholder="キーワードを追加…" maxlength="20">
+        <button class="btn-add" onclick="addTag()">＋ 追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ロゴタイプ方針 -->
+  <div class="section-card" id="sec-logotype">
+    <div class="section-header" onclick="toggleSection('sec-logotype')">
+      <span class="icon">🔡</span>
+      <span class="title">ロゴタイプ方針</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="radio-group" id="radio-group"></div>
+      <div class="field-label">補足メモ</div>
+      <textarea class="edit-textarea" id="logotype-notes" rows="3" placeholder="ロゴタイプに関する補足・詳細メモ…" oninput="debounceSave()" onblur="saveAll()"></textarea>
+    </div>
+  </div>
+
+  <!-- 4. カラー方針 -->
+  <div class="section-card" id="sec-colors">
+    <div class="section-header" onclick="toggleSection('sec-colors')">
+      <span class="icon">🎨</span>
+      <span class="title">カラー方針</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="color-list" id="color-list"></div>
+      <div class="add-row">
+        <input class="add-input" id="color-name-input" placeholder="色名" style="width:100px">
+        <input class="add-input" id="color-hex-input" placeholder="#000000" style="width:90px" maxlength="7">
+        <input class="add-input" id="color-use-input" placeholder="用途" style="width:140px">
+        <button class="btn-add" onclick="addColor()">＋ 色を追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 参考ロゴ・インスピレーション -->
+  <div class="section-card" id="sec-refs">
+    <div class="section-header" onclick="toggleSection('sec-refs')">
+      <span class="icon">🖼</span>
+      <span class="title">参考ロゴ・インスピレーション</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="ref-list" id="ref-list"></div>
+      <div class="add-row">
+        <input class="add-input" id="ref-brand-input" placeholder="ブランド名" style="width:110px">
+        <input class="add-input" id="ref-point-input" placeholder="参考ポイント" style="width:200px">
+        <input class="add-input" id="ref-url-input" placeholder="URL（任意）" style="width:160px">
+        <button class="btn-add" onclick="addRef()">＋ 追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. NG・避けたい方向性 -->
+  <div class="section-card" id="sec-ng">
+    <div class="section-header" onclick="toggleSection('sec-ng')">
+      <span class="icon">🚫</span>
+      <span class="title">NG・避けたい方向性</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="bullet-list" id="ng-list"></div>
+      <div class="add-row">
+        <input class="add-input" id="ng-input" placeholder="避けたい方向性を追加…" style="width:280px">
+        <button class="btn-add" onclick="addNG()">＋ 追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 制作フロー・ステータス -->
+  <div class="section-card" id="sec-steps">
+    <div class="section-header" onclick="toggleSection('sec-steps')">
+      <span class="icon">📋</span>
+      <span class="title">制作フロー・ステータス</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="step-list" id="step-list"></div>
+      <div class="add-row">
+        <input class="add-input" id="step-name-input" placeholder="ステップ名を追加…" style="width:260px">
+        <button class="btn-add" onclick="addStep()">＋ ステップ追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. デザイナーへの発注メモ -->
+  <div class="section-card" id="sec-memo">
+    <div class="section-header" onclick="toggleSection('sec-memo')">
+      <span class="icon">📝</span>
+      <span class="title">デザイナーへの発注メモ</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-label">発注詳細・連絡メモ</div>
+      <textarea class="edit-textarea" id="memo-text" rows="5" oninput="debounceSave()" onblur="saveAll()">予算・スケジュール・納品物・連絡先などをここに記入</textarea>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast">✓ 保存済</div>
+
+<script>
+'use strict';
+
+const STORAGE_KEY = 'aicare_hq_logo_v1';
+
+// ── DEFAULTS ──
+const DEFAULTS = {
+  overview: 'アイケアラボ本部の公式ロゴ。院・グラス・365・アプリ全プロダクトの親ブランドとして機能する。医療の信頼性とモダンなデザイン性を両立させる。',
+  keywords: ['信頼', '医療', 'モダン', 'シンプル', '洗練', '眼', '科学'],
+  logotypeSelected: 'マーク＋文字の組み合わせ',
+  logotypeNotes: '',
+  colors: [
+    { name: 'メインカラー', hex: '#0a1628', use: '背景・ベース' },
+    { name: 'アクセント',   hex: '#2563eb', use: '強調・リンク' },
+    { name: 'ゴールド',     hex: '#f59e0b', use: 'プレミアム感・金' },
+    { name: 'ホワイト',     hex: '#ffffff', use: '文字・クリーン' }
+  ],
+  refs: [
+    { brand: 'GUCCI',        point: 'シンプルな文字ロゴ。洗練された高級感', url: '' },
+    { brand: 'Apple',        point: 'ミニマルなアイコン。一目でわかる', url: '' },
+    { brand: 'Warby Parker', point: '眼鏡ブランドとして親しみやすさとスタイルの両立', url: '' }
+  ],
+  ng: ['過度に医療・病院的なデザイン', '古臭いフォント', '装飾過多', '読みにくいデザイン'],
+  steps: [
+    { step: 'ロゴブリーフ完成',                   status: '進行中' },
+    { step: 'ラフスケッチ 3案',                   status: '未着手' },
+    { step: 'デジタル化・ブラッシュアップ',        status: '未着手' },
+    { step: 'フォーマット書き出し（SVG/PNG/PDF）', status: '未着手' },
+    { step: 'ガイドライン追記',                    status: '未着手' }
+  ],
+  memo: '予算・スケジュール・納品物・連絡先などをここに記入',
+  collapsed: {}
+};
+
+const LOGOTYPE_OPTIONS = ['文字ロゴ（ワードマーク）', 'マーク＋文字の組み合わせ', 'アイコン型マーク'];
+const STATUS_OPTIONS = ['未着手', '進行中', '完了'];
+
+// ── STATE ──
+let state = {};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      state = JSON.parse(raw);
+    } else {
+      state = JSON.parse(JSON.stringify(DEFAULTS));
+    }
+  } catch(e) {
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+  }
+  // Ensure all keys exist
+  Object.keys(DEFAULTS).forEach(k => {
+    if (state[k] === undefined || state[k] === null) {
+      state[k] = JSON.parse(JSON.stringify(DEFAULTS[k]));
+    }
+  });
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  showToast();
+}
+
+function saveAll() {
+  // Collect textarea values
+  const overviewEl = document.getElementById('overview-text');
+  if (overviewEl) state.overview = overviewEl.value;
+
+  const notesEl = document.getElementById('logotype-notes');
+  if (notesEl) state.logotypeNotes = notesEl.value;
+
+  const memoEl = document.getElementById('memo-text');
+  if (memoEl) state.memo = memoEl.value;
+
+  save();
+}
+
+// ── Debounce Save ──
+let debounceTimer = null;
+function debounceSave() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(saveAll, 500);
+}
+
+// ── タブ切替・閉じる前に強制保存 ──
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveAll();
+});
+window.addEventListener('beforeunload', saveAll);
+
+// ── TOAST ──
+let toastTimer = null;
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── SECTION COLLAPSE ──
+function toggleSection(id) {
+  const card = document.getElementById(id);
+  const isCollapsed = card.classList.toggle('collapsed');
+  if (!state.collapsed) state.collapsed = {};
+  state.collapsed[id] = isCollapsed;
+  save();
+}
+
+function applyCollapsed() {
+  if (!state.collapsed) return;
+  Object.entries(state.collapsed).forEach(([id, col]) => {
+    const card = document.getElementById(id);
+    if (card && col) card.classList.add('collapsed');
+  });
+}
+
+// ── SECTION 1: OVERVIEW ──
+function renderOverview() {
+  const el = document.getElementById('overview-text');
+  el.value = state.overview || '';
+}
+
+// ── SECTION 2: KEYWORDS / TAGS ──
+function renderTags() {
+  const container = document.getElementById('tag-container');
+  container.innerHTML = '';
+  (state.keywords || []).forEach((kw, i) => {
+    const item = document.createElement('span');
+    item.className = 'tag-item';
+
+    const text = document.createElement('span');
+    text.className = 'tag-text';
+    text.contentEditable = 'true';
+    text.spellcheck = false;
+    text.textContent = kw;
+    text.addEventListener('blur', () => {
+      state.keywords[i] = text.textContent.trim() || kw;
+      save();
+    });
+    text.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); text.blur(); }
+    });
+
+    const del = document.createElement('button');
+    del.className = 'tag-delete';
+    del.innerHTML = '×';
+    del.title = '削除';
+    del.addEventListener('click', () => {
+      state.keywords.splice(i, 1);
+      renderTags();
+      save();
+    });
+
+    item.appendChild(text);
+    item.appendChild(del);
+    container.appendChild(item);
+  });
+}
+
+function addTag() {
+  const input = document.getElementById('tag-input');
+  const val = input.value.trim();
+  if (!val) return;
+  state.keywords.push(val);
+  input.value = '';
+  renderTags();
+  save();
+}
+
+document.getElementById('tag-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTag();
+});
+
+// ── SECTION 3: LOGOTYPE ──
+function renderLogotype() {
+  const group = document.getElementById('radio-group');
+  group.innerHTML = '';
+  LOGOTYPE_OPTIONS.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'radio-option' + (state.logotypeSelected === opt ? ' selected' : '');
+
+    const inp = document.createElement('input');
+    inp.type = 'radio';
+    inp.name = 'logotype';
+    inp.value = opt;
+    inp.checked = state.logotypeSelected === opt;
+
+    const dot = document.createElement('span');
+    dot.className = 'radio-dot';
+
+    const lbl = document.createElement('span');
+    lbl.className = 'radio-label';
+    lbl.textContent = opt;
+
+    label.appendChild(inp);
+    label.appendChild(dot);
+    label.appendChild(lbl);
+
+    label.addEventListener('click', () => {
+      state.logotypeSelected = opt;
+      renderLogotype();
+      save();
+    });
+
+    group.appendChild(label);
+  });
+
+  document.getElementById('logotype-notes').value = state.logotypeNotes || '';
+}
+
+// ── SECTION 4: COLORS ──
+function renderColors() {
+  const list = document.getElementById('color-list');
+  list.innerHTML = '';
+  (state.colors || []).forEach((c, i) => {
+    const item = document.createElement('div');
+    item.className = 'color-item';
+
+    // Swatch
+    const swatchWrap = document.createElement('div');
+    swatchWrap.className = 'color-swatch-wrap';
+
+    const swatch = document.createElement('div');
+    swatch.className = 'color-swatch';
+    swatch.style.background = c.hex;
+    swatch.title = 'クリックして色を変更';
+
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.className = 'color-input-hidden';
+    colorPicker.value = c.hex;
+    colorPicker.addEventListener('input', () => {
+      state.colors[i].hex = colorPicker.value;
+      swatch.style.background = colorPicker.value;
+      hexLabel.textContent = colorPicker.value.toUpperCase();
+    });
+    colorPicker.addEventListener('change', () => {
+      state.colors[i].hex = colorPicker.value;
+      save();
+    });
+
+    swatchWrap.appendChild(swatch);
+    swatchWrap.appendChild(colorPicker);
+    swatchWrap.addEventListener('click', () => colorPicker.click());
+
+    // Meta
+    const meta = document.createElement('div');
+    meta.className = 'color-meta';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'color-name';
+    nameEl.contentEditable = 'true';
+    nameEl.spellcheck = false;
+    nameEl.textContent = c.name;
+    nameEl.addEventListener('blur', () => {
+      state.colors[i].name = nameEl.textContent.trim();
+      save();
+    });
+    nameEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
+
+    const useEl = document.createElement('div');
+    useEl.className = 'color-use';
+    useEl.contentEditable = 'true';
+    useEl.spellcheck = false;
+    useEl.textContent = c.use;
+    useEl.addEventListener('blur', () => {
+      state.colors[i].use = useEl.textContent.trim();
+      save();
+    });
+    useEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); useEl.blur(); } });
+
+    meta.appendChild(nameEl);
+    meta.appendChild(useEl);
+
+    // Hex label
+    const hexLabel = document.createElement('div');
+    hexLabel.className = 'color-hex-label';
+    hexLabel.textContent = c.hex.toUpperCase();
+
+    // Delete
+    const del = document.createElement('button');
+    del.className = 'color-delete';
+    del.innerHTML = '×';
+    del.title = '削除';
+    del.addEventListener('click', () => {
+      state.colors.splice(i, 1);
+      renderColors();
+      save();
+    });
+
+    item.appendChild(swatchWrap);
+    item.appendChild(meta);
+    item.appendChild(hexLabel);
+    item.appendChild(del);
+    list.appendChild(item);
+  });
+}
+
+function addColor() {
+  const name = document.getElementById('color-name-input').value.trim();
+  const hex = document.getElementById('color-hex-input').value.trim();
+  const use = document.getElementById('color-use-input').value.trim();
+  if (!name) return;
+  const validHex = /^#[0-9a-fA-F]{3,6}$/.test(hex) ? hex : '#888888';
+  state.colors.push({ name, hex: validHex, use: use || '' });
+  document.getElementById('color-name-input').value = '';
+  document.getElementById('color-hex-input').value = '';
+  document.getElementById('color-use-input').value = '';
+  renderColors();
+  save();
+}
+
+document.getElementById('color-use-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addColor();
+});
+
+// ── SECTION 5: REFERENCES ──
+function renderRefs() {
+  const list = document.getElementById('ref-list');
+  list.innerHTML = '';
+  (state.refs || []).forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+
+    const icon = document.createElement('div');
+    icon.className = 'ref-icon';
+    icon.textContent = '✦';
+
+    const body = document.createElement('div');
+    body.className = 'ref-body';
+
+    const brand = document.createElement('div');
+    brand.className = 'ref-brand';
+    brand.contentEditable = 'true';
+    brand.spellcheck = false;
+    brand.textContent = r.brand;
+    brand.addEventListener('blur', () => { state.refs[i].brand = brand.textContent.trim(); save(); });
+    brand.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); brand.blur(); } });
+
+    const point = document.createElement('div');
+    point.className = 'ref-point';
+    point.contentEditable = 'true';
+    point.spellcheck = false;
+    point.textContent = r.point;
+    point.addEventListener('blur', () => { state.refs[i].point = point.textContent.trim(); save(); });
+
+    const url = document.createElement('span');
+    url.className = 'ref-url';
+    url.contentEditable = 'true';
+    url.spellcheck = false;
+    url.textContent = r.url || 'URL を入力…';
+    url.style.opacity = r.url ? '1' : '0.35';
+    url.addEventListener('focus', () => {
+      if (url.textContent === 'URL を入力…') { url.textContent = ''; url.style.opacity = '1'; }
+    });
+    url.addEventListener('blur', () => {
+      const v = url.textContent.trim();
+      if (!v) { url.textContent = 'URL を入力…'; url.style.opacity = '0.35'; state.refs[i].url = ''; }
+      else { state.refs[i].url = v; url.style.opacity = '1'; }
+      save();
+    });
+    url.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); url.blur(); } });
+
+    body.appendChild(brand);
+    body.appendChild(point);
+    body.appendChild(url);
+
+    const del = document.createElement('button');
+    del.className = 'ref-delete';
+    del.innerHTML = '×';
+    del.title = '削除';
+    del.addEventListener('click', () => {
+      state.refs.splice(i, 1);
+      renderRefs();
+      save();
+    });
+
+    card.appendChild(icon);
+    card.appendChild(body);
+    card.appendChild(del);
+    list.appendChild(card);
+  });
+}
+
+function addRef() {
+  const brand = document.getElementById('ref-brand-input').value.trim();
+  const point = document.getElementById('ref-point-input').value.trim();
+  const url = document.getElementById('ref-url-input').value.trim();
+  if (!brand) return;
+  state.refs.push({ brand, point, url });
+  document.getElementById('ref-brand-input').value = '';
+  document.getElementById('ref-point-input').value = '';
+  document.getElementById('ref-url-input').value = '';
+  renderRefs();
+  save();
+}
+
+document.getElementById('ref-url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addRef();
+});
+
+// ── SECTION 6: NG LIST ──
+function renderNG() {
+  const list = document.getElementById('ng-list');
+  list.innerHTML = '';
+  (state.ng || []).forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'bullet-item';
+
+    const dot = document.createElement('span');
+    dot.className = 'bullet-dot';
+
+    const text = document.createElement('span');
+    text.className = 'bullet-text';
+    text.contentEditable = 'true';
+    text.spellcheck = false;
+    text.textContent = item;
+    text.addEventListener('blur', () => { state.ng[i] = text.textContent.trim(); save(); });
+    text.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); text.blur(); } });
+
+    const del = document.createElement('button');
+    del.className = 'bullet-delete';
+    del.innerHTML = '×';
+    del.addEventListener('click', () => {
+      state.ng.splice(i, 1);
+      renderNG();
+      save();
+    });
+
+    row.appendChild(dot);
+    row.appendChild(text);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+function addNG() {
+  const input = document.getElementById('ng-input');
+  const val = input.value.trim();
+  if (!val) return;
+  state.ng.push(val);
+  input.value = '';
+  renderNG();
+  save();
+}
+
+document.getElementById('ng-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addNG();
+});
+
+// ── SECTION 7: STEPS ──
+function getStatusClass(status) {
+  if (status === '進行中') return 'status-進行中';
+  if (status === '完了') return 'status-完了';
+  return 'status-未着手';
+}
+
+function renderSteps() {
+  const list = document.getElementById('step-list');
+  list.innerHTML = '';
+  (state.steps || []).forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'step-item';
+
+    const num = document.createElement('span');
+    num.className = 'step-num';
+    num.textContent = i + 1;
+
+    const name = document.createElement('span');
+    name.className = 'step-name';
+    name.contentEditable = 'true';
+    name.spellcheck = false;
+    name.textContent = s.step;
+    name.addEventListener('blur', () => { state.steps[i].step = name.textContent.trim(); save(); });
+    name.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); name.blur(); } });
+
+    const sel = document.createElement('select');
+    sel.className = 'step-status-select ' + getStatusClass(s.status);
+    STATUS_OPTIONS.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt;
+      o.textContent = opt;
+      if (opt === s.status) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change', () => {
+      state.steps[i].status = sel.value;
+      sel.className = 'step-status-select ' + getStatusClass(sel.value);
+      save();
+    });
+
+    const del = document.createElement('button');
+    del.className = 'step-delete';
+    del.innerHTML = '×';
+    del.addEventListener('click', () => {
+      state.steps.splice(i, 1);
+      renderSteps();
+      save();
+    });
+
+    row.appendChild(num);
+    row.appendChild(name);
+    row.appendChild(sel);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+function addStep() {
+  const input = document.getElementById('step-name-input');
+  const val = input.value.trim();
+  if (!val) return;
+  state.steps.push({ step: val, status: '未着手' });
+  input.value = '';
+  renderSteps();
+  save();
+}
+
+document.getElementById('step-name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addStep();
+});
+
+// ── SECTION 8: MEMO ──
+function renderMemo() {
+  document.getElementById('memo-text').value = state.memo || '';
+}
+
+// ── INIT ──
+function init() {
+  load();
+  renderOverview();
+  renderTags();
+  renderLogotype();
+  renderColors();
+  renderRefs();
+  renderNG();
+  renderSteps();
+  renderMemo();
+  applyCollapsed();
+}
+
+init();
+</script>
+</body>
+</html>

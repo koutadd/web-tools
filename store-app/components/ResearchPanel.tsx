@@ -215,90 +215,89 @@ export default function ResearchPanel({
                 border: `1px solid ${isCurrent ? '#93c5fd' : 'var(--color-border)'}`,
                 borderRadius: 10,
                 padding: '14px 16px',
-                display: 'flex',
-                gap: 14,
-                alignItems: 'flex-start',
                 position: 'relative' as const,
                 boxShadow: isCurrent ? '0 0 0 3px #dbeafe' : 'none',
               }}
             >
-              {/* 優先度バッジ */}
-              <div style={{ flexShrink: 0, paddingTop: 2 }}>
-                <span style={{
-                  display: 'inline-block',
-                  padding: '2px 8px',
-                  borderRadius: 99,
-                  background: p.bg,
-                  border: `1px solid ${p.border}`,
-                  color: p.text,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  whiteSpace: 'nowrap' as const,
-                }}>
-                  {p.label}
-                </span>
-              </div>
-
-              {/* テキスト */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text)' }}>
-                    {item.title}
+              {/* 上段: バッジ群 + タスク化ボタン */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const, alignItems: 'center' }}>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '2px 8px',
+                    borderRadius: 99,
+                    background: p.bg,
+                    border: `1px solid ${p.border}`,
+                    color: p.text,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap' as const,
+                  }}>
+                    {p.label}
                   </span>
                   {isCurrent && (
                     <span style={{
                       fontSize: 10, fontWeight: 700,
                       background: '#dbeafe', color: '#1d4ed8',
                       padding: '1px 6px', borderRadius: 99,
+                      whiteSpace: 'nowrap' as const,
                     }}>
                       現在フェーズ向け
                     </span>
                   )}
                 </div>
-                <p style={{ fontSize: 12, color: 'var(--color-text-sub)', lineHeight: 1.6, marginBottom: 8 }}>
-                  {item.desc}
-                </p>
-                <span style={{
-                  fontSize: 11, color: '#6b7280',
-                  background: '#f3f4f6', padding: '2px 8px', borderRadius: 99,
-                }}>
-                  対象フェーズ：{item.phase}
-                </span>
+                <div style={{ flexShrink: 0 }}>
+                  {isAdded ? (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '6px 12px', borderRadius: 6,
+                      background: '#ecfdf5', border: '1px solid #a7f3d0',
+                      color: '#065f46', fontSize: 12, fontWeight: 700,
+                      whiteSpace: 'nowrap' as const,
+                    }}>
+                      ✓ 追加済み
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => addToTask(item)}
+                      disabled={isAdding || adding !== null}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 6,
+                        border: '1px solid var(--color-accent)',
+                        background: isAdding ? 'var(--color-accent-light)' : 'white',
+                        color: 'var(--color-accent)',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: isAdding || adding !== null ? 'not-allowed' : 'pointer',
+                        opacity: adding !== null && !isAdding ? 0.5 : 1,
+                        transition: 'all 0.15s',
+                        whiteSpace: 'nowrap' as const,
+                      }}
+                    >
+                      {isAdding ? '追加中...' : '+ タスクに追加'}
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* タスク化ボタン */}
-              <div style={{ flexShrink: 0 }}>
-                {isAdded ? (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                    padding: '6px 12px', borderRadius: 6,
-                    background: '#ecfdf5', border: '1px solid #a7f3d0',
-                    color: '#065f46', fontSize: 12, fontWeight: 700,
-                  }}>
-                    ✓ 追加済み
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => addToTask(item)}
-                    disabled={isAdding || adding !== null}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: 6,
-                      border: '1px solid var(--color-accent)',
-                      background: isAdding ? 'var(--color-accent-light)' : 'white',
-                      color: 'var(--color-accent)',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: isAdding || adding !== null ? 'not-allowed' : 'pointer',
-                      opacity: adding !== null && !isAdding ? 0.5 : 1,
-                      transition: 'all 0.15s',
-                      whiteSpace: 'nowrap' as const,
-                    }}
-                  >
-                    {isAdding ? '追加中...' : '+ タスクに追加'}
-                  </button>
-                )}
-              </div>
+              {/* タイトル（全幅） */}
+              <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text)', marginBottom: 4 }}>
+                {item.title}
+              </p>
+
+              {/* 説明（全幅） */}
+              <p style={{ fontSize: 12, color: 'var(--color-text-sub)', lineHeight: 1.6, marginBottom: 8 }}>
+                {item.desc}
+              </p>
+
+              {/* フェーズタグ */}
+              <span style={{
+                fontSize: 11, color: '#6b7280',
+                background: '#f3f4f6', padding: '2px 8px', borderRadius: 99,
+              }}>
+                対象フェーズ：{item.phase}
+              </span>
             </div>
           );
         })}

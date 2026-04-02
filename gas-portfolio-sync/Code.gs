@@ -73,7 +73,8 @@ const GALLERY_HEADERS = [
 //  カスタムメニュー
 // ============================================================
 function onOpen() {
-  SpreadsheetApp.getActiveSpreadsheet().addMenu('📁 PDFギャラリー', [
+  const ss = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
+  let menu = ss.addMenu('📁 PDFギャラリー', [
     { name: '▶ 初回全件同期',           functionName: 'syncAllItems'    },
     { name: '🔄 全件再同期',             functionName: 'syncAllItems'    },
     { name: '⏱ 2時間トリガー再作成',    functionName: 'setupTriggers'   },
@@ -82,6 +83,13 @@ function onOpen() {
     { name: '🗑 gallery_data クリア',    functionName: 'clearGalleryData'},
     { name: '🔍 ルートフォルダ確認',     functionName: 'testRootFolder'  },
   ]);
+  // request_id 管理メニューを追加
+  ss.addMenu('🔑 request_id 管理', [
+    { name: '▶ バックフィル（全シート・完了含む）', functionName: 'backfillAllSheets'       },
+    { name: '🔍 未採番行の監査',                    functionName: 'auditMissingIds'         },
+    { name: '⏱ 定期補完トリガー設定',               functionName: 'setupRequestIdTriggers'  },
+    { name: '🧪 ID生成テスト（10件）',              functionName: 'testGenerateIds'         },
+  ]);
 }
 
 // ============================================================
@@ -89,28 +97,47 @@ function onOpen() {
 // ============================================================
 /**
  * フロントエンドが fetch() で呼ぶ JSON API。
- * スクリプトをウェブアプリとしてデプロイ後に使用可能。
- *   GET https://script.google.com/macros/s/xxxx/exec
- *   → { ok: true, data: [...], count: N }
  *
- * クエリパラメータ（任意）:
- *   ?status=active       sync_status が ok の項目のみ返す
- *   ?category=チラシ      カテゴリで絞り込む
+ * モード一覧:
+ *   ?mode=requests           依頼シートの全行（完了含む）を返す
+ *   ?mode=log&id=<request_id> 依頼管理ログを返す
+ *   ?mode=writeDriveUrl&requestId=<id>&url=<url>  T列にURL書き戻し
+ *   ?mode=getOrCreateFolders&name=<name>           Drive フォルダ取得・作成
+ *   ?status=active / ?category=xxx                 PDFギャラリー絞り込み（デフォルト）
  */
 function doGet(e) {
   try {
-    let data = getGalleryJson_();
+    const params = (e && e.parameter) ? e.parameter : {};
+    const mode   = params.mode || '';
 
-    // クエリパラメータによる絞り込み
-    if (e && e.parameter) {
-      if (e.parameter.status === 'active') {
-        data = data.filter(d => d.sync_status === 'ok');
-      }
-      if (e.parameter.category) {
-        data = data.filter(d => d.category === e.parameter.category);
-      }
+    // ── 依頼シート一覧 ──────────────────────────────────────
+    if (mode === 'requests') {
+      return jsonResp_(getRequestRows_());
     }
 
+    // ── コメントログ取得 ────────────────────────────────────
+    if (mode === 'log') {
+      return jsonResp_(getCommentLogs_(params.id || ''));
+    }
+
+    // ── Drive URL 書き戻し（T列 = 制作完了データURL）────────
+    if (mode === 'writeDriveUrl') {
+      return writeDriveUrl_(params);
+    }
+
+    // ── フォルダ取得・作成 ───────────────────────────────────
+    if (mode === 'getOrCreateFolders') {
+      return getOrCreateFolders_(params.name || '');
+    }
+
+    // ── デフォルト: PDF ギャラリー ──────────────────────────
+    let data = getGalleryJson_();
+    if (params.status === 'active') {
+      data = data.filter(d => d.sync_status === 'ok');
+    }
+    if (params.category) {
+      data = data.filter(d => d.category === params.category);
+    }
     return ContentService
       .createTextOutput(JSON.stringify({ ok: true, data: data, count: data.length }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -120,6 +147,204 @@ function doGet(e) {
       .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// ── 依頼シート読み込み ─────────────────────────────────────────
+
+/**
+ * 依頼シートの全行を読み込み、オブジェクト配列で返す。
+ * 完了行を含む全行が対象。
+ * request_id が未付与の行も返す（フロントで表示のみ）。
+ */
+function getRequestRows_() {
+  const ss    = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
+  const sheet = ss.getSheetByName('依頼シート');
+  if (!sheet) throw new Error('依頼シートが見つかりません');
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 3) return [];
+
+  const lastCol  = sheet.getLastColumn();
+  // 行1は説明行のため行2がヘッダー、データは行3から
+  const HEADER_ROW = 2;
+  const DATA_START = 3;
+  const headers  = sheet.getRange(HEADER_ROW, 1, 1, lastCol).getValues()[0].map(String);
+  const values   = sheet.getRange(DATA_START, 1, lastRow - DATA_START + 1, lastCol).getValues();
+
+  return values
+    .map((row, i) => {
+      // 店舗・制作物のどちらかが空なら返さない（完全空行スキップ）
+      const hasStore = String(row[headers.indexOf('店舗')] || '').trim() !== '';
+      const hasWork  = String(row[headers.indexOf('制作物')] || '').trim() !== '';
+      if (!hasStore && !hasWork) return null;
+
+      const obj = {
+        row_id:     String(i + DATA_START),  // 表示専用（更新キーとして使わない）
+        request_id: '',              // 下記で設定
+      };
+      headers.forEach((h, j) => {
+        if (!h) return;
+        obj[h] = row[j];
+      });
+
+      // エイリアス（フロントエンドが依存するキー）
+      let reqIdIdx = headers.indexOf('request_id');
+      // フォールバック: Row2に無い場合は Row1 も検索（初回バックフィル時に Row1 に書かれた場合の互換性）
+      if (reqIdIdx === -1) {
+        const row1Headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(String);
+        reqIdIdx = row1Headers.indexOf('request_id');
+      }
+      obj.request_id = reqIdIdx !== -1 ? String(row[reqIdIdx] || '').trim() : '';
+      obj.store_name = String(obj['店舗'] || '').trim();
+      obj.title      = String(obj['制作物'] || obj['店舗'] || '').trim();
+      obj.category   = String(obj['制作物'] || '').trim();
+      obj.col_k      = String(obj['優先度（緊急／通常）'] || '').trim();
+      obj.col_l      = String(obj['ステータス'] || '').trim();
+      obj.drive_url  = String(obj['制作完了データ(googleドライブURL)'] || '').trim();
+
+      return obj;
+    })
+    .filter(Boolean);
+}
+
+// ── コメントログ読み込み ──────────────────────────────────────
+
+/**
+ * 依頼管理ログから指定 id のコメント一覧を返す。
+ * id は request_id または（後方互換で）row_id。
+ */
+function getCommentLogs_(id) {
+  if (!id) return [];
+  const ss    = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
+  const sheet = ss.getSheetByName('依頼管理ログ');
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  const lastRow  = sheet.getLastRow();
+  const lastCol  = sheet.getLastColumn();
+  const allRows  = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  const idStr    = String(id).trim();
+
+  // A列の値が id と一致する行を返す。
+  // 新形式(request_id)・旧形式(row_id = 数値)両方に対応（後方互換）。
+  return allRows
+    .filter(row => String(row[0] || '').trim() === idStr)
+    .map(row => ({
+      request_id: String(row[0] || ''),
+      timestamp:  row[1] ? (row[1] instanceof Date ? row[1].toISOString() : String(row[1])) : '',
+      author:     String(row[2] || ''),
+      comment:    String(row[3] || ''),
+    }));
+}
+
+// ── Drive URL 書き戻し ────────────────────────────────────────
+
+/**
+ * T列（制作完了データURL）に URL を書き戻す。
+ * request_id で行を特定し、verifyBeforeUpdate_ で安全チェック後に書き込む。
+ */
+function writeDriveUrl_(params) {
+  const requestId = params.requestId || '';
+  const url       = params.url || '';
+
+  if (!requestId) {
+    return jsonResp_({ ok: false, error: 'requestId が未指定です' });
+  }
+
+  const ss    = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
+  const sheet = ss.getSheetByName('依頼シート');
+  if (!sheet) return jsonResp_({ ok: false, error: '依頼シートが見つかりません' });
+
+  // storeName・workName は GAS 側で再取得するため省略可
+  const verify = verifyBeforeUpdate_(sheet, requestId, '', '');
+  if (!verify.ok) {
+    writeAuditLog_({
+      actionType: 'write_drive_url',
+      request_id: requestId,
+      sheetName: '依頼シート',
+      targetColumn: '制作完了データ(googleドライブURL)',
+      newValue: url,
+      success: false,
+      errorMessage: verify.error,
+    });
+    return jsonResp_({ ok: false, error: verify.error });
+  }
+
+  const rowNum    = verify.rowNum;
+  const headerMap = getHeaderMap_(sheet);
+  const colIdx    = headerMap['制作完了データ(googleドライブURL)'];
+  if (!colIdx) return jsonResp_({ ok: false, error: '制作完了データ列が見つかりません' });
+
+  const prevValue = String(sheet.getRange(rowNum, colIdx).getValue() || '');
+  sheet.getRange(rowNum, colIdx).setValue(url);
+
+  const afterVerify = verifyAfterWrite_(sheet, rowNum, colIdx, url);
+
+  writeAuditLog_({
+    actionType: 'write_drive_url',
+    request_id: requestId,
+    sheetName: '依頼シート',
+    currentRowIndex: rowNum,
+    storeName: verify.actualStore,
+    workName: verify.actualWork,
+    targetColumn: '制作完了データ(googleドライブURL)',
+    previousValue: prevValue,
+    newValue: url,
+    success: afterVerify.ok,
+    errorMessage: afterVerify.ok ? '' : `再取得検証失敗: 実際="${afterVerify.actual}"`,
+  });
+
+  if (!afterVerify.ok) {
+    return jsonResp_({ ok: false, error: `書き込み後検証失敗: 期待="${url}" 実際="${afterVerify.actual}"` });
+  }
+  return jsonResp_({ ok: true, rowNum });
+}
+
+// ── Drive フォルダ取得・作成 ──────────────────────────────────
+
+/**
+ * 指定名のフォルダ階層を取得または作成する。
+ * 返す: { ok, existed, mainId, outputId, nyukoMaeId, nyukoId, nyukoUrl }
+ */
+function getOrCreateFolders_(folderName) {
+  if (!folderName) return jsonResp_({ ok: false, error: 'フォルダ名が未指定です' });
+
+  const root = getRootFolder_();
+  if (!root) return jsonResp_({ ok: false, error: 'ルートフォルダが取得できません' });
+
+  let mainFolder = findSubFolderByName_(root, folderName);
+  const existed  = !!mainFolder;
+
+  if (!mainFolder) {
+    mainFolder = root.createFolder(folderName);
+    Logger.log(`[createFolders] 新規フォルダ作成: "${folderName}"`);
+  }
+
+  // サブフォルダ定義
+  const subFolderDefs = [
+    { key: 'output',   name: 'アウトプット' },
+    { key: 'nyukoMae', name: '入稿前データ' },
+    { key: 'nyuko',    name: '入稿データ'   },
+  ];
+
+  const ids = { mainId: mainFolder.getId() };
+  for (const def of subFolderDefs) {
+    let sub = findSubFolderByName_(mainFolder, def.name);
+    if (!sub) sub = mainFolder.createFolder(def.name);
+    ids[def.key + 'Id'] = sub.getId();
+    if (def.key === 'nyuko') {
+      ids.nyukoUrl = sub.getUrl();
+    }
+  }
+
+  return jsonResp_({ ok: true, existed, ...ids });
+}
+
+// ── レスポンスヘルパー ────────────────────────────────────────
+
+function jsonResp_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // ============================================================
@@ -135,7 +360,7 @@ function syncAllItems() {
   const startTime = new Date();
   Logger.log(`=== syncAllItems 開始 [${startTime.toISOString()}] ===`);
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
   const mgmtSheet = ss.getSheetByName(CONFIG.MANAGEMENT_SHEET);
   if (!mgmtSheet) {
     throw new Error(`管理シート "${CONFIG.MANAGEMENT_SHEET}" が見つかりません`);
@@ -176,7 +401,7 @@ function syncAllItems() {
   const elapsed = ((new Date() - startTime) / 1000).toFixed(1);
   Logger.log(`=== syncAllItems 完了 (成功:${successCount} / スキップ:${skippedCount} / エラー:${errorCount} / ${elapsed}秒) ===`);
 
-  SpreadsheetApp.getActiveSpreadsheet().toast(
+  SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ').toast(
     `完了: 成功 ${successCount} 件 / エラー ${errorCount} 件 / スキップ ${skippedCount} 件 (${elapsed}秒)`,
     '📁 PDF同期完了', 6
   );
@@ -306,7 +531,7 @@ function setupTriggers() {
     .create();
 
   Logger.log(`トリガー設定完了: ${funcName} を ${CONFIG.TRIGGER_INTERVAL_HOURS}時間ごとに実行`);
-  SpreadsheetApp.getActiveSpreadsheet().toast(
+  SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ').toast(
     `${CONFIG.TRIGGER_INTERVAL_HOURS} 時間ごとに自動実行するトリガーを設定しました`,
     '⏱ トリガー設定完了', 4
   );
@@ -467,7 +692,7 @@ function getManagementRows_(sheet) {
  * @param {Object} data  GALLERY_HEADERS のキーを持つオブジェクト
  */
 function updateGalleryData_(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
   let sheet = ss.getSheetByName(CONFIG.GALLERY_SHEET);
 
   // シートがなければ作成
@@ -538,7 +763,7 @@ function getGalleryHeaders_(sheet) {
  * @returns {Object[]}
  */
 function getGalleryJson_() {
-  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const ss    = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
   const sheet = ss.getSheetByName(CONFIG.GALLERY_SHEET);
   if (!sheet || sheet.getLastRow() < 2) return [];
 
@@ -578,7 +803,7 @@ function previewJson() {
  * gallery_data シートのデータ行をすべて削除する（ヘッダーは残す）。
  */
 function clearGalleryData() {
-  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const ss    = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
   const sheet = ss.getSheetByName(CONFIG.GALLERY_SHEET);
   if (!sheet || sheet.getLastRow() < 2) {
     SpreadsheetApp.getUi().alert('gallery_data にデータがありません');
@@ -626,7 +851,7 @@ function testRootFolder() {
 function testSyncOne() {
   const ITEM_ID_TO_TEST = '001'; // ★ テストしたい item_id に変更
 
-  const ss        = SpreadsheetApp.getActiveSpreadsheet();
+  const ss        = SpreadsheetApp.openById('14o-3G_-30qi4NCw-XhR4FaGGFNJhrlJF8ktL3DA7CJQ');
   const mgmtSheet = ss.getSheetByName(CONFIG.MANAGEMENT_SHEET);
   if (!mgmtSheet) throw new Error(`管理シート "${CONFIG.MANAGEMENT_SHEET}" が見つかりません`);
 

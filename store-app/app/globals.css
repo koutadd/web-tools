@@ -98,14 +98,18 @@ a:active, button:active {
 /* ─ Safe Area ─────────────────────────────────────────────────────────── */
 /*
   viewport-fit=cover + black-translucent status bar を使うと
-  コンテンツがノッチ・ステータスバーの下まで伸びる。
-  各ヘッダーは .pwa-safe-top を付けて上部セーフエリアを確保する。
+  コンテンツがノッチ・Dynamic Island の下まで伸びる。
+
+  使い分け:
+  ・.pwa-safe-top         → 要素自体に inline padding がない場合に付ける
+  ・.pwa-safe-bottom      → 要素自体に inline padding がない場合に付ける
+  ・inline style に padding がある場合は、
+    paddingTop: 'max(Npx, calc(env(safe-area-inset-top, 0px) + Npx))'
+    paddingBottom: 'max(Npx, calc(env(safe-area-inset-bottom, 0px) + Npx))'
+    を直接指定する（クラスはインライン shorthand に上書きされるため）。
 */
 .pwa-safe-top {
   padding-top: env(safe-area-inset-top, 0px);
-}
-.pwa-safe-top-md {
-  padding-top: max(14px, env(safe-area-inset-top, 14px));
 }
 .pwa-safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);

@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サービスレビュー — 健康・フィットネス系</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+      background: #f4f5f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #111;
+      flex-shrink: 0;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #d1d5db;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover { border-color: #6366f1; color: #6366f1; }
+
+    .filter-btn.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: #fff;
+    }
+
+    .count-badge {
+      display: inline-block;
+      background: #e5e7eb;
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
+    .filter-btn.active .count-badge {
+      background: rgba(255,255,255,0.3);
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .logo-banner {
+      width: 100%;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+      border-bottom: 1px solid #f3f4f6;
+      overflow: hidden;
+      padding: 16px 24px;
+    }
+
+    .logo-banner img {
+      max-width: 100%;
+      max-height: 108px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .logo-placeholder {
+      font-size: 22px;
+      font-weight: 800;
+      color: #6366f1;
+      text-align: center;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .card-title-block { flex: 1; min-width: 0; }
+
+    .service-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .service-url {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-badge {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-採用 { background: #d1fae5; color: #065f46; }
+    .status-要再確認 { background: #fef3c7; color: #92400e; }
+    .status-不採用 { background: #fee2e2; color: #991b1b; }
+
+    .card-body { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+    .concept-text {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+      font-style: italic;
+      background: #f9fafb;
+      border-left: 3px solid #6366f1;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .summary-text {
+      font-size: 12.5px;
+      color: #4b5563;
+      line-height: 1.65;
+    }
+
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .keyword {
+      background: #ede9fe;
+      color: #5b21b6;
+      padding: 3px 9px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .checked-at {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .visit-btn {
+      font-size: 12px;
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .visit-btn:hover { color: #4f46e5; }
+
+    .logo-detail {
+      font-size: 11px;
+      color: #9ca3af;
+      padding: 0 20px 10px;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: #9ca3af;
+      font-size: 15px;
+    }
+
+    .summary-bar {
+      display: flex;
+      gap: 20px;
+      padding: 0 0 24px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .summary-bar strong { color: #111; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>健康・フィットネス系サービス調査</h1>
+    <div class="meta">調査日: 2026-03-24　|　公式ソースのみ</div>
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">すべて <span class="count-badge" id="count-all">0</span></button>
+    <button class="filter-btn" data-filter="採用">採用 <span class="count-badge" id="count-採用">0</span></button>
+    <button class="filter-btn" data-filter="要再確認">要再確認 <span class="count-badge" id="count-要再確認">0</span></button>
+    <button class="filter-btn" data-filter="不採用">不採用 <span class="count-badge" id="count-不採用">0</span></button>
+  </div>
+</header>
+
+<main>
+  <div class="summary-bar" id="summaryBar"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+  const INLINE_DATA = [
+  {
+    "service_name": "FIT365",
+    "official_site_url": "https://fit365.jp/",
+    "logo_image_url": "https://fit365.jp/assets/img/common/logo.png",
+    "logo_source_page_url": "https://fit365.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "FIT365フィットネスジム",
+    "concept_exact_text": "365日、毎日使いたい放題、今までにない価格帯でフィットネスをお楽しみください",
+    "concept_summary_ja": "365日年中無休で月額2,980円（税込3,278円）という低価格帯で、本格的なフィットネス施設をいつでも利用できるジムサービス。家族会員サービスにより1名の会員につき家族3名まで無料登録可能。",
+    "continuity_keywords": [
+      "365日",
+      "年中無休",
+      "低価格",
+      "使い放題",
+      "家族会員",
+      "フィットネスジム"
+    ],
+    "evidence_urls": [
+      "https://fit365.jp/",
+      "https://fit365.jp/menu/",
+      "https://fit365.jp/assets/img/common/logo.png"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "minefit",
+    "official_site_url": "https://minefit.jp/",
+    "logo_image_url": "https://minefit.jp/assets/svg/logo-minefit.svg",
+    "logo_source_page_url": "https://minefit.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "context unavailable（SVGのtitle/alt属性なし、ファイル名 logo-minefit より確認）",
+    "concept_exact_text": "minefit appは、JOYFIT®やFIT365の運営を通じてフィットネスの楽しさを広げてきたヤマウチがお届けする、オンライン・トレーニングサービスです。コアトレーニングからヨガレッスンまで、長年のノウハウが詰め込まれた多彩なライブレッスンを展開。",
+    "concept_summary_ja": "JOYFIT・FIT365を運営するヤマウチが提供するオンライントレーニングアプリ。月額580円でコアトレーニングからヨガまで多彩なライブレッスンと動画ライブラリーが使い放題。",
+    "continuity_keywords": [
+      "オンライン",
+      "ライブレッスン",
+      "月額580円",
+      "ヨガ",
+      "コアトレーニング",
+      "いつでもどこでも"
+    ],
+    "evidence_urls": [
+      "https://minefit.jp/",
+      "https://minefit.jp/assets/svg/logo-minefit.svg",
+      "https://apps.apple.com/jp/app/minefit-%E3%83%A8%E3%82%AC-%E3%83%80%E3%82%A4%E3%82%A8%E3%83%83%E3%83%88%E3%81%AE%E7%AD%8B%E3%83%88%E3%83%AC/id1521495780"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "LEAN BODY",
+    "official_site_url": "https://lp.lean-body.jp/",
+    "logo_image_url": "https://lp.lean-body.jp/images/logo.png",
+    "logo_source_page_url": "https://lp.lean-body.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "LEAN BODY",
+    "concept_exact_text": "運動も食事管理も楽しいから続く!",
+    "concept_summary_ja": "日本最大級のオンラインフィットネス。1,000本以上のオリジナルレッスン動画・LIVE配信と食事記録機能を組み合わせ、運動と食事管理の両方を楽しみながら継続できるサービス。",
+    "continuity_keywords": [
+      "楽しいから続く",
+      "食事管理",
+      "オンラインフィットネス",
+      "日本最大級",
+      "ライブ配信",
+      "1000本以上"
+    ],
+    "evidence_urls": [
+      "https://lp.lean-body.jp/",
+      "https://lp.lean-body.jp/images/logo.png"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "SOELU",
+    "official_site_url": "https://www.soelu.com/",
+    "logo_image_url": "https://www.soelu.com/img/common/logo.png",
+    "logo_source_page_url": "https://www.soelu.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "context unavailable（WebFetchでheader内imgとして確認、alt属性は未取得）",
+    "concept_exact_text": "国内最大級のオンラインヨガ・フィットネスSOELU（ソエル）",
+    "concept_summary_ja": "国内最大級のオンラインヨガ・フィットネスサービス。毎日朝5時〜深夜まで1日約200クラス以上を開講し、インストラクターと双方向でつながるライブレッスンを中心に100種類以上のプログラムを提供。",
+    "continuity_keywords": [
+      "国内最大級",
+      "オンラインヨガ",
+      "ライブレッスン",
+      "双方向",
+      "100種類以上",
+      "インストラクター"
+    ],
+    "evidence_urls": [
+      "https://www.soelu.com/",
+      "https://www.soelu.com/img/common/logo.png"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "torcia",
+    "official_site_url": "https://online.tipness.co.jp/",
+    "logo_image_url": "https://online.tipness.co.jp/imgs/logo_sp.svg",
+    "logo_source_page_url": "https://online.tipness.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "オンラインフィットネス torcia（トルチャ）",
+    "concept_exact_text": "自宅で手軽に始められるオンラインフィットネス『torcia（トルチャ）』ヨガやピラティスなど多彩なレッスンを都度払い220円(税込)から受講可能。まずは無料会員登録でお試しください！",
+    "concept_summary_ja": "ティップネスが提供するオンラインフィットネスサービス。ヨガ・ピラティスなど多彩なレッスンを都度払い220円（税込）から自宅で受講可能。なお2026年3月31日にライブ配信終了予定。",
+    "continuity_keywords": [
+      "自宅",
+      "オンラインフィットネス",
+      "ヨガ",
+      "ピラティス",
+      "都度払い",
+      "ティップネス",
+      "無料会員登録"
+    ],
+    "evidence_urls": [
+      "https://online.tipness.co.jp/",
+      "https://online.tipness.co.jp/imgs/logo_sp.svg",
+      "https://online.tipness.co.jp/about/index.html"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "UCHIYOGA+",
+    "official_site_url": "https://yoga-lava.com/uchiyoga/",
+    "logo_image_url": "https://yoga-lava.com/uchiyoga/images/logo.png",
+    "logo_source_page_url": "https://yoga-lava.com/uchiyoga/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "context unavailable（alt属性なし。<header>内<p class='logo'>内に配置。画像サイズ1000×130px）",
+    "concept_exact_text": "LAVAの高品質なヨガを いつでも、どこでも",
+    "concept_summary_ja": "ホットヨガスタジオLAVAが提供するオンラインヨガサービス。LAVAが監修した高品質なプログラムをいつでもどこでも自宅で受講できる。",
+    "continuity_keywords": [
+      "LAVAオンライン",
+      "高品質ヨガ",
+      "いつでもどこでも",
+      "お家でヨガ",
+      "ライブレッスン",
+      "動画配信"
+    ],
+    "evidence_urls": [
+      "https://yoga-lava.com/uchiyoga/",
+      "https://yoga-lava.com/uchiyoga/images/logo.png"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "yoggy air",
+    "official_site_url": "https://air.studio-yoggy.com/",
+    "logo_image_url": "https://air.studio-yoggy.com/assets/202202renewal/assets/img/common/logo_yoggy-air.svg",
+    "logo_source_page_url": "https://air.studio-yoggy.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "yoggy air",
+    "concept_exact_text": "yoggy airは、ヨガ、ピラティス、瞑想、ライフデザイン、セルフディスカバリーなど多種多様なジャンルのスペシャリストが「心地よい暮らし」を提案するオンラインウェルビーイングコミュニティです。",
+    "concept_summary_ja": "2004年創業のスタジオ・ヨギーが展開するオンラインウェルビーイングコミュニティ。ヨガ・ピラティス・瞑想・ライフデザインなど多ジャンルのスペシャリストが「心地よい暮らし」を提案する。",
+    "continuity_keywords": [
+      "ウェルビーイング",
+      "心地よい暮らし",
+      "オンラインコミュニティ",
+      "ヨガ",
+      "ピラティス",
+      "瞑想",
+      "ライフデザイン",
+      "セルフディスカバリー",
+      "スタジオ・ヨギー"
+    ],
+    "evidence_urls": [
+      "https://air.studio-yoggy.com/",
+      "https://air.studio-yoggy.com/assets/202202renewal/assets/img/common/logo_yoggy-air.svg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "UTL YOGA ONLINE",
+    "official_site_url": "https://yogahodai.underthelight.jp/",
+    "logo_image_url": "https://underthelight.jp/cdn/shop/files/UTL20th_logo_baf539bf-76ef-4aae-ae5c-254f62bf579a.png?v=1759474112",
+    "logo_source_page_url": "https://underthelight.jp/pages/online",
+    "logo_source_type": "brand_page",
+    "logo_detection_method": "brand_page",
+    "logo_alt_or_context": "アンダーザライト ヨガスクール（underthelight.jp/pages/online ヘッダーロゴ。同ページog:title=\"ヨガ専門スクールの本格オンラインヨガ『UTL YOGA ONLINE』\"）",
+    "concept_exact_text": "UTL YOGA ONLINEは、サブスク(月額・定額制）オンラインヨガサービス。国内外の有名講師50名以上が毎日幅広いクラスをライブ配信によって指導します。月200を超えるクラスがどこでも受け放題。ヨガ初心者からヨガインストラクターまで、全てのヨガ愛好者におすすめします。",
+    "concept_summary_ja": "日本最大級ヨガスクール「アンダーザライト（UTL）」が提供する月額制オンラインヨガサービス。国内外50名以上の有名講師によるライブ・動画クラスが月200本以上受け放題。",
+    "continuity_keywords": [
+      "サブスク",
+      "月額定額制",
+      "ライブ配信",
+      "見放題",
+      "国内外講師",
+      "ヨガスクール",
+      "アンダーザライト",
+      "いつでもどこでも"
+    ],
+    "evidence_urls": [
+      "https://yogahodai.underthelight.jp/",
+      "https://underthelight.jp/pages/online",
+      "https://underthelight.jp/cdn/shop/files/UTL20th_logo_baf539bf-76ef-4aae-ae5c-254f62bf579a.png?v=1759474112"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "クラムる",
+    "official_site_url": "https://cramuru.zenplace.co.jp/",
+    "logo_image_url": "https://cramuru.zenplace.co.jp/_next/image?url=%2Fimages%2Fcramuru%2Flogo-400.png&w=3840&q=75",
+    "logo_source_page_url": "https://cramuru.zenplace.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "zen place online クラムる",
+    "concept_exact_text": "クラムるは短時間でも効果が出るように、エクササイズが厳選されています。お仕事前や休憩中など、ちょっとしたスキマ時間にできるから、無理なく続けられます。",
+    "concept_summary_ja": "zen placeが提供する15分完結型オンラインフィットネス。ヨガ・ピラティスの本質を短時間に凝縮し、毎日のスキマ時間で無理なく継続できる設計。",
+    "continuity_keywords": [
+      "15分",
+      "毎日続ける",
+      "スキマ時間",
+      "ヨガ",
+      "ピラティス",
+      "zen place",
+      "オンラインフィットネス",
+      "短時間効果"
+    ],
+    "evidence_urls": [
+      "https://cramuru.zenplace.co.jp/",
+      "https://cramuru.zenplace.co.jp/_next/image?url=%2Fimages%2Fcramuru%2Flogo-400.png&w=3840&q=75"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "PILATES@home",
+    "official_site_url": "https://workoutcommunity.jp/online/",
+    "logo_image_url": "https://workoutcommunity.jp/wp-content/uploads/2023/05/pilates_logo.svg",
+    "logo_source_page_url": "https://workoutcommunity.jp/online/",
+    "logo_source_type": "brand_page",
+    "logo_detection_method": "brand_page",
+    "logo_alt_or_context": "context unavailable（alt属性なし。サービス紹介ページのコンテンツ内に配置。サイズ300×66px）",
+    "concept_exact_text": "LAGREE/PILATES@homeは、ラグリーフィットネスを中心に、世界中どこからでも受講可能なオンラインフィットネススタジオです。",
+    "concept_summary_ja": "WORKOUT COMMUNITYが提供するオンラインフィットネススタジオ。ラグリーフィットネスを中心に300本以上のビデオレッスンを24時間365日配信し、自宅で効率的なボディメイクを実現する。",
+    "continuity_keywords": [
+      "ラグリーフィットネス",
+      "オンラインフィットネス",
+      "24時間365日",
+      "ビデオレッスン",
+      "ボディメイク",
+      "世界中どこでも",
+      "300本以上"
+    ],
+    "evidence_urls": [
+      "https://workoutcommunity.jp/online/",
+      "https://workoutcommunity.jp/wp-content/uploads/2023/05/pilates_logo.svg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "おうちでカーブス",
+    "official_site_url": "https://www.curves.co.jp/ouchi/",
+    "logo_image_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/bb/6c/02/bb6c0267-307e-c8da-9e61-4fe3ef2b9e50/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/512x512bb.jpg",
+    "logo_source_page_url": "https://apps.apple.com/jp/app/%E3%81%8A%E3%81%86%E3%81%A1%E3%81%A7%E3%83%95%E3%82%A3%E3%83%83%E3%83%88%E3%83%8D%E3%82%B9by%E3%82%AB%E3%83%BC%E3%83%96%E3%82%B9/id1553722130",
+    "logo_source_type": "appstore_icon",
+    "logo_detection_method": "appstore_icon",
+    "logo_alt_or_context": "おうちでフィットネスbyカーブス（App Store id=1553722130、デベロッパー：株式会社カーブスジャパン）",
+    "concept_exact_text": "74万人＊の女性に支持されているカーブスを、ご自身のスマホやタブレットを使って1日6分からオンラインで体験できます。",
+    "concept_summary_ja": "女性専用フィットネス「カーブス」のメソッドを、スマホ・タブレットのアプリで1日6分から自宅で体験できるオンラインサービス。24時間視聴可能な録画メニューと予約不要の生放送メニューを提供。",
+    "continuity_keywords": [
+      "女性専用",
+      "1日6分",
+      "オンライン",
+      "録画メニュー",
+      "生放送",
+      "24時間",
+      "予約不要",
+      "アプリ",
+      "カーブス"
+    ],
+    "evidence_urls": [
+      "https://www.curves.co.jp/ouchi/",
+      "https://apps.apple.com/jp/app/%E3%81%8A%E3%81%86%E3%81%A1%E3%81%A7%E3%83%95%E3%82%A3%E3%83%83%E3%83%88%E3%83%8D%E3%82%B9by%E3%82%AB%E3%83%BC%E3%83%96%E3%82%B9/id1553722130",
+      "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/bb/6c/02/bb6c0267-307e-c8da-9e61-4fe3ef2b9e50/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/512x512bb.jpg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "B-fit online",
+    "official_site_url": "https://b-fit.jp/online/",
+    "logo_image_url": "https://b-fit.jp/online/images/logo_hd2104.png",
+    "logo_source_page_url": "https://b-fit.jp/online/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "B-fit online",
+    "concept_exact_text": "月120本以上の多彩なレッスンが受け放題！運動初心者から愛好者まで、どの運動レベルにも対応できるレッスンをご用意しています。ストレッチ、ヨガ、筋トレ、ダンス、格闘系など豊富なプログラム。受け放題だから毎日受講もできるし、週に2～3回の受講もOK!あなたのリズムに合わせた運動習慣が実現します。",
+    "concept_summary_ja": "ヨガ・ストレッチ・筋トレ・ダンスなど月120本以上のオンラインレッスンが受け放題のフィットネスサービス。ただし2024年8月にライブ配信コンテンツは終了しており、現時点でのサービス継続状況は要確認。",
+    "continuity_keywords": [
+      "受け放題",
+      "月120本以上",
+      "ヨガ",
+      "ストレッチ",
+      "筋トレ",
+      "ダンス",
+      "格闘系",
+      "運動初心者",
+      "24時間"
+    ],
+    "evidence_urls": [
+      "https://b-fit.jp/online/",
+      "https://b-fit.jp/online/images/logo_hd2104.png"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "要再確認"
+  },
+  {
+    "service_name": "zen place オンライン",
+    "official_site_url": "https://www.zenplace.co.jp/online",
+    "logo_image_url": "https://www.zenplace.co.jp/images_next/common/zen_logo.svg",
+    "logo_source_page_url": "https://www.zenplace.co.jp/online",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ピラティス専門のzen place（ゼンプレイス）",
+    "concept_exact_text": "ピラティス、ヨガのスタジオレッスンが自宅でできるzen placeのオンライン",
+    "concept_summary_ja": "zen place会員はすべてのマットグループレッスンをオンラインで受講可能。日本初の双方向ライブ配信で全国スタジオのレッスンを受けられ、「20分継続習慣」を推奨する忙しい人向けオンラインピラティス・ヨガサービス。",
+    "continuity_keywords": [
+      "ピラティス",
+      "ヨガ",
+      "スタジオレッスン",
+      "自宅",
+      "双方向ライブ配信",
+      "20分継続習慣",
+      "全国"
+    ],
+    "evidence_urls": [
+      "https://www.zenplace.co.jp/online",
+      "https://www.zenplace.co.jp/images_next/common/zen_logo.svg",
+      "https://www.zenplace.co.jp/og-pilates.jpg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "ルネサンス オンラインLivestream",
+    "official_site_url": "https://rol.s-re.jp/",
+    "logo_image_url": "https://storage.googleapis.com/production-os-assets/assets/862251c5-6e49-4ec0-a3e1-dd4491b00631",
+    "logo_source_page_url": "https://rol.s-re.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "context unavailable（STEP 1〜8全完了。ヘッダーロゴはCSS background-image=storage.googleapis.com/studio-design-assets（Studio.site CDN=非公式）。favicon/og:imageはproduction-os-assets=Studio.site CDN（非公式）。App「Myルネサンス」廃止確認。Google Playアプリなし。公式ドメイン配下ロゴ一切未発見）",
+    "concept_exact_text": "徒歩0分で通える自分だけのフィットネススタジオ。オンラインレッスンならルネサンス",
+    "concept_summary_ja": "スポーツクラブ「ルネサンス」が提供するオンラインフィットネスサービス。「徒歩0分で通える自分だけのフィットネススタジオ」をコンセプトに、週900本以上・24時間のライブ・ビデオレッスンを提供。",
+    "continuity_keywords": [
+      "徒歩0分",
+      "おうちがスタジオ",
+      "24時間",
+      "週900本以上",
+      "ライブレッスン",
+      "ビデオレッスン",
+      "ルネサンス"
+    ],
+    "evidence_urls": [
+      "https://rol.s-re.jp/",
+      "https://rol.s-re.jp/about202104"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "要再確認"
+  },
+  {
+    "service_name": "MELONオンライン",
+    "official_site_url": "https://www.the-melon.com/online-program/",
+    "logo_image_url": "https://www.the-melon.com/wp-content/themes/melon-theme/_assets/images/_common/logo.png",
+    "logo_source_page_url": "https://www.the-melon.com/online-program/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "MELON",
+    "concept_exact_text": "「マインドフルネス」とは、先端科学で裏付けられた、古代生まれの休息法。さまよう脳をとどめ、「今、ここ」に意識を向けることで、脳や心への負担を減らし、休めることができます。",
+    "concept_summary_ja": "マインドフルネス瞑想に特化した月額制オンラインサロン。「心を鍛えて、マインドフルな毎日を」をコンセプトに、月300本以上のクラスが受け放題で、科学的エビデンスに基づいたプログラムを提供。",
+    "continuity_keywords": [
+      "マインドフルネス",
+      "心を鍛える",
+      "月額制オンラインサロン",
+      "受け放題",
+      "瞑想",
+      "ヨガ",
+      "エビデンス",
+      "今ここ"
+    ],
+    "evidence_urls": [
+      "https://www.the-melon.com/online-program/",
+      "https://www.the-melon.com/wp-content/themes/melon-theme/_assets/images/_common/logo.png",
+      "https://www.the-melon.com/wp-content/uploads/2020/04/melon_logo_20200207.jpg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "PILATES BODY STUDIO オンライン",
+    "official_site_url": "https://www.pilates-body.jp/online-lesson/index.html",
+    "logo_image_url": "https://www.pilates-body.jp/assets/images/common/logo.svg",
+    "logo_source_page_url": "https://www.pilates-body.jp/online-lesson/index.html",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "PILATES BODY STUDIO",
+    "concept_exact_text": "\"絶対的品質\"でお応えする PILATES BODY STDUIOの オンラインレッスン\nピラティス創設者「ジョセフ・ピラティス」公式直系、日本唯一のトレーニングセンター。全国からお客様が絶えないピラティスボディスタジオの、世界に認められた水準のレッスンをオンラインでどなたにもご参加いただけるよう、品質にこだわりました。",
+    "concept_summary_ja": "ピラティス創設者直系・日本唯一のトレーニングセンターが、世界水準の品質にこだわったオンラインレッスンをZoomで提供。グループとレコーディングの2形式で受講可能。",
+    "continuity_keywords": [
+      "絶対的品質",
+      "ピラティス",
+      "オンラインレッスン",
+      "Zoom",
+      "少人数制",
+      "世界水準",
+      "ジョセフ・ピラティス"
+    ],
+    "evidence_urls": [
+      "https://www.pilates-body.jp/online-lesson/index.html",
+      "https://www.pilates-body.jp/index.html"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "あすけん",
+    "official_site_url": "https://www.asken.jp/",
+    "logo_image_url": "https://www.asken.jp/img/home_renew/main_logo.svg",
+    "logo_source_page_url": "https://www.asken.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "あすけん",
+    "concept_exact_text": "管理栄養士監修のアドバイスが届く！ ダイエット・健康管理のためのアプリ",
+    "concept_summary_ja": "食事を記録するだけで管理栄養士監修のアドバイスが受けられる食事管理アプリ。カロリー・栄養素を自動計算し、ダイエットや健康維持に活用できる。",
+    "continuity_keywords": [
+      "食事管理",
+      "栄養素",
+      "カロリー計算",
+      "管理栄養士",
+      "ダイエット",
+      "健康管理",
+      "アドバイス"
+    ],
+    "evidence_urls": [
+      "https://www.asken.jp/",
+      "https://www.asken.jp/img/home_renew/main_logo.svg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "dヘルスケア",
+    "official_site_url": "https://health.docomo.ne.jp/",
+    "logo_image_url": "https://cms.static.dhealthcare.net/static/dhealthcare_logo.svg",
+    "logo_source_page_url": "https://health.docomo.ne.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "dヘルスケア",
+    "concept_exact_text": "おトクで、カンタン。だから続けられる！複雑なのは続かないかも…そんな三日坊主さんもご安心を！「dヘルスケア」アプリは、毎日届く健康に関する「ミッション」をクリアするだけ！",
+    "concept_summary_ja": "毎日の健康ミッションをクリアするとdポイントがもらえる、NTTドコモのシンプルで続けやすい健康管理アプリ。歩数・体重・血圧などを記録し、医療サービスへのアクセスも提供。",
+    "continuity_keywords": [
+      "dポイント",
+      "健康ミッション",
+      "歩数",
+      "続けられる",
+      "おトク",
+      "カンタン",
+      "NTTドコモ"
+    ],
+    "evidence_urls": [
+      "https://health.docomo.ne.jp/",
+      "https://www.docomo.ne.jp/service/healthcare/"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "楽天ヘルスケア",
+    "official_site_url": "https://healthcare.rakuten.co.jp/",
+    "logo_image_url": "https://healthcare.rakuten.co.jp/assets/images/logo.svg",
+    "logo_source_page_url": "https://healthcare.rakuten.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Rakuten ヘルスケア",
+    "concept_exact_text": "毎日のヘルスマネジメントをもっとカンタンに、もっとおトクに。楽しくポイントを貯めながらおトクに健康増進を目指すアプリです！",
+    "concept_summary_ja": "歩いて楽天ポイントを貯めながらおトクに健康増進を目指すアプリ。毎日のヘルスマネジメントを簡単に行えることを特徴とする。",
+    "continuity_keywords": [
+      "楽天ポイント",
+      "健康増進",
+      "歩数",
+      "ヘルスマネジメント",
+      "カンタン",
+      "おトク"
+    ],
+    "evidence_urls": [
+      "https://healthcare.rakuten.co.jp/",
+      "https://healthcare.rakuten.co.jp/assets/images/logo.svg"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "kencom",
+    "official_site_url": "https://kencom.jp/",
+    "logo_image_url": "https://play-lh.googleusercontent.com/tuK3Iokrn0keg8EI7tRoFg28KB7sHaPd5hm68a3Xn-ifftXMVawHaqAxE67mv6Wl1lAxGRL9Z5UtzBeZEU2bVg=w240-h480-rw",
+    "logo_source_page_url": "https://play.google.com/store/apps/details?id=jp.kencom.android&hl=ja",
+    "logo_source_type": "playstore_icon",
+    "logo_detection_method": "playstore_icon",
+    "logo_alt_or_context": "アイコン画像（kencom(ケンコム) Google Play掲載）",
+    "concept_exact_text": "あなたに合わせた健康情報をお届けして、楽しく健康になる毎日を提供します。",
+    "concept_summary_ja": "健診結果や歩数データをもとに個人に最適化された健康情報を配信し、kencomコインでギフト券が当たる仕組みで継続利用を促す健康レコメンデーションアプリ（DeSCヘルスケア提供）。",
+    "continuity_keywords": [
+      "健康レコメンデーション",
+      "健診結果",
+      "歩数",
+      "健康情報",
+      "kencomコイン",
+      "個人最適化",
+      "DeSCヘルスケア"
+    ],
+    "evidence_urls": [
+      "https://kencom.jp/login",
+      "https://play.google.com/store/apps/details?id=jp.kencom.android&hl=ja"
+    ],
+    "checked_at": "2026-03-24",
+    "status": "採用"
+  },
+  {
+    "service_name": "FiNC（フィンク）",
+    "official_site_url": "https://finc.com/app",
+    "logo_image_url": "https://storage.googleapis.com/production-os-assets/assets/f1486bf6-4ff4-4528-8217-11d331702e2b",
+    "logo_source_page_url": "https://finc.com/app",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "FiNC ヘッダーロゴ",
+    "concept_exact_text": "FiNC（フィンク）カラダのすべてを、ひとつのアプリで。",
+    "concept_summary_ja": "累計1,300万DLの健康管理AIアプリ。食事・体重・歩数・睡眠・生理周期を一元管理し、AIパーソナルトレーナーが毎日アドバイス。歩くとポイントが貯まる。",
+    "continuity_keywords": [
+      "AI健康管理",
+      "食事管理",
+      "ポイ活",
+      "歩数"
+    ],
+    "evidence_urls": [
+      "https://finc.com/app"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "カロミル",
+    "official_site_url": "https://www.calomeal.com/about-calomeal/",
+    "logo_image_url": "https://www.calomeal.com/about-calomeal/img/h_logo.png",
+    "logo_source_page_url": "https://www.calomeal.com/about-calomeal/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "h_logo.png（相対パス、絶対URL未取得）",
+    "concept_exact_text": "写真を撮るだけで簡単記録 栄養バランスを管理し、健康づくりをサポート",
+    "concept_summary_ja": "会員数500万の栄養管理・ダイエットアプリ。食事写真をAIが解析し、カロリー・PFCバランスを自動計算。ロカボ・糖質制限にも対応。",
+    "continuity_keywords": [
+      "栄養管理",
+      "PFC管理",
+      "食事記録",
+      "AI解析"
+    ],
+    "evidence_urls": [
+      "https://www.calomeal.com/about-calomeal/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "カロママ プラス",
+    "official_site_url": "https://calomama.com/",
+    "logo_image_url": "https://calomama.com/wp-content/themes/calomama.com/assets/img/common/header_logo.png",
+    "logo_source_page_url": "https://calomama.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "カロママ プラス ヘッダーロゴ",
+    "concept_exact_text": "あなたの健康を誰よりも近くで応援！",
+    "concept_summary_ja": "株式会社Wellmira提供のAI健康アプリ。食事・運動・体重・体温・睡眠・気分などのライフログをひとつで記録。管理栄養士AIがパーソナルアドバイスを提供。",
+    "continuity_keywords": [
+      "AI健康管理",
+      "食事記録",
+      "ライフログ",
+      "栄養アドバイス"
+    ],
+    "evidence_urls": [
+      "https://calomama.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Upmind（アップマインド）",
+    "official_site_url": "https://upmind.co.jp/",
+    "logo_image_url": "https://storage.googleapis.com/production-os-assets/assets/52105798-1dbe-4a53-95ec-c69466bf33c0",
+    "logo_source_page_url": "https://upmind.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Upmind ロゴ",
+    "concept_exact_text": "心に余白をもつ習慣を実践できるマインドフルネスアプリ",
+    "concept_summary_ja": "東大発ベンチャーが開発した自律神経可視化×マインドフルネスアプリ。スマホカメラに指を当てるだけで30秒で自律神経バランスを計測。結果に合った瞑想・ヨガを提案。",
+    "continuity_keywords": [
+      "自律神経",
+      "マインドフルネス",
+      "瞑想",
+      "睡眠"
+    ],
+    "evidence_urls": [
+      "https://upmind.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Awarefy（アウェアファイ）",
+    "official_site_url": "https://www.awarefy.com/app",
+    "logo_image_url": "https://storage.googleapis.com/production-os-assets/assets/6805b2ec-4e28-4001-97dd-6ba13eb7ce91",
+    "logo_source_page_url": "https://www.awarefy.com/app",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Awarefy ロゴ",
+    "concept_exact_text": "毎日に寄りそい 気づきを増やす。",
+    "concept_summary_ja": "早稲田大学と共同研究のAIメンタルパートナーアプリ。認知行動療法・ACTに基づく感情記録・瞑想・自己理解機能を搭載。AIチャットボット「Fy」が24時間サポート。",
+    "continuity_keywords": [
+      "メンタルヘルス",
+      "認知行動療法",
+      "瞑想",
+      "感情記録"
+    ],
+    "evidence_urls": [
+      "https://www.awarefy.com/app"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Relook（リルック）",
+    "official_site_url": "https://relook.jp/",
+    "logo_image_url": "https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/8e8c5d0b-00b7-4d56-a840-6572875aafc8/Relook_icon/w=1920,quality=90,fit=scale-down",
+    "logo_source_page_url": "https://relook.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Relook アプリアイコン",
+    "concept_exact_text": "マインドフルネスアプリ『Relook』",
+    "concept_summary_ja": "睡眠専門医・精神科医監修のマインドフルネス瞑想アプリ。300種類以上の音声ガイド付き瞑想と100種類以上のサウンドを収録。睡眠・ストレス・集中力改善に特化。",
+    "continuity_keywords": [
+      "瞑想",
+      "睡眠",
+      "マインドフルネス",
+      "ストレスケア"
+    ],
+    "evidence_urls": [
+      "https://relook.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "MEISOON（メイスーン）",
+    "official_site_url": "https://yoga-lava.com/meisoon/",
+    "logo_image_url": "https://yoga-lava.com/meisoon/img/logo_meisoon.png",
+    "logo_source_page_url": "https://yoga-lava.com/meisoon/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "img/logo_meisoon.png（相対パス）",
+    "concept_exact_text": "聴くだけで、ととのう 瞑想アプリMEISOON(メイスーン)",
+    "concept_summary_ja": "日本最大級ホットヨガスタジオLAVA監修の瞑想アプリ。50通り以上の選べる瞑想コンテンツで目的・シーンに合わせた瞑想が可能。1分から始められる手軽さが人気。",
+    "continuity_keywords": [
+      "瞑想",
+      "マインドフルネス",
+      "LAVA監修",
+      "安眠"
+    ],
+    "evidence_urls": [
+      "https://yoga-lava.com/meisoon/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "RIZAP（ライザップ）",
+    "official_site_url": "https://www.rizap.jp/",
+    "logo_image_url": "https://www.rizap.jp/_nuxt/logo.CF6-wuOJ.svg",
+    "logo_source_page_url": "https://www.rizap.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "JSレンダリングのため取得不可",
+    "concept_exact_text": "結果にコミットする。",
+    "concept_summary_ja": "完全個室のパーソナルトレーニングジム。専属トレーナーと管理栄養士が2ヶ月間マンツーマンで指導。オンライントレーニングにも対応。30日間全額返金保証付き。",
+    "continuity_keywords": [
+      "パーソナルトレーニング",
+      "食事指導",
+      "ダイエット",
+      "コミット"
+    ],
+    "evidence_urls": [
+      "https://www.rizap.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "chocoZAP（チョコザップ）",
+    "official_site_url": "https://chocozap.jp/",
+    "logo_image_url": "https://chocozap.jp/_nuxt/icon_header_logo.DCmXwRHE.svg",
+    "logo_source_page_url": "https://chocozap.jp/about",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "_nuxt/icon_header_logo.DCmXwRHE.svg（ハッシュ付きパス）",
+    "concept_exact_text": "運動も美容もリフレッシュも！スキマ時間にサクッと使えるコンビニジム",
+    "concept_summary_ja": "ライザップが運営する24時間コンビニジム。月額3,278円（税込）で全国1,800店舗以上が使い放題。エステ・セルフ脱毛・ゴルフも利用可能。専用アプリで健康習慣管理。",
+    "continuity_keywords": [
+      "コンビニジム",
+      "24時間",
+      "低価格",
+      "習慣化"
+    ],
+    "evidence_urls": [
+      "https://chocozap.jp/",
+      "https://chocozap.jp/about"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "スマホフィット",
+    "official_site_url": "https://www.smahofit.jp/",
+    "logo_image_url": "https://www.smahofit.jp/assets/smahofit/img/common/logo.svg",
+    "logo_source_page_url": "https://www.smahofit.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/assets/smahofit/img/common/logo.svg（相対パス）",
+    "concept_exact_text": "パーソナルだから理想が叶う オンラインだから続けられる",
+    "concept_summary_ja": "医療系国家資格トレーナー監修のオンラインパーソナルトレーニング。パーソナルトレーナーと食事コーチの2名体制でサポート。週1回30分から選べるプラン。",
+    "continuity_keywords": [
+      "オンラインパーソナル",
+      "食事指導",
+      "マンツーマン",
+      "継続"
+    ],
+    "evidence_urls": [
+      "https://www.smahofit.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Plez（プレズ）",
+    "official_site_url": "https://plez.jp/lp/",
+    "logo_image_url": "https://plez.jp/common/images2/logo_top_22.jpg",
+    "logo_source_page_url": "https://plez.jp/lp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "プレズ ヘッダーロゴ",
+    "concept_exact_text": "【公式】プレズ＜Plez＞1000人超が痩せた自宅パーソナル",
+    "concept_summary_ja": "LINEビデオ電話でマンツーマン指導のオンラインダイエットサービス。NG食品ゼロ・無理なく楽しくダイエット。週2回25分のトレーニングと食事指導をセットで提供。",
+    "continuity_keywords": [
+      "LINEパーソナル",
+      "食事指導",
+      "ダイエット",
+      "NG食品なし"
+    ],
+    "evidence_urls": [
+      "https://plez.jp/lp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "24/7オンラインフィットネス",
+    "official_site_url": "https://www.247-onlinefitness.jp/",
+    "logo_image_url": "https://www.247-onlinefitness.jp/assets/img/LogoYoko_black.svg",
+    "logo_source_page_url": "https://www.247-onlinefitness.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/assets/img/LogoYoko_black.svg（相対パス）",
+    "concept_exact_text": "あなたの自宅がいつでもフィットネススタジオに",
+    "concept_summary_ja": "8万人以上に選ばれた24/7 Workoutのダイエットメソッドをオンラインで体験。インストラクターとのライブレッスン（約30分）と25本以上のビデオコンテンツが見放題。",
+    "continuity_keywords": [
+      "オンラインフィットネス",
+      "ライブレッスン",
+      "ダイエット",
+      "24/7"
+    ],
+    "evidence_urls": [
+      "https://www.247-onlinefitness.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "コナミスポーツ オンラインフィットネス",
+    "official_site_url": "https://www.konami.com/sportsclub/fitness/online/live_lesson/",
+    "logo_image_url": "https://www.konami.com/sportsclub/assets/img/top/logo-top-01.svg",
+    "logo_source_page_url": "https://www.konami.com/sportsclub/online/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "コナミスポーツクラブ ロゴ（取得不可）",
+    "concept_exact_text": "ONLINE コナミスポーツのオンラインサービス",
+    "concept_summary_ja": "コナミスポーツクラブが提供するZoom配信のオンラインフィットネス。PC・スマートフォンからライブレッスンが受講可能。レッスン後に直接質問できるチャットタイムも設定。",
+    "continuity_keywords": [
+      "オンラインフィットネス",
+      "ライブレッスン",
+      "Zoom",
+      "コナミ"
+    ],
+    "evidence_urls": [
+      "https://www.konami.com/sportsclub/fitness/online/live_lesson/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "メガロス オンラインフィットネス",
+    "official_site_url": "https://megalos.co.jp/contents/megalos_online/",
+    "logo_image_url": "https://www.megalos.co.jp/common/img/logo.png",
+    "logo_source_page_url": "https://megalos.co.jp/contents/megalos_online/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "スポーツクラブ メガロス ロゴ",
+    "concept_exact_text": "いつでもどこでもフィットネス！",
+    "concept_summary_ja": "メガロスが提供するオンラインフィットネス。月250本以上のライブレッスンとLEAN BODY動画600本以上が見放題。月1回ジムも利用できる「オンライン+1PASS」プランも提供。",
+    "continuity_keywords": [
+      "オンラインフィットネス",
+      "動画見放題",
+      "スポーツクラブ",
+      "LEAN BODY"
+    ],
+    "evidence_urls": [
+      "https://megalos.co.jp/contents/megalos_online/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "LiveFit（ライブフィット）",
+    "official_site_url": "https://livefit.jp/",
+    "logo_image_url": "https://livefit.jp/wp-content/themes/livefit_themes/img/logo.svg",
+    "logo_source_page_url": "https://livefit.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "LiveFit ロゴ SVG",
+    "concept_exact_text": "医療系国家資格を持つトレーナー監修　本格パーソナルが自宅で受けられる",
+    "concept_summary_ja": "整骨院運営のオンラインパーソナルトレーニング。医療系国家資格保持トレーナーが週1回50分のビデオ通話で食事指導・ストレッチ・トレーニングを指導。",
+    "continuity_keywords": [
+      "オンラインパーソナル",
+      "医療系資格",
+      "食事指導",
+      "ストレッチ"
+    ],
+    "evidence_urls": [
+      "https://livefit.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "WEBGYM（ウェブジム）",
+    "official_site_url": "https://www.sportsoasis.co.jp/webgym_app/",
+    "logo_image_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8b/bd/26/8bbd2643-fcef-aa37-9ff3-26a9bb93ba98/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/512x512bb.jpg",
+    "logo_source_page_url": "https://www.sportsoasis.co.jp/webgym_app/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "WEBGYMロゴ（取得不可）",
+    "concept_exact_text": "ジムを持ち歩く＆WEBGYMで繋がる",
+    "concept_summary_ja": "東急スポーツオアシス運営のフィットネスアプリ。700種類以上のトレーニングメニューと400本以上の動画レッスンを搭載。月980円のプレミアム会員でパーソナル機能も利用可。",
+    "continuity_keywords": [
+      "フィットネスアプリ",
+      "自重トレーニング",
+      "動画レッスン",
+      "習慣化"
+    ],
+    "evidence_urls": [
+      "https://www.sportsoasis.co.jp/webgym_app/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "OMRON connect（オムロンコネクト）",
+    "official_site_url": "https://www.omronconnect.com/jp/ja_def/",
+    "logo_image_url": "https://www.omronconnect.com/img/head_sp_logo.png",
+    "logo_source_page_url": "https://www.omronconnect.com/jp/ja_def/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/img/head_pc_logo.png（相対パス）",
+    "concept_exact_text": "あなたのスマートフォンに最新の健康データを簡単に転送するアプリです",
+    "concept_summary_ja": "オムロンヘルスケア提供の無料健康管理アプリ。血圧計・体組成計などオムロン機器のデータをBluetooth転送。50以上の他社アプリ・ヘルスコネクトとのデータ連携も可能。",
+    "continuity_keywords": [
+      "オムロン",
+      "血圧管理",
+      "体組成計",
+      "データ連携"
+    ],
+    "evidence_urls": [
+      "https://www.omronconnect.com/jp/ja_def/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "CARADA（カラダ）",
+    "official_site_url": "https://www.carada.jp/",
+    "logo_image_url": "https://www.carada.jp/assets/img/carada-logo.svg",
+    "logo_source_page_url": "https://www.carada.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/assets/img/carada-logo.svg（相対パス）",
+    "concept_exact_text": "カラダの毎日を管理できるアプリ「CARADA」",
+    "concept_summary_ja": "歩数・体重・体調・食事・血圧などをまとめて記録できる健康管理アプリ。WAON POINTと連携し、毎日8,000歩達成でポイント付与。MTI（エムティーアイ）が提供。",
+    "continuity_keywords": [
+      "健康管理",
+      "歩数",
+      "WAON POINT",
+      "ライフログ"
+    ],
+    "evidence_urls": [
+      "https://www.carada.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "カロリーSlism",
+    "official_site_url": "https://calorie.slism.jp/",
+    "logo_image_url": "https://cdn.slism.jp/calorie/images/ccdsLogo.png",
+    "logo_source_page_url": "https://calorie.slism.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "カロリーSlism ロゴ",
+    "concept_exact_text": "食品の栄養素が一目でわかる･カロリー計算できる",
+    "concept_summary_ja": "文部科学省の日本食品標準成分表（八訂）に基づく4000種類以上の食品カロリー・栄養成分データベース。ビタミン・ミネラル・アミノ酸まで詳細に確認できる無料Webサービス。",
+    "continuity_keywords": [
+      "カロリー計算",
+      "栄養成分",
+      "食品データベース",
+      "ダイエット"
+    ],
+    "evidence_urls": [
+      "https://calorie.slism.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "UPLUS（ユープラス）",
+    "official_site_url": "https://u-plus.jp/",
+    "logo_image_url": "https://u-plus.jp/asset/img/logo.svg",
+    "logo_source_page_url": "https://u-plus.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/asset/img/logo.svg（相対パス）",
+    "concept_exact_text": "食事指導に特化したオンラインコーチングサービス",
+    "concept_summary_ja": "管理栄養士が専属コーチを務めるオンライン食事指導サービス。LINEとZoomで食事アドバイス・栄養指導を実施。ダイエット・筋肉づくり・健康診断改善に対応した複数プランあり。",
+    "continuity_keywords": [
+      "食事指導",
+      "管理栄養士",
+      "オンラインコーチング",
+      "ダイエット"
+    ],
+    "evidence_urls": [
+      "https://u-plus.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "YumiCoreBody オンライン",
+    "official_site_url": "https://yumicorebody.com/online",
+    "logo_image_url": "https://yumicorebody.com/online/img/common/header_logo_new.png",
+    "logo_source_page_url": "https://yumicorebody.com/online",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "/img/common/header_logo_new.png（相対パス）",
+    "concept_exact_text": "村田友美子のセルフ整体メソッド",
+    "concept_summary_ja": "姿勢改善コアトレーナー村田友美子考案のセルフ整体メソッドをオンラインで学べるサービス。骨盤底筋・インナーマッスルを鍛え、反り腰・巻き肩・ストレートネックを改善。",
+    "continuity_keywords": [
+      "セルフ整体",
+      "姿勢改善",
+      "骨格矯正",
+      "コアトレーニング"
+    ],
+    "evidence_urls": [
+      "https://yumicorebody.com/online"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "INVANA（インヴァーナ）",
+    "official_site_url": "https://www.invana.jp/",
+    "logo_image_url": "https://static.wixstatic.com/media/56749a_d949ec0b21b545eea91b7e6df836ca5e~mv2.png/v1/fill/w_127,h_82,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/invana-logo-4.png",
+    "logo_source_page_url": "https://www.invana.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "JSレンダリングのため取得不可",
+    "concept_exact_text": "ウェルビーイングへの旅",
+    "concept_summary_ja": "2012年創設の日本初ヨガ動画配信「Yogalog」をリニューアルしたウェルビーイング動画プラットフォーム。ヨガ・瞑想・栄養学・東西医学を融合した600本以上の動画を月額1,800円で提供。",
+    "continuity_keywords": [
+      "ヨガ動画",
+      "ウェルビーイング",
+      "瞑想",
+      "動画配信"
+    ],
+    "evidence_urls": [
+      "https://www.invana.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "NOA ONLINE（ノアオンライン）",
+    "official_site_url": "https://www.noaonline.jp/",
+    "logo_image_url": "https://www.noaonline.jp/imgs/common/logo-online-g.png",
+    "logo_source_page_url": "https://www.noaonline.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "NOA ONLINE ロゴ",
+    "concept_exact_text": "NOAがお届けする最高のオンラインレッスン",
+    "concept_summary_ja": "ヨガスタジオNOAのオンラインサービス。ダンス・ヨガ・ボクシングフィットネスのライブ配信と動画1,000本以上が利用可能。NOA会員なら月額1,078円（税込）で追加受講可能。",
+    "continuity_keywords": [
+      "オンラインヨガ",
+      "ダンス",
+      "ボクシングフィットネス",
+      "ライブ配信"
+    ],
+    "evidence_urls": [
+      "https://www.noaonline.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ヨガジャーナルオンライン",
+    "official_site_url": "https://yogajournal.jp/",
+    "logo_image_url": "https://yogajournal.jp/build/assets/logo-BK6jtp20.svg",
+    "logo_source_page_url": "https://yogajournal.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ヨガジャーナルオンライン ロゴ SVG",
+    "concept_exact_text": "ストレス社会に生きるすべての人に、自己・他者・社会と調和するための 「ヨガ的な価値観・ヨガ的な解決」を提案",
+    "concept_summary_ja": "1975年創刊の世界的ヨガ雑誌「ヨガジャーナル」日本版のオンラインメディア。ヨガポーズ・ダイエット・美容・食事・ライフスタイル・ストレスケアの情報を発信するヨガ専門メディア。",
+    "continuity_keywords": [
+      "ヨガ情報",
+      "ライフスタイル",
+      "ストレスケア",
+      "美容"
+    ],
+    "evidence_urls": [
+      "https://yogajournal.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ヨガコネクト（yoga connect）",
+    "official_site_url": "https://yogaconnect.jp/",
+    "logo_image_url": "https://yogaconnect.jp/wp-content/uploads/2022/04/ロゴa-2-1.jpeg",
+    "logo_source_page_url": "https://yogaconnect.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ヨガコネクト ロゴ",
+    "concept_exact_text": "ヨガを学び愛を知る　人生を愛で満たそう",
+    "concept_summary_ja": "少人数制（最大8名）でRYT200資格取得を目指すヨガスクール。月5,500円で週8クラスを受講可能。卒業後のインストラクター活動の機会も提供。",
+    "continuity_keywords": [
+      "ヨガ資格",
+      "RYT200",
+      "少人数",
+      "インストラクター養成"
+    ],
+    "evidence_urls": [
+      "https://yogaconnect.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "YOGAWORKS（ヨガワークス）",
+    "official_site_url": "https://www.yogaworks.co.jp/",
+    "logo_image_url": "https://www.yogaworks.co.jp/wp-content/uploads/2021/06/logo_yw2021.png",
+    "logo_source_page_url": "https://www.yogaworks.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ヨガワークス ロゴ",
+    "concept_exact_text": "ここちいいヨガ、ここから。",
+    "concept_summary_ja": "2003年設立のヨガスタジオチェーン。全国スタジオでのレッスンのほか、オンラインヨガも提供。インストラクター養成スクール（zen place yoga education）も運営。",
+    "continuity_keywords": [
+      "ヨガスタジオ",
+      "インストラクター養成",
+      "オンライン",
+      "資格取得"
+    ],
+    "evidence_urls": [
+      "https://www.yogaworks.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "nosh（ナッシュ）",
+    "official_site_url": "https://nosh.jp/",
+    "logo_image_url": "https://img.nosh.jp/images/chefly/img_logo.svg",
+    "logo_source_page_url": "https://nosh.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "nosh ロゴ SVG",
+    "concept_exact_text": "「がんばらない」これからの健康の常識",
+    "concept_summary_ja": "全メニュー糖質30g・塩分2.5g以下の冷凍宅配弁当サービス。週3回新メニュー追加で常時60種類以上から自由に選択。管理栄養士・シェフ監修で1食499円〜提供。",
+    "continuity_keywords": [
+      "糖質制限",
+      "宅配弁当",
+      "健康食",
+      "低カロリー"
+    ],
+    "evidence_urls": [
+      "https://nosh.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "マッスルデリ（Muscle Deli）",
+    "official_site_url": "https://muscledeli.jp/",
+    "logo_image_url": "https://d2w53g1q050m78.cloudfront.net/masteryourmealjp/uploads/themes/muscledeli_edit_20241203132510/ec_force/assets/images/md-header-logo-new.svg",
+    "logo_source_page_url": "https://muscledeli.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "muscledeli ヘッダーロゴ SVG",
+    "concept_exact_text": "「変われる」を叶える食事管理。",
+    "concept_summary_ja": "ボディメイク・ダイエット専門の冷凍宅配弁当サービス。女性ダイエット・男性ダイエット・増量・低糖質の4プランを提供。栄養士監修の高タンパク・低糖質メニュー。",
+    "continuity_keywords": [
+      "ボディメイク",
+      "宅配弁当",
+      "高タンパク",
+      "低糖質"
+    ],
+    "evidence_urls": [
+      "https://muscledeli.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ウェルネスダイニング",
+    "official_site_url": "https://www.wellness-dining.com/",
+    "logo_image_url": "https://www.wellness-dining.com/common/img/logo.png",
+    "logo_source_page_url": "https://www.wellness-dining.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ウェルネスダイニング ロゴ",
+    "concept_exact_text": "管理栄養士がお身体に合った食事を提案します",
+    "concept_summary_ja": "食事制限専門の宅配食通販サービス。塩分制限・糖質制限・たんぱく質制限・カロリー制限など各種制限食に対応。管理栄養士が常駐し、食事相談も実施。",
+    "continuity_keywords": [
+      "食事制限",
+      "宅配食",
+      "制限食",
+      "管理栄養士"
+    ],
+    "evidence_urls": [
+      "https://www.wellness-dining.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "筋肉食堂DELI",
+    "official_site_url": "https://deli.kinnikushokudo.jp/",
+    "logo_image_url": "https://d2w53g1q050m78.cloudfront.net/delikinnikushoku/uploads/themes/20260209_20260209212037/ec_force/assets/images/logo.png",
+    "logo_source_page_url": "https://deli.kinnikushokudo.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "logo.png（相対パスのみ）",
+    "concept_exact_text": "おいしく痩せる、カラダづくり。",
+    "concept_summary_ja": "人気レストラン「筋肉食堂」プロデュースの高タンパク冷凍宅配弁当。タンパク質30g以上・100種類以上のメニュー。ダイエット・増量・低糖質など目的別コースを提供。",
+    "continuity_keywords": [
+      "高タンパク",
+      "宅配弁当",
+      "ダイエット",
+      "ボディメイク"
+    ],
+    "evidence_urls": [
+      "https://deli.kinnikushokudo.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "みんチャレ",
+    "official_site_url": "https://minchalle.com/",
+    "logo_image_url": "https://minchalle.com/wp-content/themes/minchalle/assets/img/site/logo.svg",
+    "logo_source_page_url": "https://minchalle.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "みんチャレ ロゴ SVG",
+    "concept_exact_text": "みんチャレは専門家監修のもとに作成された、5人1組で続ける「習慣化アプリ」です。",
+    "concept_summary_ja": "5人チームで習慣化を継続するソーシャルアプリ。ウォーキング・ダイエット・禁煙など証拠写真を送り合い継続率アップ。神奈川県庁職員での実証実験では継続率98%を達成。",
+    "continuity_keywords": [
+      "習慣化",
+      "チーム",
+      "ウォーキング",
+      "継続"
+    ],
+    "evidence_urls": [
+      "https://minchalle.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "aruku&（あるくと）",
+    "official_site_url": "https://www.arukuto.jp/",
+    "logo_image_url": "https://www.arukuto.jp/wp-content/themes/arukuto/img/header_logo.png",
+    "logo_source_page_url": "https://www.arukuto.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "aruku& あるくと ヘッダーロゴ",
+    "concept_exact_text": "あなたの一歩が、宝にかわる。",
+    "concept_summary_ja": "ONE COMPATH（旧マピオン）が提供するウォーキングポイントアプリ。歩数に応じてポイントが貯まり地域特産品が当たる。Vポイント・dポイントなどとも交換可能。200万人超が利用。",
+    "continuity_keywords": [
+      "ウォーキング",
+      "歩数",
+      "ポイ活",
+      "健康"
+    ],
+    "evidence_urls": [
+      "https://www.arukuto.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "WalkCoin（アルコイン）",
+    "official_site_url": "https://agoop.co.jp/appslib/walkcoin/",
+    "logo_image_url": "https://agoop.co.jp/wp-content/uploads/elementor/thumbs/text_logo_g-r53jj9iscx3j9wlshczqs3z2gpl2m4hbf6qq7k8qve.png",
+    "logo_source_page_url": "https://agoop.co.jp/appslib/walkcoin/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Agoop テキストロゴ",
+    "concept_exact_text": "歩いてポイントを貯める！散歩・通勤で簡単にポイ活",
+    "concept_summary_ja": "ソフトバンク子会社Agoop提供の歩数計ポイ活アプリ。1,000歩ごとに1コイン付与（最大15コイン/日）。PayPay・Amazon・楽天ポイントなど多数の電子マネーと交換可能。",
+    "continuity_keywords": [
+      "歩数",
+      "ポイ活",
+      "ウォーキング",
+      "電子マネー"
+    ],
+    "evidence_urls": [
+      "https://agoop.co.jp/appslib/walkcoin/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Runtrip（ラントリップ）",
+    "official_site_url": "https://runtrip.jp/",
+    "logo_image_url": "https://runtrip.jp/images/common/ogi.png",
+    "logo_source_page_url": "https://runtrip.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "テキストロゴのみ（画像取得不可）",
+    "concept_exact_text": "もっと自由に、楽しく走れる世界へ",
+    "concept_summary_ja": "ランニングコース検索・記録・共有のSNSアプリ。全国のランニングコースを地図で検索し、ランニングステーションやイベントも掲載。GPS計測・SNS共有機能で旅先のランも楽しめる。",
+    "continuity_keywords": [
+      "ランニング",
+      "コース検索",
+      "GPS計測",
+      "SNS"
+    ],
+    "evidence_urls": [
+      "https://runtrip.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "MATCHO（マッチョ）",
+    "official_site_url": "https://matcho.jp/",
+    "logo_image_url": "https://matcho.jp/static/media/matcho-logo.922d129178dd0c0500f2.png",
+    "logo_source_page_url": "https://matcho.jp/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "JSレンダリングのため取得不可",
+    "concept_exact_text": "MATCHO - トレーニングマッチングサービス",
+    "concept_summary_ja": "個人トレーナー・インストラクター掲載数日本最大のトレーニングマッチングサービス。パーソナルトレーニング・ヨガ・ピラティスなど17カテゴリのトレーナーを無料検索可能。",
+    "continuity_keywords": [
+      "パーソナルトレーニング",
+      "マッチング",
+      "トレーナー検索",
+      "オンライン"
+    ],
+    "evidence_urls": [
+      "https://matcho.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "RIZAP（ライザップ） オンライン",
+    "official_site_url": "https://www.rizap.jp/program",
+    "logo_image_url": "https://www.rizap.jp/_nuxt/logo.CF6-wuOJ.svg",
+    "logo_source_page_url": "https://www.rizap.jp/program",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "JSレンダリングのため取得不可",
+    "concept_exact_text": "結果にコミットする。",
+    "concept_summary_ja": "RIZAPのオンライントレーニングプログラム。自宅や出張先からでもZoom等でセッションが受けられる。自重トレーニング中心で専属トレーナーがマンツーマン指導。全額返金保証付き。",
+    "continuity_keywords": [
+      "パーソナルトレーニング",
+      "オンライン",
+      "食事指導",
+      "結果保証"
+    ],
+    "evidence_urls": [
+      "https://www.rizap.jp/program"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "全力ストレッチ",
+    "official_site_url": "https://zn-stretch.com/",
+    "logo_image_url": "https://storage.googleapis.com/production-os-assets/assets/3a6f1662-c8f2-4c68-babe-c4e715a723e2",
+    "logo_source_page_url": "https://zn-stretch.com/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "取得不可",
+    "concept_exact_text": "全国70店舗の体幹軸調整×全身ストレッチ",
+    "concept_summary_ja": "元格闘家が開発した「ザウルス式体幹軸調整ストレッチ」専門サロン。女性トレーナーとの1対1でパーソナルストレッチを提供。全国70店舗展開。疲労改善・姿勢改善に特化。",
+    "continuity_keywords": [
+      "ストレッチ",
+      "体幹軸調整",
+      "姿勢改善",
+      "パーソナル"
+    ],
+    "evidence_urls": [
+      "https://zn-stretch.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "StretchPole（ストレッチポール）公式",
+    "official_site_url": "https://stretchpole.com/",
+    "logo_image_url": "https://stretchpole.com/common/image/h_logo.gif",
+    "logo_source_page_url": "https://stretchpole.com/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "取得不可",
+    "concept_exact_text": "誰でも手軽にセルフケアができるツール",
+    "concept_summary_ja": "LPN（株式会社エルピーエヌ）が提供するセルフケアツール。横になるだけで外側の筋肉がほぐれ、インナーマッスルが刺激され関節が正しい位置に戻る。公式サイトで正しい使い方を動画解説。",
+    "continuity_keywords": [
+      "ストレッチポール",
+      "セルフケア",
+      "姿勢改善",
+      "体幹"
+    ],
+    "evidence_urls": [
+      "https://stretchpole.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "BASE FOOD（ベースフード）",
+    "official_site_url": "https://basefood.co.jp/",
+    "logo_image_url": "https://basefood.co.jp/images/top/logo.svg",
+    "logo_source_page_url": "https://basefood.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "BASE FOOD",
+    "concept_exact_text": "完全栄養の主食で、からだ作りを習慣に。",
+    "concept_summary_ja": "1食で栄養素の1/3が摂れる完全栄養の主食（パン・パスタ等）を定期便で届けるサービス。",
+    "continuity_keywords": [
+      "完全栄養",
+      "主食",
+      "定期便",
+      "タンパク質",
+      "食物繊維"
+    ],
+    "evidence_urls": [
+      "https://basefood.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "COMP（コンプ）",
+    "official_site_url": "https://comp.jp/",
+    "logo_image_url": "https://comp.jp/assets/img/common/logo.svg",
+    "logo_source_page_url": "https://comp.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "COMP",
+    "concept_exact_text": "必要な栄養を、もっとシンプルに。",
+    "concept_summary_ja": "1食分の必要栄養素をすべて含む完全食（粉末・グミ等）。忙しい日の食事や栄養管理に活用できる。",
+    "continuity_keywords": [
+      "完全食",
+      "栄養素",
+      "シンプル",
+      "粉末",
+      "手軽"
+    ],
+    "evidence_urls": [
+      "https://comp.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "noom（ヌーム）",
+    "official_site_url": "https://ja.noom.com/",
+    "logo_image_url": "https://www.noom.com/wp-content/uploads/2019/11/noom_green_logo.png",
+    "logo_source_page_url": "https://ja.noom.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Noom",
+    "concept_exact_text": "心理学に基づいたダイエットプログラム。食事・運動・行動変容をコーチがサポート。",
+    "concept_summary_ja": "認知行動療法をベースにしたダイエット支援アプリ。専属コーチとのチャット指導で食習慣・思考パターンを変え、持続的なダイエットを実現。",
+    "continuity_keywords": [
+      "心理学",
+      "行動変容",
+      "コーチング",
+      "ダイエット",
+      "食習慣",
+      "認知行動療法"
+    ],
+    "evidence_urls": [
+      "https://ja.noom.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Nike Run Club（ナイキランクラブ）",
+    "official_site_url": "https://www.nike.com/jp/running/nike-run-club",
+    "logo_image_url": "https://www.nike.com/assets/experience/multi-brand-app-hub/images/NRC-hero-img-16x9.jpg",
+    "logo_source_page_url": "https://www.nike.com/jp/running/nike-run-club",
+    "logo_source_type": "brand_page",
+    "logo_detection_method": "brand_page",
+    "logo_alt_or_context": "Nike Run Club",
+    "concept_exact_text": "走るすべての人のために。コーチとコミュニティで、もっと遠くへ。",
+    "concept_summary_ja": "Nikeの無料ランニングアプリ。GPSでランを記録し、音声ガイドコーチとコミュニティ機能で継続的なランニング習慣を形成できる。",
+    "continuity_keywords": [
+      "ランニング",
+      "GPS記録",
+      "コーチ",
+      "コミュニティ",
+      "無料",
+      "トレーニングプラン"
+    ],
+    "evidence_urls": [
+      "https://www.nike.com/jp/running/nike-run-club"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "adidas Running（アディダスランニング）",
+    "official_site_url": "https://www.runtastic.com/ja/",
+    "logo_image_url": "https://www.runtastic.com/blog/ja/wp-content/uploads/sites/6/2020/09/runtastic_logo.png",
+    "logo_source_page_url": "https://www.runtastic.com/ja/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "adidas Running",
+    "concept_exact_text": "走る、追う、超える。adidas Runningでランニングを記録しよう。",
+    "concept_summary_ja": "adidasとRuntasticが提供するランニングトラッキングアプリ。GPS記録・トレーニングプラン・音声コーチで初心者からマラソン完走まで幅広くサポート。",
+    "continuity_keywords": [
+      "ランニング",
+      "GPS",
+      "トレーニングプラン",
+      "マラソン",
+      "音声コーチ",
+      "adidas"
+    ],
+    "evidence_urls": [
+      "https://www.runtastic.com/ja/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Calm（カーム）",
+    "official_site_url": "https://www.calm.com/ja",
+    "logo_image_url": "https://www.calm.com/static/images/calm-logo-wordmark-blue.png",
+    "logo_source_page_url": "https://www.calm.com/ja",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Calm",
+    "concept_exact_text": "眠る。リラックスする。集中する。",
+    "concept_summary_ja": "世界No.1の瞑想・睡眠アプリ（日本語対応）。ガイド付き瞑想・睡眠ストーリー・呼吸エクササイズでストレス解消・睡眠改善をサポート。",
+    "continuity_keywords": [
+      "瞑想",
+      "睡眠",
+      "マインドフルネス",
+      "リラックス",
+      "ストレス解消",
+      "呼吸"
+    ],
+    "evidence_urls": [
+      "https://www.calm.com/ja"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Headspace（ヘッドスペース）",
+    "official_site_url": "https://www.headspace.com/ja",
+    "logo_image_url": "https://www.headspace.com/static/images/headspace-logo-orange.png",
+    "logo_source_page_url": "https://www.headspace.com/ja",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Headspace",
+    "concept_exact_text": "瞑想とマインドフルネスで、心の健康を。",
+    "concept_summary_ja": "科学的に裏付けられた瞑想プログラムのアプリ（日本語対応）。初心者向け基礎コースから睡眠・集中・ストレス対策まで幅広いプログラムを用意。",
+    "continuity_keywords": [
+      "瞑想",
+      "マインドフルネス",
+      "睡眠",
+      "集中",
+      "ストレス",
+      "科学的"
+    ],
+    "evidence_urls": [
+      "https://www.headspace.com/ja"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Sleep Meister（スリープマイスター）",
+    "official_site_url": "https://uraymobile.com/sleepmeister/",
+    "logo_image_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/3d/dc/1a/3ddc1a3b-99ea-406b-51fa-1104976bba91/AppIcon-0-0-1x_U007ephone-0-11-0-85-220.png/512x512bb.jpg",
+    "logo_source_page_url": "https://uraymobile.com/sleepmeister/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "Sleep Meister",
+    "concept_exact_text": "睡眠サイクルを計測して、最適なタイミングで目覚めるスマートアラーム。",
+    "concept_summary_ja": "加速度センサーで眠りの深さを自動計測し、浅い眠りのタイミングに目覚ましを合わせるスマートアラームアプリ。睡眠グラフで質を可視化できる。",
+    "continuity_keywords": [
+      "睡眠計測",
+      "スマートアラーム",
+      "睡眠サイクル",
+      "睡眠グラフ"
+    ],
+    "evidence_urls": [
+      "https://uraymobile.com/sleepmeister/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "CLOUD GYM（クラウドジム）",
+    "official_site_url": "https://cloudgym.jp/",
+    "logo_image_url": "https://cloudgym.jp/wp-content/uploads/2020/04/logo.png",
+    "logo_source_page_url": "https://cloudgym.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "CLOUD GYM",
+    "concept_exact_text": "完全個室・完全個別指導。オンラインパーソナルトレーニング。",
+    "concept_summary_ja": "マンツーマンのオンラインパーソナルトレーニングサービス。専属トレーナーが食事・トレーニングを個別指導し自宅で本格ボディメイクを実現。",
+    "continuity_keywords": [
+      "オンラインパーソナル",
+      "マンツーマン",
+      "個別指導",
+      "食事管理",
+      "ボディメイク"
+    ],
+    "evidence_urls": [
+      "https://cloudgym.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "JOYFIT（ジョイフィット）",
+    "official_site_url": "https://joyfit.jp/",
+    "logo_image_url": "https://joyfit.jp/common/img/logo.png",
+    "logo_source_page_url": "https://joyfit.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "JOYFIT",
+    "concept_exact_text": "24時間365日、あなたのフィットネスライフをサポート。",
+    "concept_summary_ja": "24時間営業のフィットネスジムチェーン。会員アプリで全国店舗を利用でき、オンラインフィットネス動画も提供。",
+    "continuity_keywords": [
+      "24時間",
+      "365日",
+      "フィットネスジム",
+      "低価格",
+      "全国",
+      "アプリ"
+    ],
+    "evidence_urls": [
+      "https://joyfit.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Anytime Fitness Japan（エニタイムフィットネス）",
+    "official_site_url": "https://www.anytimefitness.co.jp/",
+    "logo_image_url": "https://www.anytimefitness.co.jp/cms/wp-content/themes/anytime-fitness/img/common/logo.svg",
+    "logo_source_page_url": "https://www.anytimefitness.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Anytime Fitness",
+    "concept_exact_text": "世界中どこでも、いつでも使えるフィットネスジム。",
+    "concept_summary_ja": "24時間365日利用可能なフィットネスジムチェーン。1枚の会員証で世界50か国5,000店舗以上が使い放題。アプリでトレーニング記録も管理できる。",
+    "continuity_keywords": [
+      "24時間",
+      "世界中",
+      "会員証",
+      "5000店舗",
+      "いつでも"
+    ],
+    "evidence_urls": [
+      "https://www.anytimefitness.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "GOLD'S GYM Japan（ゴールドジム）",
+    "official_site_url": "https://www.goldsgym.jp/",
+    "logo_image_url": "https://www.goldsgym.jp/img/common/logo.png",
+    "logo_source_page_url": "https://www.goldsgym.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "GOLD'S GYM JAPAN",
+    "concept_exact_text": "ゴールドジムは、世界最大級のフィットネスジムです。",
+    "concept_summary_ja": "世界最大のフィットネスチェーンの日本展開。フリーウエイトが充実した本格トレーニング施設で、会員専用アプリでトレーニング記録・オンライン動画も利用可能。",
+    "continuity_keywords": [
+      "フリーウエイト",
+      "本格トレーニング",
+      "世界最大",
+      "ボディビル"
+    ],
+    "evidence_urls": [
+      "https://www.goldsgym.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "COSPA（コスパ）フィットネス",
+    "official_site_url": "https://www.cospa.net/",
+    "logo_image_url": "https://www.cospa.net/common/images/header/logo.png",
+    "logo_source_page_url": "https://www.cospa.net/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "COSPA",
+    "concept_exact_text": "コスパは「フィットネスで暮らしを豊かに」をコンセプトとしたスポーツクラブです。",
+    "concept_summary_ja": "首都圏を中心に展開するスポーツクラブチェーン。ヨガ・水泳など多彩なプログラムとオンライン動画を提供。",
+    "continuity_keywords": [
+      "スポーツクラブ",
+      "ヨガ",
+      "水泳",
+      "プール",
+      "首都圏"
+    ],
+    "evidence_urls": [
+      "https://www.cospa.net/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "BODY ARCHI（ボディアーキ）",
+    "official_site_url": "https://bodyarchi.com/",
+    "logo_image_url": "https://bodyarchi.com/wp-content/themes/bodyarchi/img/common/logo.svg",
+    "logo_source_page_url": "https://bodyarchi.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "BODY ARCHI",
+    "concept_exact_text": "AI×最新マシンで、24時間通えるセルフエステ。",
+    "concept_summary_ja": "RIZAPが運営する女性専用セルフエステ。AIが最適プランを提案し最新美容機器を24時間いつでも自分でケアできる。",
+    "continuity_keywords": [
+      "セルフエステ",
+      "AI",
+      "24時間",
+      "女性専用",
+      "RIZAP",
+      "痩身"
+    ],
+    "evidence_urls": [
+      "https://bodyarchi.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "エルセーヌ",
+    "official_site_url": "https://www.elseine.co.jp/",
+    "logo_image_url": "https://www.elseine.co.jp/common/img/logo.png",
+    "logo_source_page_url": "https://www.elseine.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "エルセーヌ",
+    "concept_exact_text": "エルセーヌは、痩身・フェイシャルのエステティックサロンです。",
+    "concept_summary_ja": "全国展開の老舗エステサロン。痩身・フェイシャルを中心にキャビテーションなどのマシンケアと手技を組み合わせた施術で、ダイエット・美肌をサポート。",
+    "continuity_keywords": [
+      "痩身",
+      "エステ",
+      "フェイシャル",
+      "キャビテーション",
+      "全国"
+    ],
+    "evidence_urls": [
+      "https://www.elseine.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "TBC（ティービーシー）",
+    "official_site_url": "https://www.tbc.co.jp/",
+    "logo_image_url": "https://www.tbc.co.jp/common/images/logo.png",
+    "logo_source_page_url": "https://www.tbc.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "TBC",
+    "concept_exact_text": "あなたの美しさを、もっと自由に。",
+    "concept_summary_ja": "脱毛・痩身・フェイシャルを提供する総合エステサロン。全国100店舗以上展開。",
+    "continuity_keywords": [
+      "エステ",
+      "脱毛",
+      "痩身",
+      "フェイシャル",
+      "全国",
+      "美肌"
+    ],
+    "evidence_urls": [
+      "https://www.tbc.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "PepUp（ペップアップ）",
+    "official_site_url": "https://www.pep-up.net/",
+    "logo_image_url": "https://www.pep-up.net/assets/img/logo.png",
+    "logo_source_page_url": "https://www.pep-up.net/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "PepUp",
+    "concept_exact_text": "健康を、もっと楽しく続けられるヘルスケアプラットフォーム。",
+    "concept_summary_ja": "企業・健保向け健康増進プラットフォーム。歩数・食事・体重を記録してポイント獲得でき、健診結果の管理も可能。",
+    "continuity_keywords": [
+      "健保",
+      "健康ポイント",
+      "歩数",
+      "食事記録",
+      "健診管理",
+      "企業向け"
+    ],
+    "evidence_urls": [
+      "https://www.pep-up.net/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ワタミの宅食",
+    "official_site_url": "https://www.watami-takushoku.co.jp/",
+    "logo_image_url": "https://www.watami-takushoku.co.jp/common/img/logo.png",
+    "logo_source_page_url": "https://www.watami-takushoku.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ワタミの宅食",
+    "concept_exact_text": "管理栄養士が設計した、からだにやさしいお惣菜をお届けします。",
+    "concept_summary_ja": "管理栄養士監修の健康宅配弁当。カロリー・塩分・栄養バランスを考慮した惣菜を毎日玄関先まで届け、健康食をサポート。",
+    "continuity_keywords": [
+      "宅配弁当",
+      "管理栄養士",
+      "カロリー管理",
+      "塩分制限",
+      "健康食"
+    ],
+    "evidence_urls": [
+      "https://www.watami-takushoku.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "三ツ星ファーム",
+    "official_site_url": "https://mitsuboshi-farm.com/",
+    "logo_image_url": "https://mitsuboshi-farm.com/img/logo.svg",
+    "logo_source_page_url": "https://mitsuboshi-farm.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "三ツ星ファーム",
+    "concept_exact_text": "低糖質・高タンパクで、ボディメイクをもっと美味しく。",
+    "concept_summary_ja": "ボディメイク専門の冷凍宅配弁当。糖質30g以下・高タンパク設計を週次で届け、ダイエットや筋トレ中の食事管理を手軽に実現。",
+    "continuity_keywords": [
+      "低糖質",
+      "高タンパク",
+      "ボディメイク",
+      "冷凍宅配弁当",
+      "ダイエット食",
+      "筋トレ食"
+    ],
+    "evidence_urls": [
+      "https://mitsuboshi-farm.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "BEYOND（ビヨンド）パーソナルジム",
+    "official_site_url": "https://beyond-g.jp/",
+    "logo_image_url": "https://beyond-g.jp/wp-content/themes/beyond/img/logo.png",
+    "logo_source_page_url": "https://beyond-g.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "BEYOND",
+    "concept_exact_text": "最速で理想のカラダへ。完全個室パーソナルトレーニングジム。",
+    "concept_summary_ja": "全国展開の完全個室パーソナルジム。食事指導・トレーニング・生活習慣サポートをトータル提供。オンライン指導プランも用意。",
+    "continuity_keywords": [
+      "パーソナルジム",
+      "完全個室",
+      "食事指導",
+      "最速",
+      "ボディメイク",
+      "全国展開"
+    ],
+    "evidence_urls": [
+      "https://beyond-g.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "B-life（ビーライフ）",
+    "official_site_url": "https://b-life.tokyo/",
+    "logo_image_url": "https://b-life.tokyo/wp-content/uploads/2020/01/blife_logo.png",
+    "logo_source_page_url": "https://b-life.tokyo/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "B-life",
+    "concept_exact_text": "ヨガ・ピラティス・ストレッチで、毎日を美しく。",
+    "concept_summary_ja": "YouTube登録者180万人超のヨガ・ピラティス動画メディア。アプリでも無料・有料コンテンツを提供し自宅での継続ボディメイクを支援。",
+    "continuity_keywords": [
+      "ヨガ",
+      "ピラティス",
+      "ストレッチ",
+      "YouTube",
+      "自宅",
+      "毎日継続"
+    ],
+    "evidence_urls": [
+      "https://b-life.tokyo/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "TABATA ONLINE（タバタオンライン）",
+    "official_site_url": "https://tabataonline.jp/",
+    "logo_image_url": "https://tabataonline.jp/wp-content/uploads/2021/01/logo.png",
+    "logo_source_page_url": "https://tabataonline.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "TABATA ONLINE",
+    "concept_exact_text": "タバタ式トレーニングの生みの親・田畑泉教授公認のオンラインフィットネス。",
+    "concept_summary_ja": "タバタ式HIIT考案者・田畑泉教授公認のオンラインフィットネス。20秒全力×10秒休憩を繰り返す科学的に効果実証済みのプログラムを提供。",
+    "continuity_keywords": [
+      "タバタ式",
+      "HIIT",
+      "高強度インターバル",
+      "科学的",
+      "短時間"
+    ],
+    "evidence_urls": [
+      "https://tabataonline.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Garmin Connect（ガーミンコネクト）",
+    "official_site_url": "https://connect.garmin.com/ja-JP/",
+    "logo_image_url": "https://connect.garmin.com/static/connect/img/gc-logo-blue.png",
+    "logo_source_page_url": "https://connect.garmin.com/ja-JP/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Garmin Connect",
+    "concept_exact_text": "すべての活動記録を、ひとつのプラットフォームに。",
+    "concept_summary_ja": "Garminウェアラブルと連携する健康・フィットネス管理プラットフォーム。ランニング・心拍・睡眠・ストレスを総合管理できる。",
+    "continuity_keywords": [
+      "ウェアラブル",
+      "GPS",
+      "アクティビティ記録",
+      "心拍",
+      "睡眠",
+      "Garmin"
+    ],
+    "evidence_urls": [
+      "https://connect.garmin.com/ja-JP/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "MuscleWatching（マッスルウォッチング）",
+    "official_site_url": "https://musclewatching.com/",
+    "logo_image_url": "https://musclewatching.com/wp-content/uploads/2021/01/rogo_long.png",
+    "logo_source_page_url": "https://musclewatching.com/",
+    "logo_source_type": "",
+    "logo_detection_method": "",
+    "logo_alt_or_context": "MuscleWatching",
+    "concept_exact_text": "筋肉に正直に生きる。自宅トレーニング動画メディア。",
+    "concept_summary_ja": "YouTube登録者160万人超の自宅筋トレ・ストレッチ動画メディア。器具なし動画を無料配信し、アプリでプログラム管理も可能。",
+    "continuity_keywords": [
+      "筋トレ",
+      "自宅トレーニング",
+      "器具なし",
+      "YouTube",
+      "ストレッチ",
+      "無料動画"
+    ],
+    "evidence_urls": [
+      "https://musclewatching.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "LINEヘルスケア",
+    "official_site_url": "https://healthcare.line.me/",
+    "logo_image_url": "https://healthcare.line.me/img/og-image.png",
+    "logo_source_page_url": "https://healthcare.line.me/",
+    "logo_source_type": "og_image",
+    "logo_detection_method": "og_image",
+    "logo_alt_or_context": "LINEヘルスケア",
+    "concept_exact_text": "LINEで医師・薬剤師に相談できる、オンライン健康相談サービス。",
+    "concept_summary_ja": "LINEアプリから医師・薬剤師にテキストで健康相談できるサービス。24時間対応で症状確認・医療機関受診の目安を確認できる。",
+    "continuity_keywords": [
+      "オンライン相談",
+      "医師",
+      "薬剤師",
+      "LINE",
+      "24時間",
+      "健康相談"
+    ],
+    "evidence_urls": [
+      "https://healthcare.line.me/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "タニタ HealthPlanet",
+    "official_site_url": "https://www.healthplanet.jp/",
+    "logo_image_url": "https://www.healthplanet.jp/images/logo.png",
+    "logo_source_page_url": "https://www.healthplanet.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "HealthPlanet タニタ",
+    "concept_exact_text": "タニタ製品の計測データをまとめて管理できる健康管理サービス。",
+    "concept_summary_ja": "タニタの体組成計・歩数計など各種健康機器データをスマホで一元管理。体脂肪率・筋肉量・内臓脂肪をグラフで確認できる。",
+    "continuity_keywords": [
+      "体組成",
+      "体脂肪率",
+      "筋肉量",
+      "内臓脂肪",
+      "タニタ",
+      "データ管理"
+    ],
+    "evidence_urls": [
+      "https://www.healthplanet.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "TATTA（タッタ）",
+    "official_site_url": "https://runtrip.jp/tatta",
+    "logo_image_url": "https://runtrip.jp/assets/img/tatta/logo.png",
+    "logo_source_page_url": "https://runtrip.jp/tatta",
+    "logo_source_type": "brand_page",
+    "logo_detection_method": "brand_page",
+    "logo_alt_or_context": "TATTA ランニングSNS",
+    "concept_exact_text": "走る楽しさを、みんなでシェア。ランニングSNS。",
+    "concept_summary_ja": "国内最大級のランニングSNSアプリ。ランの記録・コース共有・仲間フォロー機能でランニングを楽しく続けられるコミュニティを形成。",
+    "continuity_keywords": [
+      "ランニングSNS",
+      "コース共有",
+      "仲間",
+      "記録",
+      "コミュニティ",
+      "マラソン"
+    ],
+    "evidence_urls": [
+      "https://runtrip.jp/tatta"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "キャビスパ360（CAVISPA）",
+    "official_site_url": "https://cavispa.com/",
+    "logo_image_url": "https://cavispa.com/wp-content/uploads/logo.png",
+    "logo_source_page_url": "https://cavispa.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "キャビスパ360",
+    "concept_exact_text": "自分でケアする、新しいセルフ痩身スタジオ。",
+    "concept_summary_ja": "キャビテーション・EMS等の本格美容機器を自分で操作するセルフエステスタジオ。月額通い放題で低価格を実現。",
+    "continuity_keywords": [
+      "セルフエステ",
+      "キャビテーション",
+      "EMS",
+      "通い放題",
+      "月額制",
+      "痩身"
+    ],
+    "evidence_urls": [
+      "https://cavispa.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "シンクロライフ（SyncLife）",
+    "official_site_url": "https://synclife.app/",
+    "logo_image_url": "https://synclife.app/img/logo.png",
+    "logo_source_page_url": "https://synclife.app/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "SyncLife",
+    "concept_exact_text": "食事の写真を撮るだけでポイントがもらえる、ヘルスケアアプリ。",
+    "concept_summary_ja": "食事写真を投稿するだけでポイントが貯まりグルメクーポン等に交換できるヘルスケアアプリ。AIが食事内容を自動解析して栄養バランスも管理。",
+    "continuity_keywords": [
+      "食事写真",
+      "ポイント",
+      "AI解析",
+      "グルメ",
+      "栄養管理"
+    ],
+    "evidence_urls": [
+      "https://synclife.app/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "オムロン ヘルスケア（OMRON connect）",
+    "official_site_url": "https://www.healthcare.omron.co.jp/",
+    "logo_image_url": "https://www.healthcare.omron.co.jp/common/img/logo.png",
+    "logo_source_page_url": "https://www.healthcare.omron.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "OMRON ヘルスケア",
+    "concept_exact_text": "血圧・体重・活動量を記録して、健康管理をもっと身近に。",
+    "concept_summary_ja": "オムロン製血圧計・体重計・活動量計と連携するスマホアプリ。測定データを自動記録・グラフ化し、家族や医療機関とデータ共有も可能。",
+    "continuity_keywords": [
+      "血圧管理",
+      "体重管理",
+      "活動量計",
+      "OMRON",
+      "家族共有",
+      "医療連携"
+    ],
+    "evidence_urls": [
+      "https://www.healthcare.omron.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ダイエットプラス",
+    "official_site_url": "https://dietplus.jp/",
+    "logo_image_url": "https://dietplus.jp/assets/img/common/logo.png",
+    "logo_source_page_url": "https://dietplus.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ダイエットプラス",
+    "concept_exact_text": "食事記録で、無理なくダイエット。",
+    "concept_summary_ja": "写真でカロリー自動計算・栄養バランス分析・コミュニティ機能で継続的な体重管理をサポートするダイエットアプリ。",
+    "continuity_keywords": [
+      "食事記録",
+      "AI",
+      "カロリー計算",
+      "写真",
+      "ダイエット",
+      "コミュニティ"
+    ],
+    "evidence_urls": [
+      "https://dietplus.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ポケットダイエット",
+    "official_site_url": "https://www.pocket-diet.jp/",
+    "logo_image_url": "https://www.pocket-diet.jp/assets/img/logo.png",
+    "logo_source_page_url": "https://www.pocket-diet.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "ポケットダイエット",
+    "concept_exact_text": "いつでもどこでも、ポケットの中にダイエットを。",
+    "concept_summary_ja": "食事・運動・体重を記録しダイエットを管理できる日本製アプリ。栄養素グラフ・目標カロリー設定・日記機能で無理なく継続できる。",
+    "continuity_keywords": [
+      "食事記録",
+      "体重管理",
+      "カロリー",
+      "栄養素",
+      "ダイエット日記"
+    ],
+    "evidence_urls": [
+      "https://www.pocket-diet.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "COCORO HEALTH（コロロヘルス）",
+    "official_site_url": "https://cocorohealth.jp/",
+    "logo_image_url": "https://cocorohealth.jp/img/logo.png",
+    "logo_source_page_url": "https://cocorohealth.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "COCORO HEALTH",
+    "concept_exact_text": "シャープが提供する、AIを活用した健康管理サービス。",
+    "concept_summary_ja": "シャープ提供のAI健康管理サービス。歩数・睡眠・体重・血圧などのデータをAIが分析し個別健康アドバイスを配信。家電連携も特徴。",
+    "continuity_keywords": [
+      "AI",
+      "健康管理",
+      "シャープ",
+      "歩数",
+      "睡眠",
+      "家電連携"
+    ],
+    "evidence_urls": [
+      "https://cocorohealth.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "スポーツクラブNAS",
+    "official_site_url": "https://www.nas-sports.co.jp/",
+    "logo_image_url": "https://www.nas-sports.co.jp/common/img/logo.png",
+    "logo_source_page_url": "https://www.nas-sports.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "NAS スポーツクラブ",
+    "concept_exact_text": "あなたのライフスタイルに合わせた、総合スポーツクラブ。",
+    "concept_summary_ja": "関東・関西を中心に展開する総合スポーツクラブ。プール・スタジオ・マシンジムを完備しオンラインフィットネス動画「NASコネクト」も提供。",
+    "continuity_keywords": [
+      "スポーツクラブ",
+      "プール",
+      "スタジオ",
+      "マシンジム",
+      "オンライン"
+    ],
+    "evidence_urls": [
+      "https://www.nas-sports.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "タニタカフェ オンラインショップ",
+    "official_site_url": "https://www.tanita.co.jp/shop/",
+    "logo_image_url": "https://www.tanita.co.jp/img/common/logo.png",
+    "logo_source_page_url": "https://www.tanita.co.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "TANITA",
+    "concept_exact_text": "計って、知って、動く。タニタの健康づくり。",
+    "concept_summary_ja": "体組成計・血圧計・活動量計などの健康機器メーカー「タニタ」が提供するオンラインショップ。健康管理機器と連携アプリで日々の健康データを管理できる。",
+    "continuity_keywords": [
+      "体組成計",
+      "血圧計",
+      "活動量計",
+      "健康管理",
+      "TANITA",
+      "計測"
+    ],
+    "evidence_urls": [
+      "https://www.tanita.co.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "カラダファクトリー",
+    "official_site_url": "https://karadafactory.com/",
+    "logo_image_url": "https://karadafactory.com/wp-content/themes/karadafactory/images/logo.png",
+    "logo_source_page_url": "https://karadafactory.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "カラダファクトリー",
+    "concept_exact_text": "体の歪みを整えて、根本から健康に。",
+    "concept_summary_ja": "整体・骨格矯正・ストレッチを提供する全国展開のボディケアサロン。肩こり・腰痛・姿勢改善に特化したオーダーメイドの施術でカラダの根本改善を目指す。",
+    "continuity_keywords": [
+      "整体",
+      "骨格矯正",
+      "ストレッチ",
+      "肩こり",
+      "腰痛",
+      "姿勢改善",
+      "全国展開"
+    ],
+    "evidence_urls": [
+      "https://karadafactory.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "SIXPAD（シックスパッド）",
+    "official_site_url": "https://www.sixpad.jp/",
+    "logo_image_url": "https://www.sixpad.jp/img/common/logo.svg",
+    "logo_source_page_url": "https://www.sixpad.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "SIXPAD",
+    "concept_exact_text": "すべての人に、すべての人のトレーニングを。",
+    "concept_summary_ja": "EMS（電気刺激）トレーニング機器を販売するMTGのブランド。専用アプリ「SIXPAD App」でトレーニング強度管理・記録が可能。クリスティアーノ・ロナウドが公認モデル。",
+    "continuity_keywords": [
+      "EMS",
+      "電気刺激",
+      "腹筋",
+      "トレーニング器具",
+      "アプリ連携",
+      "MTG"
+    ],
+    "evidence_urls": [
+      "https://www.sixpad.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ストレッチ専門店 Dr.ストレッチ",
+    "official_site_url": "https://doctor-stretch.com/",
+    "logo_image_url": "https://doctor-stretch.com/img/logo.svg",
+    "logo_source_page_url": "https://doctor-stretch.com/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Dr.ストレッチ",
+    "concept_exact_text": "60分のストレッチで、カラダが変わる。",
+    "concept_summary_ja": "国内最大手のストレッチ専門店チェーン。全国500店舗以上でプロのストレッチトレーナーが施術し、柔軟性向上・姿勢改善・疲労回復をサポート。",
+    "continuity_keywords": [
+      "ストレッチ専門",
+      "柔軟性",
+      "姿勢改善",
+      "疲労回復",
+      "全国展開",
+      "プロトレーナー"
+    ],
+    "evidence_urls": [
+      "https://doctor-stretch.com/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ランニングステーション（Runtrip）",
+    "official_site_url": "https://runtrip.jp/",
+    "logo_image_url": "https://runtrip.jp/assets/img/common/logo.png",
+    "logo_source_page_url": "https://runtrip.jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Runtrip",
+    "concept_exact_text": "ランニングで、旅をしよう。",
+    "concept_summary_ja": "ランニングコースを旅感覚で楽しむメディア＆アプリ。全国のランニングコース情報・仮想旅ラン・ランニングイベント情報を提供し、ランを通じた地域体験を推進。",
+    "continuity_keywords": [
+      "ランニング",
+      "コース",
+      "旅",
+      "観光",
+      "イベント",
+      "地域"
+    ],
+    "evidence_urls": [
+      "https://runtrip.jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "ファンクショナルトレーニングスタジオ TORAIZ",
+    "official_site_url": "https://toraiz.net/",
+    "logo_image_url": "https://toraiz.net/wp-content/themes/toraiz/img/logo.png",
+    "logo_source_page_url": "https://toraiz.net/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "TORAIZ",
+    "concept_exact_text": "プロ直伝のパーソナルトレーニングを、もっと身近に。",
+    "concept_summary_ja": "英会話「RIZAP」が展開する語学×フィットネス融合のパーソナルトレーニングスタジオ。完全マンツーマンで英語を学びながらトレーニングできる独自コンセプト。",
+    "continuity_keywords": [
+      "パーソナルトレーニング",
+      "英語",
+      "マンツーマン",
+      "RIZAP",
+      "語学",
+      "ダイエット"
+    ],
+    "evidence_urls": [
+      "https://toraiz.net/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "FitClub（フィットクラブ）オンライン",
+    "official_site_url": "https://www.fitclub.co.jp/online/",
+    "logo_image_url": "https://www.fitclub.co.jp/img/logo.png",
+    "logo_source_page_url": "https://www.fitclub.co.jp/online/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "FitClub",
+    "concept_exact_text": "自宅でスタジオクラスを。FitClubオンラインフィットネス。",
+    "concept_summary_ja": "東急スポーツオアシス系列のFitClubが提供するオンラインフィットネスサービス。ヨガ・ダンス・筋トレ等のライブ・録画レッスンを月額制で提供。",
+    "continuity_keywords": [
+      "オンラインフィットネス",
+      "ヨガ",
+      "ダンス",
+      "ライブレッスン",
+      "月額制",
+      "スタジオクラス"
+    ],
+    "evidence_urls": [
+      "https://www.fitclub.co.jp/online/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  },
+  {
+    "service_name": "Withings Health Mate（ウィジングス）",
+    "official_site_url": "https://www.withings.com/jp/",
+    "logo_image_url": "https://www.withings.com/media/logo/default/withings-logo.svg",
+    "logo_source_page_url": "https://www.withings.com/jp/",
+    "logo_source_type": "header",
+    "logo_detection_method": "header_img",
+    "logo_alt_or_context": "Withings",
+    "concept_exact_text": "データで知る、健康の未来。",
+    "concept_summary_ja": "スマート体重計・血圧計・活動量計などのウェアラブル健康機器を販売するWithingsの日本向けサービス。専用アプリHealth Mateで体重・心拍・睡眠を総合管理。",
+    "continuity_keywords": [
+      "スマート体重計",
+      "血圧計",
+      "睡眠計測",
+      "ウェアラブル",
+      "健康データ",
+      "Withings"
+    ],
+    "evidence_urls": [
+      "https://www.withings.com/jp/"
+    ],
+    "checked_at": "2026-03-25",
+    "status": "採用"
+  }
+];
+
+  function load() {
+    const data = INLINE_DATA;
+    render(data);
+  }
+
+  let allData = [];
+  let currentFilter = 'all';
+
+  function render(data) {
+    allData = data;
+
+    // counts
+    const counts = { all: data.length };
+    data.forEach(d => {
+      counts[d.status] = (counts[d.status] || 0) + 1;
+    });
+
+    ['all', '採用', '要再確認', '不採用'].forEach(k => {
+      const el = document.getElementById('count-' + k);
+      if (el) el.textContent = counts[k] || 0;
+    });
+
+    // remove unused filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      const f = btn.dataset.filter;
+      if (f !== 'all' && !counts[f]) btn.style.display = 'none';
+    });
+
+    applyFilter();
+  }
+
+  function applyFilter() {
+    const filtered = currentFilter === 'all'
+      ? allData
+      : allData.filter(d => d.status === currentFilter);
+
+    const summaryBar = document.getElementById('summaryBar');
+    summaryBar.textContent = `表示中: ${filtered.length} 件`;
+
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="empty">該当するサービスがありません</div>';
+      return;
+    }
+
+    filtered.forEach(svc => {
+      grid.appendChild(makeCard(svc));
+    });
+  }
+
+  function makeCard(svc) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const hasLogo = svc.logo_image_url && svc.logo_image_url.trim() !== '';
+    // safe service name for inline onerror attribute
+    const safeName = svc.service_name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+    const logoBannerHtml = hasLogo
+      ? `<img src="${esc(svc.logo_image_url)}" alt="${esc(svc.service_name)}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;logo-placeholder&quot;>${safeName}</span>'">`
+      : `<span class="logo-placeholder">${esc(svc.service_name)}</span>`;
+
+    const domain = (() => {
+      try { return new URL(svc.official_site_url).hostname; } catch { return svc.official_site_url; }
+    })();
+
+    const keywordsHtml = (svc.continuity_keywords || [])
+      .map(k => `<span class="keyword">${esc(k)}</span>`)
+      .join('');
+
+    card.innerHTML = `
+      <div class="logo-banner">${logoBannerHtml}</div>
+      <div class="card-header">
+        <div class="card-title-block">
+          <div class="service-name">${esc(svc.service_name)}</div>
+          <div class="service-url">${esc(domain)}</div>
+        </div>
+        <span class="status-badge status-${esc(svc.status)}">${esc(svc.status)}</span>
+      </div>
+      <div class="card-body">
+        <div class="concept-text">${esc(svc.concept_exact_text)}</div>
+        <div class="summary-text">${esc(svc.concept_summary_ja)}</div>
+        ${keywordsHtml ? `<div class="keywords">${keywordsHtml}</div>` : ''}
+      </div>
+      <div class="card-footer">
+        <span class="checked-at">確認日: ${esc(svc.checked_at)}</span>
+        <a class="visit-btn" href="${esc(svc.official_site_url)}" target="_blank" rel="noopener">
+          公式サイト →
+        </a>
+      </div>
+    `;
+
+    return card;
+  }
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // filter buttons
+  document.getElementById('filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilter();
+  });
+
+  load().catch(err => {
+    document.getElementById('grid').innerHTML = `<div class="empty">データの読み込みに失敗しました: ${err.message}</div>`;
+  });
+</script>
+
+</body>
+</html>

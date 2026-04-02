@@ -1,8 +1,9 @@
 /**
  * GET /api/stores/[storeId]/drive/info
  *
- * フロントエンドが「入稿データフォルダURL」と「設定済みか」を確認するためのシンプルなエンドポイント。
- * driveUploadUrl: 04_提出データ フォルダの URL（ユーザーが直接アップロードする先）
+ * フロントエンドがカテゴリ別フォルダURLと設定済みフラグを確認するエンドポイント。
+ * driveUploadUrl: 04_提出データ フォルダ URL（後方互換のため維持）
+ * photoFolderUrl / assetFolderUrl / documentFolderUrl / rootFolderUrl: カテゴリ別フォルダ URL
  */
 
 import { prisma } from '@/lib/prisma';
@@ -14,11 +15,22 @@ export async function GET(_req: Request, { params }: Ctx) {
 
   const dest = await prisma.uploadDestination.findUnique({
     where: { storeId },
-    select: { submitFolderUrl: true, isConfigured: true },
+    select: {
+      submitFolderUrl:   true,
+      photoFolderUrl:    true,
+      assetFolderUrl:    true,
+      documentFolderUrl: true,
+      rootFolderUrl:     true,
+      isConfigured:      true,
+    },
   });
 
   return Response.json({
-    driveUploadUrl: dest?.submitFolderUrl ?? '',
-    isConfigured:   dest?.isConfigured   ?? false,
+    driveUploadUrl:    dest?.submitFolderUrl   ?? '',
+    photoFolderUrl:    dest?.photoFolderUrl    ?? '',
+    assetFolderUrl:    dest?.assetFolderUrl    ?? '',
+    documentFolderUrl: dest?.documentFolderUrl ?? '',
+    rootFolderUrl:     dest?.rootFolderUrl     ?? '',
+    isConfigured:      dest?.isConfigured      ?? false,
   });
 }

@@ -475,6 +475,7 @@ const MOCK_PHASE_CHECKS = {
     { id: 'pc-002-03', store_id: 'store-002', phase_name: '内装進行中', template_id: 'pct-in-03', item_name: '内装スケジュール確認', item_type: 'confirmation', is_required: true,  sort_order: 3, status: 'completed', checked_at: '2026-03-10T11:00:00', checked_by: '佐藤 健一', note: '4/20完了予定', created_at: '2026-03-08', updated_at: '2026-03-10' },
     { id: 'pc-002-04', store_id: 'store-002', phase_name: '内装進行中', template_id: 'pct-in-04', item_name: '電源確認',             item_type: 'checklist',    is_required: true,  sort_order: 4, status: 'pending',   checked_at: '',                    checked_by: '',          note: '',            created_at: '2026-03-08', updated_at: '2026-03-08' },
     { id: 'pc-002-05', store_id: 'store-002', phase_name: '内装進行中', template_id: 'pct-in-05', item_name: 'ネット回線確認',       item_type: 'checklist',    is_required: true,  sort_order: 5, status: 'pending',   checked_at: '',                    checked_by: '',          note: '',            created_at: '2026-03-08', updated_at: '2026-03-08' },
+    { id: 'pc-002-06', store_id: 'store-002', phase_name: '内装進行中', template_id: 'pct-in-06', item_name: '工事見積書',           item_type: 'document',     is_required: true,  sort_order: 6, status: 'pending',   checked_at: '',                    checked_by: '',          note: 'FC側から未提出', created_at: '2026-03-08', updated_at: '2026-03-08' },
   ],
 
   'store-003': [], // 採用進行中（テンプレートなし）
@@ -492,5 +493,30 @@ const MOCK_PHASE_CHECKS = {
     { id: 'pc-005-02', store_id: 'store-005', phase_name: 'オープン準備中', template_id: 'pct-op-02', item_name: 'スタッフ周知', item_type: 'checklist',    is_required: true,  sort_order: 2, status: 'completed', checked_at: '2026-01-20T10:00:00', checked_by: '山田 花子', note: '',            created_at: '2026-01-01', updated_at: '2026-01-20' },
     { id: 'pc-005-03', store_id: 'store-005', phase_name: 'オープン準備中', template_id: 'pct-op-03', item_name: '最終導線確認', item_type: 'checklist',    is_required: true,  sort_order: 3, status: 'completed', checked_at: '2026-01-28T14:00:00', checked_by: '山田 花子', note: '',            created_at: '2026-01-01', updated_at: '2026-01-28' },
     { id: 'pc-005-04', store_id: 'store-005', phase_name: 'オープン準備中', template_id: 'pct-op-04', item_name: '告知確認',     item_type: 'confirmation', is_required: true,  sort_order: 4, status: 'completed', checked_at: '2026-01-28T15:00:00', checked_by: '山田 花子', note: 'チラシ配布完了', created_at: '2026-01-01', updated_at: '2026-01-28' },
+  ],
+};
+
+// ============================================================
+// MOCK COMMENTS (store_id → comment[])
+// ============================================================
+const MOCK_COMMENTS = {
+  'store-001': [
+    { id: 'cm-001-01', store_id: 'store-001', author: '山田 花子', body: '看板設置の業者から連絡あり。3/25に完了予定で確定。このまま進める。', created_at: '2026-03-15' },
+    { id: 'cm-001-02', store_id: 'store-001', author: '田中 太郎', body: '予約システムの設定が3/14期限を過ぎてしまっている。システム担当に今日中に確認する。', created_at: '2026-03-14' },
+    { id: 'cm-001-03', store_id: 'store-001', author: '山田 花子', body: '研修スケジュール確定。4/3〜4/5の3日間で実施。対象スタッフ5名に通知済み。', created_at: '2026-03-12' },
+    { id: 'cm-001-04', store_id: 'store-001', author: '田中 太郎', body: 'オープン準備全体の進捗を確認。内装完了・チラシ承認・採用完了が揃ったので順調に進んでいる。', created_at: '2026-03-10' },
+  ],
+  'store-002': [
+    { id: 'cm-002-01', store_id: 'store-002', author: '佐藤 健一', body: '内装工事が3月中旬に着工。スケジュール通り4/20完成を目指している。', created_at: '2026-03-12' },
+    { id: 'cm-002-02', store_id: 'store-002', author: '佐藤 健一', body: '求人掲載の期限3/14が迫っているが、まだ掲載先が決まっていない。人事に確認が必要。', created_at: '2026-03-11' },
+  ],
+  'store-003': [
+    { id: 'cm-003-01', store_id: 'store-003', author: '田中 太郎', body: '採用面接を開始した。現在応募5名、4月中に3名採用目標。', created_at: '2026-03-14' },
+  ],
+  'store-004': [
+    { id: 'cm-004-01', store_id: 'store-004', author: '伊藤 美咲', body: '契約フェーズ完了確認。物件契約の交渉が少し長引いているが、3/28には締結できる見込み。', created_at: '2026-03-15' },
+  ],
+  'store-005': [
+    { id: 'cm-005-01', store_id: 'store-005', author: '山田 花子', body: '名古屋栄店、2/1グランドオープン完了。初日来客数は目標の110%。運営移行フェーズに入った。', created_at: '2026-02-01' },
   ],
 };

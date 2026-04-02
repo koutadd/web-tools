@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>眼の整体院とは | アイケアラボ</title>
+  <meta name="description" content="アイケアラボは、眼を「整える」という発想から生まれた新しいカテゴリのケア専門院です。">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { navy: '#0D2B5E' } } } }
+  </script>
+  <style>
+    body { font-family: 'Helvetica Neue','Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif; color: #111; line-height: 1.75; }
+    .btn-navy { background:#111; color:white; transition:opacity 0.2s; } .btn-navy:hover { opacity:0.82; }
+    .btn-outline { border:1px solid #111; color:#111; transition:all 0.2s; } .btn-outline:hover { background:#111; color:white; }
+  </style>
+</head>
+<body class="bg-white">
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav { position:sticky;top:0;z-index:99999;background:#040c18;border-bottom:1px solid rgba(245,158,11,0.18);display:flex;align-items:center;gap:6px;padding:0 20px;height:42px;min-height:42px;max-height:42px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none;font-family:'DM Mono','SF Mono',monospace;font-size:11px;letter-spacing:0.05em;box-sizing:border-box; }
+#aicare-common-nav::-webkit-scrollbar{display:none}
+#aicare-common-nav>*{flex-shrink:0}
+#aicare-common-nav .cn-label{color:rgba(255,255,255,0.25);font-size:10px;letter-spacing:0.1em;padding-right:4px}
+#aicare-common-nav .cn-sep{color:rgba(255,255,255,0.15);padding:0 2px;user-select:none}
+#aicare-common-nav a{color:rgba(148,163,184,0.85);text-decoration:none;padding:3px 10px;border-radius:4px;border:1px solid rgba(148,163,184,0.12);transition:color 0.15s,background 0.15s;white-space:nowrap}
+#aicare-common-nav a:hover{color:#e2eaf4;background:rgba(255,255,255,0.06)}
+#aicare-common-nav a.cn-active{color:#f59e0b!important;border-color:rgba(245,158,11,0.35)!important;background:rgba(245,158,11,0.08)!important}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span><span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a><a href="aicare-sitemap.html">サイトマップ</a><a href="aicare-stores.html">店舗一覧</a><a href="aicare-store-detail.html">店舗詳細</a><a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a><a href="aicare-brand-overview.html">ブランドマップ</a><a href="store-persona-map.html">店舗ペルソナ</a><a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span><a href="reference-sites.html">参考サイト集</a><span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a><a href="aicare-flagship.html">フラッグシップ</a><a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>(function(){var c=location.pathname.split('/').pop()||'';document.querySelectorAll('#aicare-common-nav a').forEach(function(a){if(a.getAttribute('href')===c)a.classList.add('cn-active')})})();</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+      <a href="aicare-top-prototype.html" class="flex items-center flex-shrink-0">
+        <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-9 md:h-10 w-auto">
+      </a>
+      <nav class="hidden lg:flex items-center gap-6">
+        <a href="about.html" style="font-size:13px; color:#444;">眼の整体院とは</a>
+        <a href="menu.html" style="font-size:13px; color:#444;">メニュー・料金</a>
+        <a href="aicare-stores.html" style="font-size:13px; color:#444;">店舗一覧</a>
+        <a href="news.html" style="font-size:13px; color:#444;">お知らせ</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-3">
+        <a href="contact.html" style="border:1px solid #111; color:#111; padding:8px 20px; font-size:12px; text-decoration:none;">お問い合わせ</a>
+        <a href="aicare-top-prototype.html#reserve" style="background:#111; color:white; padding:8px 20px; font-size:12px; text-decoration:none;">予約する</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- パンくず -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+  <nav class="text-xs text-gray-400">
+    <a href="aicare-top-prototype.html" class="hover:text-gray-700 transition-colors">TOP</a>
+    <span class="mx-1">&gt;</span>
+    <span class="text-gray-700">眼の整体院とは</span>
+  </nav>
+</div>
+
+<main>
+  <!-- H1 -->
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-12">
+    <span style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#888; display:block; margin-bottom:16px;">ABOUT</span>
+    <h1 style="font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1.5rem;">眼の整体院とは</h1>
+    <p class="text-gray-600 leading-relaxed mb-6">アイケアラボは、「眼を整える」という新しい発想から生まれたケア専門院です。パソコンやスマートフォンの普及により、私たちの目は日常的に大きな負担を強いられています。しかし、整骨院や整体院のように身体をケアする場所はあっても、「眼」を専門的にケアする場所はほとんどありませんでした。</p>
+    <p class="text-gray-600 leading-relaxed mb-6">私たちは、眼科とも美容とも異なる第三のアプローチとして、筋肉や血流に着目した独自のアイケアメソッドを開発しました。施術だけでなく、生活習慣の改善やホームケアの提案まで、お客様一人ひとりに合わせたトータルケアを提供しています。</p>
+  </section>
+
+  <!-- サービス概要 -->
+  <section class="bg-gray-50 py-16">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <h2 class="text-2xl font-bold mb-8">サービス概要</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white p-8 shadow-sm">
+          <div class="text-3xl mb-4">👁</div>
+          <h3 class="font-bold mb-3">眼筋ケア施術</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">眼球周辺の筋肉（外眼筋・毛様体筋）に直接アプローチし、凝り固まった眼の疲労をほぐします。施術後は視界のクリアさを実感いただけます。</p>
+        </div>
+        <div class="bg-white p-8 shadow-sm">
+          <div class="text-3xl mb-4">📊</div>
+          <h3 class="font-bold mb-3">視機能測定</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">独自の視機能測定システムにより、視力だけでなく、ピント調節力、眼球運動の状態まで総合的に分析。改善計画の立案に活用します。</p>
+        </div>
+        <div class="bg-white p-8 shadow-sm">
+          <div class="text-3xl mb-4">🏠</div>
+          <h3 class="font-bold mb-3">ホームケア指導</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">施術効果を維持するためのセルフケア方法を丁寧にお伝えします。日常生活に取り入れやすいストレッチやトレーニングをご提案します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 眼の整体とは何か -->
+  <section class="py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <h2 class="text-2xl font-bold mb-8">眼の整体とは何か</h2>
+      <p class="text-gray-600 leading-relaxed mb-6">「眼の整体」とは、眼科医療や視力矯正とは異なるアプローチで目の不調にアプローチするケアです。身体の整体が骨格や筋肉の歪みを整えるように、眼の整体では眼球を動かす筋肉や、ピントを合わせる毛様体筋の緊張を緩和し、本来の柔軟性を取り戻すことを目的としています。</p>
+      <p class="text-gray-600 leading-relaxed mb-6">長時間のデスクワークやスマホ使用による「近方固定ストレス」は、眼の筋肉を硬直させ、視界のぼやけや頭痛、肩こりなどの症状を引き起こします。眼の整体では、この筋肉の緊張を専門的な手技で解放し、血行を改善することで、症状の根本的な改善を目指します。</p>
+      <div class="bg-gray-50 p-8 mt-8">
+        <h3 class="font-bold mb-4">施術の流れ</h3>
+        <div class="space-y-4">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-black text-white text-sm font-bold">1</span>
+            <div><p class="font-medium">カウンセリング・視機能測定</p><p class="text-sm text-gray-500">現在の目の状態を詳しくヒアリングし、独自の測定で客観的なデータを取得します。</p></div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-black text-white text-sm font-bold">2</span>
+            <div><p class="font-medium">施術（約40〜60分）</p><p class="text-sm text-gray-500">目の周辺・頭部・首回りの筋肉に丁寧にアプローチ。痛みのない心地よい施術です。</p></div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-black text-white text-sm font-bold">3</span>
+            <div><p class="font-medium">アフターカウンセリング</p><p class="text-sm text-gray-500">施術後の変化を確認し、日常のケア方法や次回の施術プランをご提案します。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- こんな方におすすめ -->
+  <section class="bg-gray-50 py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <h2 class="text-2xl font-bold mb-8">こんな方におすすめ</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">長時間のPC作業で目が疲れやすい方</p>
+        </div>
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">夕方になると視界がぼやける方</p>
+        </div>
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">目の疲れから頭痛や肩こりが起きやすい方</p>
+        </div>
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">子どもの視力低下が気になる保護者の方</p>
+        </div>
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">ドライアイや目の充血に悩んでいる方</p>
+        </div>
+        <div class="bg-white p-6 flex items-start gap-4">
+          <span class="text-lg">✔</span>
+          <p class="text-gray-700 text-sm">目のケアに関心があるが、何から始めればよいか分からない方</p>
+        </div>
+      </div>
+      <div class="mt-10 text-center">
+        <a href="about-strength.html" class="inline-block bg-black text-white px-8 py-3 text-sm hover:opacity-80 transition-opacity">強み・選ばれる理由を見る →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer style="background:#111111; margin-top:80px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10" style="border-bottom:1px solid rgba(255,255,255,0.1);">
+      <div><p class="text-sm text-gray-400 leading-relaxed mb-4">視界を整え、毎日の質を変える。眼の整体院という新しいカテゴリで、日本の目のケアを変えていきます。</p></div>
+      <div>
+        <h4 class="text-xs font-medium text-white mb-4 tracking-widest">サービス</h4>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="about.html" class="hover:text-white transition-colors">眼の整体院とは</a></li>
+          <li><a href="menu.html" class="hover:text-white transition-colors">メニュー・料金</a></li>
+          <li><a href="aicare-stores.html" class="hover:text-white transition-colors">店舗一覧</a></li>
+          <li><a href="faq.html" class="hover:text-white transition-colors">よくある質問</a></li>
+          <li><a href="aicare-vision-check.html" class="hover:text-white transition-colors">セルフ視界チェック</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-medium text-white mb-4 tracking-widest">情報</h4>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="achievements.html" class="hover:text-white transition-colors">専門機関・実績</a></li>
+          <li><a href="voices.html" class="hover:text-white transition-colors">お客様の声</a></li>
+          <li><a href="news.html" class="hover:text-white transition-colors">お知らせ</a></li>
+          <li><a href="contact.html" class="hover:text-white transition-colors">お問い合わせ</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-6 text-xs text-gray-600">&copy; 2025 アイケアラボ / 眼の整体院</div>
+  </div>
+</footer>
+</body>
+</html>

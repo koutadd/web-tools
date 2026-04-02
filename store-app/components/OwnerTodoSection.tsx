@@ -121,7 +121,7 @@ export default function OwnerTodoSection({
                 <span style={{ fontSize: 20, lineHeight: 1 }}>
                   {CATEGORY_ICONS[topItem.category] ?? '📌'}
                 </span>
-                <p style={{ fontSize: 15, fontWeight: 800, color: '#111827', flex: 1 }}>
+                <p style={{ fontSize: 15, fontWeight: 800, color: '#111827', flex: 1, minWidth: 0 }}>
                   {topItem.label}
                 </p>
               </div>

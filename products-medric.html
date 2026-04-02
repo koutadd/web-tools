@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メドリック | アイケアラボ</title>
+  <meta name="description" content="目の健康に特化した機能性サプリメント「メドリック」。ルテイン・アスタキサンチンを高配合。">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { theme: { extend: { colors: { navy: '#0D2B5E' } } } }</script>
+  <style>
+    body { font-family: 'Helvetica Neue','Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif; color: #111; line-height: 1.75; }
+    .btn-navy { background:#111; color:white; transition:opacity 0.2s; } .btn-navy:hover { opacity:0.82; }
+    .btn-outline { border:1px solid #111; color:#111; transition:all 0.2s; } .btn-outline:hover { background:#111; color:white; }
+  </style>
+</head>
+<body class="bg-white">
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav { position:sticky;top:0;z-index:99999;background:#040c18;border-bottom:1px solid rgba(245,158,11,0.18);display:flex;align-items:center;gap:6px;padding:0 20px;height:42px;min-height:42px;max-height:42px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none;font-family:'DM Mono','SF Mono',monospace;font-size:11px;letter-spacing:0.05em;box-sizing:border-box; }
+#aicare-common-nav::-webkit-scrollbar{display:none}
+#aicare-common-nav>*{flex-shrink:0}
+#aicare-common-nav .cn-label{color:rgba(255,255,255,0.25);font-size:10px;letter-spacing:0.1em;padding-right:4px}
+#aicare-common-nav .cn-sep{color:rgba(255,255,255,0.15);padding:0 2px;user-select:none}
+#aicare-common-nav a{color:rgba(148,163,184,0.85);text-decoration:none;padding:3px 10px;border-radius:4px;border:1px solid rgba(148,163,184,0.12);transition:color 0.15s,background 0.15s;white-space:nowrap}
+#aicare-common-nav a:hover{color:#e2eaf4;background:rgba(255,255,255,0.06)}
+#aicare-common-nav a.cn-active{color:#f59e0b!important;border-color:rgba(245,158,11,0.35)!important;background:rgba(245,158,11,0.08)!important}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span><span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a><a href="aicare-sitemap.html">サイトマップ</a><a href="aicare-stores.html">店舗一覧</a><a href="aicare-store-detail.html">店舗詳細</a><a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a><a href="aicare-brand-overview.html">ブランドマップ</a><a href="store-persona-map.html">店舗ペルソナ</a><a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span><a href="reference-sites.html">参考サイト集</a><span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a><a href="aicare-flagship.html">フラッグシップ</a><a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>(function(){var c=location.pathname.split('/').pop()||'';document.querySelectorAll('#aicare-common-nav a').forEach(function(a){if(a.getAttribute('href')===c)a.classList.add('cn-active')})})();</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+      <a href="aicare-top-prototype.html" class="flex items-center flex-shrink-0">
+        <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-9 md:h-10 w-auto">
+      </a>
+      <nav class="hidden lg:flex items-center gap-6">
+        <a href="about.html" style="font-size:13px; color:#444;">眼の整体院とは</a>
+        <a href="menu.html" style="font-size:13px; color:#444;">メニュー・料金</a>
+        <a href="aicare-stores.html" style="font-size:13px; color:#444;">店舗一覧</a>
+        <a href="news.html" style="font-size:13px; color:#444;">お知らせ</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-3">
+        <a href="contact.html" style="border:1px solid #111; color:#111; padding:8px 20px; font-size:12px; text-decoration:none;">お問い合わせ</a>
+        <a href="aicare-top-prototype.html#reserve" style="background:#111; color:white; padding:8px 20px; font-size:12px; text-decoration:none;">予約する</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4"><nav class="text-xs text-gray-400"><a href="aicare-top-prototype.html" class="hover:text-gray-700 transition-colors">TOP</a><span class="mx-1">&gt;</span><a href="products.html" class="hover:text-gray-700 transition-colors">取り扱い商品一覧</a><span class="mx-1">&gt;</span><span class="text-gray-700">メドリック</span></nav></div>
+
+<main>
+<section class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-12">
+    <span style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#888; display:block; margin-bottom:16px;">MEDRIC</span>
+    <h1 style="font-size:clamp(28px,4vw,44px); font-weight:700; line-height:1.2; margin-bottom:1.5rem;">メドリック</h1>
+    <p class="text-gray-600 leading-relaxed mb-4">メドリックは、アイケアラボが眼の健康維持のために独自開発した機能性サプリメントです。目に不可欠な栄養素であるルテイン、ゼアキサンチン、アスタキサンチンを中心に、ビルベリーエキスやDHAなど、科学的根拠に基づいた成分を最適な配合バランスで凝縮しました。</p>
+    <p class="text-gray-600 leading-relaxed">施術によるケアに加え、体の内側からも目の健康をサポート。毎日の食事では摂りきれない眼に必要な栄養を、1日2粒で手軽に補えます。</p>
+  </section>
+
+  <section class="bg-gray-50 py-16">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <h2 class="text-xl font-bold mb-8">主要成分</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 flex gap-4">
+          <div class="w-12 h-12 bg-yellow-50 rounded flex items-center justify-center flex-shrink-0 text-xl">🟡</div>
+          <div>
+            <h3 class="font-bold text-sm mb-1">ルテイン 20mg</h3>
+            <p class="text-xs text-gray-600 leading-relaxed">マリーゴールド由来のフリー体ルテイン。網膜の黄斑部に蓄積し、ブルーライトなどの有害光線から目を保護します。</p>
+          </div>
+        </div>
+        <div class="bg-white p-6 flex gap-4">
+          <div class="w-12 h-12 bg-orange-50 rounded flex items-center justify-center flex-shrink-0 text-xl">🟠</div>
+          <div>
+            <h3 class="font-bold text-sm mb-1">アスタキサンチン 6mg</h3>
+            <p class="text-xs text-gray-600 leading-relaxed">ヘマトコッカス藻由来。強力な抗酸化作用で目の疲労を軽減し、ピント調節機能の改善をサポートします。</p>
+          </div>
+        </div>
+        <div class="bg-white p-6 flex gap-4">
+          <div class="w-12 h-12 bg-purple-50 rounded flex items-center justify-center flex-shrink-0 text-xl">🟣</div>
+          <div>
+            <h3 class="font-bold text-sm mb-1">ビルベリーエキス 120mg</h3>
+            <p class="text-xs text-gray-600 leading-relaxed">北欧産ビルベリーから抽出したアントシアニンが豊富。暗所視力の改善や目の血流促進に貢献します。</p>
+          </div>
+        </div>
+        <div class="bg-white p-6 flex gap-4">
+          <div class="w-12 h-12 bg-blue-50 rounded flex items-center justify-center flex-shrink-0 text-xl">🔵</div>
+          <div>
+            <h3 class="font-bold text-sm mb-1">DHA 100mg</h3>
+            <p class="text-xs text-gray-600 leading-relaxed">網膜の構成成分であるDHAを配合。目の健康維持に不可欠な脂肪酸を効率的に補給します。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <h2 class="text-xl font-bold mb-4">価格</h2>
+      <div class="flex items-baseline justify-center gap-2 mb-2">
+        <span class="text-4xl font-bold" style="font-family:'Montserrat',sans-serif;">4,980</span>
+        <span class="text-sm text-gray-500">円（税込）</span>
+      </div>
+      <p class="text-sm text-gray-500 mb-2">内容量: 60粒（約30日分）</p>
+      <p class="text-xs text-gray-400 mb-8">定期便なら 10%OFF: 4,482円（税込）/月</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#" class="inline-block bg-black text-white px-10 py-4 text-sm hover:opacity-80 transition-opacity">単品で購入する</a>
+        <a href="#" class="inline-block border border-black text-black px-10 py-4 text-sm hover:bg-black hover:text-white transition-all">定期便で申し込む</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer style="background:#111111; margin-top:80px;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10" style="border-bottom:1px solid rgba(255,255,255,0.1);">
+      <div><p class="text-sm text-gray-400 leading-relaxed mb-4">視界を整え、毎日の質を変える。眼の整体院という新しいカテゴリで、日本の目のケアを変えていきます。</p></div>
+      <div>
+        <h4 class="text-xs font-medium text-white mb-4 tracking-widest">サービス</h4>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="about.html" class="hover:text-white transition-colors">眼の整体院とは</a></li>
+          <li><a href="menu.html" class="hover:text-white transition-colors">メニュー・料金</a></li>
+          <li><a href="aicare-stores.html" class="hover:text-white transition-colors">店舗一覧</a></li>
+          <li><a href="faq.html" class="hover:text-white transition-colors">よくある質問</a></li>
+          <li><a href="aicare-vision-check.html" class="hover:text-white transition-colors">セルフ視界チェック</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-medium text-white mb-4 tracking-widest">情報</h4>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="achievements.html" class="hover:text-white transition-colors">専門機関・実績</a></li>
+          <li><a href="voices.html" class="hover:text-white transition-colors">お客様の声</a></li>
+          <li><a href="news.html" class="hover:text-white transition-colors">お知らせ</a></li>
+          <li><a href="contact.html" class="hover:text-white transition-colors">お問い合わせ</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-6 text-xs text-gray-600">&copy; 2025 アイケアラボ / 眼の整体院</div>
+  </div>
+</footer>
+</body>
+</html>

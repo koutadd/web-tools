@@ -1,0 +1,3 @@
+[    1004ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://b-fit.jp/images/bg_line.png:0
+[    1004ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://b-fit.jp/online/images/icon_wh_yz.gif:0
+[   23400ms] [WARNING] Swiper Loop Warning: The number of slides is not enough for loop mode, it will be disabled and not function properly. You need to add more slides (or make duplicates) or lower the values of slidesPerView and slidesPerGroup parameters @ https://cramuru.zenplace.co.jp/_next/static/chunks/9352-71f2c4d187b94240.js:0

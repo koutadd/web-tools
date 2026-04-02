@@ -12,6 +12,7 @@ export type EquipmentItem = {
   reason: string;
   priority: EquipmentPriority;
   status: EquipmentStatus;
+  /** 準備期限（YYYY-MM-DD 形式の文字列） */
   deadline?: string;
   amazonUrl: string;
   price: string;
@@ -19,6 +20,8 @@ export type EquipmentItem = {
   tag?: string;
   purchaseNotes?: string;  // 買う時の注意点
   criteria?: string;       // おすすめの選び方
+  /** 購入・利用時の注意点（purchaseNotes より短く、警告色で表示する想定） */
+  caution?: string;
 };
 
 // ─── ステータス表示 ────────────────────────────────────────────────────────────
@@ -60,23 +63,27 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     title: 'リングライト（スタッフ写真用）',
     reason: 'スタッフ写真の顔の影をなくし、明るくプロっぽい仕上がりになります。自然光が入らない時間帯でも綺麗に撮れます。',
     status: '未購入',
+    deadline: '2026-03-20',
     price: '¥2,500〜',
     emoji: '💡',
     tag: 'スタッフ写真に最適',
     amazonUrl: 'https://www.amazon.co.jp/s?k=リングライト+撮影+スタッフ',
     purchaseNotes: 'USB充電タイプを選ぶとコンセント不要で場所を選ばず使えます。スマホホルダー付きのモデルを選ぶとさらに効率的です。',
     criteria: '直径20cm以上のものが明るく使いやすいです。色温度（暖色・白・寒色）が切り替えられるものを選ぶと、店内の雰囲気に合った写真が撮れます。',
+    caution: 'スタッフ写真の撮影日が迫っています。Amazonの配送日を確認し、撮影日の2〜3日前に届くよう余裕をもって注文してください。',
   },
   {
     id: 3, phase: 'デザイン', priority: '必須',
     title: 'USBメモリ（32GB以上）',
     reason: '撮影した写真データを担当者へ渡すときに使います。クラウドアップロードが難しい場合でも確実にデータを共有できます。',
     status: '購入済み',
+    deadline: '2026-03-20',
     price: '¥980〜',
     emoji: '💾',
     amazonUrl: 'https://www.amazon.co.jp/s?k=USBメモリ+32GB',
     purchaseNotes: '差し込み口がUSB Type-Aかどうか確認してください。Type-Cしかないパソコンには別途変換アダプターが必要です。',
     criteria: '容量は32GBあれば十分です。速度より信頼性を優先し、サンディスク・バッファロー・東芝など有名ブランドを選ぶと安心です。',
+    caution: 'Macをお使いの場合はUSB Type-Aポートがない機種があります。担当者のパソコン環境を事前に確認してから渡してください。',
   },
 
   // ── 制作フェーズ ──

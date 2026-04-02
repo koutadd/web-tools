@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>アイケアLaBo ブランドガイドライン 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0C1D3F; --navy-mid:#183569; --navy-light:#254B8C; --navy-pale:#EEF1F8;
+  --white:#FFFFFF; --gray-50:#F7F8FA; --gray-100:#EDEEF2; --gray-200:#D8DBE6;
+  --gray-400:#9BA2B4; --gray-600:#5A6278; --gray-800:#2A2F42;
+  --font:'A1ゴシック','A1Gothic','Noto Sans JP','Hiragino Sans','Yu Gothic UI',sans-serif;
+  --w:1920px; --h:1080px;
+}
+body{background:#0e0f12;margin:0;padding:0;overflow-x:hidden;}
+#book-scaler{display:flex;flex-direction:column;align-items:center;gap:20px;padding:48px 24px;transform-origin:top left;width:max-content;min-width:100%;}
+
+/* ══ UPLOAD BAR ══════════════════════════════════════════ */
+#upload-bar{
+  position:sticky;top:16px;z-index:100;width:var(--w);
+  background:rgba(18,22,32,.97);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-radius:6px;
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.ub-title{font-family:var(--font);font-size:11px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.1em;white-space:nowrap;flex-shrink:0;}
+.ub-slots{display:flex;gap:10px;flex:1;}
+.ub-slot{
+  flex:1;display:flex;align-items:center;gap:8px;
+  border:1.5px dashed rgba(255,255,255,.12);border-radius:4px;
+  padding:8px 10px;cursor:pointer;position:relative;
+  transition:border-color .2s,background .2s;min-width:0;
+}
+.ub-slot:hover{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);}
+.ub-slot.has-file{border-color:rgba(255,255,255,.25);border-style:solid;}
+.ub-slot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.ub-slot-preview{
+  width:40px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  border-radius:2px;overflow:hidden;
+}
+.ub-slot-preview.bg-dark{background:var(--navy);}
+.ub-slot-preview.bg-light{background:#fff;border:1px solid rgba(255,255,255,.12);}
+.ub-slot-preview.bg-mid{background:var(--gray-100);border:1px solid rgba(255,255,255,.08);}
+.ub-slot-preview img{max-width:100%;max-height:100%;object-fit:contain;}
+.ub-slot-preview .no-img{width:16px;height:10px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.2);}
+.ub-slot-preview .no-img-dark{border-color:rgba(0,0,0,.2);}
+.ub-slot-info{flex:1;min-width:0;}
+.ub-slot-name{font-family:var(--font);font-size:10px;font-weight:500;color:rgba(255,255,255,.7);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ub-slot-where{font-family:var(--font);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.04em;margin-top:2px;line-height:1.4;}
+.ub-slot-check{font-size:10px;color:#4caf7d;flex-shrink:0;display:none;}
+.ub-slot.has-file .ub-slot-check{display:block;}
+.ub-slot.has-file .ub-slot-name{color:rgba(255,255,255,.9);}
+.ub-divider{width:1px;height:36px;background:rgba(255,255,255,.08);flex-shrink:0;}
+.ub-btn-apply{
+  background:var(--navy);color:#fff;border:none;
+  font-family:var(--font);font-size:10px;font-weight:500;
+  letter-spacing:.1em;padding:9px 18px;cursor:pointer;border-radius:3px;
+  transition:background .2s;flex-shrink:0;white-space:nowrap;
+}
+.ub-btn-apply:hover{background:var(--navy-mid);}
+.ub-btn-apply:disabled{background:rgba(255,255,255,.08);color:rgba(255,255,255,.25);cursor:default;}
+.ub-btn-reset{
+  background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);
+  font-family:var(--font);font-size:10px;padding:8px 14px;cursor:pointer;border-radius:3px;
+  transition:border-color .2s,color .2s;flex-shrink:0;white-space:nowrap;
+}
+.ub-btn-reset:hover{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.6);}
+.ub-count{font-family:var(--font);font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.06em;flex-shrink:0;}
+
+/* ══ PAGE BASE ══════════════════════════════════════════ */
+.pg{width:var(--w);height:var(--h);position:relative;overflow:hidden;flex-shrink:0;font-family:var(--font);}
+.pg-num{position:absolute;bottom:36px;right:60px;font-size:14px;letter-spacing:.14em;color:var(--gray-400);}
+.pg-num-light{color:rgba(255,255,255,.3);}
+
+/* ══ COVER ══ */
+.pg-cover{background:var(--navy);}
+.cover-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 60% 50%,#1a3668 0%,var(--navy) 65%);}
+.cover-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:56px 56px;}
+.cover-wm{position:absolute;right:-36px;bottom:-90px;font-size:650px;font-weight:700;color:rgba(255,255,255,.018);line-height:1;user-select:none;letter-spacing:-.02em;}
+.cover-inner{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;}
+.cover-left{display:flex;flex-direction:column;justify-content:space-between;padding:80px 88px;}
+.cover-top-row{display:flex;align-items:center;gap:14px;}
+.cover-brand-tag{font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.4);}
+.cover-bottom-row{display:flex;flex-direction:column;gap:18px;}
+.cover-title-label{font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.4);}
+.cover-title{font-size:80px;font-weight:700;color:#fff;line-height:1.18;letter-spacing:.02em;}
+.cover-rule{width:72px;height:3px;background:rgba(255,255,255,.35);}
+.cover-sub{font-size:18px;color:rgba(255,255,255,.45);letter-spacing:.06em;line-height:1.85;font-weight:300;}
+.cover-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;padding:80px 88px;border-left:1px solid rgba(255,255,255,.07);}
+.cover-year{font-size:14px;letter-spacing:.2em;color:rgba(255,255,255,.3);}
+.cover-right-bottom{display:flex;flex-direction:column;align-items:flex-end;gap:32px;}
+.cover-eye-large{opacity:.55;}
+.cover-brand-name{font-size:40px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.14em;}
+.cover-brand-en{font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.3);margin-top:6px;text-align:right;}
+
+/* ══ TOC ══ */
+.pg-toc{background:var(--white);}
+.toc-inner{padding:80px 96px;height:100%;display:flex;gap:112px;}
+.toc-left{width:320px;flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-start;gap:44px;}
+.toc-left-title{font-size:72px;font-weight:700;color:var(--navy);line-height:1.1;letter-spacing:.02em;}
+.toc-left-label{font-size:14px;letter-spacing:.2em;color:var(--gray-400);}
+.toc-left-rule{width:48px;height:3px;background:var(--navy);margin:24px 0;}
+.toc-left-desc{font-size:16px;color:var(--gray-400);line-height:1.8;font-weight:300;letter-spacing:.04em;}
+.toc-right{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.toc-item{display:flex;align-items:center;padding:17px 0;border-bottom:1px solid var(--gray-100);}
+.toc-ch{font-size:14px;letter-spacing:.18em;color:var(--gray-400);width:80px;flex-shrink:0;}
+.toc-name{font-size:20px;font-weight:500;color:var(--navy);flex:1;letter-spacing:.04em;}
+.toc-sub{font-size:15px;color:var(--gray-400);letter-spacing:.04em;font-weight:300;margin-left:12px;}
+.toc-pg{font-size:15px;color:var(--gray-400);width:32px;text-align:right;}
+
+/* ══ CHAPTER DIVIDERS ══ */
+.pg-ch{background:var(--navy);display:grid;grid-template-columns:1fr 1fr;}
+.ch-left{padding:80px 88px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;border-right:1px solid rgba(255,255,255,.06);}
+.ch-tag{position:absolute;top:80px;left:88px;font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.3);}
+.ch-left-body{display:flex;flex-direction:column;}
+.ch-num-bg{position:absolute;bottom:48px;left:56px;font-size:280px;font-weight:700;color:rgba(255,255,255,.04);line-height:1;letter-spacing:-.02em;user-select:none;pointer-events:none;}
+.ch-title{font-size:72px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:.02em;position:relative;}
+.ch-right{padding:80px 88px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;}
+.ch-right-top{position:absolute;top:80px;right:88px;display:flex;justify-content:flex-end;}
+.ch-right-body{display:flex;flex-direction:column;gap:32px;position:relative;z-index:1;}
+.ch-rule{width:56px;height:3px;background:rgba(255,255,255,.3);}
+.ch-num-small{font-size:15px;letter-spacing:.18em;color:rgba(255,255,255,.4);}
+.ch-title-en{font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.3);}
+.ch-desc{font-size:18px;color:rgba(255,255,255,.45);line-height:1.9;font-weight:300;letter-spacing:.04em;max-width:500px;}
+
+/* ══ CONTENT PAGES ══ */
+.pg-content{background:var(--white);}
+.ct-inner{padding:76px 88px;height:100%;display:flex;flex-direction:column;}
+.ct-header{display:flex;align-items:center;gap:24px;margin-bottom:44px;}
+.ct-ch-label{font-size:14px;letter-spacing:.18em;color:var(--gray-400);white-space:nowrap;flex-shrink:0;}
+.ct-vdiv{width:1px;min-height:44px;background:var(--gray-200);align-self:stretch;flex-shrink:0;}
+.ct-h1{font-size:38px;font-weight:700;color:var(--navy);letter-spacing:.03em;line-height:1.2;}
+.ct-rule{width:100%;height:1px;background:var(--gray-200);margin-bottom:38px;}
+.ct-body{flex:1;display:flex;flex-direction:column;gap:32px;min-height:0;}
+.ct-h2{font-size:22px;font-weight:600;color:var(--navy);letter-spacing:.04em;margin-bottom:12px;}
+.ct-h3{font-size:15px;font-weight:600;color:var(--navy);letter-spacing:.1em;margin-bottom:10px;}
+.ct-p{font-size:18px;line-height:1.9;color:var(--gray-800);font-weight:300;letter-spacing:.04em;}
+.ct-p b{font-weight:600;color:var(--navy);}
+.ct-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.ct-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
+.ct-card{background:var(--gray-50);padding:28px 32px;border-left:4px solid var(--navy);}
+.ct-card-title{font-size:18px;font-weight:600;color:var(--navy);margin-bottom:10px;letter-spacing:.04em;}
+.ct-card-body{font-size:16px;line-height:1.8;color:var(--gray-600);font-weight:300;}
+.ct-kw-list{display:flex;flex-wrap:wrap;gap:11px;margin-top:12px;}
+.ct-kw{font-size:15px;padding:6px 18px;border:1px solid var(--navy);color:var(--navy);letter-spacing:.06em;}
+.ct-highlight{background:var(--navy);padding:38px 44px;}
+.ct-hl-label{font-size:14px;letter-spacing:.2em;color:rgba(255,255,255,.4);margin-bottom:12px;}
+.ct-hl-text{font-size:26px;font-weight:600;color:#fff;line-height:1.5;letter-spacing:.04em;}
+.ct-hl-sub{font-size:16px;color:rgba(255,255,255,.55);margin-top:12px;line-height:1.8;font-weight:300;}
+
+/* ══ LOGO DISPLAY AREAS ══ */
+/* Generic logo placeholder (SVG + text) */
+.logo-ph{display:flex;flex-direction:column;align-items:center;gap:8px;}
+/* Uploaded image inside any logo area */
+.lg-img{object-fit:contain;display:block;}
+/* Logo boxes on the logo showcase page */
+.logo-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0;overflow:hidden;}
+.logo-box-white{background:var(--white);border:1px solid var(--gray-200);}
+.logo-box-navy{background:var(--navy);}
+.logo-box-gray{background:var(--gray-100);}
+.logo-name-dark{font-size:20px;font-weight:600;color:var(--navy);letter-spacing:.12em;margin-top:10px;}
+.logo-name-light{font-size:20px;font-weight:600;color:#fff;letter-spacing:.12em;margin-top:10px;}
+.logo-en{font-size:12px;letter-spacing:.2em;color:var(--gray-400);margin-top:3px;}
+.logo-en-light{font-size:12px;letter-spacing:.2em;color:rgba(255,255,255,.4);margin-top:3px;}
+.logo-sample-label{font-size:14px;letter-spacing:.12em;color:var(--gray-400);text-align:center;margin-top:12px;}
+/* Clearspace */
+.clearspace-box{border:2px dashed var(--gray-400);padding:38px;display:flex;align-items:center;justify-content:center;position:relative;background:var(--white);overflow:hidden;}
+.cs-label{position:absolute;font-size:12px;letter-spacing:.08em;color:var(--gray-400);}
+.cs-label-top{top:6px;left:50%;transform:translateX(-50%);}
+.cs-label-bottom{bottom:6px;left:50%;transform:translateX(-50%);}
+.cs-label-left{left:6px;top:50%;transform:translateY(-50%) rotate(-90deg);}
+.cs-label-right{right:6px;top:50%;transform:translateY(-50%) rotate(90deg);}
+
+/* ══ OK/NG ══ */
+.ok-ng-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.ok-box{background:#F0F6F0;border-left:4px solid #2D7D46;padding:22px 24px;}
+.ng-box{background:#FEF2F2;border-left:4px solid #C0392B;padding:22px 24px;}
+.ok-label{font-size:14px;letter-spacing:.1em;font-weight:600;color:#2D7D46;margin-bottom:7px;}
+.ng-label{font-size:14px;letter-spacing:.1em;font-weight:600;color:#C0392B;margin-bottom:7px;}
+.ok-ng-text{font-size:16px;line-height:1.7;color:var(--gray-800);font-weight:300;}
+
+/* ══ COLOR ══ */
+.color-swatch-lg{height:240px;display:flex;align-items:flex-end;padding:24px;}
+.swatch-navy{background:var(--navy);}
+.swatch-white{background:#fff;border:1px solid var(--gray-200);}
+.swatch-gray{background:var(--gray-100);border:1px solid var(--gray-200);}
+.color-name{font-size:18px;font-weight:600;letter-spacing:.06em;}
+.color-name-light{color:rgba(255,255,255,.9);}
+.color-name-dark{color:var(--navy);}
+.color-code{font-size:15px;letter-spacing:.06em;margin-top:3px;font-weight:300;}
+.color-code-light{color:rgba(255,255,255,.5);}
+.color-code-dark{color:var(--gray-600);}
+.color-info-label{font-size:14px;letter-spacing:.14em;color:var(--gray-400);margin-bottom:5px;margin-top:16px;}
+.color-info-table{width:100%;border-collapse:collapse;}
+.color-info-table td{font-size:15px;color:var(--gray-800);padding:5px 0;font-weight:300;}
+.color-info-table td:first-child{color:var(--gray-400);width:72px;}
+.color-role{font-size:16px;line-height:1.75;color:var(--gray-600);font-weight:300;background:var(--gray-50);padding:18px 22px;}
+.color-role b{color:var(--navy);font-weight:600;}
+
+/* ══ LANGUAGE ══ */
+.lang-ok{background:#F0F6F0;border-left:4px solid #2D7D46;padding:18px 24px;}
+.lang-ng{background:#FEF2F2;border-left:4px solid #C0392B;padding:18px 24px;}
+.lang-item-label{font-size:14px;letter-spacing:.14em;font-weight:600;margin-bottom:7px;}
+.lang-ok .lang-item-label{color:#2D7D46;}
+.lang-ng .lang-item-label{color:#C0392B;}
+.lang-item-text{font-size:17px;line-height:1.7;color:var(--gray-800);font-weight:300;}
+.lang-word-chip{padding:16px 22px;background:var(--navy);color:#fff;font-size:18px;font-weight:500;letter-spacing:.06em;text-align:center;}
+
+/* ══ VISUAL ══ */
+.vis-item-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.vis-dot-ok{width:8px;height:8px;border-radius:50%;background:#2D7D46;margin-top:7px;flex-shrink:0;}
+.vis-dot-ng{width:8px;height:8px;border-radius:50%;background:#C0392B;margin-top:7px;flex-shrink:0;}
+.vis-item-text{font-size:16px;line-height:1.7;color:var(--gray-800);font-weight:300;}
+.vis-col-label{font-size:14px;letter-spacing:.14em;font-weight:600;margin-bottom:16px;}
+.vis-do .vis-col-label{color:#2D7D46;}
+.vis-dont .vis-col-label{color:#C0392B;}
+
+/* ══ ROLLOUT ══ */
+.rollout-card{background:var(--gray-50);padding:32px 28px;display:flex;flex-direction:column;gap:10px;}
+.rollout-title{font-size:20px;font-weight:600;color:var(--navy);letter-spacing:.04em;}
+.rollout-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.rollout-list li{font-size:16px;color:var(--gray-600);font-weight:300;line-height:1.6;padding-left:16px;position:relative;}
+.rollout-list li::before{content:'—';position:absolute;left:0;color:var(--gray-400);}
+
+/* ══ CLOSING ══ */
+.pg-closing{background:var(--navy);}
+.closing-bg{position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 30% 50%,#1a3668 0%,var(--navy) 70%);}
+.closing-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:56px 56px;}
+.closing-wm{position:absolute;right:-24px;bottom:-72px;font-size:560px;font-weight:700;color:rgba(255,255,255,.02);line-height:1;user-select:none;}
+.closing-inner{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;}
+.closing-left{padding:80px 88px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(255,255,255,.06);}
+.closing-right{padding:80px 88px;display:flex;flex-direction:column;justify-content:center;gap:32px;}
+.closing-tag{font-size:14px;letter-spacing:.2em;color:rgba(255,255,255,.3);}
+.closing-main{font-size:56px;font-weight:700;color:#fff;line-height:1.4;letter-spacing:.02em;}
+.closing-rule{width:60px;height:3px;background:rgba(255,255,255,.3);}
+.closing-footer{display:flex;align-items:center;gap:16px;}
+.closing-brand-name{font-size:20px;color:rgba(255,255,255,.5);letter-spacing:.12em;}
+.closing-year{font-size:14px;letter-spacing:.18em;color:rgba(255,255,255,.25);}
+.closing-sub{font-size:18px;color:rgba(255,255,255,.45);line-height:1.9;font-weight:300;letter-spacing:.04em;}
+</style>
+</head>
+<body>
+<!-- ── Aicare Nav ── -->
+<nav style="position:sticky;top:0;z-index:9999;background:#0D2B5E;border-bottom:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:2px;padding:7px 16px;font-family:system-ui,-apple-system,sans-serif;font-size:11px;letter-spacing:0.04em;flex-wrap:wrap;">
+  <a href="http://localhost:8766/persona-dashboard.html#positioning" style="color:rgba(255,255,255,0.55);text-decoration:none;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);white-space:nowrap;margin-right:8px;">← Hub</a>
+  <span style="color:rgba(255,255,255,0.2);padding:0 4px;">|</span>
+  <a href="/aicare-sitemap.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">サイトマップ</a>
+  <a href="/aicare-top-prototype.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">TOPプロト</a>
+  <a href="/aicare-brand-book.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ブランドブック</a>
+  <a href="/aicare-portfolio.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ポートフォリオ</a>
+  <a href="/aicare-lab365.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">Lab365</a>
+  <a href="/aicare-stores.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">店舗</a>
+  <a href="/aicare-vision-check.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">視力チェック</a>
+  <a href="/aicare-dashboard.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ダッシュボード</a>
+</nav>
+<div id="book-scaler">
+
+<!-- ══════════════════════════════════════════
+  ロゴアップロードパネル
+══════════════════════════════════════════ -->
+<div id="upload-bar">
+  <span class="ub-title">ロゴ登録</span>
+
+  <div class="ub-slots">
+    <!-- Slot 1: 白ロゴ（紺背景向け） -->
+    <div class="ub-slot" id="slot-ondark" data-slot="on-dark">
+      <input type="file" accept="image/*" onchange="onFileSelect(this,'on-dark')">
+      <div class="ub-slot-preview bg-dark" id="prev-ondark">
+        <div class="no-img"></div>
+      </div>
+      <div class="ub-slot-info">
+        <div class="ub-slot-name" id="name-ondark">白ロゴ（紺背景用）</div>
+        <div class="ub-slot-where">表紙・章扉・クロージング</div>
+      </div>
+      <span class="ub-slot-check">✓</span>
+    </div>
+
+    <!-- Slot 2: 紺ロゴ（白背景向け） -->
+    <div class="ub-slot" id="slot-onlight" data-slot="on-light">
+      <input type="file" accept="image/*" onchange="onFileSelect(this,'on-light')">
+      <div class="ub-slot-preview bg-light" id="prev-onlight">
+        <div class="no-img no-img-dark"></div>
+      </div>
+      <div class="ub-slot-info">
+        <div class="ub-slot-name" id="name-onlight">紺ロゴ（白背景用）</div>
+        <div class="ub-slot-where">ロゴ白背景・グレー背景</div>
+      </div>
+      <span class="ub-slot-check">✓</span>
+    </div>
+
+    <!-- Slot 3: シンボルマーク -->
+    <div class="ub-slot" id="slot-mark" data-slot="mark">
+      <input type="file" accept="image/*" onchange="onFileSelect(this,'mark')">
+      <div class="ub-slot-preview bg-mid" id="prev-mark">
+        <div class="no-img no-img-dark"></div>
+      </div>
+      <div class="ub-slot-info">
+        <div class="ub-slot-name" id="name-mark">シンボルマーク</div>
+        <div class="ub-slot-where">章扉アイコン・小サイズ</div>
+      </div>
+      <span class="ub-slot-check">✓</span>
+    </div>
+  </div>
+
+  <div class="ub-divider"></div>
+  <span class="ub-count" id="ub-count">0 / 3 登録済</span>
+  <button class="ub-btn-apply" id="ub-apply" onclick="applyAllLogos()" disabled>全ページに適用</button>
+  <button class="ub-btn-reset" onclick="resetAll()">リセット</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PAGE 1: COVER
+══════════════════════════════════════════ -->
+<div class="pg pg-cover">
+  <div class="cover-bg"></div>
+  <div class="cover-grid"></div>
+  <div class="cover-wm">眼</div>
+  <div class="cover-inner">
+    <!-- Left -->
+    <div class="cover-left">
+      <div class="cover-top-row">
+        <!-- Small mark accent: data-logo-type="mark" -->
+        <div data-logo-type="mark" class="logo-target" style="width:44px;height:27px;display:flex;align-items:center;justify-content:center;">
+          <svg class="def-svg" width="44" height="27" viewBox="0 0 28 17" fill="none">
+            <path d="M1 8.5C7 1.5 21 1.5 27 8.5C21 15.5 7 15.5 1 8.5Z" stroke="rgba(255,255,255,.45)" stroke-width="1.2" fill="none"/>
+            <circle cx="14" cy="8.5" r="4" stroke="rgba(255,255,255,.45)" stroke-width="1.2" fill="none"/>
+            <circle cx="14" cy="8.5" r="1.5" fill="rgba(255,255,255,.45)"/>
+          </svg>
+        </div>
+        <span class="cover-brand-tag">AICARE LAB</span>
+      </div>
+      <div class="cover-bottom-row">
+        <div class="cover-title-label">BRAND GUIDELINES</div>
+        <div class="cover-title">ブランド<br>ガイドライン</div>
+        <div class="cover-rule"></div>
+        <div class="cover-sub">アイケアLaBoのブランド思想・ビジュアル方針・<br>言葉・運用ルールをまとめたガイドラインです。</div>
+      </div>
+    </div>
+    <!-- Right: large logo display on dark bg -->
+    <div class="cover-right">
+      <span class="cover-year">2026</span>
+      <div class="cover-right-bottom">
+        <!-- Large logo mark on dark: data-logo-type="on-dark" -->
+        <div data-logo-type="on-dark" class="logo-target cover-eye-large logo-ph" style="min-height:120px;display:flex;align-items:center;justify-content:center;">
+          <svg class="def-svg" width="160" height="96" viewBox="0 0 80 48" fill="none">
+            <path d="M3 24C19 4 61 4 77 24C61 44 19 44 3 24Z" stroke="rgba(255,255,255,.6)" stroke-width="1.5" fill="none"/>
+            <circle cx="40" cy="24" r="12" stroke="rgba(255,255,255,.6)" stroke-width="1.5" fill="none"/>
+            <circle cx="40" cy="24" r="4.5" fill="rgba(255,255,255,.6)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cover-brand-name">アイケアLaBo</div>
+          <div class="cover-brand-en">EYE CARE LAB</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num pg-num-light">01</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PAGE 2: TOC
+══════════════════════════════════════════ -->
+<div class="pg pg-toc">
+  <div class="toc-inner">
+    <div class="toc-left">
+      <div>
+        <div class="toc-left-label">CONTENTS</div>
+        <div class="toc-left-rule"></div>
+        <div class="toc-left-title">目次</div>
+      </div>
+      <div class="toc-left-desc">アイケアLaBoのブランド思想からビジュアル・言葉・展開まで、一貫した指針をまとめています。</div>
+    </div>
+    <div class="toc-right">
+      <div class="toc-item"><span class="toc-ch">Ch. 01</span><span class="toc-name">ブランド概要</span><span class="toc-sub">アイケアLaBoとは</span><span style="flex:1"></span><span class="toc-pg">04</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 02</span><span class="toc-name">ブランドコンセプト</span><span class="toc-sub">眼の整体院という定義</span><span style="flex:1"></span><span class="toc-pg">06</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 03</span><span class="toc-name">ブランドの独自性</span><span class="toc-sub">ラボであることの意味</span><span style="flex:1"></span><span class="toc-pg">08</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 04</span><span class="toc-name">ロゴ</span><span class="toc-sub">基本使用・余白・OK/NG例</span><span style="flex:1"></span><span class="toc-pg">10</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 05</span><span class="toc-name">カラー</span><span class="toc-sub">ブランドカラー定義と使用方針</span><span style="flex:1"></span><span class="toc-pg">13</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 06</span><span class="toc-name">タイポグラフィ</span><span class="toc-sub">書体・文字組み・階層設計</span><span style="flex:1"></span><span class="toc-pg">15</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 07</span><span class="toc-name">言葉のガイドライン</span><span class="toc-sub">使うべき言葉・避けるべき言葉</span><span style="flex:1"></span><span class="toc-pg">17</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 08</span><span class="toc-name">写真・ビジュアル方針</span><span class="toc-sub">ラボ感・専門性・清潔感の表現</span><span style="flex:1"></span><span class="toc-pg">19</span></div>
+      <div class="toc-item"><span class="toc-ch">Ch. 09</span><span class="toc-name">展開方針</span><span class="toc-sub">Web・SNS・店舗・配布物</span><span style="flex:1"></span><span class="toc-pg">21</span></div>
+    </div>
+  </div>
+  <span class="pg-num">02</span>
+</div>
+
+<!-- ══ CHAPTER DIVIDER HELPER MACRO ══
+  Each ch-right-top has a small mark icon (data-logo-type="mark")
+  Falls back to eye SVG if no mark uploaded
+-->
+
+<!-- ══════════════════════════════════════════
+  PAGE 3: CH01 DIVIDER
+══════════════════════════════════════════ -->
+<div class="pg pg-ch">
+  <div class="ch-left">
+    <span class="ch-tag">CHAPTER 01</span>
+    <div class="ch-left-body">
+      <div class="ch-num-bg">01</div>
+      <div class="ch-title">ブランド<br>概要</div>
+    </div>
+  </div>
+  <div class="ch-right">
+    <div class="ch-right-top">
+      <div data-logo-type="mark" class="logo-target" style="width:32px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.25;">
+        <svg class="def-svg" width="32" height="20" viewBox="0 0 32 20" fill="none">
+          <path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/>
+          <circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/>
+          <circle cx="16" cy="10" r="1.8" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ch-right-body">
+      <div class="ch-rule"></div>
+      <span class="ch-num-small">Chapter 01</span>
+      <div class="ch-title-en">BRAND OVERVIEW</div>
+      <div class="ch-desc">アイケアLaBoが何者であり、何を目指し、社会にどんな価値を届けるブランドかを定義します。</div>
+    </div>
+  </div>
+  <span class="pg-num pg-num-light">03</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PAGE 4: ブランド概要
+══════════════════════════════════════════ -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 01</span><div class="ct-vdiv"></div><div class="ct-h1">ブランド概要</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div class="ct-grid-2" style="gap:20px;flex:0 0 auto;">
+        <div>
+          <div class="ct-h2">アイケアLaBoとは</div>
+          <p class="ct-p">アイケアLaBoは、<b>「眼の整体院」</b>という新しいカテゴリを定義し、その価値を社会に広げていくブランドです。目のケアを通じて、視界を整えることで、人が人生をより豊かに生きるための土台をつくることを目的としています。</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="ct-card"><div class="ct-card-title">ブランドの役割</div><div class="ct-card-body">目を人生の中でより良く使える状態へと導く。視界や身体の在り方を探求し続けることで、新しいケアの基準をつくる。</div></div>
+          <div class="ct-card"><div class="ct-card-title">目指す姿</div><div class="ct-card-body">「眼の整体院と言えばアイケアLaBo」という認知を社会に定着させ、信頼と専門性の象徴となること。</div></div>
+        </div>
+      </div>
+      <div class="ct-highlight">
+        <div class="ct-hl-label">BRAND DEFINITION</div>
+        <div class="ct-hl-text">視界を整える。それは、生き方を整えること。</div>
+        <div class="ct-hl-sub">アイケアLaBoは、目のケアを通じて、人の視界と人生の質を向上させることに真剣に向き合い続けるブランドです。</div>
+      </div>
+      <div><div class="ct-h3">ブランド表現キーワード</div>
+        <div class="ct-kw-list"><span class="ct-kw">上質</span><span class="ct-kw">誠実</span><span class="ct-kw">専門的</span><span class="ct-kw">清潔感</span><span class="ct-kw">信頼感</span><span class="ct-kw">探求心</span><span class="ct-kw">ラボ感</span><span class="ct-kw">わかりやすさ</span></div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">04</span>
+</div>
+
+<!-- PAGE 5: CH02 DIVIDER -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 02</span><div class="ch-left-body"><div class="ch-num-bg">02</div><div class="ch-title">ブランド<br>コンセプト</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top">
+      <div data-logo-type="mark" class="logo-target" style="width:32px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.25;">
+        <svg class="def-svg" width="32" height="20" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg>
+      </div>
+    </div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 02</span><div class="ch-title-en">BRAND CONCEPT</div><div class="ch-desc">「眼の整体院」という概念がなぜ生まれたのか。その存在意義を定義します。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">05</span>
+</div>
+
+<!-- PAGE 6: ブランドコンセプト -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 02</span><div class="ct-vdiv"></div><div class="ct-h1">ブランドコンセプト</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div style="text-align:center;padding:16px 0 12px;border-bottom:1px solid var(--gray-100);">
+        <div style="font-size:14px;letter-spacing:.2em;color:var(--gray-400);margin-bottom:12px;">CONCEPT STATEMENT</div>
+        <div style="font-size:40px;font-weight:700;color:var(--navy);letter-spacing:.04em;">眼の整体院＝アイケアLaBo</div>
+      </div>
+      <div class="ct-grid-2" style="gap:20px;">
+        <div>
+          <div class="ct-h2">視界を整えるという価値</div>
+          <p class="ct-p">整体院が身体の歪みを整えるように、アイケアLaBoは<b>眼の状態を整え</b>、視界を本来あるべき状態へ導きます。視界が整うことで、集中力・疲労感・生活の質すべてに変化が生まれます。</p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+            <div class="ct-card" style="border-left-width:2px;"><div class="ct-card-title">存在意義（Why）</div><div class="ct-card-body">目を使い過ぎる現代社会において、眼の本来の状態を取り戻す場所が必要だから。</div></div>
+            <div class="ct-card" style="border-left-width:2px;"><div class="ct-card-title">提供価値（What）</div><div class="ct-card-body">専門性に裏打ちされたアイケアで、視界と身体の状態を整え、人生の質を高める。</div></div>
+          </div>
+        </div>
+        <div style="background:var(--navy-pale);padding:24px;display:flex;flex-direction:column;gap:14px;">
+          <div style="font-size:14px;letter-spacing:.16em;color:var(--gray-400);">BRAND VALUES</div>
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div style="display:flex;gap:16px;"><div style="width:3px;min-height:56px;background:var(--navy);flex-shrink:0;"></div><div><div style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:4px;">視界を整える</div><div style="font-size:16px;color:var(--gray-600);line-height:1.7;font-weight:300;">眼の状態を本来あるべき姿へ</div></div></div>
+            <div style="display:flex;gap:16px;"><div style="width:3px;min-height:56px;background:var(--navy);flex-shrink:0;"></div><div><div style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:4px;">探求し続ける</div><div style="font-size:16px;color:var(--gray-600);line-height:1.7;font-weight:300;">研究・実践・進化を止めない姿勢</div></div></div>
+            <div style="display:flex;gap:16px;"><div style="width:3px;min-height:56px;background:var(--navy);flex-shrink:0;"></div><div><div style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:4px;">人生の質につなげる</div><div style="font-size:16px;color:var(--gray-600);line-height:1.7;font-weight:300;">ケアの先にある豊かな日常</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">06</span>
+</div>
+
+<!-- PAGE 7: CH03 DIVIDER -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 03</span><div class="ch-left-body"><div class="ch-num-bg">03</div><div class="ch-title">ブランドの<br>独自性</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 03</span><div class="ch-title-en">BRAND UNIQUENESS</div><div class="ch-desc">ラボであることの意味。一般的な整体院やリラクゼーションとは異なる、アイケアLaBoの立ち位置。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">07</span>
+</div>
+
+<!-- PAGE 8: ブランドの独自性 -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 03</span><div class="ct-vdiv"></div><div class="ct-h1">ブランドの独自性</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div class="ct-grid-2" style="gap:20px;align-items:start;">
+        <div>
+          <div class="ct-h2">「ラボ」であることの意味</div>
+          <p class="ct-p">アイケアLaBoの「ラボ（Lab）」は、<b>探求・研究・実験・進化</b>を続ける場所という、ブランドの姿勢そのものです。一人ひとりの眼の状態を観察し、最善を追求し続ける専門的な態度を意味します。</p>
+          <div class="ct-grid-3" style="margin-top:20px;gap:16px;">
+            <div style="background:var(--navy);padding:24px 20px;color:#fff;"><div style="font-size:32px;opacity:.3;font-weight:700;margin-bottom:10px;">01</div><div style="font-size:18px;font-weight:600;margin-bottom:8px;">探求心</div><div style="font-size:15px;line-height:1.7;opacity:.65;font-weight:300;">答えを決めつけず、常により良い方法を探し続ける姿勢。</div></div>
+            <div style="background:var(--navy-mid);padding:24px 20px;color:#fff;"><div style="font-size:32px;opacity:.3;font-weight:700;margin-bottom:10px;">02</div><div style="font-size:18px;font-weight:600;margin-bottom:8px;">研究心</div><div style="font-size:15px;line-height:1.7;opacity:.65;font-weight:300;">根拠に基づく施術と、知識のアップデートを欠かさない専門性。</div></div>
+            <div style="background:var(--navy-light);padding:24px 20px;color:#fff;"><div style="font-size:32px;opacity:.3;font-weight:700;margin-bottom:10px;">03</div><div style="font-size:18px;font-weight:600;margin-bottom:8px;">熱意</div><div style="font-size:15px;line-height:1.7;opacity:.65;font-weight:300;">目のケアを通じて、人の生活を本気で変えたいという信念。</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="ct-h2">他との違い</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:var(--gray-50);padding:24px;border-top:3px solid var(--gray-200);"><div style="font-size:14px;letter-spacing:.1em;color:var(--gray-400);margin-bottom:12px;">一般的な整体院・リラクゼーション</div><div style="font-size:16px;line-height:1.8;color:var(--gray-600);font-weight:300;">・リラクゼーション・癒しが主目的<br>・施術の標準化を重視<br>・視界改善への専門的アプローチは限定的</div></div>
+            <div style="background:var(--navy-pale);padding:24px;border-top:3px solid var(--navy);"><div style="font-size:14px;letter-spacing:.1em;color:var(--navy-light);margin-bottom:12px;">アイケアLaBo</div><div style="font-size:16px;line-height:1.8;color:var(--navy);font-weight:500;">・視界の本質的な改善が目的<br>・個別の状態への深い観察と対応<br>・常に探求・更新し続ける専門家集団<br>・「眼の整体院」という新カテゴリを定義</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">08</span>
+</div>
+
+<!-- PAGE 9: CH04 DIVIDER — ロゴ -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 04</span><div class="ch-left-body"><div class="ch-num-bg">04</div><div class="ch-title">ロゴ</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 04</span><div class="ch-title-en">LOGO GUIDELINES</div><div class="ch-desc">ロゴの基本使用・クリアスペース・使用例と禁止例を定義します。ロゴはブランドの顔。一貫した使用を徹底してください。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">09</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PAGE 10: ロゴ基本使用
+══════════════════════════════════════════ -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 04</span><div class="ct-vdiv"></div><div class="ct-h1">ロゴ 基本使用・余白</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div class="ct-grid-2" style="gap:20px;flex:0 0 auto;">
+        <div>
+          <div class="ct-h2">基本ロゴ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <!-- White bg: on-light logo -->
+            <div>
+              <div class="logo-box logo-box-white" style="height:240px;">
+                <div data-logo-type="on-light" class="logo-target logo-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <svg class="def-svg" width="44" height="27" viewBox="0 0 44 27" fill="none">
+                    <path d="M2 13.5C10 2 34 2 42 13.5C34 25 10 25 2 13.5Z" stroke="#0C1D3F" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="6" stroke="#0C1D3F" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="2.2" fill="#0C1D3F"/>
+                  </svg>
+                  <div class="logo-name-dark">アイケアLaBo</div>
+                  <div class="logo-en">AICARE LAB</div>
+                </div>
+              </div>
+              <div class="logo-sample-label">白背景（推奨）</div>
+            </div>
+            <!-- Navy bg: on-dark logo -->
+            <div>
+              <div class="logo-box logo-box-navy" style="height:240px;">
+                <div data-logo-type="on-dark" class="logo-target logo-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <svg class="def-svg" width="44" height="27" viewBox="0 0 44 27" fill="none">
+                    <path d="M2 13.5C10 2 34 2 42 13.5C34 25 10 25 2 13.5Z" stroke="rgba(255,255,255,.8)" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="6" stroke="rgba(255,255,255,.8)" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="2.2" fill="rgba(255,255,255,.8)"/>
+                  </svg>
+                  <div class="logo-name-light">アイケアLaBo</div>
+                  <div class="logo-en-light">AICARE LAB</div>
+                </div>
+              </div>
+              <div class="logo-sample-label">紺背景</div>
+            </div>
+            <!-- Gray bg: on-light logo -->
+            <div>
+              <div class="logo-box logo-box-gray" style="height:240px;">
+                <div data-logo-type="on-light" class="logo-target logo-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <svg class="def-svg" width="44" height="27" viewBox="0 0 44 27" fill="none">
+                    <path d="M2 13.5C10 2 34 2 42 13.5C34 25 10 25 2 13.5Z" stroke="#0C1D3F" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="6" stroke="#0C1D3F" stroke-width="1.3" fill="none"/>
+                    <circle cx="22" cy="13.5" r="2.2" fill="#0C1D3F"/>
+                  </svg>
+                  <div class="logo-name-dark">アイケアLaBo</div>
+                  <div class="logo-en">AICARE LAB</div>
+                </div>
+              </div>
+              <div class="logo-sample-label">グレー背景</div>
+            </div>
+          </div>
+        </div>
+        <!-- Clear space -->
+        <div>
+          <div class="ct-h2">クリアスペース（保護エリア）</div>
+          <p class="ct-p" style="margin-bottom:12px;">ロゴ高さの<b>1/2（x）</b>以上の余白を周囲に確保。この範囲内に他の要素を配置してはいけません。</p>
+          <div class="clearspace-box" style="height:240px;">
+            <!-- clearspace uses on-light logo (mark only, no logotype) -->
+            <div data-logo-type="on-light" class="logo-target logo-ph" style="display:flex;align-items:center;justify-content:center;">
+              <svg class="def-svg" width="80" height="49" viewBox="0 0 80 49" fill="none">
+                <path d="M2 24.5C16 4 64 4 78 24.5C64 45 16 45 2 24.5Z" stroke="var(--navy)" stroke-width="2" fill="none"/>
+                <circle cx="40" cy="24.5" r="11" stroke="var(--navy)" stroke-width="2" fill="none"/>
+                <circle cx="40" cy="24.5" r="4" fill="var(--navy)"/>
+              </svg>
+            </div>
+            <span class="cs-label cs-label-top">x</span>
+            <span class="cs-label cs-label-bottom">x</span>
+            <span class="cs-label cs-label-left">x</span>
+            <span class="cs-label cs-label-right">x</span>
+          </div>
+        </div>
+      </div>
+      <!-- OK/NG -->
+      <div>
+        <div class="ct-h2">正しい使用例・誤った使用例</div>
+        <div class="ok-ng-grid">
+          <div class="ok-box"><div class="ok-label">✓ OK</div><div class="ok-ng-text">白または紺背景にブランドカラーのロゴを使用</div></div>
+          <div class="ng-box"><div class="ng-label">✕ NG</div><div class="ok-ng-text">ロゴを拡大・縦横比を変えて変形する</div></div>
+          <div class="ok-box"><div class="ok-label">✓ OK</div><div class="ok-ng-text">コントラストが十分に確保されている背景への使用</div></div>
+          <div class="ng-box"><div class="ng-label">✕ NG</div><div class="ok-ng-text">ブランドカラー以外の色でロゴを表示する</div></div>
+          <div class="ok-box"><div class="ok-label">✓ OK</div><div class="ok-ng-text">クリアスペースを確保した状態での使用</div></div>
+          <div class="ng-box"><div class="ng-label">✕ NG</div><div class="ok-ng-text">ロゴに影・グラデーション・装飾を追加する</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">10</span>
+</div>
+
+<!-- PAGE 11: CH05 DIVIDER — カラー -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 05</span><div class="ch-left-body"><div class="ch-num-bg">05</div><div class="ch-title">カラー</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 05</span><div class="ch-title-en">COLOR SYSTEM</div><div class="ch-desc">ブランドカラーは、アイケアLaBoの世界観そのものです。紺と白の組み合わせが持つ意味と、正しい使い方を定義します。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">11</span>
+</div>
+
+<!-- PAGE 12: カラー定義 -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 05</span><div class="ct-vdiv"></div><div class="ct-h1">ブランドカラー</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px;flex:0 0 auto;">
+        <div><div class="color-swatch-lg swatch-navy"><div><div class="color-name color-name-light">ブランドネイビー</div><div class="color-code color-code-light">#0C1D3F</div></div></div><div class="color-info-label">カラー値</div><table class="color-info-table"><tr><td>HEX</td><td>#0C1D3F</td></tr><tr><td>RGB</td><td>R12 / G29 / B63</td></tr><tr><td>CMYK</td><td>C81 M54 Y0 K75（参考値）</td></tr></table></div>
+        <div><div class="color-swatch-lg swatch-white"><div><div class="color-name color-name-dark" style="font-size:11px;">ブランドホワイト</div><div class="color-code color-code-dark">#FFFFFF</div></div></div><div class="color-info-label">カラー値</div><table class="color-info-table"><tr><td>HEX</td><td>#FFFFFF</td></tr><tr><td>RGB</td><td>R255 / G255 / B255</td></tr><tr><td>CMYK</td><td>C0 M0 Y0 K0</td></tr></table></div>
+        <div><div class="color-swatch-lg swatch-gray"><div><div class="color-name color-name-dark" style="font-size:11px;">補助グレー</div><div class="color-code color-code-dark">#F0F1F5</div></div></div><div class="color-info-label">カラー値</div><table class="color-info-table"><tr><td>HEX</td><td>#F0F1F5</td></tr><tr><td>RGB</td><td>R240 / G241 / B245</td></tr><tr><td>CMYK</td><td>C2 M1 Y0 K4</td></tr></table></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px;">
+        <div class="color-role"><b>ブランドネイビー</b><br>上質さ・品格・信頼感・専門性を表現。アイケアLaBoのアイデンティティを体現する中心色。</div>
+        <div class="color-role"><b>ブランドホワイト</b><br>清潔感・誠実さ・透明性を表現。紺とのコントラストでラボ感と上質さを演出。</div>
+        <div class="color-role"><b>補助グレー</b><br>背景・区切り・補助情報に使用。使用頻度は最低限に抑える。</div>
+      </div>
+      <div>
+        <div class="ct-h3">カラー使用比率の考え方</div>
+        <div style="display:flex;height:36px;border:1px solid var(--gray-200);overflow:hidden;border-radius:2px;">
+          <div style="width:55%;background:#fff;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--gray-200);"><span style="font-size:14px;color:var(--gray-400);letter-spacing:.06em;">白 55%</span></div>
+          <div style="width:35%;background:var(--navy);display:flex;align-items:center;justify-content:center;"><span style="font-size:14px;color:#fff;letter-spacing:.06em;">紺 35%</span></div>
+          <div style="width:10%;background:var(--gray-100);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;color:var(--gray-600);">補 10%</span></div>
+        </div>
+        <div style="font-size:15px;color:var(--gray-600);margin-top:8px;font-weight:300;line-height:1.7;">白を基調に紺でアクセントをつける構成が基本。補助グレーは最小限に。</div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">12</span>
+</div>
+
+<!-- PAGE 13: CH06 DIVIDER — タイポグラフィ -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 06</span><div class="ch-left-body"><div class="ch-num-bg">06</div><div class="ch-title">タイポ<br>グラフィ</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 06</span><div class="ch-title-en">TYPOGRAPHY</div><div class="ch-desc">A1ゴシックをロゴ・メインに、ヒラギノ角ゴシックを本文・UIに使い分けます。2書体の役割を明確にし、一貫したタイポグラフィを体系化します。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">13</span>
+</div>
+
+<!-- PAGE 14: タイポグラフィ -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 06</span><div class="ct-vdiv"></div><div class="ct-h1">タイポグラフィ</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div class="ct-grid-2" style="gap:20px;flex:0 0 auto;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <!-- 書体01: A1ゴシック -->
+          <div style="border:1px solid var(--gray-100);padding:22px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="background:var(--navy);color:#fff;font-size:12px;letter-spacing:.1em;padding:4px 10px;border-radius:2px;">01</div>
+              <div style="font-size:14px;letter-spacing:.14em;color:var(--gray-400);">ロゴ・メイン</div>
+            </div>
+            <div style="font-size:28px;font-weight:700;color:var(--navy);font-family:'A1ゴシック','A1Gothic',sans-serif;margin-bottom:2px;">A1ゴシック</div>
+            <div style="font-size:14px;color:var(--gray-400);margin-bottom:14px;">ロゴ・メインタイトル・ブランドキーワード・章タイトル</div>
+            <div style="border-top:1px solid var(--gray-100);padding-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:14px;color:var(--gray-400);width:44px;">W7</span><span style="font-size:22px;font-weight:700;color:var(--navy);font-family:'A1ゴシック','A1Gothic',sans-serif;">視界を整える</span></div>
+              <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:14px;color:var(--gray-400);width:44px;">W4</span><span style="font-size:22px;font-weight:400;color:var(--navy);font-family:'A1ゴシック','A1Gothic',sans-serif;">眼の整体院</span></div>
+            </div>
+          </div>
+          <!-- 書体02: ヒラギノ角ゴシック -->
+          <div style="border:1px solid var(--gray-100);padding:22px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="background:var(--gray-400);color:#fff;font-size:12px;letter-spacing:.1em;padding:4px 10px;border-radius:2px;">02</div>
+              <div style="font-size:14px;letter-spacing:.14em;color:var(--gray-400);">本文・UI・その他</div>
+            </div>
+            <div style="font-size:28px;font-weight:700;color:var(--navy);font-family:'Hiragino Sans','ヒラギノ角ゴ ProN',sans-serif;margin-bottom:2px;">ヒラギノ角ゴシック</div>
+            <div style="font-size:14px;color:var(--gray-400);margin-bottom:14px;">本文・説明文・UI・キャプション・注釈</div>
+            <div style="border-top:1px solid var(--gray-100);padding-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:14px;color:var(--gray-400);width:44px;">W6</span><span style="font-size:22px;font-weight:600;color:var(--navy);font-family:'Hiragino Sans',sans-serif;">ブランドコンセプト</span></div>
+              <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:14px;color:var(--gray-400);width:44px;">W3</span><span style="font-size:18px;font-weight:300;color:var(--gray-800);font-family:'Hiragino Sans',sans-serif;line-height:1.8;">視界を整えることで、人生の質が変わる。</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:14px;letter-spacing:.16em;color:var(--gray-400);margin-bottom:10px;">サイズ・階層設計</div>
+          <div style="border:1px solid var(--gray-100);padding:24px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--gray-100);padding-bottom:14px;"><span style="font-size:14px;color:var(--gray-400);width:120px;flex-shrink:0;">Display / 48px<br><span style="color:var(--navy);font-weight:600;">A1ゴシック</span></span><span style="font-size:44px;font-weight:700;color:var(--navy);font-family:'A1ゴシック','A1Gothic',sans-serif;">視界を整える</span></div>
+            <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--gray-100);padding-bottom:14px;"><span style="font-size:14px;color:var(--gray-400);width:120px;flex-shrink:0;">H1 / 28–32px<br><span style="color:var(--navy);font-weight:600;">A1ゴシック</span></span><span style="font-size:28px;font-weight:600;color:var(--navy);font-family:'A1ゴシック','A1Gothic',sans-serif;">眼の整体院</span></div>
+            <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--gray-100);padding-bottom:14px;"><span style="font-size:14px;color:var(--gray-400);width:120px;flex-shrink:0;">H2 / 18–22px<br><span style="color:var(--gray-400);">ヒラギノ</span></span><span style="font-size:22px;font-weight:600;color:var(--navy);font-family:'Hiragino Sans',sans-serif;">ブランドコンセプト</span></div>
+            <div style="display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--gray-100);padding-bottom:14px;"><span style="font-size:14px;color:var(--gray-400);width:120px;flex-shrink:0;">Body / 13–14px<br><span style="color:var(--gray-400);">ヒラギノ</span></span><span style="font-size:18px;font-weight:300;color:var(--gray-800);line-height:1.9;font-family:'Hiragino Sans',sans-serif;">アイケアLaBoは、視界と身体の探求を続けるブランドです。</span></div>
+            <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-size:14px;color:var(--gray-400);width:120px;flex-shrink:0;">Caption / 10px<br><span style="color:var(--gray-400);">ヒラギノ</span></span><span style="font-size:15px;font-weight:300;color:var(--gray-400);letter-spacing:.1em;font-family:'Hiragino Sans',sans-serif;">補足・ラベル・注釈テキスト</span></div>
+          </div>
+        </div>
+      </div>
+      <div><div class="ct-h3">文字組みの基本原則</div>
+        <div class="ct-grid-3">
+          <div style="background:var(--gray-50);padding:20px 22px;font-size:16px;line-height:1.75;color:var(--gray-700);font-weight:300;"><b style="color:var(--navy);font-size:14px;letter-spacing:.08em;display:block;margin-bottom:6px;">書体の使い分け</b>A1ゴシック＝ロゴ・メイン。ヒラギノ角ゴシック＝本文・UI・その他。混在させず、役割で明確に切り替える。</div>
+          <div style="background:var(--gray-50);padding:20px 22px;font-size:16px;line-height:1.75;color:var(--gray-700);font-weight:300;"><b style="color:var(--navy);font-size:14px;letter-spacing:.08em;display:block;margin-bottom:6px;">行間・字間</b>本文行間 1.9〜2.0em。見出し行間 1.2〜1.4em。ラベル字間 0.12〜0.2em で品格を演出。</div>
+          <div style="background:var(--gray-50);padding:20px 22px;font-size:16px;line-height:1.75;color:var(--gray-700);font-weight:300;"><b style="color:var(--navy);font-size:14px;letter-spacing:.08em;display:block;margin-bottom:6px;">禁則</b>句読点・括弧の行頭禁止。段落冒頭の字下げは不要（ブロック余白で区切る）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">14</span>
+</div>
+
+<!-- PAGE 15: CH07 DIVIDER — 言葉 -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 07</span><div class="ch-left-body"><div class="ch-num-bg">07</div><div class="ch-title">言葉の<br>ガイドライン</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 07</span><div class="ch-title-en">LANGUAGE GUIDELINES</div><div class="ch-desc">アイケアLaBoが使うべき言葉、避けるべき言葉。「眼の整体院」という概念を育てる言語設計を定義します。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">15</span>
+</div>
+
+<!-- PAGE 16: 言葉のガイドライン -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 07</span><div class="ct-vdiv"></div><div class="ct-h1">言葉のガイドライン</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div><div class="ct-h2">コアボキャブラリー</div>
+        <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:8px;">
+          <div class="lang-word-chip">眼の整体院</div><div class="lang-word-chip">視界を整える</div><div class="lang-word-chip">アイケア</div><div class="lang-word-chip">探求</div><div class="lang-word-chip">専門性</div><div class="lang-word-chip">ラボ</div><div class="lang-word-chip">状態を整える</div><div class="lang-word-chip">人生の質</div><div class="lang-word-chip">視界</div>
+        </div>
+      </div>
+      <div class="ct-grid-2" style="gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="ct-h2">使うべき言葉・表現</div>
+          <div class="lang-ok"><div class="lang-item-label">✓ 推奨</div><div class="lang-item-text">「視界を整える」「眼の状態を整える」</div></div>
+          <div class="lang-ok"><div class="lang-item-label">✓ 推奨</div><div class="lang-item-text">「探求し続ける」「根拠に基づいたケア」</div></div>
+          <div class="lang-ok"><div class="lang-item-label">✓ 推奨</div><div class="lang-item-text">「人生の質につながるアイケア」</div></div>
+          <div class="lang-ok"><div class="lang-item-label">✓ 推奨</div><div class="lang-item-text">「専門的な眼のケア」「ラボとして研究する」</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="ct-h2">避けるべき言葉・表現</div>
+          <div class="lang-ng"><div class="lang-item-label">✕ 非推奨</div><div class="lang-item-text">「癒し」「リラックス」「気持ちいい」</div></div>
+          <div class="lang-ng"><div class="lang-item-label">✕ 非推奨</div><div class="lang-item-text">「安い」「お得」「割引」（価格訴求の多用）</div></div>
+          <div class="lang-ng"><div class="lang-item-label">✕ 非推奨</div><div class="lang-item-text">「目が楽になる」のみの表現（浅い）</div></div>
+          <div class="lang-ng"><div class="lang-item-label">✕ 非推奨</div><div class="lang-item-text">「整体」単体（「眼の整体院」と組み合わせて使う）</div></div>
+        </div>
+      </div>
+      <div class="ct-highlight"><div class="ct-hl-label">LANGUAGE PRINCIPLE</div><div class="ct-hl-text">「眼の整体院」という概念を、言葉で社会に定着させていく。</div><div class="ct-hl-sub">すべての文章・コピー・SNS投稿において、この軸をぶらさないこと。言葉の積み重ねが、ブランドの認知をつくります。</div></div>
+    </div>
+  </div>
+  <span class="pg-num">16</span>
+</div>
+
+<!-- PAGE 17: CH08 DIVIDER — 写真 -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 08</span><div class="ch-left-body"><div class="ch-num-bg">08</div><div class="ch-title">写真・<br>ビジュアル<br>方針</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 08</span><div class="ch-title-en">VISUAL GUIDELINES</div><div class="ch-desc">ラボ感・専門性・清潔感・上質さを視覚的に伝えるための写真トーン・被写体・グラフィックの方針を定めます。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">17</span>
+</div>
+
+<!-- PAGE 18: 写真・ビジュアル方針 -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 08</span><div class="ct-vdiv"></div><div class="ct-h1">写真・ビジュアル方針</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div class="ct-grid-2" style="gap:20px;align-items:start;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><div class="ct-h2">写真トーン</div><div style="display:flex;height:56px;border-radius:2px;overflow:hidden;margin-bottom:12px;"><div style="flex:1;background:#D4DDE8;"></div><div style="flex:1;background:#C8D4E0;"></div><div style="flex:1;background:#BCC8D8;"></div><div style="flex:1;background:#B0BED0;"></div><div style="flex:1;background:#A4B4C8;display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;color:#fff;letter-spacing:.08em;">基準</span></div></div><p class="ct-p">ブルーベースのクールトーン・自然光・高輝度・低彩度が基本。暖色・過剰コントラストは避ける。</p></div>
+          <div><div class="ct-h3">グラフィック・あしらいの方向性</div>
+            <div class="ct-grid-3" style="gap:14px;">
+              <div style="background:var(--navy);padding:20px;color:#fff;"><div style="font-size:14px;opacity:.5;margin-bottom:8px;">図解</div><div style="font-size:15px;line-height:1.7;opacity:.8;font-weight:300;">シンプルな線・円を使ったミニマルな説明図</div></div>
+              <div style="background:var(--gray-100);padding:20px;"><div style="font-size:14px;color:var(--gray-400);margin-bottom:8px;">アイコン</div><div style="font-size:15px;line-height:1.7;color:var(--gray-600);font-weight:300;">細め・シャープな線画アイコンに統一</div></div>
+              <div style="background:var(--navy-pale);padding:20px;"><div style="font-size:14px;color:var(--gray-400);margin-bottom:8px;">装飾</div><div style="font-size:15px;line-height:1.7;color:var(--gray-600);font-weight:300;">過剰な装飾はNG。余白と線で上質さを演出</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;">
+          <div class="vis-do"><div class="vis-col-label">✓ 推奨するビジュアル</div><div class="vis-item-row"><div class="vis-dot-ok"></div><div class="vis-item-text">白・紺・ライトグレーが基調の清潔感ある空間写真</div></div><div class="vis-item-row"><div class="vis-dot-ok"></div><div class="vis-item-text">専門的な道具・機器・施術シーンの丁寧な撮影</div></div><div class="vis-item-row"><div class="vis-dot-ok"></div><div class="vis-item-text">自然光またはスタジオライトで撮影した明るい写真</div></div><div class="vis-item-row"><div class="vis-dot-ok"></div><div class="vis-item-text">余白を活かした構図・俯瞰やフラットレイ</div></div><div class="vis-item-row"><div class="vis-dot-ok"></div><div class="vis-item-text">信頼感を伝える施術者の表情・手元の写真</div></div></div>
+          <div class="vis-dont"><div class="vis-col-label">✕ 避けるビジュアル</div><div class="vis-item-row"><div class="vis-dot-ng"></div><div class="vis-item-text">暖色系の柔らかい光・オレンジ・黄みがかったトーン</div></div><div class="vis-item-row"><div class="vis-dot-ng"></div><div class="vis-item-text">一般的な整体院・マッサージ店らしい雰囲気</div></div><div class="vis-item-row"><div class="vis-dot-ng"></div><div class="vis-item-text">過剰なフィルター・彩度が高すぎる写真</div></div><div class="vis-item-row"><div class="vis-dot-ng"></div><div class="vis-item-text">暗すぎる・ぼんやりした低品質な写真</div></div><div class="vis-item-row"><div class="vis-dot-ng"></div><div class="vis-item-text">汎用的すぎるストックフォトの無加工使用</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num">18</span>
+</div>
+
+<!-- PAGE 19: CH09 DIVIDER — 展開方針 -->
+<div class="pg pg-ch">
+  <div class="ch-left"><span class="ch-tag">CHAPTER 09</span><div class="ch-left-body"><div class="ch-num-bg">09</div><div class="ch-title">展開<br>方針</div></div></div>
+  <div class="ch-right">
+    <div class="ch-right-top"><div data-logo-type="mark" class="logo-target" style="width:52px;height:32px;display:flex;align-items:center;justify-content:center;opacity:.25;"><svg class="def-svg" width="52" height="32" viewBox="0 0 32 20" fill="none"><path d="M1 10C8 2 24 2 31 10C24 18 8 18 1 10Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="4.5" stroke="#fff" stroke-width="1" fill="none"/><circle cx="16" cy="10" r="1.8" fill="#fff"/></svg></div></div>
+    <div class="ch-right-body"><div class="ch-rule"></div><span class="ch-num-small">Chapter 09</span><div class="ch-title-en">BRAND ROLLOUT</div><div class="ch-desc">Web・SNS・店舗・配布物など、すべての接点においてアイケアLaBoのブランドを一貫して体験させるための指針です。</div></div>
+  </div>
+  <span class="pg-num pg-num-light">19</span>
+</div>
+
+<!-- PAGE 20: 展開方針 -->
+<div class="pg pg-content">
+  <div class="ct-inner">
+    <div class="ct-header"><span class="ct-ch-label">Ch. 09</span><div class="ct-vdiv"></div><div class="ct-h1">展開方針</div></div>
+    <div class="ct-rule"></div>
+    <div class="ct-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;flex:0 0 auto;">
+        <div class="rollout-card"><div style="width:40px;height:40px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1" stroke="#fff" stroke-width="1"/><line x1="1" y1="4" x2="11" y2="4" stroke="#fff" stroke-width="1"/></svg></div><div class="rollout-title">Web サイト</div><ul class="rollout-list"><li>白地・紺アクセントのクリーンなレイアウト</li><li>「眼の整体院」をファーストビューで明示</li><li>専門性・探求心を伝えるコンテンツ設計</li><li>SEOは「眼の整体院」概念認知から構築</li></ul></div>
+        <div class="rollout-card"><div style="width:40px;height:40px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="3" cy="6" r="1.5" stroke="#fff" stroke-width="1"/><circle cx="9" cy="2.5" r="1.5" stroke="#fff" stroke-width="1"/><circle cx="9" cy="9.5" r="1.5" stroke="#fff" stroke-width="1"/><line x1="4.5" y1="5.3" x2="7.5" y2="3.5" stroke="#fff" stroke-width="1"/><line x1="4.5" y1="6.7" x2="7.5" y2="8.5" stroke="#fff" stroke-width="1"/></svg></div><div class="rollout-title">SNS</div><ul class="rollout-list"><li>投稿ビジュアルは紺・白・グレートーン統一</li><li>#眼の整体院 を必ず使用</li><li>専門知識・探求の背景を発信</li><li>リラクゼーション訴求ではなく専門性訴求</li></ul></div>
+        <div class="rollout-card"><div style="width:40px;height:40px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 5.5L6 2L10 5.5V11H2V5.5Z" stroke="#fff" stroke-width="1" fill="none"/><rect x="4.5" y="7.5" width="3" height="3.5" stroke="#fff" stroke-width="1"/></svg></div><div class="rollout-title">店舗サイン・空間</div><ul class="rollout-list"><li>外看板・内装はネイビー×白を基調</li><li>ロゴのクリアスペースを必ず確保</li><li>照明：白色系・清潔感ある明るさを維持</li><li>「ラボ」の空気感を空間で体現</li></ul></div>
+        <div class="rollout-card"><div style="width:40px;height:40px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:8px;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1" width="9" height="10" rx="1" stroke="#fff" stroke-width="1"/><line x1="3.5" y1="4" x2="8.5" y2="4" stroke="#fff" stroke-width="1"/><line x1="3.5" y1="6.5" x2="8.5" y2="6.5" stroke="#fff" stroke-width="1"/><line x1="3.5" y1="9" x2="6.5" y2="9" stroke="#fff" stroke-width="1"/></svg></div><div class="rollout-title">名刺・配布物</div><ul class="rollout-list"><li>名刺：紺地×白、または白地×紺</li><li>ガイドライン準拠の書体を使用</li><li>「眼の整体院」を必ずどこかに入れる</li><li>過剰な装飾は避けシンプルさを優先</li></ul></div>
+      </div>
+      <div class="ct-highlight"><div class="ct-hl-label">CONSISTENCY RULE</div><div class="ct-hl-text">すべての接点でブランドを一致させること。ばらつきは、信頼を損ないます。</div><div class="ct-hl-sub">Web・SNS・店舗・配布物——どの接点から出会っても「アイケアLaBoらしい」と感じられる一貫性が、ブランドへの信頼を積み上げます。</div></div>
+    </div>
+  </div>
+  <span class="pg-num">20</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PAGE 21: CLOSING
+══════════════════════════════════════════ -->
+<div class="pg pg-closing">
+  <div class="closing-bg"></div>
+  <div class="closing-grid"></div>
+  <div class="closing-wm">眼</div>
+  <div class="closing-inner">
+    <div class="closing-left">
+      <span class="closing-tag">AICARE LAB — BRAND GUIDELINES 2026</span>
+      <div class="closing-main">眼の整体院＝<br>アイケアLaBo。<br>視界を整えることが、<br>人生を整えること。</div>
+      <div class="closing-footer">
+        <!-- Small mark on dark -->
+        <div data-logo-type="mark" class="logo-target" style="width:36px;height:22px;display:flex;align-items:center;justify-content:center;opacity:.45;">
+          <svg class="def-svg" width="36" height="22" viewBox="0 0 22 14" fill="none"><path d="M1 7C5 1.5 17 1.5 21 7C17 12.5 5 12.5 1 7Z" stroke="#fff" stroke-width="1" fill="none"/><circle cx="11" cy="7" r="3" stroke="#fff" stroke-width="1" fill="none"/><circle cx="11" cy="7" r="1.2" fill="#fff"/></svg>
+        </div>
+        <span class="closing-brand-name">アイケアLaBo</span>
+        <span class="closing-year" style="margin-left:auto;">© 2026 AICARE LAB</span>
+      </div>
+    </div>
+    <div class="closing-right">
+      <div class="closing-rule"></div>
+      <div class="closing-sub">このガイドラインは、アイケアLaBoというブランドの思想・表現・ルールを定めたものです。</div>
+      <div class="closing-sub">すべての制作・発信・空間において、このガイドラインを拠り所にしてください。ブランドは、一つひとつの積み重ねによって育ちます。</div>
+      <!-- Large logo on dark bg -->
+      <div data-logo-type="on-dark" class="logo-target" style="margin-top:18px;display:flex;align-items:center;justify-content:center;min-height:80px;">
+        <svg class="def-svg" width="100" height="60" viewBox="0 0 60 36" fill="none">
+          <path d="M2 18C12 3 48 3 58 18C48 33 12 33 2 18Z" stroke="rgba(255,255,255,.35)" stroke-width="1.2" fill="none"/>
+          <circle cx="30" cy="18" r="9" stroke="rgba(255,255,255,.35)" stroke-width="1.2" fill="none"/>
+          <circle cx="30" cy="18" r="3.5" fill="rgba(255,255,255,.35)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <span class="pg-num pg-num-light">21</span>
+</div>
+
+<script>
+// ── ロゴデータ（base64 → localStorage永続化）────
+const LS_KEYS = { 'on-dark': 'aicare_logo_ondark', 'on-light': 'aicare_logo_onlight', 'mark': 'aicare_logo_mark' };
+const logos = { 'on-dark': null, 'on-light': null, 'mark': null };
+let uploadedCount = 0;
+
+// ── ファイル選択ハンドラ ──────────────────────
+function onFileSelect(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const wasEmpty = !logos[type];
+    logos[type] = dataUrl;
+    // localStorageに保存（永続化）
+    try { localStorage.setItem(LS_KEYS[type], dataUrl); } catch(e) {}
+    if (wasEmpty) uploadedCount++;
+    updateSlotUI(type, dataUrl, file.name);
+    updateBar();
+    // アップロードしたらすぐ全ページ適用
+    applyAllLogos();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateSlotUI(type, url, name) {
+  const id = type.replace('-','');
+  const slot = document.getElementById('slot-' + id);
+  const prev = document.getElementById('prev-' + id);
+  const nameEl = document.getElementById('name-' + id);
+  slot.classList.add('has-file');
+  prev.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.maxWidth = '100%';
+  img.style.maxHeight = '100%';
+  img.style.objectFit = 'contain';
+  prev.appendChild(img);
+  const short = name && name.length > 16 ? name.slice(0,14) + '…' : (name || '登録済');
+  nameEl.textContent = short;
+}
+
+function updateBar() {
+  document.getElementById('ub-count').textContent = uploadedCount + ' / 3 登録済';
+  document.getElementById('ub-apply').disabled = uploadedCount === 0;
+}
+
+// ── 全ページに適用 ──────────────────────────
+function applyAllLogos() {
+  document.querySelectorAll('[data-logo-type]').forEach(el => {
+    const type = el.dataset.logoType;
+    const url = type === 'mark'
+      ? (logos.mark || logos['on-dark'])
+      : logos[type];
+    if (!url) return;
+
+    // ① SVGを非表示にする前にコンテナを計測
+    const rect = el.getBoundingClientRect();
+    el.querySelectorAll('.def-svg').forEach(s => s.style.display = 'none');
+
+    // ② imgをSVGがあった位置（先頭）に挿入
+    let img = el.querySelector('img.lg-img');
+    if (!img) {
+      img = document.createElement('img');
+      img.className = 'lg-img';
+      el.insertBefore(img, el.firstChild);
+    }
+    img.src = url;
+    img.style.display   = 'block';
+    img.style.objectFit = 'contain';
+    img.style.flexShrink = '0';
+
+    // ③ コンテナ種別に応じてサイズを決定（200%スケール）
+    const inlineW   = parseFloat(el.style.width);
+    const inlineH   = parseFloat(el.style.height);
+    const inlineMinH = parseFloat(el.style.minHeight);
+
+    if (inlineW > 0 && inlineH > 0) {
+      // 固定アイコン（章扉・表紙マーク・クロージングマーク）× 2
+      img.style.width    = (inlineW * 2) + 'px';
+      img.style.height   = (inlineH * 2) + 'px';
+      img.style.maxWidth = '';
+      img.style.maxHeight = '';
+    } else {
+      // フレキシブルエリア（表紙大ロゴ・クロージング・ロゴショーケース・クリアスペース）× 2
+      const maxH = inlineMinH > 0
+        ? inlineMinH * 2
+        : (rect.height > 0 ? Math.min(rect.height * 1.1, 144) : 112);
+      const maxW = rect.width > 0
+        ? Math.min(rect.width - 16, 400)
+        : 320;
+      img.style.width    = 'auto';
+      img.style.height   = 'auto';
+      img.style.maxHeight = Math.max(maxH, 40) + 'px';
+      img.style.maxWidth  = Math.max(maxW, 120) + 'px';
+    }
+  });
+}
+
+// ── リセット ────────────────────────────────
+function resetAll() {
+  Object.keys(logos).forEach(k => {
+    logos[k] = null;
+    try { localStorage.removeItem(LS_KEYS[k]); } catch(e) {}
+  });
+  uploadedCount = 0;
+  ['ondark','onlight','mark'].forEach(id => {
+    const slot = document.getElementById('slot-' + id);
+    slot.classList.remove('has-file');
+    const prev = document.getElementById('prev-' + id);
+    const cls = id === 'ondark' ? 'no-img' : 'no-img no-img-dark';
+    prev.innerHTML = `<div class="${cls}"></div>`;
+    const labels = {'ondark':'白ロゴ（紺背景用）','onlight':'紺ロゴ（白背景用）','mark':'シンボルマーク'};
+    document.getElementById('name-' + id).textContent = labels[id];
+    slot.querySelector('input[type=file]').value = '';
+  });
+  document.querySelectorAll('img.lg-img').forEach(img => img.remove());
+  document.querySelectorAll('.def-svg').forEach(svg => svg.style.display = '');
+  updateBar();
+}
+
+// ── 起動時: localStorageから復元して自動適用 ──
+(function restoreLogos() {
+  let restored = 0;
+  Object.entries(LS_KEYS).forEach(([type, key]) => {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      logos[type] = saved;
+      restored++;
+      uploadedCount++;
+      updateSlotUI(type, saved, '保存済');
+    }
+  });
+  updateBar();
+  if (restored > 0) {
+    // DOM構築後に適用
+    requestAnimationFrame(() => requestAnimationFrame(() => applyAllLogos()));
+  }
+})();
+</script>
+<script>
+(function scaleBook() {
+  function update() {
+    var scaler = document.getElementById('book-scaler');
+    var contentW = 1920 + 48; // page width + 24px * 2 padding
+    var scale = Math.min(1, window.innerWidth / contentW);
+    scaler.style.zoom = scale;
+  }
+  update();
+  window.addEventListener('resize', update);
+})();
+</script>
+</div><!-- /book-scaler -->
+</body>
+</html>

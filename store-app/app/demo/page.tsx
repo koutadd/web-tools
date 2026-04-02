@@ -69,6 +69,7 @@ export default function DemoPage() {
       <header style={{
         background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
         padding: '20px 16px 24px',
+        paddingTop: 'max(20px, calc(env(safe-area-inset-top, 0px) + 20px))',
         color: 'white',
       }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>

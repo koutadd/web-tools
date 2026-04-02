@@ -1264,6 +1264,19 @@
 </style>
 </head>
 <body>
+<!-- ── Aicare Nav ── -->
+<nav style="position:sticky;top:0;z-index:9999;background:#0D2B5E;border-bottom:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:2px;padding:7px 16px;font-family:system-ui,-apple-system,sans-serif;font-size:11px;letter-spacing:0.04em;flex-wrap:wrap;">
+  <a href="http://localhost:8766/persona-dashboard.html#positioning" style="color:rgba(255,255,255,0.55);text-decoration:none;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);white-space:nowrap;margin-right:8px;">← Hub</a>
+  <span style="color:rgba(255,255,255,0.2);padding:0 4px;">|</span>
+  <a href="/aicare-sitemap.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">サイトマップ</a>
+  <a href="/aicare-top-prototype.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">TOPプロト</a>
+  <a href="/aicare-brand-book.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ブランドブック</a>
+  <a href="/aicare-portfolio.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ポートフォリオ</a>
+  <a href="/aicare-lab365.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">Lab365</a>
+  <a href="/aicare-stores.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">店舗</a>
+  <a href="/aicare-vision-check.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">視力チェック</a>
+  <a href="/aicare-dashboard.html" style="color:rgba(255,255,255,0.7);text-decoration:none;padding:4px 10px;border-radius:4px;white-space:nowrap;">ダッシュボード</a>
+</nav>
 
 
 <div id="sp-top-header">
@@ -1653,7 +1666,7 @@
 
     <!-- Google Sheets から一括インポート -->
     <div class="sheets-import-row">
-      <input id="sheets-import-url" type="url" placeholder="スプレッドシートのURLを貼���付けて一括取得">
+      <input id="sheets-import-url" type="url" placeholder="スプレッドシートのURLを貼り付けて一括取得">
       <button id="sheets-import-btn">📊 Sheetsから取得</button>
     </div>
     <div class="sheets-preview" id="sheets-preview">
@@ -1675,7 +1688,7 @@
   <div class="modal" role="dialog">
     <div class="modal-title">
       <span id="modal-heading">Edit Work</span>
-      <button class="modal-close" id="modal-close">��</button>
+      <button class="modal-close" id="modal-close">×</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="field"><label>Name</label><input type="text" id="f-name" placeholder="Project Name"></div>
@@ -2364,7 +2377,8 @@ const GENRE_MAP = [
   { label: 'Web',          keys: ['サイト', 'アプリ'],                              color: '#1a5fbe', bg: '#eef4fd' },
 ];
 
-let genreOverrides = {};  // { [pdfItemKey]: ジャンルラベル }
+const LS_GENRE_OVERRIDES = 'aicare_genre_overrides_v1';
+let genreOverrides = JSON.parse(localStorage.getItem(LS_GENRE_OVERRIDES) || '{}');
 
 function pdfGenre(d) {
   const key = pdfItemKey(d);
@@ -2525,6 +2539,78 @@ function setPdfStore(store) {
   if (!store) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ── ジャンルピッカー ──────────────────────────────────────────────────
+let _activePicker = null;
+
+function openGenrePicker(itemId, btn, event) {
+  event.stopPropagation();
+
+  // 既存ピッカーを閉じる（同じボタンなら閉じるだけ）
+  if (_activePicker) {
+    const wasSame = _activePicker._itemId === itemId;
+    _activePicker.remove();
+    _activePicker = null;
+    if (wasSame) return;
+  }
+
+  const picker = document.createElement('div');
+  picker.className = 'genre-picker';
+  picker._itemId = itemId;
+  _activePicker = picker;
+
+  const labels = [...GENRE_MAP.map(g => g.label), 'その他'];
+  const current = genreOverrides[itemId];
+
+  labels.forEach(label => {
+    const b = document.createElement('button');
+    b.textContent = (label === current ? '✓ ' : '') + label;
+    b.onclick = (e) => {
+      e.stopPropagation();
+      genreOverrides[itemId] = label;
+      localStorage.setItem(LS_GENRE_OVERRIDES, JSON.stringify(genreOverrides));
+      picker.remove();
+      _activePicker = null;
+      renderPdfGallery();
+    };
+    picker.appendChild(b);
+  });
+
+  // リセットボタン
+  if (current) {
+    const sep = document.createElement('hr');
+    sep.style.cssText = 'border:none;border-top:1px solid #eee;margin:3px 0';
+    picker.appendChild(sep);
+    const reset = document.createElement('button');
+    reset.className = 'picker-reset';
+    reset.textContent = '↩ 自動判定に戻す';
+    reset.onclick = (e) => {
+      e.stopPropagation();
+      delete genreOverrides[itemId];
+      localStorage.setItem(LS_GENRE_OVERRIDES, JSON.stringify(genreOverrides));
+      picker.remove();
+      _activePicker = null;
+      renderPdfGallery();
+    };
+    picker.appendChild(reset);
+  }
+
+  // カードの .pdf-card-tags に追加（position: relative ありき）
+  const tagsEl = btn.closest('.pdf-card-tags');
+  tagsEl.appendChild(picker);
+
+  // 画面外にはみ出したら上方向に表示
+  const rect = picker.getBoundingClientRect();
+  if (rect.bottom > window.innerHeight) {
+    picker.style.bottom = '100%';
+    picker.style.top = 'auto';
+  }
+}
+
+// ピッカー外クリックで閉じる
+document.addEventListener('click', () => {
+  if (_activePicker) { _activePicker.remove(); _activePicker = null; }
+});
+
 // ── Sticky Nav scroll ──────────────────────────────────────────────────
 (function() {
   const THRESHOLD = 120;
@@ -2672,7 +2758,9 @@ function reqCardHtml(d) {
   // 納期（COL_TITLES[8] = '納期'）
   const deadline = fmtDate(String(d['納期'] || '').trim());
   const deadlineEl = deadline ? `<div class="req-card-deadline">📅 納期: ${esc(deadline)}</div>` : '';
-  const log    = reqLogs[d.row_id];
+  // request_id を唯一の更新キーとして使用（row_id へのフォールバック禁止）
+  const itemKey = d.request_id;
+  const log    = reqLogs[itemKey];
   const lastMsg = log && log.length ? esc(log[log.length-1].comment) : '';
   const lastComment = lastMsg ? `<div class="req-card-comment">💬 ${lastMsg}</div>` : '';
   // NEW バッジ: 依頼日から5日以内
@@ -2684,7 +2772,7 @@ function reqCardHtml(d) {
       newBadge = '<span class="req-new-badge">NEW</span>';
     }
   }
-  return `<div class="req-card" data-status="${esc(colL)}" onclick="openReqDrawer('${esc(d.row_id)}')">
+  return `<div class="req-card" data-status="${esc(colL)}" onclick="openReqDrawer('${esc(itemKey)}')">
     ${newBadge}
     <div class="req-card-title">${title}</div>
     <div class="req-card-store"><span class="req-row-id">#${esc(d.row_id)}</span>${store}</div>
@@ -2696,18 +2784,29 @@ function reqCardHtml(d) {
 }
 
 // 除外するキー（内部用・表示不要）
-const REQ_SKIP_KEYS = new Set(['row_id']);
+const REQ_SKIP_KEYS = new Set(['row_id', 'request_id']);
 
 async function updateReqStatus(status) {
   if (!currentReqId) return;
+  // request_id 形式チェック（row_id での更新を禁止）
+  if (!currentReqId.startsWith('req_')) {
+    alert('この依頼は request_id が未付与のため更新できません。\nページを再読み込みして再試行してください。');
+    return;
+  }
   try {
+    const item = reqItems.find(d => d.request_id === currentReqId);
     await fetch(GAS_API_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateStatus', rowId: currentReqId, status }),
+      body: JSON.stringify({
+        action: 'updateStatus',
+        requestId: currentReqId,
+        storeName: item ? (item.store_name || item['店舗'] || '') : '',
+        workName:  item ? (item.title || item['制作物'] || '') : '',
+        status,
+      }),
     });
     // ローカルキャッシュ更新
-    const item = reqItems.find(d => d.row_id === currentReqId);
     if (item) { item.col_l = status; item.status = status; }
     renderReqCards();
     // ヘッダー背景色を即時切り替え
@@ -2730,7 +2829,7 @@ async function updateReqStatus(status) {
 function updateDrawerArchiveBtn(colL) {
   const row = document.getElementById('rq-archive-btn-row');
   if (!row) return;
-  const item = reqItems.find(d => d.row_id === currentReqId);
+  const item = reqItems.find(d => d.request_id === currentReqId);
   const rawUrl = item ? String(item['制作完了データ(googleドライブURL)'] || item.drive_url || '').trim() : '';
   const folderUrl = rawUrl.startsWith('http') ? rawUrl : (rawUrl ? `https://drive.google.com/drive/folders/${rawUrl}` : '');
   let html = '';
@@ -2743,13 +2842,20 @@ function updateDrawerArchiveBtn(colL) {
   row.innerHTML = html;
 }
 
-async function openReqDrawer(rowId) {
-  currentReqId = rowId;
-  const item = reqItems.find(d => d.row_id === rowId);
+async function openReqDrawer(requestId) {
+  // request_id のみ受け付ける（row_id フォールバック禁止）
+  if (!requestId || !requestId.startsWith('req_')) {
+    console.warn('[openReqDrawer] request_id が未付与です:', requestId);
+    alert('この依頼は request_id が未付与のため開けません。\nページを再読み込みして再試行してください。');
+    return;
+  }
+  currentReqId = requestId;
+  const item = reqItems.find(d => d.request_id === requestId);
   if (!item) return;
 
   document.getElementById('rq-title').textContent = item.title || item.store_name || '';
-  document.getElementById('rq-meta').textContent  = ['#' + rowId, item.store_name, item.category].filter(Boolean).join(' · ');
+  // 表示用番号は row_id（表示専用・更新キーとして使わない）
+  document.getElementById('rq-meta').textContent  = ['#' + (item.row_id || '?'), item.store_name, item.category].filter(Boolean).join(' · ');
 
   // L列ステータスによるヘッダー背景色 + バッジ
   const colK = String(item.col_k || '').trim();
@@ -2782,8 +2888,8 @@ async function openReqDrawer(rowId) {
   // 全情報テーブル（A〜T列を全20列確実に表示）
   renderReqInfoView();
 
-  // メモ復元
-  const memo = localStorage.getItem(`reqMemo_${rowId}`) || '';
+  // メモ復元（request_id をキーに保存）
+  const memo = localStorage.getItem(`reqMemo_${requestId}`) || '';
   document.getElementById('rq-memo').value = memo;
   document.getElementById('rq-memo-saved').classList.remove('show');
 
@@ -2794,9 +2900,10 @@ async function openReqDrawer(rowId) {
   renderSlackForm();
 
   try {
-    const res = await fetch(`${GAS_API_URL}?mode=log&id=${encodeURIComponent(rowId)}`, { cache: 'no-store' });
-    reqLogs[rowId] = await res.json();
-    renderChat(rowId);
+    // ログ取得は request_id をキーに（GAS 側でマッチング）
+    const res = await fetch(`${GAS_API_URL}?mode=log&id=${encodeURIComponent(requestId)}`, { cache: 'no-store' });
+    reqLogs[requestId] = await res.json();
+    renderChat(requestId);
   } catch(e) {
     document.getElementById('req-chat').innerHTML = '<div style="font-size:0.75rem;color:var(--muted)">読み込みエラー</div>';
   }
@@ -2812,8 +2919,8 @@ function saveReqMemo() {
   memoTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-function renderChat(rowId) {
-  const logs = reqLogs[rowId] || [];
+function renderChat(requestId) {
+  const logs = reqLogs[requestId] || [];
   const chat = document.getElementById('req-chat');
   if (!logs.length) {
     chat.innerHTML = '<div class="pdf-loading" style="padding:20px;font-size:0.78rem">コメントはまだありません</div>';
@@ -2841,11 +2948,11 @@ async function sendComment() {
     await fetch(GAS_API_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment, author: '' }),
+      body: JSON.stringify({ action: 'addComment', requestId: currentReqId, comment, author: '' }),
     });
     input.value = '';
     if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
-    reqLogs[currentReqId].push({ row_id: currentReqId, comment, author: '', timestamp: new Date().toISOString() });
+    reqLogs[currentReqId].push({ request_id: currentReqId, comment, author: '', timestamp: new Date().toISOString() });
     renderChat(currentReqId);
     renderReqCards();
   } catch(e) {
@@ -2945,10 +3052,10 @@ async function _saveCommentLog(logText, author) {
   await fetch(GAS_API_URL, {
     method: 'POST', mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'addComment', rowId: currentReqId, comment: logText, author }),
+    body: JSON.stringify({ action: 'addComment', requestId: currentReqId, comment: logText, author }),
   });
   if (!reqLogs[currentReqId]) reqLogs[currentReqId] = [];
-  reqLogs[currentReqId].push({ row_id: currentReqId, comment: logText, author, timestamp: new Date().toISOString() });
+  reqLogs[currentReqId].push({ request_id: currentReqId, comment: logText, author, timestamp: new Date().toISOString() });
   renderChat(currentReqId);
   renderReqCards();
 }
@@ -3080,7 +3187,7 @@ closeDrawer = function() {
 let reqEditMode = false;
 
 function renderReqInfoView() {
-  const item = reqItems.find(d => d.row_id === currentReqId);
+  const item = reqItems.find(d => d.request_id === currentReqId);
   if (!item) return;
   const table = document.getElementById('rq-info-table');
   table.classList.remove('edit-mode');
@@ -3112,7 +3219,7 @@ function toggleReqEdit(event) {
 }
 
 function renderReqInfoEdit() {
-  const item = reqItems.find(d => d.row_id === currentReqId);
+  const item = reqItems.find(d => d.request_id === currentReqId);
   if (!item) return;
   const makers = [...new Set(reqItems.map(d => String(d['製作者'] || '').trim()).filter(m => m && !MAKER_EXCLUDE.has(m)))].sort();
   const table = document.getElementById('rq-info-table');
@@ -3156,17 +3263,29 @@ function renderReqInfoEdit() {
 }
 
 async function saveReqFields() {
+  // request_id 形式チェック（fail closed）
+  if (!currentReqId || !currentReqId.startsWith('req_')) {
+    alert('この依頼は request_id が未付与のため保存できません。\nページを再読み込みして再試行してください。');
+    return;
+  }
   const table = document.getElementById('rq-info-table');
   const saveBtn = document.getElementById('rq-save-btn');
   const fields = {};
   table.querySelectorAll('[name]').forEach(el => { fields[el.name] = el.value; });
 
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '保存中…'; }
+  const _it = reqItems.find(d => d.request_id === currentReqId);
   try {
     const res = await fetch(GAS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateFields', rowId: currentReqId, fields }),
+      body: JSON.stringify({
+        action: 'updateFields',
+        requestId: currentReqId,
+        storeName: _it ? (_it.store_name || _it['店舗'] || '') : '',
+        workName:  _it ? (_it.title || _it['制作物'] || '') : '',
+        fields,
+      }),
     });
     const json = await res.json().catch(() => ({}));
     if (json.error) throw new Error(json.error);
@@ -3177,7 +3296,7 @@ async function saveReqFields() {
   }
 
   // ローカルデータ更新
-  const item = reqItems.find(d => d.row_id === currentReqId);
+  const item = reqItems.find(d => d.request_id === currentReqId);
   if (item) {
     Object.assign(item, fields);
     item.title      = item['制作物'] || item['店舗'];
@@ -3278,9 +3397,16 @@ async function submitNewReq() {
     });
     const json = await res.json().catch(() => ({}));
     if (json.ok) {
+      // GAS が request_id を返さない場合はエラー（fail closed）
+      if (!json.requestId || !json.requestId.startsWith('req_')) {
+        document.getElementById('nrm-msg').textContent = 'エラー: GAS から request_id が返されませんでした。管理者に連絡してください。';
+        btn.disabled = false;
+        return;
+      }
       // ローカルに即追加して再描画
       const newItem = {
-        row_id: json.rowId || String(reqItems.length + 2),
+        row_id: json.rowNum ? String(json.rowNum) : '',  // 表示用のみ
+        request_id: json.requestId,  // GAS が返す request_id を必須で保持
         title: fields['制作物'],
         store_name: fields['店舗'],
         col_k: fields['優先度'],
@@ -3325,14 +3451,21 @@ let arcFolderName = '';
 let arcFolderIds = {}; // { mainId, outputId, nyukoMaeId, nyukoId, nyukoUrl }
 let arcFiles = { 1: [], 2: [], 3: [] };
 
-function openArchiveModal(rowId, event) {
+function openArchiveModal(requestId, event) {
   if (event) event.stopPropagation();
-  const item = reqItems.find(d => d.row_id === rowId);
+  // request_id 形式チェック（row_id での格納を禁止）
+  if (!requestId || !requestId.startsWith('req_')) {
+    alert('この依頼は request_id が未付与のため格納できません。\nページを再読み込みして再試行してください。');
+    return;
+  }
+  const item = reqItems.find(d => d.request_id === requestId);
   if (!item) return;
-  arcRowId = rowId;
+  arcRowId = requestId;  // arcRowId は request_id のみ保持（更新キー）
   const store = String(item.store_name || item['店舗'] || '').trim();
   const title = String(item.title || item['制作物'] || '').trim();
-  arcFolderName = [rowId, store, title].filter(Boolean).join('_');
+  // フォルダ名は表示用 row_id を使う（既存フォルダとの後方互換）
+  const displayId = item.row_id || requestId;
+  arcFolderName = [displayId, store, title].filter(Boolean).join('_');
   arcFiles = { 1: [], 2: [], 3: [] };
   arcFolderIds = {};
 
@@ -3523,11 +3656,16 @@ async function arcUpload(stepNum, nextStep) {
 async function arcWriteDriveUrl() {
   if (!arcRowId || !arcFolderIds.nyukoUrl) return;
   try {
-    const url = `${GAS_API_URL}?mode=writeDriveUrl&rowId=${encodeURIComponent(arcRowId)}&url=${encodeURIComponent(arcFolderIds.nyukoUrl)}`;
-    await fetch(url, { cache: 'no-store' });
-    const item = reqItems.find(d => d.row_id === arcRowId);
+    // arcRowId は request_id。GAS 側で request_id ベースで書き込む
+    const url = `${GAS_API_URL}?mode=writeDriveUrl&requestId=${encodeURIComponent(arcRowId)}&url=${encodeURIComponent(arcFolderIds.nyukoUrl)}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok === false) {
+      console.warn('[arcWriteDriveUrl] GAS 書き込み失敗:', data.error);
+    }
+    const item = reqItems.find(d => d.request_id === arcRowId);
     if (item) item['制作完了データ(googleドライブURL)'] = arcFolderIds.nyukoUrl;
-  } catch(e) { /* ignore */ }
+  } catch(e) { console.error('[arcWriteDriveUrl]', e); }
 }
 
 function arcSkip(nextStep) {
@@ -3539,12 +3677,14 @@ function arcSkip(nextStep) {
 }
 
 function arcGoStep4() {
-  const item = reqItems.find(d => d.row_id === arcRowId);
+  const item = reqItems.find(d => d.request_id === arcRowId);
   const store    = item ? (item.store_name || item['店舗'] || '') : '';
   const title    = item ? (item.title || item['制作物'] || '') : '';
   const nyukoUrl = arcFolderIds.nyukoUrl || '';
+  // メッセージは表示用 row_id を使う（request_id は内部キーのため非表示）
+  const displayId = item ? (item.row_id || '') : '';
   const lines = [
-    `${arcRowId}　${store}　${title}のデータを送付します！`,
+    `${displayId ? displayId + '　' : ''}${store}　${title}のデータを送付します！`,
     '',
     '格納先はこちらになりますので、ご査収ください！',
     nyukoUrl,
@@ -3892,6 +4032,12 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#hm-wrap')) closeHM();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHM(); });
+
+// ── リアルタイム自動保存 ──────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { try { saveProjects(); } catch(e) {} }
+});
+window.addEventListener('beforeunload', () => { try { saveProjects(); } catch(e) {} });
 </script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+[    1215ms] ReferenceError: SmartnewsAds is not defined
+    at <anonymous>:1:1
+    at https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:946:429
+    at https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:947:132
+    at vR (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:948:31)
+    at Ld.uR (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:945:92)
+    at Ld.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:336:187)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:261:466)
+    at hb (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:225:719)
+    at gb (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:225:470)
+    at Ld.<anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-52V9836:285:473)
+[    1797ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 465329601832605. @ https://connect.facebook.net/en_US/fbevents.js:175
+[    2075ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.curves.co.jp/ouchi/:0

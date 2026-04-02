@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フラッグシップ店 プランニング | アイケアラボ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --surface3: #2a2e42;
+      --border: #2e3350;
+      --border2: #3a3f5c;
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --muted2: #9ca3af;
+      --accent: #f59e0b;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --radius: 10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      padding: 36px 32px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .page-header-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .page-header h1 span.label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .page-header p.sub {
+      font-size: 0.85rem;
+      color: var(--muted2);
+      margin-top: 6px;
+    }
+    .save-status {
+      font-size: 0.75rem;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      padding: 6px 12px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 6px;
+    }
+    .save-status.visible { opacity: 1; }
+
+    /* ── Main Layout ── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ── Section Card ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header:hover { background: rgba(255,255,255,0.03); }
+
+    .section-header .icon {
+      font-size: 1.15rem;
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+    .section-header .item-count {
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+    .section-header .toggle-arrow {
+      color: var(--muted);
+      font-size: 0.75rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .section-card.collapsed .toggle-arrow { transform: rotate(-90deg); }
+    .section-card.collapsed .section-body { display: none; }
+
+    .section-body {
+      padding: 20px;
+    }
+
+    /* ── Textarea sections ── */
+    .free-textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      padding: 14px 16px;
+      resize: vertical;
+      min-height: 100px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .free-textarea:focus { border-color: var(--border2); }
+
+    /* ── Add Button ── */
+    .add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--muted2);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      font-family: inherit;
+      margin-top: 12px;
+    }
+    .add-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* ── Inline Add Form ── */
+    .add-form {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 12px;
+      display: none;
+    }
+    .add-form.open { display: block; }
+    .add-form .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .add-form .form-row:last-child { margin-bottom: 0; }
+    .add-form input, .add-form select, .add-form textarea {
+      flex: 1;
+      min-width: 120px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .add-form input:focus, .add-form select:focus, .add-form textarea:focus {
+      border-color: var(--accent);
+    }
+    .add-form select option { background: var(--surface3); }
+    .add-form .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-save {
+      padding: 7px 18px;
+      background: var(--accent);
+      border: none;
+      border-radius: 7px;
+      color: #1a1a1a;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-cancel {
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--muted2);
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.05); }
+
+    /* ── Status Badge ── */
+    .status-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .status-green { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+    .status-yellow { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+    .status-blue { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+
+    /* ── Items ── */
+    .item-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .item-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px 16px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+    .item-card:hover { border-color: var(--border2); }
+    .item-card:hover .item-delete { opacity: 1; }
+
+    .item-delete {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 5px;
+      color: #ef4444;
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+    .item-delete:hover { background: rgba(239,68,68,0.22); }
+
+    /* Editable fields */
+    .editable {
+      outline: none;
+      border-radius: 4px;
+      padding: 1px 3px;
+      margin: -1px -3px;
+      transition: background 0.15s;
+      cursor: text;
+    }
+    .editable:focus {
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 1px var(--border2);
+    }
+
+    /* Location cards */
+    .loc-area { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .loc-reason { font-size: 0.82rem; color: var(--muted2); margin-bottom: 8px; }
+    .loc-footer { display: flex; align-items: center; justify-content: space-between; }
+
+    /* Space items */
+    .space-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .space-desc { font-size: 0.82rem; color: var(--muted2); line-height: 1.55; }
+
+    /* Service items */
+    .svc-name { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .svc-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+    .svc-desc { font-size: 0.8rem; color: var(--muted2); }
+    .svc-price { font-size: 0.8rem; color: var(--accent); font-weight: 500; }
+
+    /* Staff items */
+    .staff-role { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .staff-meta { display: flex; gap: 12px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+    .staff-count { font-size: 0.8rem; color: var(--muted2); }
+    .staff-note { font-size: 0.8rem; color: var(--muted); }
+
+    /* Finance items */
+    .fin-item-name { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .fin-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .fin-amount { font-size: 0.82rem; color: var(--accent); font-weight: 500; }
+    .fin-cat { font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; }
+    .fin-cat-init { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.25); }
+    .fin-cat-ops { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+
+    /* Timeline items */
+    .timeline-list { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px 16px 13px 50px;
+      position: relative;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
+    }
+    .timeline-item:hover { border-color: var(--border2); }
+    .timeline-item:hover .item-delete { opacity: 1; }
+    .timeline-dot {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+    }
+    .timeline-dot.dot-green { background: #10b981; border-color: rgba(16,185,129,0.4); }
+    .timeline-dot.dot-yellow { background: #f59e0b; border-color: rgba(245,158,11,0.4); }
+    .timeline-dot.dot-blue { background: #3b82f6; border-color: rgba(59,130,246,0.4); }
+    .tl-date { font-size: 0.75rem; color: var(--muted); margin-bottom: 3px; }
+    .tl-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .tl-footer { margin-top: 6px; }
+
+    /* Partner cards */
+    .partner-name { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .partner-role { font-size: 0.82rem; color: var(--muted2); margin-bottom: 8px; }
+
+    /* TODO list */
+    .todo-list { display: flex; flex-direction: column; gap: 7px; }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s;
+    }
+    .todo-item:hover { border-color: var(--border2); }
+    .todo-item:hover .item-delete { opacity: 1; }
+    .todo-item .item-delete { position: static; opacity: 0; }
+    .todo-check {
+      width: 17px;
+      height: 17px;
+      border: 2px solid var(--border2);
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.65rem;
+      color: transparent;
+    }
+    .todo-item.done .todo-check {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+    .todo-text {
+      flex: 1;
+      font-size: 0.88rem;
+      color: var(--text);
+      outline: none;
+    }
+    .todo-item.done .todo-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+    .todo-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .todo-input-row input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .todo-input-row input:focus { border-color: var(--accent); }
+    .todo-input-row input::placeholder { color: var(--muted); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--surface);
+      border: 1px solid rgba(16,185,129,0.35);
+      border-radius: 9px;
+      padding: 10px 18px;
+      font-size: 0.82rem;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 28px 0 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 600px) {
+      .page-header, .main { padding-left: 16px; padding-right: 16px; }
+      .section-body { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1>
+        <span class="label">Flagship Store Planning</span>
+        フラッグシップ店 プランニング
+      </h1>
+      <p class="sub">アイケアラボ旗艦店の構想・計画書</p>
+    </div>
+    <div id="saveStatus" class="save-status">
+      <span>✓</span> 保存済
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ① コンセプト・ミッション -->
+  <div class="section-card" id="sec-concept">
+    <div class="section-header" onclick="toggleSection('sec-concept')">
+      <span class="icon">✨</span>
+      <h2>コンセプト・ミッション</h2>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <textarea class="free-textarea" id="concept-text" rows="5"
+        placeholder="コンセプト・ミッションを自由に記述..."
+        oninput="debounceSave()" onblur="saveAll()"></textarea>
+    </div>
+  </div>
+
+  <!-- ② ロケーション候補 -->
+  <div class="section-card" id="sec-location">
+    <div class="section-header" onclick="toggleSection('sec-location')">
+      <span class="icon">📍</span>
+      <h2>ロケーション候補</h2>
+      <span class="item-count" id="count-location">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-location"></div>
+      <button class="add-btn" onclick="toggleForm('form-location')">＋ 候補を追加</button>
+      <div class="add-form" id="form-location">
+        <div class="form-row">
+          <input type="text" id="loc-area" placeholder="エリア名（例：表参道・青山エリア）">
+        </div>
+        <div class="form-row">
+          <input type="text" id="loc-reason" placeholder="選定理由">
+        </div>
+        <div class="form-row">
+          <select id="loc-status">
+            <option value="検討中">検討中</option>
+            <option value="交渉中">交渉中</option>
+            <option value="確定">確定</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addLocation()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-location')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 空間・内装方針 -->
+  <div class="section-card" id="sec-space">
+    <div class="section-header" onclick="toggleSection('sec-space')">
+      <span class="icon">🏗</span>
+      <h2>空間・内装方針</h2>
+      <span class="item-count" id="count-space">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-space"></div>
+      <button class="add-btn" onclick="toggleForm('form-space')">＋ 方針を追加</button>
+      <div class="add-form" id="form-space">
+        <div class="form-row">
+          <input type="text" id="space-title" placeholder="タイトル（例：照明設計）">
+        </div>
+        <div class="form-row">
+          <textarea id="space-desc" rows="2" placeholder="説明"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addSpace()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-space')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 提供サービス・メニュー -->
+  <div class="section-card" id="sec-service">
+    <div class="section-header" onclick="toggleSection('sec-service')">
+      <span class="icon">💆</span>
+      <h2>提供サービス・メニュー</h2>
+      <span class="item-count" id="count-service">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-service"></div>
+      <button class="add-btn" onclick="toggleForm('form-service')">＋ サービスを追加</button>
+      <div class="add-form" id="form-service">
+        <div class="form-row">
+          <input type="text" id="svc-name" placeholder="サービス名">
+        </div>
+        <div class="form-row">
+          <input type="text" id="svc-desc" placeholder="概要">
+          <input type="text" id="svc-price" placeholder="価格帯（任意）">
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addService()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-service')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ スタッフ構成 -->
+  <div class="section-card" id="sec-staff">
+    <div class="section-header" onclick="toggleSection('sec-staff')">
+      <span class="icon">👥</span>
+      <h2>スタッフ構成</h2>
+      <span class="item-count" id="count-staff">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-staff"></div>
+      <button class="add-btn" onclick="toggleForm('form-staff')">＋ スタッフを追加</button>
+      <div class="add-form" id="form-staff">
+        <div class="form-row">
+          <input type="text" id="staff-role" placeholder="役職">
+          <input type="number" id="staff-count" placeholder="人数" min="1" style="max-width:90px;">
+        </div>
+        <div class="form-row">
+          <input type="text" id="staff-note" placeholder="備考">
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addStaff()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-staff')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 資金計画 -->
+  <div class="section-card" id="sec-finance">
+    <div class="section-header" onclick="toggleSection('sec-finance')">
+      <span class="icon">💰</span>
+      <h2>資金計画（概算）</h2>
+      <span class="item-count" id="count-finance">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-finance"></div>
+      <button class="add-btn" onclick="toggleForm('form-finance')">＋ 費用項目を追加</button>
+      <div class="add-form" id="form-finance">
+        <div class="form-row">
+          <input type="text" id="fin-item" placeholder="項目名（例：設備投資）">
+        </div>
+        <div class="form-row">
+          <input type="text" id="fin-amount" placeholder="金額（例：¥500万）">
+          <select id="fin-category">
+            <option value="初期費用">初期費用</option>
+            <option value="運営費">運営費</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addFinance()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-finance')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ スケジュール・マイルストーン -->
+  <div class="section-card" id="sec-schedule">
+    <div class="section-header" onclick="toggleSection('sec-schedule')">
+      <span class="icon">📅</span>
+      <h2>スケジュール・マイルストーン</h2>
+      <span class="item-count" id="count-schedule">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="timeline-list" id="list-schedule"></div>
+      <button class="add-btn" onclick="toggleForm('form-schedule')">＋ マイルストーンを追加</button>
+      <div class="add-form" id="form-schedule">
+        <div class="form-row">
+          <input type="text" id="sched-date" placeholder="日付・期間（例：2026年 Q3）">
+        </div>
+        <div class="form-row">
+          <input type="text" id="sched-title" placeholder="タイトル">
+        </div>
+        <div class="form-row">
+          <select id="sched-status">
+            <option value="予定">予定</option>
+            <option value="進行中">進行中</option>
+            <option value="完了">完了</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addSchedule()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-schedule')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑧ パートナー・連携先候補 -->
+  <div class="section-card" id="sec-partner">
+    <div class="section-header" onclick="toggleSection('sec-partner')">
+      <span class="icon">🤝</span>
+      <h2>パートナー・連携先候補</h2>
+      <span class="item-count" id="count-partner">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="item-list" id="list-partner"></div>
+      <button class="add-btn" onclick="toggleForm('form-partner')">＋ パートナーを追加</button>
+      <div class="add-form" id="form-partner">
+        <div class="form-row">
+          <input type="text" id="partner-name" placeholder="名前・会社名">
+        </div>
+        <div class="form-row">
+          <input type="text" id="partner-role" placeholder="役割">
+          <select id="partner-status">
+            <option value="検討中">検討中</option>
+            <option value="選定中">選定中</option>
+            <option value="交渉中">交渉中</option>
+            <option value="確定">確定</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="addPartner()">追加</button>
+          <button class="btn-cancel" onclick="closeForm('form-partner')">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑨ TODO・次のアクション -->
+  <div class="section-card" id="sec-todo">
+    <div class="section-header" onclick="toggleSection('sec-todo')">
+      <span class="icon">✅</span>
+      <h2>TODO・次のアクション</h2>
+      <span class="item-count" id="count-todo">0</span>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="todo-list" id="list-todo"></div>
+      <div class="todo-input-row">
+        <input type="text" id="todo-new-input" placeholder="新しいタスクを入力して Enter..."
+          onkeydown="if(event.key==='Enter') addTodo()">
+        <button class="btn-save" onclick="addTodo()" style="flex-shrink:0;">追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑩ メモ・その他 -->
+  <div class="section-card" id="sec-memo">
+    <div class="section-header" onclick="toggleSection('sec-memo')">
+      <span class="icon">📝</span>
+      <h2>メモ・その他</h2>
+      <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="section-body">
+      <textarea class="free-textarea" id="memo-text" rows="6"
+        placeholder="自由にメモを記入..."
+        oninput="debounceSave()" onblur="saveAll()"></textarea>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ 保存済</div>
+
+<script>
+// ─── Storage Key ───────────────────────────────────────
+const STORAGE_KEY = 'aicare_flagship_v1';
+
+// ─── Default Data ──────────────────────────────────────
+const DEFAULTS = {
+  concept: 'アイケアラボの世界観を体現する空間。目から始まる、脳と全身の再設計。来院者が非日常の体験を受けられる旗艦店。',
+  memo: '',
+  location: [
+    { id: uid(), area: '代々木・渋谷エリア', reason: '本院の延長線。既存顧客へのアクセスが良い', status: '検討中' },
+    { id: uid(), area: '表参道・青山エリア', reason: 'ブランドイメージとの親和性が高い', status: '検討中' }
+  ],
+  space: [
+    { id: uid(), title: 'カラートーン', desc: 'ネイビー・ホワイト・ゴールドを基調。医療感とラグジュアリー感の両立' },
+    { id: uid(), title: '照明設計', desc: '施術エリアは集中できる間接照明。エントランスは明るく清潔感' },
+    { id: uid(), title: 'サインデザイン', desc: 'ロゴとブランドカラーに統一。外から視認できる大型サイネージ' }
+  ],
+  service: [
+    { id: uid(), name: '眼整体 スタンダード', desc: '60分 個別施術', price: '¥15,000〜' },
+    { id: uid(), name: '眼整体 プレミアム', desc: '90分 + アフターケア', price: '¥25,000〜' },
+    { id: uid(), name: 'アイケアグラス フィッティング', desc: 'プリズムレンズ測定・販売', price: '¥30,000〜' },
+    { id: uid(), name: '眼コンディショニング 体験', desc: '初回体験コース', price: '¥5,000' }
+  ],
+  staff: [
+    { id: uid(), role: '院長・眼整体士', count: 1, note: '旗艦店マネージャー兼任' },
+    { id: uid(), role: '眼整体士', count: 3, note: 'フルタイム' },
+    { id: uid(), role: 'フロントスタッフ', count: 2, note: '予約管理・接客' }
+  ],
+  finance: [
+    { id: uid(), item: '内装・設備費', amount: '¥1,000〜3,000万', category: '初期費用' },
+    { id: uid(), item: '保証金・礼金', amount: '家賃の6〜12ヶ月分', category: '初期費用' },
+    { id: uid(), item: '家賃（月額）', amount: '¥50〜150万/月（エリアによる）', category: '運営費' },
+    { id: uid(), item: '人件費（月額）', amount: '¥200〜300万/月', category: '運営費' }
+  ],
+  schedule: [
+    { id: uid(), date: '2026年 Q2', title: 'コンセプト・ロケーション確定', status: '進行中' },
+    { id: uid(), date: '2026年 Q3', title: '内装デザイン発注・工事開始', status: '予定' },
+    { id: uid(), date: '2026年 Q4', title: 'スタッフ採用・研修', status: '予定' },
+    { id: uid(), date: '2027年 Q1', title: 'グランドオープン', status: '予定' }
+  ],
+  partner: [
+    { id: uid(), name: '内装デザイン会社（TBD）', role: '空間デザイン・施工', status: '選定中' },
+    { id: uid(), name: '権威性アンバサダー', role: 'オープン告知・PR', status: '検討中' }
+  ],
+  todo: [
+    { id: uid(), text: 'ロケーション候補を3ヶ所に絞る', done: false },
+    { id: uid(), text: '内装デザイン会社のポートフォリオ収集', done: false },
+    { id: uid(), text: '資金計画の詳細試算', done: false }
+  ],
+  collapsed: {}
+};
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ─── State ─────────────────────────────────────────────
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Merge with defaults to handle new fields added later
+      return Object.assign({}, DEFAULTS, parsed);
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+
+function saveAll() {
+  // Collect textarea values
+  state.concept = document.getElementById('concept-text').value;
+  state.memo = document.getElementById('memo-text').value;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    showToast();
+  } catch(e) {}
+}
+
+// ─── Debounce Save ─────────────────────────────────────
+let debounceTimer = null;
+function debounceSave() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(saveAll, 500);
+}
+
+// ─── タブ切替・閉じる前に強制保存 ──────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveAll();
+});
+window.addEventListener('beforeunload', saveAll);
+
+// ─── Toast ─────────────────────────────────────────────
+let toastTimer = null;
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ─── Section Toggle ────────────────────────────────────
+function toggleSection(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('collapsed');
+  state.collapsed = state.collapsed || {};
+  state.collapsed[id] = card.classList.contains('collapsed');
+  saveAll();
+}
+
+// ─── Form Toggle ───────────────────────────────────────
+function toggleForm(formId) {
+  const form = document.getElementById(formId);
+  form.classList.toggle('open');
+}
+function closeForm(formId) {
+  document.getElementById(formId).classList.remove('open');
+}
+
+// ─── Status Badge Helper ───────────────────────────────
+function statusBadge(status) {
+  const map = {
+    '確定': 'green', '完了': 'green',
+    '進行中': 'yellow', '交渉中': 'yellow',
+    '検討中': 'blue', '選定中': 'blue', '予定': 'blue'
+  };
+  const cls = map[status] || 'blue';
+  return `<span class="status-badge status-${cls}">${esc(status)}</span>`;
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── Update Count Badge ────────────────────────────────
+function updateCount(key, listId) {
+  const el = document.getElementById('count-' + key);
+  if (el && state[key]) el.textContent = state[key].length;
+}
+
+// ─── Render: Location ──────────────────────────────────
+function renderLocation() {
+  const list = document.getElementById('list-location');
+  list.innerHTML = '';
+  if (!state.location || !state.location.length) {
+    list.innerHTML = '<div class="empty-state">候補はまだありません</div>';
+    updateCount('location');
+    return;
+  }
+  state.location.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('location',${i})">× 削除</button>
+      <div class="loc-area editable" contenteditable="true"
+        onblur="editField('location',${i},'area',this)" data-field="area">${esc(item.area)}</div>
+      <div class="loc-reason editable" contenteditable="true"
+        onblur="editField('location',${i},'reason',this)">${esc(item.reason)}</div>
+      <div class="loc-footer">
+        ${statusBadge(item.status)}
+        <select class="status-select" onchange="editFieldVal('location',${i},'status',this.value)" style="background:transparent;border:none;color:var(--muted2);font-size:0.75rem;cursor:pointer;outline:none;font-family:inherit;">
+          ${['検討中','交渉中','確定'].map(s=>`<option value="${s}" ${item.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('location');
+}
+
+function addLocation() {
+  const area = document.getElementById('loc-area').value.trim();
+  const reason = document.getElementById('loc-reason').value.trim();
+  const status = document.getElementById('loc-status').value;
+  if (!area) { document.getElementById('loc-area').focus(); return; }
+  state.location.push({ id: uid(), area, reason, status });
+  document.getElementById('loc-area').value = '';
+  document.getElementById('loc-reason').value = '';
+  closeForm('form-location');
+  renderLocation();
+  saveAll();
+}
+
+// ─── Render: Space ─────────────────────────────────────
+function renderSpace() {
+  const list = document.getElementById('list-space');
+  list.innerHTML = '';
+  if (!state.space || !state.space.length) {
+    list.innerHTML = '<div class="empty-state">方針はまだありません</div>';
+    updateCount('space');
+    return;
+  }
+  state.space.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('space',${i})">× 削除</button>
+      <div class="space-title editable" contenteditable="true"
+        onblur="editField('space',${i},'title',this)">${esc(item.title)}</div>
+      <div class="space-desc editable" contenteditable="true"
+        onblur="editField('space',${i},'desc',this)">${esc(item.desc)}</div>`;
+    list.appendChild(div);
+  });
+  updateCount('space');
+}
+
+function addSpace() {
+  const title = document.getElementById('space-title').value.trim();
+  const desc = document.getElementById('space-desc').value.trim();
+  if (!title) { document.getElementById('space-title').focus(); return; }
+  state.space.push({ id: uid(), title, desc });
+  document.getElementById('space-title').value = '';
+  document.getElementById('space-desc').value = '';
+  closeForm('form-space');
+  renderSpace();
+  saveAll();
+}
+
+// ─── Render: Service ───────────────────────────────────
+function renderService() {
+  const list = document.getElementById('list-service');
+  list.innerHTML = '';
+  if (!state.service || !state.service.length) {
+    list.innerHTML = '<div class="empty-state">サービスはまだありません</div>';
+    updateCount('service');
+    return;
+  }
+  state.service.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('service',${i})">× 削除</button>
+      <div class="svc-name editable" contenteditable="true"
+        onblur="editField('service',${i},'name',this)">${esc(item.name)}</div>
+      <div class="svc-meta">
+        <span class="svc-desc editable" contenteditable="true"
+          onblur="editField('service',${i},'desc',this)">${esc(item.desc)}</span>
+        <span class="svc-price editable" contenteditable="true"
+          onblur="editField('service',${i},'price',this)">${esc(item.price || '')}</span>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('service');
+}
+
+function addService() {
+  const name = document.getElementById('svc-name').value.trim();
+  const desc = document.getElementById('svc-desc').value.trim();
+  const price = document.getElementById('svc-price').value.trim();
+  if (!name) { document.getElementById('svc-name').focus(); return; }
+  state.service.push({ id: uid(), name, desc, price });
+  document.getElementById('svc-name').value = '';
+  document.getElementById('svc-desc').value = '';
+  document.getElementById('svc-price').value = '';
+  closeForm('form-service');
+  renderService();
+  saveAll();
+}
+
+// ─── Render: Staff ─────────────────────────────────────
+function renderStaff() {
+  const list = document.getElementById('list-staff');
+  list.innerHTML = '';
+  if (!state.staff || !state.staff.length) {
+    list.innerHTML = '<div class="empty-state">スタッフ情報はまだありません</div>';
+    updateCount('staff');
+    return;
+  }
+  state.staff.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('staff',${i})">× 削除</button>
+      <div class="staff-role editable" contenteditable="true"
+        onblur="editField('staff',${i},'role',this)">${esc(item.role)}</div>
+      <div class="staff-meta">
+        <span class="staff-count">人数: <strong class="editable" contenteditable="true"
+          onblur="editFieldNum('staff',${i},'count',this)">${esc(String(item.count))}</strong> 名</span>
+        <span class="staff-note editable" contenteditable="true"
+          onblur="editField('staff',${i},'note',this)">${esc(item.note || '')}</span>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('staff');
+}
+
+function addStaff() {
+  const role = document.getElementById('staff-role').value.trim();
+  const count = parseInt(document.getElementById('staff-count').value) || 1;
+  const note = document.getElementById('staff-note').value.trim();
+  if (!role) { document.getElementById('staff-role').focus(); return; }
+  state.staff.push({ id: uid(), role, count, note });
+  document.getElementById('staff-role').value = '';
+  document.getElementById('staff-count').value = '';
+  document.getElementById('staff-note').value = '';
+  closeForm('form-staff');
+  renderStaff();
+  saveAll();
+}
+
+// ─── Render: Finance ───────────────────────────────────
+function renderFinance() {
+  const list = document.getElementById('list-finance');
+  list.innerHTML = '';
+  if (!state.finance || !state.finance.length) {
+    list.innerHTML = '<div class="empty-state">費用項目はまだありません</div>';
+    updateCount('finance');
+    return;
+  }
+  state.finance.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    const catClass = item.category === '初期費用' ? 'fin-cat-init' : 'fin-cat-ops';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('finance',${i})">× 削除</button>
+      <div class="fin-item-name editable" contenteditable="true"
+        onblur="editField('finance',${i},'item',this)">${esc(item.item)}</div>
+      <div class="fin-meta">
+        <span class="fin-amount editable" contenteditable="true"
+          onblur="editField('finance',${i},'amount',this)">${esc(item.amount)}</span>
+        <span class="fin-cat ${catClass}">${esc(item.category)}</span>
+        <select onchange="editFieldVal('finance',${i},'category',this.value)" style="background:transparent;border:none;color:var(--muted2);font-size:0.72rem;cursor:pointer;outline:none;font-family:inherit;">
+          ${['初期費用','運営費'].map(s=>`<option value="${s}" ${item.category===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('finance');
+}
+
+function addFinance() {
+  const item = document.getElementById('fin-item').value.trim();
+  const amount = document.getElementById('fin-amount').value.trim();
+  const category = document.getElementById('fin-category').value;
+  if (!item) { document.getElementById('fin-item').focus(); return; }
+  state.finance.push({ id: uid(), item, amount, category });
+  document.getElementById('fin-item').value = '';
+  document.getElementById('fin-amount').value = '';
+  closeForm('form-finance');
+  renderFinance();
+  saveAll();
+}
+
+// ─── Render: Schedule ──────────────────────────────────
+function dotClass(status) {
+  const map = { '完了': 'dot-green', '進行中': 'dot-yellow', '予定': 'dot-blue' };
+  return map[status] || 'dot-blue';
+}
+
+function renderSchedule() {
+  const list = document.getElementById('list-schedule');
+  list.innerHTML = '';
+  if (!state.schedule || !state.schedule.length) {
+    list.innerHTML = '<div class="empty-state">マイルストーンはまだありません</div>';
+    updateCount('schedule');
+    return;
+  }
+  state.schedule.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'timeline-item';
+    div.innerHTML = `
+      <div class="timeline-dot ${dotClass(item.status)}"></div>
+      <button class="item-delete" onclick="deleteItem('schedule',${i})">× 削除</button>
+      <div class="tl-date editable" contenteditable="true"
+        onblur="editField('schedule',${i},'date',this)">${esc(item.date)}</div>
+      <div class="tl-title editable" contenteditable="true"
+        onblur="editField('schedule',${i},'title',this)">${esc(item.title)}</div>
+      <div class="tl-footer">
+        ${statusBadge(item.status)}
+        <select onchange="editFieldVal('schedule',${i},'status',this.value)" style="background:transparent;border:none;color:var(--muted2);font-size:0.75rem;cursor:pointer;outline:none;margin-left:8px;font-family:inherit;">
+          ${['予定','進行中','完了'].map(s=>`<option value="${s}" ${item.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('schedule');
+}
+
+function addSchedule() {
+  const date = document.getElementById('sched-date').value.trim();
+  const title = document.getElementById('sched-title').value.trim();
+  const status = document.getElementById('sched-status').value;
+  if (!title) { document.getElementById('sched-title').focus(); return; }
+  state.schedule.push({ id: uid(), date, title, status });
+  document.getElementById('sched-date').value = '';
+  document.getElementById('sched-title').value = '';
+  closeForm('form-schedule');
+  renderSchedule();
+  saveAll();
+}
+
+// ─── Render: Partner ───────────────────────────────────
+function renderPartner() {
+  const list = document.getElementById('list-partner');
+  list.innerHTML = '';
+  if (!state.partner || !state.partner.length) {
+    list.innerHTML = '<div class="empty-state">パートナーはまだありません</div>';
+    updateCount('partner');
+    return;
+  }
+  state.partner.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <button class="item-delete" onclick="deleteItem('partner',${i})">× 削除</button>
+      <div class="partner-name editable" contenteditable="true"
+        onblur="editField('partner',${i},'name',this)">${esc(item.name)}</div>
+      <div class="partner-role editable" contenteditable="true"
+        onblur="editField('partner',${i},'role',this)">${esc(item.role)}</div>
+      <div>
+        ${statusBadge(item.status)}
+        <select onchange="editFieldVal('partner',${i},'status',this.value)" style="background:transparent;border:none;color:var(--muted2);font-size:0.75rem;cursor:pointer;outline:none;margin-left:8px;font-family:inherit;">
+          ${['検討中','選定中','交渉中','確定'].map(s=>`<option value="${s}" ${item.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCount('partner');
+}
+
+function addPartner() {
+  const name = document.getElementById('partner-name').value.trim();
+  const role = document.getElementById('partner-role').value.trim();
+  const status = document.getElementById('partner-status').value;
+  if (!name) { document.getElementById('partner-name').focus(); return; }
+  state.partner.push({ id: uid(), name, role, status });
+  document.getElementById('partner-name').value = '';
+  document.getElementById('partner-role').value = '';
+  closeForm('form-partner');
+  renderPartner();
+  saveAll();
+}
+
+// ─── Render: TODO ──────────────────────────────────────
+function renderTodo() {
+  const list = document.getElementById('list-todo');
+  list.innerHTML = '';
+  if (!state.todo || !state.todo.length) {
+    list.innerHTML = '<div class="empty-state">タスクはまだありません</div>';
+    updateCount('todo');
+    return;
+  }
+  state.todo.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'todo-item' + (item.done ? ' done' : '');
+    div.innerHTML = `
+      <div class="todo-check" onclick="toggleTodo(${i})">${item.done ? '✓' : ''}</div>
+      <span class="todo-text editable" contenteditable="true"
+        onblur="editField('todo',${i},'text',this)">${esc(item.text)}</span>
+      <button class="item-delete" onclick="deleteItem('todo',${i})">× 削除</button>`;
+    list.appendChild(div);
+  });
+  updateCount('todo');
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-new-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.todo.push({ id: uid(), text, done: false });
+  input.value = '';
+  renderTodo();
+  saveAll();
+}
+
+function toggleTodo(i) {
+  state.todo[i].done = !state.todo[i].done;
+  renderTodo();
+  saveAll();
+}
+
+// ─── Generic Edit/Delete ───────────────────────────────
+function editField(key, i, field, el) {
+  const newVal = el.innerText.trim();
+  if (state[key] && state[key][i] !== undefined) {
+    state[key][i][field] = newVal;
+    saveAll();
+  }
+}
+
+function editFieldNum(key, i, field, el) {
+  const newVal = parseInt(el.innerText.trim()) || 1;
+  if (state[key] && state[key][i] !== undefined) {
+    state[key][i][field] = newVal;
+    saveAll();
+  }
+}
+
+function editFieldVal(key, i, field, val) {
+  if (state[key] && state[key][i] !== undefined) {
+    state[key][i][field] = val;
+    renderAll();
+    saveAll();
+  }
+}
+
+function deleteItem(key, i) {
+  if (!confirm('削除しますか？')) return;
+  state[key].splice(i, 1);
+  renderAll();
+  saveAll();
+}
+
+// ─── Render All ────────────────────────────────────────
+function renderAll() {
+  document.getElementById('concept-text').value = state.concept || '';
+  document.getElementById('memo-text').value = state.memo || '';
+  renderLocation();
+  renderSpace();
+  renderService();
+  renderStaff();
+  renderFinance();
+  renderSchedule();
+  renderPartner();
+  renderTodo();
+
+  // Restore collapsed states
+  if (state.collapsed) {
+    Object.keys(state.collapsed).forEach(id => {
+      const card = document.getElementById(id);
+      if (card && state.collapsed[id]) card.classList.add('collapsed');
+    });
+  }
+}
+
+// ─── Init ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  renderAll();
+  // contenteditable の変更をリアルタイムで保存
+  document.addEventListener('input', e => {
+    if (e.target.contentEditable === 'true') debounceSave();
+  });
+});
+</script>
+</body>
+</html>
