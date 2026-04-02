@@ -744,34 +744,34 @@ body {
   transition: background 0.12s, border-color 0.12s;
   min-height: 52px;
 }
-.proj-row:hover { background: var(--surface2); border-color: #3a4a6a; }
+.proj-row:hover { background: var(--surface2); border-color: var(--accent); }
 .proj-row.dim { opacity: 0.42; }
 .proj-row .proj-row-name {
   flex: 1; font-size: 14px; font-weight: 600;
   cursor: pointer; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  color: #e8f0ff;
+  color: var(--text);
 }
-.proj-row .proj-row-name:hover { color: #fbbf24; }
+.proj-row .proj-row-name:hover { color: var(--accent); }
 .proj-row-waiting {
   font-size: 11px; padding: 4px 10px; border-radius: 20px; white-space: nowrap;
-  background: rgba(249,115,22,0.15); color: #fdba74;
-  border: 1px solid rgba(249,115,22,0.35); cursor: pointer;
+  background: rgba(234,88,12,0.1); color: #c2410c;
+  border: 1px solid rgba(234,88,12,0.3); cursor: pointer;
   min-width: 72px; text-align: center; font-weight: 600;
 }
 .proj-row-waiting.empty {
-  background: transparent; color: #3d4f66; border: 1px dashed #2a3a52; font-style: italic; font-weight: 400;
+  background: transparent; color: var(--muted); border: 1px dashed var(--border); font-style: italic; font-weight: 400;
 }
-.proj-row-waiting:hover { border-color: #fb923c; background: rgba(249,115,22,0.25); color: #fb923c; }
+.proj-row-waiting:hover { border-color: #ea580c; background: rgba(249,115,22,0.25); color: #ea580c; }
 .proj-row-next {
-  font-size: 12px; color: #5a7090; width: 150px;
+  font-size: 12px; color: var(--muted); width: 150px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   cursor: pointer; padding: 4px 8px; border-radius: 6px;
-  border: 1px dashed #2a3a52;
+  border: 1px dashed var(--border);
 }
-.proj-row-next:hover { border-color: #f59e0b; color: #e8f0ff; background: rgba(245,158,11,0.06); }
+.proj-row-next:hover { border-color: #f59e0b; color: var(--text); background: rgba(245,158,11,0.06); }
 .proj-row-deadline {
-  font-size: 12px; color: #5a7090; cursor: pointer; white-space: nowrap;
+  font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap;
   padding: 4px 8px; border-radius: 6px; border: 1px dashed transparent;
   width: 90px; text-align: center;
 }
@@ -792,7 +792,7 @@ body {
   transition: background 0.12s;
 }
 .priority-item:hover { background: rgba(0,0,0,0.04); }
-.priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e8f0ff; }
+.priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
 .priority-item .pi-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11px; }
 
 /* ===================== BLOCKER FILTER ===================== */
@@ -803,7 +803,7 @@ body {
   background: transparent; color: var(--muted); transition: all 0.15s;
 }
 .blocker-btn:hover { color: var(--text); background: var(--surface2); }
-.blocker-btn.active { background: rgba(249,115,22,0.18); color: #fb923c; border-color: rgba(249,115,22,0.4); }
+.blocker-btn.active { background: rgba(249,115,22,0.18); color: #ea580c; border-color: rgba(249,115,22,0.4); }
 
 /* ===================== PERSON SHORTCUTS ===================== */
 .person-shortcuts { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -869,7 +869,7 @@ body {
 .task-item.dragging { opacity: 0.35; }
 .task-item.drop-before::before { content:''; position:absolute; top:-2px; left:0; right:0; height:3px; background:#60a5fa; border-radius:2px; z-index:10; }
 .task-item.drop-after::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:3px; background:#60a5fa; border-radius:2px; z-index:10; }
-.task-item.drop-child { border-color:#a78bfa !important; background:#2d1f4e !important; }
+.task-item.drop-child { border-color:#6d28d9 !important; background:#2d1f4e !important; }
 .task-children { margin-left:28px; margin-top:6px; padding-left:12px; border-left:2px solid #374151; }
 .task-children .task-item { background:var(--surface2); }
 
@@ -1405,7 +1405,7 @@ function render() {
       app.innerHTML = renderPersonView(route.name);
     }
   } catch(e) {
-    app.innerHTML = `<div style="padding:40px;color:#f87171;font-size:13px;"><b>描画エラー:</b> ${e.message}<br><pre style="margin-top:8px;font-size:11px;color:#9ca3af;">${e.stack}</pre></div>`;
+    app.innerHTML = `<div style="padding:40px;color:#f87171;font-size:13px;"><b>描画エラー:</b> ${e.message}<br><pre style="margin-top:8px;font-size:11px;color:var(--muted);">${e.stack}</pre></div>`;
     console.error('render error:', e);
   }
 }
@@ -1478,6 +1478,8 @@ function renderMembers() {
     else allNames.forEach(name => addToGroup(name, p));
   });
 
+  // APP.people に登録されている人も必ず表示（プロジェクト未割当でも）
+  getPeople().forEach(name => { if (name && !grouped[name]) grouped[name] = []; });
   const people = Object.keys(grouped).sort();
 
   const sections = people.map(person => {
@@ -1705,7 +1707,7 @@ function renderBlockerListInner(projects) {
       <span class="pi-name">${p.name}</span>
       <div class="pi-meta">
         ${waiting ? `<span style="background:rgba(249,115,22,0.15);color:#fb923c;padding:1px 7px;border-radius:12px;border:1px solid rgba(249,115,22,0.3);">⏳ ${waiting}</span>` : ''}
-        ${blocked ? `<span style="color:#9ca3af;">詰まり: ${truncate(blocked, 20)}</span>` : ''}
+        ${blocked ? `<span style="color:var(--muted);">詰まり: ${truncate(blocked, 20)}</span>` : ''}
         ${statusBadge(p.status)}
       </div>
     </div>`;
@@ -1883,8 +1885,8 @@ function renderDashboard() {
   // 今日のタスクパネル
   let taskTodayHtml = '';
   if (todayTasks.length) {
-    taskTodayHtml = `<div class="today-panel" style="background:rgba(167,139,250,0.07);border-color:rgba(167,139,250,0.35);border-left:3px solid #a78bfa;margin-bottom:8px;">
-      <div class="today-panel-title" style="color:#a78bfa;">📌 今日期限のタスク <span style="opacity:0.65;font-weight:500;font-size:12px;">${todayTasks.length}件</span></div>
+    taskTodayHtml = `<div class="today-panel" style="background:rgba(167,139,250,0.07);border-color:rgba(109,40,217,0.25);border-left:3px solid #7c3aed;margin-bottom:8px;">
+      <div class="today-panel-title" style="color:#6d28d9;">📌 今日期限のタスク <span style="opacity:0.65;font-weight:500;font-size:12px;">${todayTasks.length}件</span></div>
       ${todayTasks.map(({ t, proj }) => {
         const d = daysUntil(t.deadline);
         const dlColor = d < 0 ? '#f87171' : '#fb923c';
@@ -2404,7 +2406,7 @@ function renderProject(id, tab) {
       ${p.deliverables ? `<div class="info-item"><div class="info-label">成果物</div><div class="info-value" style="font-size:12px;color:var(--muted);">${p.deliverables}</div></div>` : ''}
       ${p.completionCriteria ? `<div class="info-item" style="margin-top:12px;"><div class="info-label">KGI / 完了条件</div><div class="info-block pde-field" style="font-size:12px;" onclick="startProjDetailEdit('${p.id}','completionCriteria',this)">${p.completionCriteria}</div></div>` : ''}
       <div class="info-item" style="margin-top:8px;">
-        <div class="info-label" style="color:#a78bfa;">KPI</div>
+        <div class="info-label" style="color:#6d28d9;">KPI</div>
         ${p.kpi
           ? `<div class="info-block pde-field" style="font-size:12px;border-left:3px solid #7c3aed;" onclick="startKpiEdit('${p.id}',this)">${p.kpi}</div>`
           : `<div class="pde-field empty" style="font-size:12px;display:inline-block;" onclick="startKpiEdit('${p.id}',this)">＋ KPIを入力…</div>`}
@@ -3383,7 +3385,7 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 .tc-nav    { display: flex; align-items: center; gap: 8px; }
 .tc-count  { font-size: 11px; color: #3d5070; min-width: 34px; text-align: center; }
 .tc-prev   { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 12px; color: #6b7fa0; cursor: pointer; transition: all 0.15s; }
-.tc-prev:hover { color: var(--text); border-color: #3a4a6a; }
+.tc-prev:hover { color: var(--text); border-color: var(--accent); }
 .tc-next   { background: #f59e0b; border: none; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; transition: background 0.15s; }
 .tc-next:hover { background: #fbbf24; }
 </style>

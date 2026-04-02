@@ -132,7 +132,7 @@ body {
 .pg-badge { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
 .pg-assignee { font-size: 10px; color: var(--muted); }
 
-.pg-track { flex: 1; position: relative; height: 62px; }
+.pg-track { flex: 1; position: relative; height: 68px; }
 .pg-track-bg { position: absolute; inset: 0; }
 .wk-line  { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(37,48,71,0.5); }
 .today-vline { position: absolute; top: 0; bottom: 0; width: 2px; z-index: 10; pointer-events: none; background: linear-gradient(to bottom, rgba(239,68,68,0.9), rgba(239,68,68,0.3)); }
@@ -615,15 +615,15 @@ function renderGantt(projects) {
            </div>`
         : `<div style="font-size:10px;color:#3d4f66;margin-top:2px;">締切未設定</div>`;
 
-      // End-of-bar flag (visible above bar)
-      const flagLeft = dl ? Math.min(barEnd, 96) : null;
+      // End-of-bar flag (visible below bar)
+      const flagLeft = dl ? Math.max(4, Math.min(barEnd, 94)) : null;
       const flagHtml = dl
         ? `<div class="g-dl-end" style="left:${barEnd}%;background:${dlColor};"></div>
-           <div class="g-dl-flag" style="left:${flagLeft}%;top:2px;">
+           <div class="g-dl-flag" style="left:${flagLeft}%;bottom:3px;top:auto;">
              <div class="flag-date" style="color:${dlColor};">${fmtMD(dl)}</div>
-             <div class="flag-days" style="color:${dlColor}aa;">${dlDays < 0 ? Math.abs(dlDays)+'日超過' : dlDays === 0 ? '今日' : 'あと'+dlDays+'日'}</div>
+             <div class="flag-days" style="color:${dlColor};">${dlDays < 0 ? Math.abs(dlDays)+'日超過' : dlDays === 0 ? '今日' : 'あと'+dlDays+'日'}</div>
            </div>`
-        : `<div style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:9px;color:#475569;">締切未設定</div>`;
+        : ``;
 
       html += `<div class="pg-row" style="opacity:${isDim ? 0.45 : 1}">
         <div class="pg-lbl" style="border-left-color:${sc}">
@@ -646,7 +646,7 @@ function renderGantt(projects) {
           <div class="today-vline" style="left:${todayP}%">
             <div class="today-vdot"></div>
           </div>
-          <div class="g-bar${dl ? '' : ' no-dl'}" style="left:${barStart}%;width:${barWidth}%;background:${cat.color}cc;top:60%;transform:translateY(-50%);">
+          <div class="g-bar${dl ? '' : ' no-dl'}" style="left:${barStart}%;width:${barWidth}%;background:${cat.color}cc;top:38%;transform:translateY(-50%);">
             <div class="g-bar-prog" style="width:${progPct}%;background:rgba(255,255,255,0.4);"></div>
             <div class="g-bar-content">
               <span class="g-bar-text">${barLabel}</span>
