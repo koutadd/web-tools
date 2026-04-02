@@ -1845,7 +1845,7 @@ function renderDashboard() {
   });
 
   // ④ 担当者ショートカット
-  const people = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
+  const people = getPeople();
   const personCounts = {};
   people.forEach(person => {
     personCounts[person] = projects.filter(p =>
