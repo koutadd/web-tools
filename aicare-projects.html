@@ -1489,20 +1489,44 @@ function exportCSV() {
 }
 
 function scrollToPersonProjects(person) {
+  // If not on dashboard, navigate there first then scroll
+  const currentHash = location.hash;
+  if (currentHash && currentHash !== '#/' && currentHash !== '#') {
+    navigate('#/');
+    setTimeout(() => _doScrollToPerson(person), 120);
+    return;
+  }
+  _doScrollToPerson(person);
+}
+
+function _doScrollToPerson(person) {
   const statusOrd = {'進行中':0,'要確認':1,'未着手':2,'完了':3,'保留':4};
   const sorted = [...APP.projects].sort((a, b) => {
     const sA = statusOrd[a.status] ?? 5, sB = statusOrd[b.status] ?? 5;
     if (sA !== sB) return sA - sB;
     return priorityOrder(a.priority) - priorityOrder(b.priority);
   });
-  const first = sorted.find(p => (p.assignee || '') === person);
-  if (!first) return;
+  // Try exact match first, then partial match
+  let first = sorted.find(p => (p.assignee || '').trim() === person);
+  if (!first) first = sorted.find(p => (p.assignee || '').includes(person));
+  if (!first) { showSaveIndicator(`${person} のプロジェクトが見つかりません`, '#f87171'); return; }
   const el = document.getElementById('proj-row-' + first.id);
-  if (!el) return;
+  if (!el) {
+    // Fallback: scroll to project list section
+    const list = document.getElementById('proj-list');
+    if (list) list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  el.style.transition = 'background 0.2s';
-  el.style.background = 'rgba(245,158,11,0.12)';
-  setTimeout(() => { el.style.background = ''; }, 1200);
+  el.style.transition = 'background 0.3s, box-shadow 0.3s, border-color 0.3s';
+  el.style.background = 'rgba(245,158,11,0.18)';
+  el.style.boxShadow = '0 0 0 2px rgba(245,158,11,0.5)';
+  el.style.borderLeftColor = '#f59e0b';
+  setTimeout(() => {
+    el.style.background = '';
+    el.style.boxShadow = '';
+    el.style.borderLeftColor = '';
+  }, 1600);
 }
 
 function setBlockerFilter(val) {
