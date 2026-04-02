@@ -1261,6 +1261,33 @@
     .rq-info-table th,
     .rq-info-table td { font-size: 0.72rem; padding: 5px 6px; }
   }
+
+/* ── 新規依頼管理: 店舗カード ──────────────────────────────────────────── */
+.store-card .req-card-title { font-size: 1.05rem; font-weight: 700; }
+.req-tag-sm { display:inline-block; padding:1px 6px; border-radius:4px; font-size:0.68rem; font-weight:600; background:#eee; color:#555; margin:1px; }
+.req-tag-sm[data-status="進行中"]        { background:#dbeafe; color:#1d4ed8; }
+.req-tag-sm[data-status="差し戻し"]      { background:#fee2e2; color:#b91c1c; }
+.req-tag-sm[data-status="確認待ち"]      { background:#fef3c7; color:#b45309; }
+.req-tag-sm[data-status="承認待ち"]      { background:#ede9fe; color:#6d28d9; }
+.req-tag-sm[data-status="データ送付完了"] { background:#dcfce7; color:#15803d; }
+.req-tag-sm[data-status="完了"]          { background:#bbf7d0; color:#166534; }
+
+/* ── ドロワー内タスク一覧 ──────────────────────────────────────────────── */
+.rq-section { margin: 14px 0; padding: 0 2px; }
+.rq-section-title { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+.rq-store-info-text { font-size: 0.83rem; color: #444; background: #f8f8f6; border-radius: 6px; padding: 10px 12px; white-space: pre-wrap; line-height: 1.6; }
+.rq-tasks-list { display: flex; flex-direction: column; gap: 6px; }
+.rq-task-row { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; background: #fff; border: 1px solid #e8e4df; border-radius: 8px; }
+.rq-task-name { font-size: 0.88rem; font-weight: 600; color: #222; }
+.rq-task-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rq-task-sel { font-size: 0.75rem; padding: 3px 6px; border: 1px solid #ccc; border-radius: 5px; background: #fff; cursor: pointer; }
+.arc-mini-btn { font-size: 0.72rem; padding: 3px 8px; background: #1a4fa8; color: #fff; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.arc-mini-btn:hover { background: #163d88; }
+.arc-open-folder-btn { display:inline-block; margin-top:6px; padding:6px 14px; background:#f0f5ff; border:1px solid #b3c8f0; border-radius:6px; color:#1a4fa8; font-size:0.8rem; font-weight:600; text-decoration:none; }
+
+/* ── トースト通知 ──────────────────────────────────────────────────────── */
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+#toast-container { position:fixed; bottom:80px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -1549,10 +1576,10 @@
       <div class="arc-folder-tree">
         <span id="arc-folder-name-tree">フォルダ名</span>/<br>
         ├ アウトプット/<br>
+        ├ 参考資料/<br>
         ├ 制作データ/<br>
         │　├ 入稿前データ/<br>
         │　└ 入稿データ/<br>
-        └ 参考資料/
       </div>
       <div class="arc-status" id="arc-status-0"></div>
       <div class="arc-btn-row">
@@ -1564,7 +1591,7 @@
     <!-- STEP 1: アウトプット -->
     <div class="arc-step" id="arc-step-1">
       <div class="arc-title">① アウトプットデータ</div>
-      <div class="arc-sub">アウトプットフォルダに格納するデータをアップロードしてください</div>
+      <div class="arc-sub">アウトプットフォルダに格納するデータをアップロードしてください（PDF推奨）</div>
       <div class="arc-upload-zone" id="arc-zone-1" onclick="document.getElementById('arc-input-1').click()" ondragover="arcDrag(event,true,'arc-zone-1')" ondragleave="arcDrag(event,false,'arc-zone-1')" ondrop="arcDrop(event,1)">
         <div class="arc-upload-icon">📄</div>
         <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
@@ -1580,12 +1607,12 @@
       </div>
     </div>
 
-    <!-- STEP 2: 入稿前データ -->
+    <!-- STEP 2: 参考資料 (NEW) -->
     <div class="arc-step" id="arc-step-2">
-      <div class="arc-title">② 入稿前データ</div>
-      <div class="arc-sub">入稿前データをアップロードしてください</div>
+      <div class="arc-title">② 参考資料</div>
+      <div class="arc-sub">参考資料フォルダに格納するデータをアップロードしてください（PDF推奨）</div>
       <div class="arc-upload-zone" id="arc-zone-2" onclick="document.getElementById('arc-input-2').click()" ondragover="arcDrag(event,true,'arc-zone-2')" ondragleave="arcDrag(event,false,'arc-zone-2')" ondrop="arcDrop(event,2)">
-        <div class="arc-upload-icon">📐</div>
+        <div class="arc-upload-icon">📋</div>
         <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
         <div class="arc-upload-sub">複数ファイル選択可</div>
       </div>
@@ -1600,12 +1627,12 @@
       </div>
     </div>
 
-    <!-- STEP 3: 入稿データ -->
+    <!-- STEP 3: 入稿前データ -->
     <div class="arc-step" id="arc-step-3">
-      <div class="arc-title">③ 入稿データ</div>
-      <div class="arc-sub">入稿データをアップロードしてください</div>
+      <div class="arc-title">③ 入稿前データ</div>
+      <div class="arc-sub">入稿前データをアップロードしてください（大容量の場合はスキップしてフォルダに直接入れてください）</div>
       <div class="arc-upload-zone" id="arc-zone-3" onclick="document.getElementById('arc-input-3').click()" ondragover="arcDrag(event,true,'arc-zone-3')" ondragleave="arcDrag(event,false,'arc-zone-3')" ondrop="arcDrop(event,3)">
-        <div class="arc-upload-icon">📦</div>
+        <div class="arc-upload-icon">📐</div>
         <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
         <div class="arc-upload-sub">複数ファイル選択可</div>
       </div>
@@ -1616,19 +1643,39 @@
       <div class="arc-btn-row">
         <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(2)">← 戻る</button>
         <button class="arc-btn arc-btn-ghost" onclick="arcSkip(4)">スキップ</button>
-        <button class="arc-btn arc-btn-primary" onclick="arcUpload(3,4)">アップロードして完了</button>
+        <button class="arc-btn arc-btn-primary" onclick="arcUpload(3,4)">アップロードして次へ</button>
       </div>
     </div>
 
-    <!-- STEP 4: 完了・メッセージ -->
+    <!-- STEP 4: 入稿データ -->
     <div class="arc-step" id="arc-step-4">
+      <div class="arc-title">④ 入稿データ</div>
+      <div class="arc-sub">入稿データをアップロードしてください（大容量の場合はスキップしてフォルダに直接入れてください）</div>
+      <div class="arc-upload-zone" id="arc-zone-4" onclick="document.getElementById('arc-input-4').click()" ondragover="arcDrag(event,true,'arc-zone-4')" ondragleave="arcDrag(event,false,'arc-zone-4')" ondrop="arcDrop(event,4)">
+        <div class="arc-upload-icon">📦</div>
+        <div class="arc-upload-label">クリックまたはドラッグ&ドロップ</div>
+        <div class="arc-upload-sub">複数ファイル選択可</div>
+      </div>
+      <input type="file" id="arc-input-4" multiple style="display:none" onchange="arcFilePick(event,4)">
+      <div class="arc-file-list" id="arc-files-4"></div>
+      <div class="arc-progress"><div class="arc-progress-bar" id="arc-prog-4" style="width:0%"></div></div>
+      <div class="arc-status" id="arc-status-4"></div>
+      <div class="arc-btn-row">
+        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(3)">← 戻る</button>
+        <button class="arc-btn arc-btn-ghost" onclick="arcSkip(5)">スキップ</button>
+        <button class="arc-btn arc-btn-primary" onclick="arcUpload(4,5)">アップロードして完了</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: 完了・メッセージ -->
+    <div class="arc-step" id="arc-step-5">
       <div class="arc-title">✅ 格納完了！</div>
       <div class="arc-sub">以下のメッセージをコピーして送付してください</div>
       <div class="arc-message-box" id="arc-message"></div>
       <button class="arc-copy-btn" id="arc-copy-btn" onclick="arcCopyMessage()">📋 メッセージをコピー</button>
       <a id="arc-folder-link" href="#" target="_blank" style="display:block;margin-top:10px;text-align:center;padding:9px 0;background:#f0f5ff;border:1px solid #b3c8f0;border-radius:8px;color:#1a4fa8;font-size:0.85rem;font-weight:600;text-decoration:none;">📁 格納フォルダに移動する</a>
       <div style="margin-top:12px;display:flex;gap:10px">
-        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(3)">← 戻る</button>
+        <button class="arc-btn arc-btn-ghost" onclick="arcShowStep(4)">← 戻る</button>
         <button class="arc-btn arc-btn-ghost" style="flex:1" onclick="closeArchiveModal()">閉じる</button>
       </div>
     </div>
@@ -2302,6 +2349,11 @@ let currentMode  = 'pdf';
 
 // ── GASデータ取得（sessionStorageキャッシュ付き）──────────────────────
 async function loadGasData(forceRefresh = false) {
+  // 新しい Drive API ベースの制作物一覧に委譲
+  return loadPortfolioFromDrive(forceRefresh);
+}
+
+async function loadGasData_legacy(forceRefresh = false) {
   const CACHE_KEY    = 'gas_pdf_data';
   const CACHE_AT_KEY = 'gas_pdf_fetched_at';
 
@@ -2427,6 +2479,7 @@ function renderPdfGallery() {
 
 // pdf_url から Drive ファイルIDを抽出してユニークキーとして使う
 function pdfItemKey(d) {
+  if (d.id) return d.id; // Drive API から直接取得した場合
   if (d.pdf_url) {
     const m = d.pdf_url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (m) return m[1];
@@ -2446,7 +2499,7 @@ function pdfCardHtml(d) {
     : '';
 
   // Google Drive サムネイル（PDFの1ページ目）
-  const thumbUrl  = driveThumbUrl(d.pdf_url || '');
+  const thumbUrl  = d.thumbnail_link || driveThumbUrl(d.pdf_url || '');
   const thumbHtml = thumbUrl
     ? `<img src="${esc(thumbUrl)}" alt="${title}" loading="lazy"
            onerror="this.outerHTML='<div class=pdf-thumb-ph>📄<span>PDF</span></div>'">`
@@ -4038,6 +4091,547 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') { try { saveProjects(); } catch(e) {} }
 });
 window.addEventListener('beforeunload', () => { try { saveProjects(); } catch(e) {} });
+
+// ============================================================
+//  新: Drive制作物一覧 / Sheets依頼管理
+// ============================================================
+
+const DRIVE_MANAGE_API    = '/api/drive-manage';
+const REQUESTS_API        = '/api/requests-list';
+const REQUESTS_UPDATE_API = '/api/requests-update';
+
+// ── showToast ────────────────────────────────────────────────────────────
+function showToast(msg, type = 'info') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  const bg = type === 'error' ? '#c0392b' : type === 'success' ? '#2e7d32' : '#1a4fa8';
+  toast.style.cssText = `background:${bg};color:#fff;padding:10px 18px;border-radius:8px;font-size:0.85rem;box-shadow:0 4px 12px rgba(0,0,0,.2);max-width:320px;pointer-events:auto;animation:fadeIn .2s ease`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ── Drive制作物一覧 ───────────────────────────────────────────────────────
+async function loadPortfolioFromDrive(forceRefresh = false) {
+  const CACHE_KEY    = 'drive_portfolio_data';
+  const CACHE_AT_KEY = 'drive_portfolio_fetched_at';
+  const CACHE_MS     = 5 * 60 * 1000;
+
+  if (!forceRefresh && gasItems.length && Date.now() - gasFetchedAt < CACHE_MS) {
+    renderPdfGallery(); return;
+  }
+  if (!forceRefresh) {
+    try {
+      const cached   = sessionStorage.getItem(CACHE_KEY);
+      const cachedAt = Number(sessionStorage.getItem(CACHE_AT_KEY) || 0);
+      if (cached && Date.now() - cachedAt < CACHE_MS) {
+        gasItems = JSON.parse(cached); gasFetchedAt = cachedAt;
+        renderPdfGallery(); return;
+      }
+    } catch { /* ignore */ }
+  }
+
+  const masonry = document.getElementById('pdf-masonry');
+  masonry.innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+
+  try {
+    const res  = await fetch('/api/portfolio-list', { cache: 'no-store' });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+
+    gasItems = (json.data || []).map(f => ({
+      id:                  f.id,
+      pdf_url:             f.web_view_link || '',
+      title:               f.name,
+      matched_folder_name: f.media_folder_name || '',
+      store_name:          f.store_name,
+      category:            f.media_name,
+      media_name:          f.media_name,
+      pdf_updated_at:      f.modified_at,
+      mime_type:           f.mime_type,
+      thumbnail_link:      f.thumbnail_link || null,
+      _rowNum:             '',
+      sync_status:         'ok',
+    }));
+
+    gasFetchedAt = Date.now();
+    try {
+      sessionStorage.setItem(CACHE_KEY,    JSON.stringify(gasItems));
+      sessionStorage.setItem(CACHE_AT_KEY, String(gasFetchedAt));
+    } catch { /* ignore */ }
+
+    renderPdfGallery();
+
+  } catch (e) {
+    masonry.innerHTML = `<div class="pdf-error">
+      <strong>制作物一覧の取得に失敗しました:</strong> ${esc(e.message)}<br>
+      <small>Google Drive の接続設定（GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY）を確認してください。</small><br>
+      <button class="pdf-reload-btn" onclick="loadPortfolioFromDrive(true)">↺ 再読み込み</button>
+    </div>`;
+    document.getElementById('count').textContent = '— works';
+  }
+}
+
+// ── 店舗カードデータ ──────────────────────────────────────────────────────
+let storeCards = [];
+let reqStatusFilter2  = '';
+
+const STATUS_WEIGHT_MAP = {
+  '差し戻し':8, '確認待ち':7, '進行中':6, '未着手':5,
+  '承認待ち':4, '保留':3, 'データ送付完了':2, '完了':1,
+};
+
+// ── Sheets依頼管理読み込み ────────────────────────────────────────────────
+async function loadRequestsFromSheet(forceRefresh = false) {
+  if (!forceRefresh && storeCards.length) { renderStoreCards(); return; }
+  document.getElementById('req-cards').innerHTML = '<div class="pdf-loading">読み込み中...</div>';
+  try {
+    const res  = await fetch(REQUESTS_API, { cache: 'no-store' });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+    storeCards = json.stores || [];
+    renderStoreFilterBar();
+    renderStoreCards();
+  } catch(e) {
+    document.getElementById('req-cards').innerHTML = `
+      <div class="pdf-error">
+        <strong>依頼管理の読み込みに失敗しました:</strong><br>
+        ${esc(e.message)}<br>
+        <small>スプレッドシートの接続設定（GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_SHEETS_REQUESTS_ID）を確認してください。</small><br>
+        <button class="pdf-reload-btn" onclick="loadRequestsFromSheet(true)">↺ 再読み込み</button>
+      </div>`;
+  }
+}
+
+// ── 店舗カードフィルターバー ─────────────────────────────────────────────
+function renderStoreFilterBar() {
+  const bar = document.getElementById('req-filter-bar');
+  if (!bar) return;
+  const statusBtns = [
+    `<button class="pdf-filter-btn${!reqStatusFilter2?' active':''}" onclick="setStoreStatus('')">すべて</button>`,
+    ...(REQ_STATUS_LIST || ['未着手','進行中','差し戻し','確認待ち','保留','承認待ち','データ送付完了','完了']).map(s =>
+      `<button class="pdf-filter-btn${reqStatusFilter2===s?' active':''}" onclick="setStoreStatus('${esc(s)}')">${esc(s)}</button>`
+    ),
+  ].join('');
+  bar.innerHTML = `<div class="pdf-filter-row"><span class="pdf-filter-label">ステータス</span>${statusBtns}</div>`;
+}
+
+function setStoreStatus(s) {
+  reqStatusFilter2 = reqStatusFilter2 === s ? '' : s;
+  renderStoreFilterBar();
+  renderStoreCards();
+}
+
+// ── 店舗カード描画 ────────────────────────────────────────────────────────
+function renderStoreCards() {
+  const q = (document.getElementById('req-search')?.value || '').toLowerCase().trim();
+  let items = storeCards.filter(store => {
+    if (reqStatusFilter2) {
+      const match = store.tasks.some(t => t.status === reqStatusFilter2);
+      if (!match) return false;
+    }
+    if (!q) return true;
+    return store.store_name.toLowerCase().includes(q)
+      || store.store_info.toLowerCase().includes(q)
+      || store.tasks.some(t => t.item.toLowerCase().includes(q));
+  });
+
+  const countEl = document.getElementById('count');
+  if (countEl) countEl.textContent = `${items.length} / ${storeCards.length} 件`;
+
+  if (!items.length) {
+    document.getElementById('req-cards').innerHTML = '<div class="empty">条件に一致する店舗が見つかりません<br><button class="pdf-reload-btn" onclick="loadRequestsFromSheet(true)">↺ 再読み込み</button></div>';
+    return;
+  }
+  document.getElementById('req-cards').innerHTML = items.map(storeCardHtml).join('');
+}
+
+function storeCardHtml(store) {
+  const rep = store.representative_status || '未着手';
+  const done = store.completed_count;
+  const total = store.task_count;
+  const badges = buildTaskStatusBadges(store.tasks);
+  return `<div class="req-card store-card" data-status="${esc(rep)}" onclick="openStoreDrawer('${esc(store.id)}')">
+    <div class="req-card-title">${esc(store.store_name)}</div>
+    <div class="req-card-store">タスク ${total}件 / 完了 ${done}件</div>
+    <div class="req-card-tags">
+      <span class="req-tag" data-status="${esc(rep)}">${esc(rep)}</span>
+      ${badges}
+    </div>
+  </div>`;
+}
+
+function buildTaskStatusBadges(tasks) {
+  const counts = {};
+  tasks.forEach(t => { counts[t.status] = (counts[t.status] || 0) + 1; });
+  return Object.entries(counts).slice(0, 4).map(([s, n]) =>
+    `<span class="req-tag-sm" data-status="${esc(s)}">${esc(s)}${n > 1 ? ' ×'+n : ''}</span>`
+  ).join('');
+}
+
+// ── 店舗ドロワー ─────────────────────────────────────────────────────────
+let currentStoreId = '';
+
+function openStoreDrawer(storeId) {
+  const store = storeCards.find(s => s.id === storeId);
+  if (!store) return;
+  currentStoreId = storeId;
+  currentReqId   = storeId;
+
+  const rep = store.representative_status || '';
+  const header = document.getElementById('rq-header');
+  const STATUS_KEYS = ['未着手','進行中','保留','データ送付完了','完了','差し戻し','承認待ち','確認待ち'];
+  STATUS_KEYS.forEach(s => header.classList.remove(`rq-status--${s}`));
+  if (rep) header.classList.add(`rq-status--${rep}`);
+
+  document.getElementById('rq-badges').innerHTML = rep
+    ? `<span class="rq-badge rq-badge--${esc(rep)}">${esc(rep)}</span>` : '';
+  document.getElementById('rq-title').textContent = store.store_name;
+  document.getElementById('rq-meta').textContent  = `${store.task_count}件のタスク / 完了${store.completed_count}件`;
+
+  const statusRow = document.querySelector('#req-drawer .rq-status-row');
+  if (statusRow) statusRow.style.display = 'none';
+  document.getElementById('rq-archive-btn-row').innerHTML = '';
+
+  document.getElementById('req-chat').innerHTML = renderStoreDrawerContent(store);
+  document.getElementById('rq-status-saved').classList.remove('show');
+
+  document.getElementById('req-drawer-bg').style.display = 'block';
+  document.getElementById('req-drawer').classList.add('open');
+}
+
+function renderStoreDrawerContent(store) {
+  const infoHtml = store.store_info
+    ? `<div class="rq-section">
+         <div class="rq-section-title">🏪 店舗情報</div>
+         <div class="rq-store-info-text">${esc(store.store_info).replace(/\n/g,'<br>')}</div>
+       </div>` : '';
+
+  const taskRows = store.tasks.map(t => renderTaskRow(store, t)).join('');
+  const tasksHtml = `<div class="rq-section">
+    <div class="rq-section-title">📋 制作タスク（${store.task_count}件）</div>
+    <div class="rq-tasks-list">${taskRows}</div>
+  </div>`;
+
+  return infoHtml + tasksHtml;
+}
+
+function renderTaskRow(store, task) {
+  const isCompleted = task.status === '完了';
+  const badge  = `<span class="rq-badge rq-badge--${esc(task.status)}" style="font-size:0.72rem">${esc(task.status)}</span>`;
+  const arcBtn = isCompleted
+    ? `<button class="arc-mini-btn" onclick="openArchiveForTask('${esc(store.id)}',${task.row_index},event)">📦 格納</button>` : '';
+  const select = `<select class="rq-task-sel" onchange="updateTaskStatus(${task.row_index},this.value,'${esc(store.store_name).replace(/'/g,'\\\'').replace(/"/g,'&quot;')}','${esc(task.item).replace(/'/g,'\\\'').replace(/"/g,'&quot;')}')" data-row="${task.row_index}">
+    ${(REQ_STATUS_LIST||['未着手','進行中','差し戻し','確認待ち','保留','承認待ち','データ送付完了','完了']).map(s=>`<option value="${esc(s)}"${s===task.status?' selected':''}>${esc(s)}</option>`).join('')}
+  </select>`;
+  const saving = `<span class="rq-task-saving" id="task-saving-${task.row_index}" style="display:none;font-size:0.7rem;color:#2e7d32;font-weight:700"></span>`;
+  return `<div class="rq-task-row" id="task-row-${task.row_index}">
+    <div class="rq-task-name">${esc(task.item)}</div>
+    <div class="rq-task-controls">${badge}${select}${saving}${arcBtn}</div>
+  </div>`;
+}
+
+// ── タスクステータス更新 ───────────────────────────────────────────────────
+async function updateTaskStatus(rowIndex, status, storeName, item) {
+  const sels = document.querySelectorAll(`.rq-task-sel[data-row="${rowIndex}"]`);
+  sels.forEach(s => { s.disabled = true; });
+  const savingEl = document.getElementById(`task-saving-${rowIndex}`);
+  if (savingEl) { savingEl.style.display = ''; savingEl.textContent = '更新中...'; }
+
+  try {
+    const res = await fetch(REQUESTS_UPDATE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateStatus', row_index: rowIndex, status, store_name: storeName, item }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    // ローカル更新
+    const store = storeCards.find(s => s.id === currentStoreId);
+    if (store) {
+      const task = store.tasks.find(t => t.row_index === rowIndex);
+      if (task) {
+        task.status = status;
+        store.representative_status = store.tasks.reduce((b, t) =>
+          (STATUS_WEIGHT_MAP[t.status]||0) > (STATUS_WEIGHT_MAP[b]||0) ? t.status : b, store.tasks[0].status);
+        store.completed_count = store.tasks.filter(t => t.status==='完了'||t.status==='データ送付完了').length;
+      }
+      // タスク行を再描画
+      const taskEl = document.getElementById(`task-row-${rowIndex}`);
+      const task2  = store.tasks.find(t => t.row_index === rowIndex);
+      if (taskEl && task2) taskEl.outerHTML = renderTaskRow(store, task2);
+    }
+
+    sels.forEach(s => s.disabled = false);
+    if (savingEl) { savingEl.textContent = '✓ 更新済'; setTimeout(()=>{ if(savingEl) savingEl.style.display='none'; }, 2000); }
+    renderStoreCards();
+    showToast('ステータスを更新しました', 'success');
+
+    if (status === '完了' && store) {
+      const task = store.tasks.find(t => t.row_index === rowIndex);
+      if (task && confirm(`「${task.item}」が完了になりました。\n格納フローを開きますか？`)) {
+        openArchiveForTask(store.id, rowIndex, null);
+      }
+    }
+  } catch(e) {
+    showToast('更新エラー: ' + e.message, 'error');
+    sels.forEach(s => s.disabled = false);
+    if (savingEl) { savingEl.textContent = '✗ エラー'; setTimeout(()=>{ if(savingEl) savingEl.style.display='none'; }, 3000); }
+  }
+}
+
+// ── 格納フロー（タスク単位） ─────────────────────────────────────────────
+let arcStoreName = '';
+let arcMediaName = '';
+
+function openArchiveForTask(storeId, rowIndex, event) {
+  if (event) event.stopPropagation();
+  const store = storeCards.find(s => s.id === storeId);
+  if (!store) return;
+  const task  = store.tasks.find(t => t.row_index === rowIndex);
+  if (!task) return;
+
+  arcRowId     = { storeId, rowIndex };
+  arcStoreName = store.store_name;
+  arcMediaName = task.item;
+  arcFiles     = { 1:[], 2:[], 3:[], 4:[] };
+  arcFolderIds = {};
+
+  const displayName = `000_${store.store_name} > 00_${task.item}`;
+  document.getElementById('arc-folder-name').textContent      = displayName;
+  document.getElementById('arc-folder-name-tree').textContent = displayName;
+  document.getElementById('arc-status-0').textContent = '';
+  const createBtn = document.getElementById('arc-create-btn');
+  createBtn.disabled = false; createBtn.textContent = 'フォルダを作成する';
+
+  [1,2,3,4].forEach(n => {
+    const f = document.getElementById(`arc-files-${n}`);
+    const p = document.getElementById(`arc-prog-${n}`);
+    const s = document.getElementById(`arc-status-${n}`);
+    if (f) f.innerHTML = '';
+    if (p) p.style.width = '0%';
+    if (s) s.innerHTML = '';
+  });
+
+  arcShowStep(0);
+  document.getElementById('arc-overlay').classList.add('show');
+  setTimeout(() => arcAutoSetupFolders2(), 200);
+}
+
+// ── 新 arcAutoSetupFolders (Drive API版) ─────────────────────────────────
+async function arcAutoSetupFolders2() {
+  const btn      = document.getElementById('arc-create-btn');
+  const statusEl = document.getElementById('arc-status-0');
+  const titleEl  = document.querySelector('#arc-step-0 .arc-title');
+  btn.style.display = 'none';
+  statusEl.textContent = '🔍 フォルダを確認・作成しています...';
+
+  try {
+    const params = new URLSearchParams({ mode: 'createStructure', store_name: arcStoreName, media_name: arcMediaName });
+    const res    = await fetch(`${DRIVE_MANAGE_API}?${params}`, { cache: 'no-store' });
+    const data   = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'フォルダ処理失敗');
+
+    arcFolderIds = {
+      mainId:      data.media_folder.id,
+      outputId:    data.output_folder.id,
+      referenceId: data.reference_folder.id,
+      nyukoMaeId:  data.pre_nyuko_folder.id,
+      nyukoId:     data.nyuko_folder.id,
+      nyukoUrl:    data.nyuko_folder.url,
+    };
+
+    titleEl.textContent  = data.existed ? '📁 既存フォルダを確認' : '📁 フォルダを作成しました';
+    statusEl.textContent = `✅ 準備完了\n${data.store_folder.name} > ${data.media_folder.name}`;
+    setTimeout(() => arcShowStep(1), 900);
+
+  } catch(e) {
+    statusEl.textContent = '❌ エラー: ' + e.message;
+    btn.style.display = ''; btn.textContent = '↺ 再試行'; btn.disabled = false;
+    btn.onclick = () => arcAutoSetupFolders2();
+  }
+}
+
+// ── arcUpload の上書き（4ステップ対応 + エラー時フォルダ開くボタン）───────
+const _origArcUpload = typeof arcUpload === 'function' ? arcUpload : null;
+window.arcUpload = async function(stepNum, nextStep) {
+  // 旧モデル（arcRowId が文字列）は既存の関数を使用
+  if (typeof arcRowId === 'string') {
+    if (_origArcUpload) return _origArcUpload(stepNum, nextStep);
+  }
+
+  const files = arcFiles[stepNum] || [];
+  if (!files.length) {
+    if (!confirm('ファイルがアップロードされていませんが、スキップしますか？')) return;
+    arcSkip(nextStep); return;
+  }
+
+  const folderIdMap = {
+    1: arcFolderIds.outputId,
+    2: arcFolderIds.referenceId,
+    3: arcFolderIds.nyukoMaeId,
+    4: arcFolderIds.nyukoId,
+  };
+  const folderId = folderIdMap[stepNum];
+  if (!folderId) { arcSkip(nextStep); return; }
+
+  const folderUrlMap = {
+    1: arcFolderIds.outputId    ? `https://drive.google.com/drive/folders/${arcFolderIds.outputId}`    : null,
+    2: arcFolderIds.referenceId ? `https://drive.google.com/drive/folders/${arcFolderIds.referenceId}` : null,
+    3: arcFolderIds.nyukoMaeId  ? `https://drive.google.com/drive/folders/${arcFolderIds.nyukoMaeId}`  : null,
+    4: arcFolderIds.nyukoId     ? `https://drive.google.com/drive/folders/${arcFolderIds.nyukoId}`     : null,
+  };
+
+  const progEl   = document.getElementById(`arc-prog-${stepNum}`);
+  const statusEl = document.getElementById(`arc-status-${stepNum}`);
+  statusEl.textContent = `アップロード中 (0/${files.length})...`;
+
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    try {
+      // arcUploadFile は既存関数を使うが、upload session を新APIから取得
+      await arcUploadFileNew(f, folderId, statusEl, progEl, i, files.length);
+      progEl.style.width = `${Math.round((i + 1) / files.length * 100)}%`;
+      statusEl.textContent = `アップロード中 (${i + 1}/${files.length})...`;
+    } catch(e) {
+      const folderUrl = folderUrlMap[stepNum];
+      const openBtn   = folderUrl
+        ? `<a class="arc-open-folder-btn" href="${folderUrl}" target="_blank" rel="noopener">📂 フォルダを開く</a>`
+        : '';
+      statusEl.innerHTML = `❌ アップロードエラー: ${esc(f.name)}<br>
+        <span style="font-size:0.78rem;color:#666">ファイルサイズが大きすぎる可能性があります。フォルダに直接入れてください。</span><br>
+        ${openBtn}
+        <button class="arc-btn arc-btn-ghost" style="margin-top:8px;font-size:0.78rem" onclick="arcSkip(${nextStep})">スキップして続ける</button>`;
+      return;
+    }
+  }
+
+  statusEl.textContent = `✅ ${files.length}件アップロード完了！`;
+  progEl.style.width   = '100%';
+
+  if (nextStep === 5) {
+    await arcWriteDriveUrlNew();
+    arcGoStep5();
+  } else {
+    setTimeout(() => arcShowStep(nextStep), 600);
+  }
+};
+
+// ── ファイルアップロード（新API版 upload session） ───────────────────────
+async function arcUploadFileNew(f, folderId, statusEl, progEl, idx, total) {
+  const mimeType = f.type || 'application/octet-stream';
+
+  if (f.size <= 10 * 1024 * 1024) {
+    // 10MB以下: base64経由（既存GASプロキシ）
+    const b64 = await fileToBase64(f);
+    const res  = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'uploadFile', folderId, fileName: f.name, mimeType, base64Data: b64 }),
+    });
+    const result = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+    if (!res.ok || result.ok === false) throw new Error(result.error || `HTTP ${res.status}`);
+  } else {
+    // 10MB超: Resumable (新API でセッション作成)
+    statusEl.textContent = `アップロード準備中 (${idx+1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
+    const sessionRes = await fetch(DRIVE_MANAGE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createUploadSession', folder_id: folderId, file_name: f.name, mime_type: mimeType }),
+    });
+    const session = await sessionRes.json().catch(() => ({ ok: false }));
+    if (!sessionRes.ok || !session.upload_url) throw new Error(session.error || 'セッション作成失敗');
+    statusEl.textContent = `アップロード中 (${idx+1}/${total}) ${(f.size/1024/1024).toFixed(1)}MB...`;
+    const uploadRes = await fetch(session.upload_url, { method: 'PUT', headers: { 'Content-Type': mimeType }, body: f });
+    if (uploadRes.status !== 200 && uploadRes.status !== 201) {
+      throw new Error(`Drive アップロード失敗 (${uploadRes.status})`);
+    }
+  }
+}
+
+// ── Drive URL 書き戻し（新API版）────────────────────────────────────────
+async function arcWriteDriveUrlNew() {
+  if (!arcFolderIds.nyukoUrl) return;
+  try {
+    if (typeof arcRowId === 'object' && arcRowId !== null && arcRowId.rowIndex) {
+      await fetch(REQUESTS_UPDATE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'writeDriveUrl',
+          row_index: arcRowId.rowIndex,
+          drive_url: arcFolderIds.nyukoUrl,
+          store_name: arcStoreName,
+        }),
+      });
+    }
+  } catch(e) { console.error('[arcWriteDriveUrlNew]', e); }
+}
+
+// ── 格納完了画面（新メッセージ形式）────────────────────────────────────────
+function arcGoStep5() {
+  const lines = [
+    `${arcStoreName}　${arcMediaName}　の入稿データを格納しました！`,
+    '',
+    'こちらのリンクになります！ご確認よろしくお願いします！',
+    arcFolderIds.nyukoUrl || '',
+  ];
+  document.getElementById('arc-message').textContent = lines.join('\n');
+  document.getElementById('arc-copy-btn').textContent = '📋 メッセージをコピー';
+  const mainUrl = arcFolderIds.mainId
+    ? `https://drive.google.com/drive/folders/${arcFolderIds.mainId}`
+    : (arcFolderIds.nyukoUrl || '#');
+  document.getElementById('arc-folder-link').href = mainUrl;
+  arcShowStep(5);
+}
+
+// ── arcShowStep の上書き（6ステップ対応: 0〜5）────────────────────────────
+window.arcShowStep = function(n) {
+  document.querySelectorAll('.arc-step').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+  });
+  const dots = document.getElementById('arc-dots');
+  if (dots) dots.innerHTML = [0,1,2,3,4,5].map(i =>
+    `<div class="arc-dot${i < n ? ' done' : i === n ? ' active' : ''}"></div>`
+  ).join('');
+};
+
+// ── arcSkip の上書き（5番目が最終ステップ）───────────────────────────────
+const _origArcSkip = typeof arcSkip === 'function' ? arcSkip : null;
+window.arcSkip = function(nextStep) {
+  if (typeof arcRowId === 'string') {
+    // 旧モデルは既存処理
+    if (_origArcSkip) return _origArcSkip(nextStep);
+  }
+  if (nextStep === 5) {
+    arcWriteDriveUrlNew().then(() => arcGoStep5());
+  } else {
+    arcShowStep(nextStep);
+  }
+};
+
+// ── loadReqData の上書き（新Sheets APIへ切り替え）─────────────────────────
+const _origLoadReqData = typeof loadReqData === 'function' ? loadReqData : null;
+window.loadReqData = function() {
+  loadRequestsFromSheet();
+};
+
+// ── renderReqCards の上書き（店舗カードモデルへ）──────────────────────────
+window.renderReqCards = function() {
+  if (storeCards.length) {
+    renderStoreCards();
+  } else {
+    loadRequestsFromSheet();
+  }
+};
 </script>
 </body>
 </html>

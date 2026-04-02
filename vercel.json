@@ -3,8 +3,12 @@
   "buildCommand": "",
   "outputDirectory": ".",
   "functions": {
-    "api/diagnosis.js": { "maxDuration": 30 },
-    "api/data.js": { "maxDuration": 10 },
-    "api/storage.js": { "maxDuration": 15 }
+    "api/diagnosis.js":       { "maxDuration": 30 },
+    "api/data.js":            { "maxDuration": 10 },
+    "api/storage.js":         { "maxDuration": 15 },
+    "api/portfolio-list.js":  { "maxDuration": 30 },
+    "api/requests-list.js":   { "maxDuration": 20 },
+    "api/requests-update.js": { "maxDuration": 15 },
+    "api/drive-manage.js":    { "maxDuration": 20 }
   }
 }
