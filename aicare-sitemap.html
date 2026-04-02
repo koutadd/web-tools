@@ -574,27 +574,6 @@
     ::-webkit-scrollbar-thumb:hover { background: #c0c4ce; }
 
     /* ===== RIGHT TABS ===== */
-    #right-tab-bar {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--white);
-      flex-shrink: 0;
-    }
-    .right-tab-btn {
-      flex: 1;
-      padding: 10px 0;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      border-bottom: 2px solid transparent;
-      transition: color .15s, border-color .15s;
-      font-family: inherit;
-    }
-    .right-tab-btn:hover { color: var(--navy); }
-    .right-tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); }
 
     /* ===== STRUCTURE CANVAS ===== */
     #struct-panel {
@@ -839,16 +818,7 @@
 
   <!-- Detail Panel -->
   <div id="detail-panel">
-    <!-- Tab bar -->
-    <div id="right-tab-bar">
-      <button class="right-tab-btn active" data-tab="detail" onclick="switchRightTab('detail')">詳細</button>
-      <button class="right-tab-btn" data-tab="structure" onclick="switchRightTab('structure')">サイト構成</button>
-    </div>
     <button id="btn-share-page" title="このページを共有">🔗 共有</button>
-    <!-- Structure panel -->
-    <div id="struct-panel" style="display:none; flex:1; overflow:auto; position:relative;">
-      <div id="struct-canvas" style="position:relative; min-width:100%; min-height:100%;"></div>
-    </div>
     <div id="detail-scroll">
       <div id="detail-empty">
         <div class="empty-icon">&#128450;</div>
@@ -882,8 +852,22 @@
                 <option value="deprecated">&#9679; Deprecated</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <!-- Accordion: ディスクリプション -->
+        <div class="accordion" id="acc-description">
+          <button class="accordion-header" data-acc="description">
+            <span>&#128196; ディスクリプション</span>
+            <span class="accordion-arrow">&#9658;</span>
+          </button>
+          <div class="accordion-body">
             <div class="form-row">
-              <label class="form-label">ディスクリプション</label>
+              <label class="form-label">ページタイトル（&lt;title&gt;タグ）</label>
+              <input class="form-input" id="d-page-title" type="text" placeholder="例: 取り扱い商品一覧 | アイケアラボ">
+            </div>
+            <div class="form-row">
+              <label class="form-label">メタディスクリプション</label>
               <textarea class="form-textarea" id="d-description" placeholder="このページの概要・説明文（メタディスクリプションなどに使用）"></textarea>
             </div>
           </div>
@@ -1051,6 +1035,7 @@ const DEFAULT_DATA = [
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 function ensureFields(node) {
+  node.pageTitle   = node.pageTitle   ?? '';
   node.description = node.description ?? '';
   node.memo       = node.memo       ?? '';
   node.target     = node.target     ?? '';
@@ -1104,7 +1089,6 @@ let selectedIds = new Set();   // multi-select
 let dirty = false;
 let dragSrc = null;   // { node, parentArr, index }
 let ctxTargetId = null;
-let _rightTab = 'detail'; // must be declared before renderTree() is called
 
 // ============================================================
 //  UTILS
@@ -1262,7 +1246,6 @@ function renderTree() {
     root.appendChild(renderNode(node, 0));
   });
   updateToolbar();
-  if (_rightTab === 'structure') setTimeout(renderStructureTab, 50);
 }
 
 function renderNode(node, depth) {
@@ -1558,6 +1541,7 @@ function renderDetail() {
   document.getElementById('d-target').value  = node.target;
   document.getElementById('d-goal').value    = node.goal;
   document.getElementById('d-kpi').value     = node.kpi;
+  document.getElementById('d-page-title').value  = node.pageTitle;
   document.getElementById('d-description').value = node.description;
   _filling = false;
 
@@ -1601,6 +1585,7 @@ function bindDetailInputs() {
   document.getElementById('d-target').addEventListener('input', onChange('target'));
   document.getElementById('d-goal').addEventListener('input', onChange('goal'));
   document.getElementById('d-kpi').addEventListener('input', onChange('kpi'));
+  document.getElementById('d-page-title').addEventListener('input', onChange('pageTitle'));
   document.getElementById('d-description').addEventListener('input', onChange('description'));
 }
 
@@ -2329,6 +2314,7 @@ function renderShareView(nodeId) {
   badge.className = 'status-badge status-' + node.status;
   badge.textContent = getStatusLabel(node.status);
   document.getElementById('sv-url').textContent = node.url || '';
+  showShareSection('page-title', node.pageTitle);
   showShareSection('description', node.description);
   showShareSection('memo', node.memo);
   showShareSection('target', node.target);
@@ -2373,23 +2359,8 @@ if (new URLSearchParams(location.search).get('readonly') === '1') {
   });
 }
 
-/* ===== RIGHT TAB SWITCHING ===== */
-function switchRightTab(tab) {
-  _rightTab = tab;
-  document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  const detailScroll = document.getElementById('detail-scroll');
-  const structPanel = document.getElementById('struct-panel');
-  if (tab === 'detail') {
-    if (detailScroll) detailScroll.style.display = '';
-    if (structPanel) structPanel.style.display = 'none';
-  } else {
-    if (detailScroll) detailScroll.style.display = 'none';
-    if (structPanel) { structPanel.style.display = 'flex'; structPanel.style.flexDirection = 'column'; }
-    renderStructureTab();
-  }
-}
-
-/* ===== STRUCTURE TAB RENDERER ===== */
+/* ===== STRUCTURE TAB RENDERER (stub — tab removed) ===== */
+function switchRightTab() {}
 function renderStructureTab() {
   const canvas = document.getElementById('struct-canvas');
   if (!canvas) return;
@@ -2560,26 +2531,15 @@ function spSelectNode(id) {
   if (row) row.scrollIntoView({ block: 'nearest' });
 }
 
-function scSelectNode(id) {
-  selectNode(id);
-  switchRightTab('detail');
-}
-
+function scSelectNode(id) { selectNode(id); }
 function scAddChild(parentId) {
   selectNode(parentId);
   document.getElementById('btn-add-child') && document.getElementById('btn-add-child').click();
-  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
 }
-
-function scAddRoot() {
-  document.getElementById('btn-add-root') && document.getElementById('btn-add-root').click();
-  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
-}
-
+function scAddRoot() { document.getElementById('btn-add-root') && document.getElementById('btn-add-root').click(); }
 function scDeleteNode(id) {
   selectNode(id);
   document.getElementById('btn-delete') && document.getElementById('btn-delete').click();
-  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
 }
 </script>
 
@@ -2596,8 +2556,12 @@ function scDeleteNode(id) {
     <div class="share-status-row">
       <span class="share-url" id="sv-url"></span>
     </div>
+    <div class="share-section" id="sv-sec-page-title">
+      <div class="share-section-label">ページタイトル（&lt;title&gt;）</div>
+      <div class="share-section-value" id="sv-page-title"></div>
+    </div>
     <div class="share-section" id="sv-sec-description">
-      <div class="share-section-label">ディスクリプション</div>
+      <div class="share-section-label">メタディスクリプション</div>
       <div class="share-section-value" id="sv-description"></div>
     </div>
     <div class="share-section" id="sv-sec-memo">
