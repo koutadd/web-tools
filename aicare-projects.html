@@ -2181,14 +2181,15 @@ function renderProjectRow(p) {
   const waitingVal = p.waitingFor || '';
   const nextVal = p.nextAction || '';
   const assigneeVal = p.assignee || '';
-  const assigneeInitial = assigneeVal ? assigneeVal.slice(0,1) : '—';
+  const assigneeInitial = assigneeVal ? assigneeVal.slice(0,2) : '—';
+  const assigneeColor = assigneeVal ? personColor(assigneeVal.split(/[、,，\s]+/)[0].trim()) : '#94a3b8';
   return `
 <div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
   <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
-  <span style="width:68px;flex-shrink:0;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:#94a3b8;" onclick="event.stopPropagation();startInlineEdit('${p.id}','assignee',this)" title="主担当をクリックで編集">
+  <span style="width:68px;flex-shrink:0;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--muted);" onclick="event.stopPropagation();startInlineEdit('${p.id}','assignee',this)" title="主担当をクリックで編集">
     ${assigneeVal
-      ? `<span style="width:20px;height:20px;border-radius:50%;background:#1e3a5a;color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
-      : `<span style="color:#2a3a52;font-style:italic;">担当者</span>`}
+      ? `<span style="width:22px;height:22px;border-radius:50%;background:${assigneeColor};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
+      : `<span style="color:var(--muted);font-style:italic;">担当者</span>`}
   </span>
   <div style="width:72px;flex-shrink:0;" onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
   <div style="width:60px;flex-shrink:0;" onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
