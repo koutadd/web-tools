@@ -1474,13 +1474,24 @@ function renderMembers() {
     if (!grouped[name]) grouped[name] = [];
     if (!grouped[name].includes(p)) grouped[name].push(p);
   }
+  // タスク担当者を再帰収集してプロジェクトに関連付け
+  function collectTaskAssignees(tasks, proj) {
+    (tasks || []).forEach(t => {
+      (t.assignee || '').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean)
+        .forEach(name => addToGroup(name, proj));
+      if (t.children) collectTaskAssignees(t.children, proj);
+    });
+  }
+
   projects.forEach(p => {
-    // assignee と members 両方から人名を収集
+    // プロジェクトの assignee・members から収集
     const assigneeNames = (p.assignee || '').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean);
     const memberNames  = (p.members  || '').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean);
     const allNames = [...new Set([...assigneeNames, ...memberNames])];
-    if (allNames.length === 0) addToGroup('未設定', p);
+    if (allNames.length === 0 && !(p.tasks && p.tasks.length)) addToGroup('未設定', p);
     else allNames.forEach(name => addToGroup(name, p));
+    // タスク担当者も収集
+    collectTaskAssignees(p.tasks, p);
   });
 
   // APP.people に登録されている人も必ず表示（プロジェクト未割当でも）
@@ -2222,7 +2233,27 @@ let currentTab = 'tasks';
 
 // ══════════════════════════════ PROJECT DETAIL INLINE EDIT ══════════════════════════
 const DEFAULT_PEOPLE = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
-function getPeople() { return APP.people && APP.people.length ? APP.people : [...DEFAULT_PEOPLE]; }
+
+// 全プロジェクト・タスクから担当者名を収集してAPP.peopleにマージ
+function getAllKnownPeople() {
+  const set = new Set(APP.people && APP.people.length ? APP.people : DEFAULT_PEOPLE);
+  function scanTasks(tasks) {
+    (tasks || []).forEach(t => {
+      (t.assignee || '').split(/[、,，\s]+/).map(s => s.trim()).filter(Boolean).forEach(n => set.add(n));
+      if (t.children) scanTasks(t.children);
+    });
+  }
+  (APP.projects || []).forEach(p => {
+    (p.assignee || '').split(/[、,，\s]+/).map(s => s.trim()).filter(Boolean).forEach(n => set.add(n));
+    (p.members  || '').split(/[、,，\s]+/).map(s => s.trim()).filter(Boolean).forEach(n => set.add(n));
+    scanTasks(p.tasks);
+  });
+  return [...set].filter(Boolean);
+}
+
+function getPeople() {
+  return getAllKnownPeople();
+}
 
 function startProjDetailEdit(pid, field, el) {
   const p = getProjectById(pid);
