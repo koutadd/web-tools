@@ -167,6 +167,10 @@
       background: var(--navy-pale);
       border-left: 3px solid var(--navy);
     }
+    .tree-row.multi-selected {
+      background: rgba(59,130,246,.13);
+      border-left: 3px solid #60a5fa;
+    }
     .tree-row.dragging { opacity: .35; pointer-events: none; }
     /* drop indicators — position-based */
     .tree-row.dnd-before {
@@ -858,6 +862,7 @@ function loadUpdatedAt() {
 // ============================================================
 let siteData = loadData();
 let selectedId = null;
+let selectedIds = new Set();   // multi-select
 let dirty = false;
 let dragSrc = null;   // { node, parentArr, index }
 let ctxTargetId = null;
@@ -919,7 +924,8 @@ function showToast(msg) {
 //  CLOUD SYNC
 // ============================================================
 const CLOUD_API = '/api/storage?key=sitemap';
-let _lastSaveTime = 0;
+let _lastSaveTime = 0;   // when THIS browser last pushed to cloud
+let _lastSyncTime = 0;   // what cloud updatedAt we last applied (pulled from cloud)
 let _syncing = false;
 
 async function saveToCloud(data) {
@@ -942,12 +948,15 @@ async function syncFromCloud() {
     const remote = await res.json();
     if (!remote || !remote.data || !Array.isArray(remote.data)) { _syncing = false; return; }
     const cloudTs = remote.updatedAt || 0;
-    if (cloudTs <= _lastSaveTime) { _syncing = false; return; }
-    // Don't overwrite if user is actively editing (input focused)
+    // Skip if we already applied this cloud version
+    if (cloudTs <= _lastSyncTime) { _syncing = false; return; }
+    // Skip if we JUST saved this exact version (echo prevention, 6s window)
+    if (cloudTs <= _lastSaveTime && (Date.now() - _lastSaveTime) < 6000) { _syncing = false; return; }
+    // Don't overwrite if user is actively typing
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) { _syncing = false; return; }
     // Apply remote data
-    _lastSaveTime = cloudTs;
+    _lastSyncTime = cloudTs;
     siteData = remote.data;
     siteData.forEach(ensureFields);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: siteData, updatedAt: cloudTs }));
@@ -1022,7 +1031,7 @@ function renderNode(node, depth) {
 
   // row
   const row = document.createElement('div');
-  row.className = 'tree-row' + (node.id === selectedId ? ' selected' : '');
+  row.className = 'tree-row' + (node.id === selectedId ? ' selected' : (selectedIds.has(node.id) ? ' multi-selected' : ''));
   row.dataset.id = node.id;
   row.style.paddingLeft = (depth * 20 + 4) + 'px';
 
@@ -1100,7 +1109,24 @@ function renderNode(node, depth) {
     performMove(dragSrc, node.id, intent);
     dragSrc = null;
   });
-  row.addEventListener('click', e => { if (!e._wasDrag) selectNode(node.id); });
+  row.addEventListener('click', e => {
+    if (e._wasDrag) return;
+    if (e.shiftKey) {
+      // shift-click: toggle multi-select (don't change selectedId/detail panel)
+      if (selectedIds.has(node.id)) {
+        selectedIds.delete(node.id);
+      } else {
+        selectedIds.add(node.id);
+        // Also add current selectedId to the set so it stays highlighted
+        if (selectedId) selectedIds.add(selectedId);
+      }
+      updateToolbar();
+      renderTree();
+    } else {
+      selectedIds.clear();
+      selectNode(node.id);
+    }
+  });
   row.addEventListener('contextmenu', e => openCtxMenu(e, node.id));
 
   li.appendChild(row);
@@ -1138,8 +1164,11 @@ function toggleNode(id) {
 
 function updateToolbar() {
   const hasSel = !!selectedId;
-  document.getElementById('btn-add-child').disabled = !hasSel;
-  document.getElementById('btn-delete').disabled = !hasSel;
+  const hasMulti = selectedIds.size > 0;
+  document.getElementById('btn-add-child').disabled = !hasSel || hasMulti;
+  document.getElementById('btn-delete').disabled = !hasSel && !hasMulti;
+  const delBtn = document.getElementById('btn-delete');
+  delBtn.textContent = hasMulti ? `削除 (${selectedIds.size})` : '削除';
 }
 
 function startInlineEdit(id, labelEl) {
@@ -1222,12 +1251,23 @@ function deleteNode(id) {
   if (!found) return;
   found.arr.splice(found.index, 1);
   if (selectedId === id) selectedId = null;
+  selectedIds.delete(id);
   markDirty();
   renderTree();
   renderDetail();
 }
 
 function confirmDelete(id) {
+  // Multi-select batch delete
+  if (selectedIds.size > 0) {
+    const ids = [...selectedIds];
+    showModal(`${ids.length}件のページをまとめて削除しますか？`, () => {
+      ids.forEach(i => deleteNode(i));
+      selectedIds.clear();
+      updateToolbar();
+    }, true);
+    return;
+  }
   const node = findNode(id, siteData);
   if (!node) return;
   const hasChildren = node.children.length > 0;
@@ -1635,8 +1675,12 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     save();
   }
+  if (e.key === 'Escape') {
+    if (selectedIds.size > 0) { selectedIds.clear(); updateToolbar(); renderTree(); }
+  }
   if (e.key === 'Delete' || e.key === 'Backspace') {
-    if (selectedId) confirmDelete(selectedId);
+    if (selectedIds.size > 0) confirmDelete(null);
+    else if (selectedId) confirmDelete(selectedId);
   }
 });
 
@@ -1644,6 +1688,7 @@ document.addEventListener('keydown', e => {
 //  INIT
 // ============================================================
 _lastSaveTime = loadUpdatedAt();
+_lastSyncTime = _lastSaveTime;  // treat existing local data as already "synced"
 bindAccordions();
 bindDetailInputs();
 renderTree();
