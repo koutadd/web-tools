@@ -1649,12 +1649,13 @@ function renderDashboard() {
     <!-- 列ヘッダー -->
     <div style="display:flex;align-items:center;gap:10px;padding:4px 21px 8px;font-size:10px;color:#3d5070;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;">
       <span style="flex:1;">プロジェクト名</span>
+      <span style="width:68px;">主担当</span>
       <span style="width:72px;text-align:center;">状態</span>
       <span style="width:60px;text-align:center;">優先度</span>
-      <span style="width:84px;text-align:center;">誰待ち</span>
-      <span style="width:90px;text-align:center;">期限</span>
+      <span style="width:76px;text-align:center;">誰待ち</span>
+      <span style="width:84px;text-align:center;">期限</span>
       <span style="width:150px;">次アクション</span>
-      <span style="width:88px;"></span>
+      <span style="width:80px;"></span>
     </div>
     <div id="proj-list">
       ${sorted.map(p => renderProjectRow(p)).join('')}
@@ -1680,16 +1681,44 @@ function renderDashboard() {
   <!-- ⑤ カテゴリ一覧 -->
   <div class="section-block">
     ${sectionHead('🏷','カテゴリ一覧','カテゴリ別の一覧ページへ')}
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
       ${getCategories().map(cat => {
-        const count = projects.filter(p => p.categoryId === cat.id).length;
-        const doing = projects.filter(p => p.categoryId === cat.id && p.status === '進行中').length;
-        const done  = projects.filter(p => p.categoryId === cat.id && p.status === '完了').length;
+        const catProjs = projects.filter(p => p.categoryId === cat.id);
+        const count  = catProjs.length;
+        const doing  = catProjs.filter(p => p.status === '進行中').length;
+        const review = catProjs.filter(p => p.status === '要確認').length;
+        const done   = catProjs.filter(p => p.status === '完了').length;
+        const todo   = catProjs.filter(p => p.status === '未着手').length;
         return `
-        <div class="compact-cat-card" style="border-left-color:${cat.color};" onclick="navigate('#/category/${cat.id}')">
-          <span style="font-size:15px;">${cat.icon}</span>
-          <span class="ccc-name">${cat.name}</span>
-          <span class="ccc-count" style="margin-left:auto;">${count}件${doing ? `・進行${doing}` : ''}</span>
+        <div onclick="navigate('#/category/${cat.id}')" style="
+          background:var(--surface);
+          border:1px solid ${cat.color}44;
+          border-top:3px solid ${cat.color};
+          border-radius:12px;
+          padding:18px 20px;
+          cursor:pointer;
+          transition:background 0.15s, border-color 0.15s;
+          position:relative;
+          overflow:hidden;
+        " onmouseenter="this.style.background='#161d2e'" onmouseleave="this.style.background='var(--surface)'">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;">
+            <div>
+              <div style="font-size:22px;margin-bottom:4px;">${cat.icon}</div>
+              <div style="font-size:15px;font-weight:800;color:#e8f0ff;">${cat.name}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:28px;font-weight:900;color:${cat.color};line-height:1;">${count}</div>
+              <div style="font-size:10px;color:var(--muted);">件</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+            ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:#7db8ff;border:1px solid rgba(59,130,246,0.3);">進行中 ${doing}</span>` : ''}
+            ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">要確認 ${review}</span>` : ''}
+            ${todo   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(107,114,128,0.12);color:#94a3b8;border:1px solid rgba(107,114,128,0.25);">未着手 ${todo}</span>` : ''}
+            ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);color:#4ade80;border:1px solid rgba(16,185,129,0.25);">完了 ${done}</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">${cat.desc || ''}</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;pointer-events:none;font-size:12px;">今見る →</button>
         </div>`;
       }).join('')}
     </div>
@@ -1778,21 +1807,28 @@ function projectRowBorderColor(p) {
 
 function renderProjectRow(p) {
   const d = daysUntil(p.deadline);
-  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fb923c' : 'var(--muted)';
-  const dlText = p.deadline ? `<span style="color:${dlColor};">${formatDate(p.deadline)}</span>` : '<span style="color:var(--muted);">—</span>';
+  const dlColor = d !== null && d < 0 ? '#f87171' : d !== null && d <= 3 ? '#fb923c' : '#5a7090';
+  const dlText = p.deadline ? `<span style="color:${dlColor};font-weight:${d!==null&&d<=3?'700':'400'};">${formatDate(p.deadline)}</span>` : '<span style="color:#2a3a52;">—</span>';
   const dim = (p.status === '完了' || p.status === '保留') ? ' dim' : '';
   const borderColor = projectRowBorderColor(p);
   const waitingVal = p.waitingFor || '';
   const nextVal = p.nextAction || '';
+  const assigneeVal = p.assignee || '';
+  const assigneeInitial = assigneeVal ? assigneeVal.slice(0,1) : '—';
   return `
 <div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
   <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
+  <span style="width:68px;flex-shrink:0;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:#94a3b8;" onclick="event.stopPropagation();startInlineEdit('${p.id}','assignee',this)" title="主担当をクリックで編集">
+    ${assigneeVal
+      ? `<span style="width:20px;height:20px;border-radius:50%;background:#1e3a5a;color:#7db8ff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
+      : `<span style="color:#2a3a52;font-style:italic;">担当者</span>`}
+  </span>
   <div style="width:72px;flex-shrink:0;" onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
   <div style="width:60px;flex-shrink:0;" onclick="event.stopPropagation()">${priorityDropdownHtml(p)}</div>
-  <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
-  <span class="proj-row-deadline" style="width:90px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
-  <span class="proj-row-next" style="width:150px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 26) : '<i style="color:#2a3a52;">次アクション未設定</i>'}</span>
-  <div style="display:flex;gap:4px;flex-shrink:0;width:88px;" onclick="event.stopPropagation()">
+  <span class="proj-row-waiting${waitingVal ? '' : ' empty'}" style="width:76px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','waitingFor',this)">${waitingVal || '誰待ち'}</span>
+  <span class="proj-row-deadline" style="width:84px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','deadline',this)">${dlText}</span>
+  <span class="proj-row-next" style="width:150px;" onclick="event.stopPropagation();startInlineEdit('${p.id}','nextAction',this)">${nextVal ? truncate(nextVal, 24) : '<i style="color:#2a3a52;">次アクション</i>'}</span>
+  <div style="display:flex;gap:4px;flex-shrink:0;width:80px;" onclick="event.stopPropagation()">
     <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px;" onclick="navigate('#/project/${p.id}')">今見る</button>
     <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px;" onclick="openProjectModal('${p.id}')">編集</button>
   </div>
