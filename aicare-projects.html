@@ -1322,6 +1322,11 @@ async function syncFromCloud() {
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
     data.projects.forEach(p => ensureChildren(p.tasks));
+    // ローカルで追加した担当者をクラウドデータが上書きしないようにマージ
+    if (APP.people && APP.people.length) {
+      if (!data.people || !data.people.length) data.people = APP.people;
+      else data.people = [...new Set([...data.people, ...APP.people])];
+    }
     APP = data;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     render();
