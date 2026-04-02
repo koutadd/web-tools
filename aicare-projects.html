@@ -789,6 +789,38 @@ body {
 .task-children { margin-left:28px; margin-top:6px; padding-left:12px; border-left:2px solid #374151; }
 .task-children .task-item { background:#16162a; }
 
+/* ===================== TASK DETAIL EXPAND ===================== */
+.task-wrap { margin-bottom: 6px; }
+.task-item { cursor: pointer; }
+.task-item:hover { border-color: rgba(245,158,11,0.3); }
+.task-detail {
+  display: none;
+  background: #0e1520;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px 14px 52px;
+  margin-top: -6px;
+  animation: slideDown 0.15s ease;
+}
+.task-wrap.expanded .task-item {
+  border-radius: 10px 10px 0 0;
+  border-bottom-color: transparent;
+  border-color: rgba(245,158,11,0.4);
+}
+.task-wrap.expanded .task-detail { display: block; border-color: rgba(245,158,11,0.3); }
+@keyframes slideDown { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+.task-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+@media (max-width: 600px) { .task-detail-grid { grid-template-columns: 1fr; } }
+.td-row { display: flex; flex-direction: column; gap: 3px; }
+.td-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+.td-val { font-size: 13px; color: var(--text); line-height: 1.5; }
+.td-val.empty { color: #3d5070; font-style: italic; }
+
 </style>
 </head>
 <body>
@@ -1927,41 +1959,90 @@ function renderTaskTab(p) {
   </div>`;
 }
 
+function toggleTaskDetail(safeId) {
+  const wrap = document.getElementById('task-wrap-' + safeId);
+  if (wrap) wrap.classList.toggle('expanded');
+}
+
 function renderTaskItem(projectId, t, isChild) {
+  const safeId = t.id.replace(/[^a-z0-9]/gi, '_');
   const children = t.children || [];
   const childrenHtml = children.length > 0
     ? `<div class="task-children">${children.map(c => renderTaskItem(projectId, c, true)).join('')}</div>`
     : '';
+
+  const d = daysUntil(t.deadline);
+  const dlColor = d !== null && d < 0 ? '#f87171' : d !== null && d <= 3 ? '#fb923c' : 'var(--muted)';
+
+  const detailHtml = `
+  <div class="task-detail">
+    <div class="task-detail-grid">
+      <div class="td-row">
+        <div class="td-label">担当者</div>
+        <div class="td-val${t.assignee ? '' : ' empty'}">${t.assignee || '未設定'}</div>
+      </div>
+      <div class="td-row">
+        <div class="td-label">期限</div>
+        <div class="td-val${t.deadline ? '' : ' empty'}" style="${t.deadline ? 'color:' + dlColor : ''}">${t.deadline ? formatDate(t.deadline) + (d !== null ? (d < 0 ? ` （${Math.abs(d)}日超過）` : d === 0 ? ' （今日）' : ` （あと${d}日）`) : '') : '未設定'}</div>
+      </div>
+      <div class="td-row">
+        <div class="td-label">誰待ち</div>
+        <div class="td-val${t.waitingFor ? '' : ' empty'}" style="${t.waitingFor ? 'color:#fdba74;' : ''}">${t.waitingFor || 'なし'}</div>
+      </div>
+      <div class="td-row">
+        <div class="td-label">優先度</div>
+        <div class="td-val">${priorityBadge(t.priority)}</div>
+      </div>
+      ${t.nextAction ? `
+      <div class="td-row" style="grid-column:1/-1;">
+        <div class="td-label">次アクション</div>
+        <div class="td-val" style="color:#fbbf24;">▶ ${t.nextAction}</div>
+      </div>` : ''}
+      ${t.notes ? `
+      <div class="td-row" style="grid-column:1/-1;">
+        <div class="td-label">メモ</div>
+        <div class="td-val" style="color:var(--muted);white-space:pre-wrap;">${t.notes}</div>
+      </div>` : ''}
+    </div>
+    <div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openTaskModal('${projectId}','${t.id}')">✏️ 編集</button>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteTask('${projectId}','${t.id}')">🗑 削除</button>
+    </div>
+  </div>`;
+
   return `
-  <div class="task-item" data-task-id="${t.id}" data-project-id="${projectId}"
-       id="task-item-${t.id.replace(/\W/g,'_')}"
-       draggable="true"
-       ondragstart="taskDragStart(event,'${projectId}','${t.id}')"
-       ondragover="taskDragOver(event,'${projectId}','${t.id}')"
-       ondragleave="taskDragLeave(event,'${t.id}')"
-       ondrop="taskDrop(event,'${projectId}','${t.id}')"
-       ondragend="taskDragEnd()">
-    <span class="task-drag-handle">⠿</span>
-    <div>
-      <div class="status-dropdown-wrap" id="tsdw-${t.id.replace(/\W/g,'_')}">
-        <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}','${projectId}')">${t.status} ▾</span>
-        <div class="status-menu">
-          ${['未着手','進行中','完了','要確認','保留'].map(s => `<button onclick="quickChangeTaskStatus('${t.id}','${projectId}','${s}')">${s}</button>`).join('')}
+  <div class="task-wrap" id="task-wrap-${safeId}">
+    <div class="task-item" data-task-id="${t.id}" data-project-id="${projectId}"
+         id="task-item-${safeId}"
+         draggable="true"
+         ondragstart="taskDragStart(event,'${projectId}','${t.id}')"
+         ondragover="taskDragOver(event,'${projectId}','${t.id}')"
+         ondragleave="taskDragLeave(event,'${t.id}')"
+         ondrop="taskDrop(event,'${projectId}','${t.id}')"
+         ondragend="taskDragEnd()"
+         onclick="toggleTaskDetail('${safeId}')">
+      <span class="task-drag-handle" onclick="event.stopPropagation()">⠿</span>
+      <div onclick="event.stopPropagation()">
+        <div class="status-dropdown-wrap" id="tsdw-${safeId}">
+          <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}','${projectId}')">${t.status} ▾</span>
+          <div class="status-menu">
+            ${['未着手','進行中','完了','要確認','保留'].map(s => `<button onclick="quickChangeTaskStatus('${t.id}','${projectId}','${s}')">${s}</button>`).join('')}
+          </div>
         </div>
       </div>
+      <div class="task-name">${t.name}</div>
+      <div class="task-meta">
+        ${t.assignee ? `<span>👤 ${t.assignee}</span>` : ''}
+        ${t.waitingFor ? `<span style="color:#fdba74;">⏳ ${t.waitingFor}</span>` : ''}
+        ${t.deadline ? `<span style="color:${dlColor};">📅 ${formatDate(t.deadline)}</span>` : ''}
+        ${t.nextAction ? `<span style="color:#fbbf24;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">▶ ${t.nextAction}</span>` : ''}
+      </div>
+      <div style="font-size:18px;color:#3d5070;margin-left:auto;flex-shrink:0;user-select:none;" onclick="event.stopPropagation();toggleTaskDetail('${safeId}')">›</div>
+      <div class="task-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-ghost btn-sm" onclick="openTaskModal('${projectId}','${t.id}')">✏️</button>
+      </div>
     </div>
-    <div class="task-name">${t.name}</div>
-    <div class="task-meta">
-      ${priorityBadge(t.priority)}
-      ${t.assignee ? `<span>👤 ${t.assignee}</span>` : ''}
-      ${t.waitingFor ? `<span style="color:#fb923c;">⏳ ${t.waitingFor}</span>` : ''}
-      ${t.nextAction ? `<span style="color:var(--accent);">▶ ${truncate(t.nextAction,20)}</span>` : ''}
-      ${t.deadline ? `<span>📅 ${formatDate(t.deadline)}</span>` : ''}
-    </div>
-    <div class="task-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openTaskModal('${projectId}','${t.id}')">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteTask('${projectId}','${t.id}')">🗑</button>
-    </div>
+    ${detailHtml}
   </div>${childrenHtml}`;
 }
 
