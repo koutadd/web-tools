@@ -521,9 +521,64 @@
   </style>
 </head>
 <body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
 
 <!-- ========== TOOLBAR ========== -->
 <div id="toolbar">
+  <a href="http://localhost:8766/persona-dashboard.html#positioning" class="tb-btn accent" style="text-decoration:none;">← Hub</a>
+  <div class="sep"></div>
   <span class="logo">&#128065; アイケアラボ サイトマップ</span>
   <div class="sep"></div>
   <button class="tb-btn primary" id="btn-add-root" title="ルートページを追加">
@@ -710,47 +765,45 @@ const STORAGE_KEY = 'aicare-sitemap-v1';
 const DEFAULT_DATA = [
   {
     id: 'top', name: 'TOP', url: 'aicare-top-prototype.html', status: 'live',
-    memo: 'メインランディングページ。ヒーロースライダー3枚構成。',
-    target: '', goal: '', kpi: '', links: ['vision-check', 'lab365', 'stores'],
+    memo: 'メインランディングページ', target: '', goal: '', kpi: '', links: [],
     children: [
-      {id: 'about',      name: '眼の整体院とは', url: '#about',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'strengths',  name: '強み',          url: '#strengths', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'menu',       name: 'メニュー・料金', url: '#menu',      status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'trust',      name: '専門機関・実績', url: '#trust',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'voice',      name: 'お客様の声',    url: '#voice',     status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'stores-sec', name: '店舗一覧',      url: '#stores',    status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'faq',        name: 'FAQ',           url: '#faq',       status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'sns',        name: '公式メディア',   url: '#sns',       status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'lab365-sec', name: 'アイケアラボ365', url: '#lab365',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+      {
+        id: 'about', name: '眼の整体院とは', url: 'about.html', status: 'live',
+        memo: '', target: '', goal: '', kpi: '', links: [],
+        children: [
+          {id: 'menu', name: 'メニュー・料金', url: 'menu.html', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+        ]
+      },
+      {id: 'achievements', name: '専門機関・実績',  url: 'achievements.html', status: 'live',    memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {id: 'voices',       name: 'お客様の声',      url: 'voices.html',       status: 'live',    memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+      {
+        id: 'stores', name: '店舗一覧', url: 'aicare-stores.html', status: 'live',
+        memo: '', target: '', goal: '', kpi: '', links: [],
+        children: [
+          {id: 'stores-list', name: '店舗一覧',   url: 'aicare-stores.html',      status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'faq',         name: 'FAQ',        url: 'faq.html',                status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'media',       name: '公式メディア', url: 'media.html',             status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+        ]
+      },
+      {
+        id: 'lab365', name: 'アイケアラボ365', url: 'lab365.html', status: 'live',
+        memo: '', target: '', goal: '', kpi: '', links: [],
+        children: [
+          {id: 'lab365-price',   name: '料金プラン',       url: 'lab365.html#price',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'lab365-content', name: 'コンテンツフィード', url: 'lab365.html#content', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'lab365-about',   name: '概要',             url: 'lab365.html#about',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'lab365-member',  name: 'メンバー',          url: 'lab365.html#member',  status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+        ]
+      },
+      {
+        id: 'products', name: '取り扱い商品一覧', url: 'products.html', status: 'planned',
+        memo: '', target: '', goal: '', kpi: '', links: [],
+        children: [
+          {id: 'vision-check', name: 'セルフ視界チェック', url: 'aicare-vision-check.html', status: 'live',    memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
+          {id: 'contact',      name: 'お問い合わせ',       url: 'contact.html',             status: 'planned', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
+        ]
+      }
     ]
-  },
-  {
-    id: 'vision-check', name: 'セルフ視界チェック', url: 'aicare-vision-check.html', status: 'live',
-    memo: '10問の診断ツール。5種類の結果タイプ。',
-    target: '', goal: '', kpi: '', links: ['top', 'lab365'], children: []
-  },
-  {
-    id: 'lab365', name: 'アイケアラボ365', url: 'aicare-lab365.html', status: 'live',
-    memo: 'DMMオンラインサロン風サブスクページ。',
-    target: '', goal: '', kpi: '', links: ['top', 'vision-check'],
-    children: [
-      {id: 'lab365-content', name: 'コンテンツフィード', url: 'aicare-lab365.html#content', status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'lab365-about',   name: '概要',             url: 'aicare-lab365.html#about',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'lab365-member',  name: 'メンバー',          url: 'aicare-lab365.html#member',  status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]},
-      {id: 'lab365-price',   name: '料金プラン',        url: 'aicare-lab365.html#price',   status: 'live', memo:'', target:'', goal:'', kpi:'', links:[], children:[]}
-    ]
-  },
-  {
-    id: 'stores', name: '店舗一覧', url: 'aicare-stores.html', status: 'live',
-    memo: '', target: '', goal: '', kpi: '', links: [], children: []
-  },
-  {
-    id: 'store-detail', name: '店舗詳細', url: 'aicare-store-detail.html', status: 'live',
-    memo: '', target: '', goal: '', kpi: '', links: [], children: []
-  },
-  {
-    id: 'future-1', name: 'ブログ・コラム', url: '/blog', status: 'planned',
-    memo: '将来追加予定', target: '', goal: '', kpi: '', links: [], children: []
   }
 ];
 
@@ -776,13 +829,28 @@ function loadData() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      parsed.forEach(ensureFields);
-      return parsed;
+      // Support both old format (array) and new format ({data, updatedAt})
+      const arr = Array.isArray(parsed) ? parsed : (parsed.data || []);
+      if (arr.length) {
+        arr.forEach(ensureFields);
+        return arr;
+      }
     }
   } catch(e) {}
   const d = deepClone(DEFAULT_DATA);
   d.forEach(ensureFields);
   return d;
+}
+
+function loadUpdatedAt() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return parsed.updatedAt || 0;
+    }
+  } catch(e) {}
+  return 0;
 }
 
 // ============================================================
@@ -848,12 +916,61 @@ function showToast(msg) {
 }
 
 // ============================================================
+//  CLOUD SYNC
+// ============================================================
+const CLOUD_API = '/api/storage?key=sitemap';
+let _lastSaveTime = 0;
+let _syncing = false;
+
+async function saveToCloud(data) {
+  try {
+    const res = await fetch(CLOUD_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data, updatedAt: _lastSaveTime })
+    });
+    if (!res.ok) console.warn('Cloud save failed:', res.status);
+  } catch(e) { console.warn('Cloud save error:', e.message); }
+}
+
+async function syncFromCloud() {
+  if (_syncing) return;
+  _syncing = true;
+  try {
+    const res = await fetch(CLOUD_API + '&t=' + Date.now());
+    if (!res.ok) { _syncing = false; return; }
+    const remote = await res.json();
+    if (!remote || !remote.data || !Array.isArray(remote.data)) { _syncing = false; return; }
+    const cloudTs = remote.updatedAt || 0;
+    const localTs = _lastSaveTime;
+    if (cloudTs <= localTs) { _syncing = false; return; }
+    // Don't overwrite if user is actively editing
+    if (Date.now() - _lastSaveTime < 8000) { _syncing = false; return; }
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) { _syncing = false; return; }
+    // Apply remote data
+    _lastSaveTime = cloudTs;
+    siteData = remote.data;
+    siteData.forEach(ensureFields);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+    renderTree();
+    renderDetail();
+    markClean();
+    showToast('☁️ 他の端末の変更を同期しました');
+  } catch(e) { /* silent */ }
+  _syncing = false;
+}
+
+// ============================================================
 //  SAVE / EXPORT
 // ============================================================
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+  _lastSaveTime = Date.now();
+  const payload = { data: siteData, updatedAt: _lastSaveTime };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   markClean();
   showToast('保存しました');
+  saveToCloud(siteData);
 }
 
 function exportJSON() {
@@ -1508,9 +1625,7 @@ document.getElementById('btn-reset').addEventListener('click', resetToDefault);
 // ============================================================
 //  AUTO-SAVE on page unload
 // ============================================================
-window.addEventListener('beforeunload', () => {
-  if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
-});
+// beforeunload handled in INIT section
 
 // ============================================================
 //  KEYBOARD SHORTCUTS
@@ -1530,19 +1645,30 @@ document.addEventListener('keydown', e => {
 // ============================================================
 //  INIT
 // ============================================================
+_lastSaveTime = loadUpdatedAt();
 bindAccordions();
 bindDetailInputs();
 renderTree();
 renderDetail();
-markClean(); // loaded state is "clean"
+markClean();
 
-// Auto-save interval every 60 seconds
+// Auto-save + cloud sync every 5 seconds
 setInterval(() => {
   if (dirty) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
-    markClean();
+    save(); // saves to both localStorage and cloud
   }
-}, 60000);
+}, 5000);
+
+// Cloud sync every 20 seconds (pick up changes from other browsers)
+setInterval(syncFromCloud, 20000);
+syncFromCloud(); // initial sync on load
+
+// タブ切替・閉じる時も即保存
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && dirty) save();
+  if (document.visibilityState === 'visible') syncFromCloud();
+});
+window.addEventListener('beforeunload', () => { if (dirty) save(); });
 
 // ============================================================
 //  FLOW MAP
