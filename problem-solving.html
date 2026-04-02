@@ -6,376 +6,159 @@
   <title>問題解決スキーム | eye care lab</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --navy: #0D2B5E;
-      --navy-light: #1a3d7c;
-      --bg: #f5f6f8;
-      --white: #ffffff;
-      --border: #dde1ea;
-      --text: #1a1a2e;
-      --text-muted: #6b7280;
-      --accent: #3b82f6;
-      --radius: 12px;
+      --navy: #0D2B5E; --navy-light: #1a3d7c;
+      --bg: #f5f6f8; --white: #ffffff; --border: #dde1ea;
+      --text: #1a1a2e; --text-muted: #6b7280;
+      --accent: #3b82f6; --radius: 12px;
     }
+    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ── COMMON NAV ── */
-    #aicare-common-nav {
-      position: sticky; top: 0; z-index: 100;
-      background: #0D2B5E;
-      padding: 0 16px;
-      display: flex; align-items: center; flex-wrap: wrap;
-      gap: 2px 0;
-      min-height: 36px;
-      font-size: 11.5px;
-    }
-    #aicare-common-nav .cn-label {
-      color: rgba(255,255,255,.5);
-      font-size: 10px; font-weight: 700; letter-spacing: .1em;
-      margin-right: 6px; white-space: nowrap;
-    }
+    /* NAV */
+    #aicare-common-nav { position: sticky; top: 0; z-index: 200; background: #0D2B5E; padding: 0 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 2px 0; min-height: 36px; font-size: 11.5px; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,.5); font-size: 10px; font-weight: 700; letter-spacing: .1em; margin-right: 6px; white-space: nowrap; }
     #aicare-common-nav .cn-sep { color: rgba(255,255,255,.2); margin: 0 4px; }
-    #aicare-common-nav a {
-      color: rgba(255,255,255,.75); text-decoration: none;
-      padding: 8px 8px; font-size: 11.5px; white-space: nowrap;
-      border-bottom: 2px solid transparent;
-      transition: color .15s, border-color .15s;
-    }
+    #aicare-common-nav a { color: rgba(255,255,255,.75); text-decoration: none; padding: 8px 8px; font-size: 11.5px; white-space: nowrap; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
     #aicare-common-nav a:hover { color: #fff; }
     #aicare-common-nav a.cn-active { color: #fff; border-bottom-color: #60a5fa; font-weight: 700; }
+    .nav-history-btn { margin-left: auto; padding: 5px 14px; background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s; white-space: nowrap; }
+    .nav-history-btn:hover { background: rgba(255,255,255,.22); }
 
-    /* ── LAYOUT ── */
-    .page-wrap {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
-    }
+    /* LAYOUT */
+    .page-wrap { max-width: 640px; margin: 0 auto; padding: 36px 20px 80px; }
+    .page-title { text-align: center; margin-bottom: 28px; }
+    .page-title h1 { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+    .page-title p { font-size: 13px; color: var(--text-muted); }
 
-    .page-title {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .page-title h1 {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--navy);
-      margin-bottom: 6px;
-    }
-    .page-title p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* ── PROGRESS ── */
-    .progress-wrap {
-      margin-bottom: 32px;
-    }
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .progress-label {
-      font-size: 10px;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-align: center;
-      flex: 1;
-      transition: color .2s;
-    }
+    /* PROGRESS */
+    .progress-wrap { margin-bottom: 28px; }
+    .progress-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; flex: 1; transition: color .2s; }
     .progress-label.active { color: var(--accent); }
     .progress-label.done { color: var(--navy); }
-    .progress-bar-track {
-      height: 6px;
-      background: var(--border);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--navy), var(--accent));
-      border-radius: 999px;
-      transition: width .35s cubic-bezier(.4,0,.2,1);
-    }
-    .progress-step-dots {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-    }
-    .step-dot {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: var(--white);
-      border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px; font-weight: 800;
-      color: var(--text-muted);
-      transition: all .2s;
-      flex-shrink: 0;
-    }
-    .step-dot.active {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
-    }
-    .step-dot.done {
-      border-color: var(--navy);
-      background: var(--navy);
-      color: #fff;
-    }
+    .progress-bar-track { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--accent)); border-radius: 999px; transition: width .35s cubic-bezier(.4,0,.2,1); }
+    .progress-step-dots { display: flex; justify-content: space-between; margin-top: 8px; }
+    .step-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--white); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--text-muted); transition: all .2s; flex-shrink: 0; cursor: pointer; }
+    .step-dot:hover { border-color: var(--accent); }
+    .step-dot.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .step-dot.done { border-color: var(--navy); background: var(--navy); color: #fff; }
 
-    /* ── SLIDE CARD ── */
-    .slide-container {
-      position: relative;
-      min-height: 320px;
-    }
-    .slide {
-      display: none;
-      animation: slideIn .25s ease;
-    }
-    .slide.active { display: block; }
+    /* SLIDE */
+    .slide-container { position: relative; min-height: 320px; }
+    .slide { display: none; }
+    .slide.active { display: block; animation: slideIn .22s ease; }
+    .slide.active.back-anim { animation: slideBack .22s ease; }
+    @keyframes slideIn  { from { opacity:0; transform:translateX(20px);  } to { opacity:1; transform:translateX(0); } }
+    @keyframes slideBack { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(18px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes slideBack {
-      from { opacity: 0; transform: translateX(-18px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    .slide.back-anim { animation: slideBack .25s ease; }
-
-    .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 32px 28px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.07);
-      border: 1px solid var(--border);
-    }
-
-    .step-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--navy);
-      color: #fff;
-      font-size: 10px; font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 999px;
-      margin-bottom: 16px;
-      letter-spacing: .05em;
-    }
-    .step-badge .step-num {
-      background: rgba(255,255,255,.2);
-      border-radius: 50%;
-      width: 16px; height: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px;
-    }
-
-    .card h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-    .card .guide {
-      font-size: 12.5px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-    .card .guide strong {
-      color: var(--navy);
-    }
-
-    label.field-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      letter-spacing: .03em;
-      text-transform: uppercase;
-    }
-
-    textarea.main-input {
-      width: 100%;
-      min-height: 120px;
-      padding: 14px 16px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      font-size: 15px;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--white);
-      resize: vertical;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-      line-height: 1.6;
-    }
-    textarea.main-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
-    }
+    /* CARD */
+    .card { background: var(--white); border-radius: var(--radius); padding: 28px 24px; box-shadow: 0 2px 14px rgba(0,0,0,.08); border: 1px solid var(--border); }
+    .step-badge { display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-bottom: 14px; letter-spacing: .05em; }
+    .step-badge .step-num { background: rgba(255,255,255,.22); border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+    .card h2 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+    .card .guide { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6; }
+    .card .guide strong { color: var(--navy); }
+    label.field-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; letter-spacing: .05em; text-transform: uppercase; }
+    textarea.main-input { width: 100%; min-height: 110px; padding: 13px 15px; border: 2px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; color: var(--text); background: var(--white); resize: vertical; outline: none; transition: border-color .15s, box-shadow .15s; line-height: 1.6; }
+    textarea.main-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
     textarea.main-input::placeholder { color: #bbb; }
 
-    .example-hint {
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    .example-hint span {
-      display: inline-block;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 8px;
-      margin: 2px 3px;
-      cursor: pointer;
-      transition: background .1s;
-    }
-    .example-hint span:hover { background: #e0e7f7; }
+    /* CHIPS */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip { display: inline-block; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); cursor: pointer; transition: all .12s; }
+    .chip:hover { background: #dbeafe; border-color: var(--accent); color: var(--navy); }
 
-    /* ── NAVIGATION BUTTONS ── */
-    .nav-btns {
-      display: flex;
-      gap: 12px;
-      margin-top: 28px;
-      justify-content: space-between;
-    }
-    .btn-back {
-      padding: 12px 24px;
-      background: var(--white);
-      color: var(--text-muted);
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all .15s;
-    }
+    /* HELPER BUTTONS */
+    .helper-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .helper-btn { padding: 8px 14px; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all .12s; display: flex; align-items: center; gap: 5px; }
+    .helper-btn:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+
+    /* HINT BUBBLE */
+    .hint-bubble { margin-top: 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: #0369a1; line-height: 1.7; display: none; animation: fadeIn .2s ease; }
+    .hint-bubble.visible { display: block; }
+    .hint-bubble strong { display: block; font-size: 11px; font-weight: 800; letter-spacing: .04em; margin-bottom: 4px; color: #0284c7; text-transform: uppercase; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    /* NAV BTNS */
+    .nav-btns { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-back { padding: 14px 22px; background: var(--white); color: var(--text-muted); border: 2px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
     .btn-back:hover:not(:disabled) { border-color: var(--navy); color: var(--navy); }
     .btn-back:disabled { opacity: .35; cursor: default; }
-    .btn-next {
-      flex: 1;
-      padding: 14px 24px;
-      background: var(--navy);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .15s, transform .1s;
-    }
+    .btn-next { flex: 1; padding: 14px 24px; background: var(--navy); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s, transform .1s; }
     .btn-next:hover { background: var(--navy-light); }
     .btn-next:active { transform: scale(.98); }
 
-    /* ── RESULT SLIDE ── */
-    .result-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 32px 28px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.07);
-      border: 1px solid var(--border);
-    }
-    .result-card h2 {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--navy);
-      margin-bottom: 24px;
-      padding-bottom: 14px;
-      border-bottom: 2px solid var(--border);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .result-row {
-      display: flex;
-      gap: 0;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--bg);
-      align-items: flex-start;
-    }
+    /* RESULT */
+    .result-card { background: var(--white); border-radius: var(--radius); padding: 28px 24px; box-shadow: 0 2px 14px rgba(0,0,0,.08); border: 1px solid var(--border); }
+    .result-card h2 { font-size: 18px; font-weight: 800; color: var(--navy); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .result-row { display: flex; gap: 0; padding: 11px 0; border-bottom: 1px solid var(--bg); align-items: flex-start; }
     .result-row:last-of-type { border-bottom: none; }
-    .result-key {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      min-width: 80px;
-      padding-top: 2px;
-      flex-shrink: 0;
-    }
-    .result-val {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.7;
-      white-space: pre-wrap;
-      flex: 1;
-    }
+    .result-key { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase; min-width: 80px; padding-top: 2px; flex-shrink: 0; }
+    .result-val { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; flex: 1; }
     .result-val.empty { color: #bbb; font-style: italic; }
 
-    .copy-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 13px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .15s, transform .1s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .copy-btn:hover { background: #2563eb; }
-    .copy-btn:active { transform: scale(.98); }
-    .copy-btn.copied { background: #16a34a; }
+    /* ACTION BTNS */
+    .action-btn { width: 100%; margin-top: 10px; padding: 13px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s, transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .action-btn:active { transform: scale(.98); }
+    .action-btn.blue   { background: var(--accent); color: #fff; }
+    .action-btn.blue:hover   { background: #2563eb; }
+    .action-btn.blue.copied  { background: #16a34a; }
+    .action-btn.green  { background: #16a34a; color: #fff; }
+    .action-btn.green:hover  { background: #15803d; }
+    .action-btn.outline { background: var(--white); color: var(--text-muted); border: 2px solid var(--border); }
+    .action-btn.outline:hover { border-color: var(--navy); color: var(--navy); }
 
-    .restart-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 11px;
-      background: var(--white);
-      color: var(--text-muted);
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all .15s;
-    }
-    .restart-btn:hover { border-color: var(--navy); color: var(--navy); }
+    /* SHARE BOX */
+    .share-box { margin-top: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: none; animation: fadeIn .2s ease; }
+    .share-box.visible { display: block; }
+    .share-url { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 11.5px; font-family: monospace; color: var(--text-muted); background: var(--white); cursor: text; word-break: break-all; min-height: 44px; resize: none; outline: none; }
 
-    /* ── STEP ICON COLORS ── */
+    /* STEP COLORS */
     .step-1 { background: #0D2B5E; }
     .step-2 { background: #7c3aed; }
     .step-3 { background: #0891b2; }
     .step-4 { background: #dc2626; }
     .step-5 { background: #d97706; }
     .step-6 { background: #16a34a; }
+
+    /* PREVIOUS ANSWERS PANEL */
+    .prev-answers { margin-bottom: 16px; display: none; }
+    .prev-answers-title { font-size: 10px; font-weight: 800; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .prev-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 13px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+    .prev-item-badge { font-size: 9px; font-weight: 800; color: #fff; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; letter-spacing: .03em; }
+    .prev-item-text { font-size: 13px; color: var(--text); line-height: 1.55; flex: 1; white-space: pre-wrap; word-break: break-word; }
+    .prev-item-text.empty-val { color: #bbb; font-style: italic; }
+
+    /* HISTORY MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9000; display: none; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: var(--radius); width: 100%; max-width: 560px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 8px 40px rgba(0,0,0,.18); }
+    .modal-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-head h3 { font-size: 16px; font-weight: 800; color: var(--navy); }
+    .modal-close { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--bg); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background .12s; }
+    .modal-close:hover { background: var(--border); }
+    .modal-body { overflow-y: auto; padding: 16px 24px 24px; flex: 1; }
+    .modal-empty { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 14px; }
+    .hist-item { border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all .12s; }
+    .hist-item:hover { border-color: var(--accent); background: #eff6ff; }
+    .hist-item-date { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    .hist-item-goal { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .hist-item-prob { font-size: 12px; color: var(--text-muted); }
+    .hist-del { float: right; background: none; border: none; color: #f87171; font-size: 13px; cursor: pointer; padding: 2px 4px; }
+    .hist-del:hover { color: #dc2626; }
+    .modal-clear-btn { width: 100%; padding: 10px; margin-top: 8px; background: var(--white); border: 1.5px solid #fca5a5; border-radius: 8px; color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .12s; }
+    .modal-clear-btn:hover { background: #fef2f2; }
   </style>
 </head>
 <body>
 
-<!-- ── COMMON NAV ── -->
+<!-- NAV -->
 <nav id="aicare-common-nav">
   <span class="cn-label">eye care lab</span>
   <span class="cn-sep">|</span>
   <a href="aicare-top-prototype.html">サイト TOP</a>
-  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-sitemap.html">サイト制作</a>
   <a href="aicare-stores.html">店舗一覧</a>
   <a href="aicare-store-detail.html">店舗詳細</a>
   <a href="aicare-vision-check.html">視力チェック</a>
@@ -391,9 +174,8 @@
   <a href="aicare-flagship.html">フラッグシップ</a>
   <a href="aicare-hq-logo.html">本部ロゴ</a>
   <span class="cn-sep">|</span>
-  <a href="aicare-sitemap.html?tab=wireframe" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
-  <span class="cn-sep">|</span>
   <a href="problem-solving.html">🧠 問題解決スキーム</a>
+  <button class="nav-history-btn" onclick="openHistory()">📚 履歴</button>
 </nav>
 <script>
 (function(){
@@ -403,6 +185,17 @@
   });
 })();
 </script>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="histModal" onclick="if(event.target===this)closeHistory()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>📚 過去の問題解決プラン</h3>
+      <button class="modal-close" onclick="closeHistory()">✕</button>
+    </div>
+    <div class="modal-body" id="histList"></div>
+  </div>
+</div>
 
 <div class="page-wrap">
   <div class="page-title">
@@ -419,27 +212,35 @@
     <div class="progress-step-dots" id="stepDots"></div>
   </div>
 
+  <!-- PREVIOUS ANSWERS -->
+  <div class="prev-answers" id="prevAnswers"></div>
+
   <!-- SLIDES -->
   <div class="slide-container" id="slideContainer">
 
-    <!-- STEP 1 -->
+    <!-- STEP 1 ゴール設定 -->
     <div class="slide active" data-step="0">
       <div class="card">
         <div class="step-badge step-1"><span class="step-num">1</span> STEP 1</div>
         <h2>ゴール設定</h2>
         <p class="guide">最終的に<strong>何を達成したいか</strong>を明確にします。<br>「〜する」「〜になる」の形で書くと◎</p>
         <label class="field-label">ゴール</label>
-        <textarea class="main-input" id="input-0" placeholder="例: 3ヶ月以内に月商を100万円に回復させる" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(0, '3ヶ月以内に月商を100万円に回復させる')">月商を100万円に回復</span>
-          <span onclick="fillExample(0, '新規顧客を月30件獲得する')">新規顧客を月30件獲得</span>
-          <span onclick="fillExample(0, 'チームの生産性を2倍にする')">生産性を2倍にする</span>
+        <textarea class="main-input" id="input-0" placeholder="例: 3ヶ月以内に月商を150%にする" rows="4"></textarea>
+        <div class="helper-row">
+          <button class="helper-btn" onclick="suggestGoal()">💡 ゴール例を提案</button>
+        </div>
+        <div class="hint-bubble" id="goal-hint"></div>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(0,'売上を3ヶ月で150%にする')">売上を150%に</span>
+          <span class="chip" onclick="fillInput(0,'新規顧客数を2倍にする')">新規顧客2倍</span>
+          <span class="chip" onclick="fillInput(0,'離脱率を半分にする')">離脱率を半減</span>
+          <span class="chip" onclick="fillInput(0,'成約率を20%改善する')">成約率20%改善</span>
+          <span class="chip" onclick="fillInput(0,'チームの生産性を2倍にする')">生産性2倍</span>
         </div>
       </div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2 現状の問題 -->
     <div class="slide" data-step="1">
       <div class="card">
         <div class="step-badge step-2"><span class="step-num">2</span> STEP 2</div>
@@ -447,16 +248,16 @@
         <p class="guide">今<strong>何が起きているか</strong>を事象として書きます。<br>感情・解釈を入れず、起きていることだけを。</p>
         <label class="field-label">問題（事象）</label>
         <textarea class="main-input" id="input-1" placeholder="例: 売上が落ちている" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(1, '売上が落ちている')">売上が落ちている</span>
-          <span onclick="fillExample(1, '問い合わせ数が減少している')">問い合わせが減少</span>
-          <span onclick="fillExample(1, 'チームの離職率が上がっている')">離職率が上昇</span>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(1,'売上が落ちている')">売上が落ちている</span>
+          <span class="chip" onclick="fillInput(1,'問い合わせ数が減少している')">問い合わせが減少</span>
+          <span class="chip" onclick="fillInput(1,'離脱率が上がっている')">離脱率が上昇</span>
+          <span class="chip" onclick="fillInput(1,'チームの生産性が低下している')">生産性が低下</span>
         </div>
       </div>
     </div>
 
-    <!-- STEP 3 -->
+    <!-- STEP 3 事実データ -->
     <div class="slide" data-step="2">
       <div class="card">
         <div class="step-badge step-3"><span class="step-num">3</span> STEP 3</div>
@@ -464,16 +265,16 @@
         <p class="guide">問題を裏付ける<strong>数値・具体的な事実</strong>を書きます。<br>「何が、いつから、どのくらい」を意識して。</p>
         <label class="field-label">数値・事実</label>
         <textarea class="main-input" id="input-2" placeholder="例: 新規顧客が先月比30%減少、リピート率は変わらず" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(2, '新規顧客が先月比30%減少')">新規顧客30%減</span>
-          <span onclick="fillExample(2, 'Webからの問い合わせが先月0件')">Web問い合わせ0件</span>
-          <span onclick="fillExample(2, 'チャーンレートが5%→12%に増加')">チャーン率が倍増</span>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(2,'新規顧客が先月比30%減少')">新規30%減</span>
+          <span class="chip" onclick="fillInput(2,'Webからの問い合わせが先月0件')">Web問合せ0件</span>
+          <span class="chip" onclick="fillInput(2,'チャーンレートが5%→12%に増加')">チャーン率倍増</span>
+          <span class="chip" onclick="fillInput(2,'CVRが3%→1.2%に下落')">CVR60%減</span>
         </div>
       </div>
     </div>
 
-    <!-- STEP 4 -->
+    <!-- STEP 4 課題特定 -->
     <div class="slide" data-step="3">
       <div class="card">
         <div class="step-badge step-4"><span class="step-num">4</span> STEP 4</div>
@@ -481,16 +282,19 @@
         <p class="guide">事実から<strong>なぜ起きているか</strong>（原因・因果）を分析します。<br>「なぜなら〜」「〜が原因で」の形で。</p>
         <label class="field-label">原因（因果）</label>
         <textarea class="main-input" id="input-3" placeholder="例: 広告の費用対効果が悪化し、流入が減っている" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(3, '広告流入が減っている')">広告流入が減少</span>
-          <span onclick="fillExample(3, 'LP改修後にCV率が下落している')">CV率が下落</span>
-          <span onclick="fillExample(3, '競合が価格を下げて顧客を奪っている')">競合に顧客を奪われている</span>
+        <div class="helper-row">
+          <button class="helper-btn" onclick="showIssueHint()">🤖 課題のヒントを見る</button>
+        </div>
+        <div class="hint-bubble" id="issue-hint"></div>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(3,'広告流入が減っている')">広告流入が減少</span>
+          <span class="chip" onclick="fillInput(3,'LP改修後にCV率が下落している')">CV率が下落</span>
+          <span class="chip" onclick="fillInput(3,'競合が価格を下げて顧客を奪っている')">競合に顧客を奪われている</span>
         </div>
       </div>
     </div>
 
-    <!-- STEP 5 -->
+    <!-- STEP 5 方針 -->
     <div class="slide" data-step="4">
       <div class="card">
         <div class="step-badge step-5"><span class="step-num">5</span> STEP 5</div>
@@ -498,16 +302,15 @@
         <p class="guide">課題に対して<strong>何をやる / やらない</strong>かを決めます。<br>「やること」と「やらないこと」を両方書くと明確に。</p>
         <label class="field-label">何をやるか / やらないか</label>
         <textarea class="main-input" id="input-4" placeholder="例: 広告チャネルを見直す。SEOに注力する。SNS広告は一時停止。" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(4, '広告チャネルを見直す')">広告チャネルを見直す</span>
-          <span onclick="fillExample(4, 'LPをリニューアルする。バナー広告は停止。')">LP刷新・バナー停止</span>
-          <span onclick="fillExample(4, '既存顧客のリテンション施策に集中する')">リテンション集中</span>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(4,'広告チャネルを見直す')">広告を見直す</span>
+          <span class="chip" onclick="fillInput(4,'LPをリニューアルする。バナー広告は停止。')">LP刷新・バナー停止</span>
+          <span class="chip" onclick="fillInput(4,'既存顧客のリテンション施策に集中する')">リテンション集中</span>
         </div>
       </div>
     </div>
 
-    <!-- STEP 6 -->
+    <!-- STEP 6 アクション -->
     <div class="slide" data-step="5">
       <div class="card">
         <div class="step-badge step-6"><span class="step-num">6</span> STEP 6</div>
@@ -515,11 +318,10 @@
         <p class="guide">方針を実行するための<strong>具体的な行動</strong>を書きます。<br>「誰が、いつまでに、何をする」まで落とすと◎</p>
         <label class="field-label">具体行動</label>
         <textarea class="main-input" id="input-5" placeholder="例: TikTok広告を週3本出す。LPのファーストビューを来週中に改修する。" rows="4"></textarea>
-        <div class="example-hint">
-          例:
-          <span onclick="fillExample(5, 'TikTok広告を週3本出す')">TikTok週3本</span>
-          <span onclick="fillExample(5, 'LP改修を今週中に完了する')">LP今週改修</span>
-          <span onclick="fillExample(5, 'メルマガを毎週月曜に配信する')">週次メルマガ配信</span>
+        <div class="chip-row">
+          <span class="chip" onclick="fillInput(5,'TikTok広告を週3本出す')">TikTok週3本</span>
+          <span class="chip" onclick="fillInput(5,'LP改修を今週中に完了する')">LP今週改修</span>
+          <span class="chip" onclick="fillInput(5,'メルマガを毎週月曜に配信する')">週次メルマガ配信</span>
         </div>
       </div>
     </div>
@@ -529,10 +331,14 @@
       <div class="result-card">
         <h2>📋 問題解決プラン</h2>
         <div id="resultRows"></div>
-        <button class="copy-btn" id="copyBtn" onclick="copyResult()">
-          <span>📋</span> テキストをコピー
-        </button>
-        <button class="restart-btn" onclick="restart()">🔄 はじめからやり直す</button>
+        <button class="action-btn blue" id="copyBtn" onclick="copyResult()">📋 テキストをコピー</button>
+        <button class="action-btn green" onclick="generateShareLink()">🔗 共有リンクを生成</button>
+        <div class="share-box" id="shareBox">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">共有URL</div>
+          <textarea class="share-url" id="shareUrl" readonly rows="3"></textarea>
+          <button class="action-btn blue" style="margin-top:8px;font-size:13px;padding:10px;" id="copyUrlBtn" onclick="copyShareUrl()">📋 URLをコピー</button>
+        </div>
+        <button class="action-btn outline" onclick="restart()">🔄 はじめからやり直す</button>
       </div>
     </div>
 
@@ -543,88 +349,137 @@
     <button class="btn-back" id="btnBack" onclick="goBack()" disabled>← 戻る</button>
     <button class="btn-next" id="btnNext" onclick="goNext()">次へ →</button>
   </div>
-
-</div><!-- /page-wrap -->
+</div>
 
 <script>
 (function() {
   'use strict';
 
   var STEPS = [
-    { key: 'goal',   label: 'GOAL',   title: 'ゴール' },
+    { key: 'goal',   label: 'GOAL',    title: 'ゴール' },
     { key: 'prob',   label: 'PROBLEM', title: '問題' },
-    { key: 'fact',   label: 'FACT',   title: '事実' },
-    { key: 'issue',  label: 'ISSUE',  title: '課題' },
-    { key: 'policy', label: 'POLICY', title: '方針' },
-    { key: 'action', label: 'ACTION', title: 'アクション' },
+    { key: 'fact',   label: 'FACT',    title: '事実' },
+    { key: 'issue',  label: 'ISSUE',   title: '課題' },
+    { key: 'policy', label: 'POLICY',  title: '方針' },
+    { key: 'action', label: 'ACTION',  title: 'アクション' },
   ];
-  var TOTAL = STEPS.length; // 6
+  var TOTAL = STEPS.length;
 
   var current = 0;
   var answers = ['', '', '', '', '', ''];
-  var isBack = false;
+  var backFlag = false;
 
-  // ── Build progress labels & dots ──
+  /* ── Goal presets (future: /api/generate-goal) ── */
+  var GOAL_PRESETS = [
+    '売上を3ヶ月で150%にする',
+    '新規顧客数を2倍にする',
+    '離脱率を半分にする',
+    '成約率を20%改善する',
+    '日本一〇〇な状態を作る',
+    'チームの生産性を2倍にする',
+    'LTV（顧客生涯価値）を1.5倍に伸ばす',
+    '月次リピート率を80%以上にする',
+    '問い合わせ数を月100件にする',
+    'SNSフォロワーを3ヶ月で10,000人にする',
+  ];
+  var _goalIdx = -1;
+
+  window.suggestGoal = function() {
+    // Future: fetch('/api/generate-goal').then(...)
+    _goalIdx = (_goalIdx + 1) % GOAL_PRESETS.length;
+    var ta = document.getElementById('input-0');
+    ta.value = GOAL_PRESETS[_goalIdx];
+    ta.focus();
+    var hint = document.getElementById('goal-hint');
+    hint.innerHTML = '<strong>💡 AI提案</strong>このゴールを軸に、次ステップで現状の問題を整理しましょう。具体的な数値・期限が入っているほど計画が立てやすくなります。';
+    hint.classList.add('visible');
+  };
+
+  /* ── Issue hints (future: /api/analyze-problem) ── */
+  window.showIssueHint = function() {
+    saveCurrentAnswer();
+    var prob = answers[1] || '';
+    var fact = answers[2] || '';
+    var combined = prob + ' ' + fact;
+    var hints = [];
+
+    if (/売上|revenue|収益/.test(combined)) hints.push('流入数・CVR・客単価のどれが問題か切り分けてみましょう');
+    if (/離脱|bounce|离开/.test(combined)) hints.push('導線・コンテンツ・UX・価格のどこで離脱しているか確認を');
+    if (/新規|獲得|acquisition/.test(combined)) hints.push('認知（上流）の問題か、比較検討（中流）の問題か整理を');
+    if (/リピート|repeat|churn|解約/.test(combined)) hints.push('オンボーディングの問題か、プロダクト体験の問題かを分離して');
+    if (/広告|ad|流入/.test(combined)) hints.push('チャネル別の費用対効果を確認：CPAが上昇しているか、流入量が減少しているか');
+    if (/スタッフ|採用|離職|チーム/.test(combined)) hints.push('環境（待遇）・マネジメント・仕事の意義 の3軸で原因を探りましょう');
+    if (hints.length === 0) hints.push('「なぜ？」を3回繰り返してみましょう。表面の事象から根本原因に近づけます');
+
+    var hint = document.getElementById('issue-hint');
+    hint.innerHTML = '<strong>🤖 ヒント</strong>' + hints.map(function(h){ return '・' + h; }).join('<br>');
+    hint.classList.add('visible');
+  };
+
+  /* ── Progress ── */
   var labelsEl = document.getElementById('progressLabels');
   var dotsEl   = document.getElementById('stepDots');
   STEPS.forEach(function(s, i) {
     var lbl = document.createElement('span');
-    lbl.className = 'progress-label';
-    lbl.textContent = s.label;
-    lbl.id = 'plbl-' + i;
+    lbl.className = 'progress-label'; lbl.textContent = s.label; lbl.id = 'plbl-' + i;
     labelsEl.appendChild(lbl);
-
     var dot = document.createElement('div');
-    dot.className = 'step-dot';
-    dot.textContent = i + 1;
-    dot.id = 'dot-' + i;
+    dot.className = 'step-dot'; dot.textContent = i + 1; dot.id = 'dot-' + i;
+    dot.title = 'STEP ' + (i+1) + ': ' + s.title;
+    dot.addEventListener('click', function(){ if (i <= current) { saveCurrentAnswer(); current = i; showSlide(i, false); } });
     dotsEl.appendChild(dot);
   });
 
   function updateProgress() {
     var pct = current >= TOTAL ? 100 : Math.round((current / TOTAL) * 100);
     document.getElementById('progressFill').style.width = pct + '%';
-
     STEPS.forEach(function(_, i) {
-      var lbl = document.getElementById('plbl-' + i);
-      var dot = document.getElementById('dot-' + i);
-      lbl.className = 'progress-label' + (i === current ? ' active' : i < current ? ' done' : '');
-      dot.className  = 'step-dot'       + (i === current ? ' active' : i < current ? ' done' : '');
+      document.getElementById('plbl-' + i).className = 'progress-label' + (i===current?' active': i<current?' done':'');
+      document.getElementById('dot-'  + i).className = 'step-dot'       + (i===current?' active': i<current?' done':'');
     });
-
-    // nav buttons
-    var btnBack = document.getElementById('btnBack');
-    var btnNext = document.getElementById('btnNext');
-    var navBtns = document.getElementById('navBtns');
-
-    btnBack.disabled = (current === 0);
-
+    document.getElementById('btnBack').disabled = (current === 0);
     if (current >= TOTAL) {
-      // result screen — hide nav
-      navBtns.style.display = 'none';
+      document.getElementById('navBtns').style.display = 'none';
     } else {
-      navBtns.style.display = 'flex';
-      btnNext.textContent = current === TOTAL - 1 ? '完成 ✓' : '次へ →';
+      document.getElementById('navBtns').style.display = 'flex';
+      document.getElementById('btnNext').textContent = current === TOTAL - 1 ? '完成 ✓' : '次へ →';
     }
   }
 
+  /* ── Previous answers panel ── */
+  var BADGE_COLORS = ['#0D2B5E','#7c3aed','#0891b2','#dc2626','#d97706','#16a34a'];
+  function renderPrevAnswers() {
+    var el = document.getElementById('prevAnswers');
+    if (!el) return;
+    if (current === 0 || current >= TOTAL) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    var html = '<div class="prev-answers-title">ここまでの回答</div>';
+    for (var i = 0; i < current; i++) {
+      var val = answers[i] || '';
+      html += '<div class="prev-item">'
+        + '<span class="prev-item-badge" style="background:' + BADGE_COLORS[i] + '">S' + (i+1) + ' ' + STEPS[i].title + '</span>'
+        + '<div class="prev-item-text' + (val ? '' : ' empty-val') + '">' + (val ? escHtml(val) : '（未入力）') + '</div>'
+        + '</div>';
+    }
+    el.innerHTML = html;
+    el.style.display = 'block';
+  }
+
   function showSlide(idx, back) {
-    var slides = document.querySelectorAll('.slide');
-    slides.forEach(function(s) { s.classList.remove('active', 'back-anim'); });
+    document.querySelectorAll('.slide').forEach(function(s) { s.classList.remove('active','back-anim'); });
     var target = document.querySelector('[data-step="' + idx + '"]');
     if (!target) return;
-    if (back) target.classList.add('back-anim');
     target.classList.add('active');
-
-    // focus textarea if input step
+    if (back) target.classList.add('back-anim');
     if (idx < TOTAL) {
       setTimeout(function() {
         var ta = document.getElementById('input-' + idx);
         if (ta) { ta.value = answers[idx]; ta.focus(); }
-      }, 50);
+      }, 40);
     } else {
       renderResult();
+      saveHistory();
     }
+    renderPrevAnswers();
     updateProgress();
   }
 
@@ -635,83 +490,176 @@
     }
   }
 
-  window.goNext = function() {
-    saveCurrentAnswer();
-    if (current < TOTAL) { current++; showSlide(current, false); }
-  };
+  window.goNext = function() { saveCurrentAnswer(); if (current < TOTAL) { current++; showSlide(current, false); } };
+  window.goBack = function() { saveCurrentAnswer(); if (current > 0) { current--; showSlide(current, true); } };
+  window.fillInput = function(idx, text) { var ta = document.getElementById('input-' + idx); if (ta) { ta.value = text; ta.focus(); } };
 
-  window.goBack = function() {
-    saveCurrentAnswer();
-    if (current > 0) { current--; showSlide(current, true); }
-  };
-
-  window.fillExample = function(idx, text) {
-    var ta = document.getElementById('input-' + idx);
-    if (ta) { ta.value = text; ta.focus(); }
-  };
-
+  /* ── Result render ── */
   function renderResult() {
     var rows = document.getElementById('resultRows');
     rows.innerHTML = '';
     STEPS.forEach(function(s, i) {
+      var val = answers[i] || '';
       var row = document.createElement('div');
       row.className = 'result-row';
-      var val = answers[i] || '';
       row.innerHTML = '<div class="result-key">' + s.title + '</div>'
-        + '<div class="result-val' + (val ? '' : ' empty') + '">' + (val ? escHtml(val) : '（未入力）') + '</div>';
+        + '<div class="result-val' + (val?'':' empty') + '">' + (val ? escHtml(val) : '（未入力）') + '</div>';
       rows.appendChild(row);
     });
+    document.getElementById('shareBox').classList.remove('visible');
   }
 
+  /* ── Copy text ── */
   window.copyResult = function() {
     var lines = ['【問題解決プラン】', ''];
-    STEPS.forEach(function(s, i) {
-      lines.push(s.title + ': ' + (answers[i] || '（未入力）'));
-    });
-    var text = lines.join('\n');
-    navigator.clipboard.writeText(text).then(function() {
-      var btn = document.getElementById('copyBtn');
-      btn.classList.add('copied');
-      btn.innerHTML = '<span>✅</span> コピーしました！';
-      setTimeout(function() {
-        btn.classList.remove('copied');
-        btn.innerHTML = '<span>📋</span> テキストをコピー';
-      }, 2200);
-    }).catch(function() {
-      // fallback
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta);
-      var btn = document.getElementById('copyBtn');
-      btn.innerHTML = '<span>✅</span> コピーしました！';
-      setTimeout(function() { btn.innerHTML = '<span>📋</span> テキストをコピー'; }, 2200);
-    });
+    STEPS.forEach(function(s, i) { lines.push(s.title + ': ' + (answers[i] || '（未入力）')); });
+    writeClipboard(lines.join('\n'), 'copyBtn', '📋 テキストをコピー');
   };
 
-  window.restart = function() {
-    answers = ['', '', '', '', '', ''];
+  /* ── Share link ── */
+  window.generateShareLink = function() {
+    saveCurrentAnswer();
+    var params = new URLSearchParams();
+    STEPS.forEach(function(s, i) { if (answers[i]) params.set(s.key, answers[i]); });
+    var url = location.origin + location.pathname + '?' + params.toString();
+    document.getElementById('shareUrl').value = url;
+    var box = document.getElementById('shareBox');
+    box.classList.add('visible');
+    document.getElementById('copyUrlBtn').textContent = '📋 URLをコピー';
+  };
+
+  window.copyShareUrl = function() {
+    var url = document.getElementById('shareUrl').value;
+    writeClipboard(url, 'copyUrlBtn', '📋 URLをコピー');
+  };
+
+  /* ── History ── */
+  var HIST_KEY = 'problemHistory';
+
+  function saveHistory() {
+    var hasContent = answers.some(function(a){ return a.trim(); });
+    if (!hasContent) return;
+    var hist = loadHistory();
+    hist.unshift({
+      id: Date.now(),
+      goal: answers[0], prob: answers[1], fact: answers[2],
+      issue: answers[3], policy: answers[4], action: answers[5]
+    });
+    if (hist.length > 30) hist = hist.slice(0, 30);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(e) {}
+  }
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch(e) { return []; }
+  }
+
+  window.openHistory = function() {
+    renderHistoryList();
+    document.getElementById('histModal').classList.add('open');
+  };
+  window.closeHistory = function() {
+    document.getElementById('histModal').classList.remove('open');
+  };
+
+  function renderHistoryList() {
+    var list = document.getElementById('histList');
+    var hist = loadHistory();
+    if (!hist.length) {
+      list.innerHTML = '<div class="modal-empty">📭 保存された履歴はありません<br><small>STEP6完了時に自動保存されます</small></div>';
+      return;
+    }
+    list.innerHTML = '';
+    hist.forEach(function(item) {
+      var d = new Date(item.id);
+      var dateStr = d.getFullYear() + '/' + pad(d.getMonth()+1) + '/' + pad(d.getDate())
+        + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      var el = document.createElement('div');
+      el.className = 'hist-item';
+      el.innerHTML = '<button class="hist-del" onclick="event.stopPropagation();deleteHistory(' + item.id + ')">🗑 削除</button>'
+        + '<div class="hist-item-date">' + dateStr + '</div>'
+        + '<div class="hist-item-goal">' + escHtml(item.goal || '（ゴール未入力）') + '</div>'
+        + '<div class="hist-item-prob">' + escHtml(item.prob || '（問題未入力）') + '</div>';
+      el.addEventListener('click', function() { loadFromHistory(item); closeHistory(); });
+      list.appendChild(el);
+    });
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'modal-clear-btn';
+    clearBtn.textContent = '🗑 すべて削除';
+    clearBtn.onclick = function() { if (confirm('履歴をすべて削除しますか？')) { localStorage.removeItem(HIST_KEY); renderHistoryList(); } };
+    list.appendChild(clearBtn);
+  }
+
+  window.deleteHistory = function(id) {
+    var hist = loadHistory().filter(function(h){ return h.id !== id; });
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(e) {}
+    renderHistoryList();
+  };
+
+  function loadFromHistory(item) {
+    answers = [item.goal||'', item.prob||'', item.fact||'', item.issue||'', item.policy||'', item.action||''];
     current = 0;
-    document.querySelectorAll('.main-input').forEach(function(ta) { ta.value = ''; });
     showSlide(0, true);
     document.getElementById('navBtns').style.display = 'flex';
+  }
+
+  /* ── URL params on load ── */
+  function loadFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    var keys = ['goal','prob','fact','issue','policy','action'];
+    var loaded = false;
+    keys.forEach(function(k, i) {
+      if (params.has(k)) { answers[i] = params.get(k); loaded = true; }
+    });
+    return loaded;
+  }
+
+  /* ── Restart ── */
+  window.restart = function() {
+    answers = ['','','','','',''];
+    current = 0;
+    document.querySelectorAll('.main-input').forEach(function(t){ t.value=''; });
+    document.querySelectorAll('.hint-bubble').forEach(function(b){ b.classList.remove('visible'); });
+    document.getElementById('shareBox').classList.remove('visible');
+    document.getElementById('navBtns').style.display = 'flex';
+    showSlide(0, true);
+    history.replaceState(null, '', location.pathname);
   };
+
+  /* ── Clipboard helper ── */
+  function writeClipboard(text, btnId, defaultLabel) {
+    var btn = document.getElementById(btnId);
+    function onSuccess() {
+      if (btn) { btn.textContent = '✅ コピーしました！'; setTimeout(function(){ btn.textContent = defaultLabel; }, 2000); }
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
+    } else { fallback(); }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta); onSuccess();
+    }
+  }
 
   function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+  function pad(n) { return n < 10 ? '0'+n : String(n); }
 
-  // Enter key (Ctrl/Cmd+Enter) to advance
+  /* ── Keyboard shortcut ── */
   document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      if (current < TOTAL) goNext();
-    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && current < TOTAL) goNext();
   });
 
-  // init
+  /* ── Init ── */
+  var fromUrl = loadFromUrl();
   showSlide(0, false);
+  if (fromUrl) {
+    var ta0 = document.getElementById('input-0');
+    if (ta0) ta0.value = answers[0];
+  }
+
 })();
 </script>
 </body>
