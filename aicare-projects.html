@@ -1392,8 +1392,13 @@ function render() {
         const target = _scrollToPerson;
         _scrollToPerson = null;
         setTimeout(() => {
-          const el = document.getElementById('person-section-' + encodeURIComponent(target));
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const cards = app.querySelectorAll('[data-person]');
+          for (const card of cards) {
+            if (card.dataset.person === target) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              break;
+            }
+          }
         }, 80);
       }
     } else if (route.view === 'person') {
@@ -1529,7 +1534,7 @@ function renderMembers() {
     );
 
     return `
-    <div class="card" id="person-section-${encodeURIComponent(person)}" style="margin-bottom:24px;">
+    <div class="card" data-person="${person}" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
         <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4f7cff,#7c4fff);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">${person.slice(0,1)}</div>
         <div style="flex:1;">
@@ -1593,7 +1598,33 @@ function exportCSV() {
 
 function goToPersonSection(person) {
   _scrollToPerson = person;
-  navigate('#/members');
+  const cur = window.location.hash;
+  if (cur === '#/members' || cur === '#/members/') {
+    // Already on members page — just scroll directly
+    const app = document.getElementById('app');
+    if (app) {
+      const cards = app.querySelectorAll('[data-person]');
+      for (const card of cards) {
+        if (card.dataset.person === person) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          _scrollToPerson = null;
+          return;
+        }
+      }
+    }
+    // Not found — re-render members and scroll
+    _scrollToPerson = person;
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.innerHTML = renderMembers();
+    setTimeout(() => {
+      const cards2 = document.querySelectorAll('[data-person]');
+      for (const c of cards2) {
+        if (c.dataset.person === person) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); _scrollToPerson = null; break; }
+      }
+    }, 80);
+  } else {
+    navigate('#/members');
+  }
 }
 
 function scrollToPersonProjects(person) {
