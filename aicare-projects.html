@@ -786,12 +786,16 @@ body {
 /* ===================== PRIORITY ITEMS (today panel) ===================== */
 .priority-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; background: rgba(0,0,0,0.02);
-  border-radius: 8px; margin-bottom: 4px;
+  padding: 10px 14px; background: var(--surface);
+  border-radius: 8px; margin-bottom: 0;
   border-left: 3px solid; cursor: pointer;
   transition: background 0.12s;
+  border-bottom: 1px solid var(--border);
 }
-.priority-item:hover { background: rgba(0,0,0,0.04); }
+.priority-item:last-child { border-bottom: none; border-radius: 0 0 8px 8px; }
+.priority-item:first-child { border-radius: 8px 8px 0 0; }
+.priority-item:only-child { border-radius: 8px; border-bottom: none; }
+.priority-item:hover { background: var(--surface2); }
 .priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
 .priority-item .pi-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11px; }
 
@@ -845,6 +849,16 @@ body {
   100% { background: transparent; }
 }
 .task-item.done-anim { animation: taskDoneFlash 0.5s ease; }
+@keyframes taskHighlightPulse {
+  0%   { background: rgba(245,158,11,0.0); box-shadow: none; }
+  20%  { background: rgba(245,158,11,0.22); box-shadow: 0 0 0 3px rgba(245,158,11,0.35); }
+  70%  { background: rgba(245,158,11,0.15); box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+  100% { background: rgba(245,158,11,0.06); box-shadow: 0 0 0 2px rgba(245,158,11,0.25); }
+}
+.task-item.highlight-focus {
+  animation: taskHighlightPulse 1.6s ease forwards;
+  border-color: rgba(245,158,11,0.6) !important;
+}
 
 /* ===================== BULK SELECT ===================== */
 .task-select-cb {
@@ -1301,6 +1315,7 @@ function initializeApp() {
 
 let _lastSaveTime = 0;  // track last user save to guard sync
 let _scrollToPerson = null; // pending scroll target after members render
+let _highlightTaskId = null; // pending task highlight after project render
 
 async function syncFromCloud() {
   try {
@@ -1391,6 +1406,18 @@ function render() {
     } else if (route.view === 'project') {
       app.innerHTML = renderProject(route.id, route.tab);
       initProjectTabs(route.id);
+      if (_highlightTaskId) {
+        const tid = _highlightTaskId;
+        _highlightTaskId = null;
+        setTimeout(() => {
+          const safeId = tid.replace(/[^a-z0-9]/gi, '_');
+          const el = document.getElementById('task-item-' + safeId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => el.classList.add('highlight-focus'), 150);
+          }
+        }, 120);
+      }
     } else if (route.view === 'members') {
       app.innerHTML = renderMembers();
       if (_scrollToPerson) {
@@ -1904,13 +1931,12 @@ function renderDashboard() {
         const d = daysUntil(t.deadline);
         const dlColor = d < 0 ? '#f87171' : d === 0 ? '#fb923c' : d <= 1 ? '#f59e0b' : '#6d28d9';
         const dlLabel = d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`;
-        return `<div class="priority-item" style="border-left-color:rgba(167,139,250,0.6);" onclick="navigate('#/project/${proj.id}')">
+        return `<div class="priority-item" style="border-left-color:${dlColor};" onclick="_highlightTaskId='${t.id}';navigate('#/project/${proj.id}')">
           <span class="pi-name">📌 ${t.name}</span>
           <div class="pi-meta">
             <span style="font-size:11px;color:var(--muted);">${proj.name}</span>
             ${t.assignee ? `<span style="font-size:11px;color:#6d28d9;">👤 ${t.assignee}</span>` : ''}
             <span style="color:${dlColor};font-weight:700;font-size:11px;">${dlLabel}</span>
-            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();navigate('#/project/${proj.id}')">今見る →</button>
           </div>
         </div>`;
       }).join('')}
@@ -2182,7 +2208,7 @@ function renderProjectRow(p) {
   const waitingVal = p.waitingFor || '';
   const nextVal = p.nextAction || '';
   const assigneeVal = p.assignee || '';
-  const assigneeInitial = assigneeVal ? assigneeVal.slice(0,2) : '—';
+  const assigneeInitial = assigneeVal ? assigneeVal.slice(0,1) : '—';
   const assigneeColor = assigneeVal ? personColor(assigneeVal.split(/[、,，\s]+/)[0].trim()) : '#94a3b8';
   return `
 <div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
