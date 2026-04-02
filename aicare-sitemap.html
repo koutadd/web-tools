@@ -547,6 +547,44 @@
 #aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
 #aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
 #aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+
+    /* Share button */
+    #btn-share-page {
+      position: absolute; top: 12px; right: 16px;
+      background: #3b82f6; color: #fff; border: none; border-radius: 6px;
+      padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: 600;
+      display: none; gap: 5px; align-items: center;
+    }
+    #btn-share-page.visible { display: flex; }
+    #btn-share-page:hover { background: #2563eb; }
+
+    /* Read-only share view overlay */
+    #share-view {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: #f8fafc; overflow-y: auto;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    #share-view.active { display: block; }
+    .share-header {
+      background: #1e3a5f; color: #fff; padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .share-header h1 { font-size: 18px; font-weight: 700; margin: 0; }
+    .share-header .share-brand { font-size: 12px; opacity: .6; }
+    .share-body { max-width: 720px; margin: 40px auto; padding: 0 24px 80px; }
+    .share-page-name { font-size: 28px; font-weight: 800; color: #1e3a5f; margin-bottom: 8px; }
+    .share-status-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .share-url { font-size: 13px; color: #64748b; }
+    .share-section { margin-bottom: 24px; }
+    .share-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+      color: #94a3b8; margin-bottom: 8px;
+    }
+    .share-section-value {
+      font-size: 15px; color: #1e293b; line-height: 1.7; white-space: pre-wrap;
+      background: #f1f5f9; border-radius: 8px; padding: 12px 16px;
+    }
+    .share-section-value.empty { color: #94a3b8; font-style: italic; }
 </style>
 <nav id="aicare-common-nav">
   <span class="cn-label">eye care lab</span>
@@ -629,6 +667,7 @@
 
   <!-- Detail Panel -->
   <div id="detail-panel">
+    <button id="btn-share-page" title="このページを共有">🔗 共有</button>
     <div id="detail-scroll">
       <div id="detail-empty">
         <div class="empty-icon">&#128450;</div>
@@ -661,6 +700,10 @@
                 <option value="planned">&#9679; Planned</option>
                 <option value="deprecated">&#9679; Deprecated</option>
               </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">ディスクリプション</label>
+              <textarea class="form-textarea" id="d-description" placeholder="このページの概要・説明文（メタディスクリプションなどに使用）"></textarea>
             </div>
           </div>
         </div>
@@ -814,6 +857,7 @@ const DEFAULT_DATA = [
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 function ensureFields(node) {
+  node.description = node.description ?? '';
   node.memo       = node.memo       ?? '';
   node.target     = node.target     ?? '';
   node.goal       = node.goal       ?? '';
@@ -1152,6 +1196,10 @@ function selectNode(id) {
   renderTree();
   renderDetail();
   updateToolbar();
+  // show/hide share button
+  const shareBtn = document.getElementById('btn-share-page');
+  if (id) shareBtn.classList.add('visible');
+  else shareBtn.classList.remove('visible');
 }
 
 function toggleNode(id) {
@@ -1312,6 +1360,7 @@ function renderDetail() {
   document.getElementById('d-target').value  = node.target;
   document.getElementById('d-goal').value    = node.goal;
   document.getElementById('d-kpi').value     = node.kpi;
+  document.getElementById('d-description').value = node.description;
   _filling = false;
 
   // links checklist
@@ -1354,6 +1403,7 @@ function bindDetailInputs() {
   document.getElementById('d-target').addEventListener('input', onChange('target'));
   document.getElementById('d-goal').addEventListener('input', onChange('goal'));
   document.getElementById('d-kpi').addEventListener('input', onChange('kpi'));
+  document.getElementById('d-description').addEventListener('input', onChange('description'));
 }
 
 function renderLinksChecklist(node) {
@@ -2056,6 +2106,91 @@ function markDirtyAndRefreshFlow() {
 document.getElementById('btn-flowmap').addEventListener('click', () => {
   setTimeout(fitView, 50);
 }, true);
+
+// ============================================================
+//  SHARE VIEW
+// ============================================================
+function showShareSection(id, value) {
+  const sec = document.getElementById('sv-sec-' + id);
+  const val = document.getElementById('sv-' + id);
+  if (!value || !value.trim()) {
+    sec.style.display = 'none';
+  } else {
+    sec.style.display = '';
+    val.textContent = value;
+    val.classList.toggle('empty', false);
+  }
+}
+
+function renderShareView(nodeId) {
+  const node = findNode(nodeId, siteData);
+  if (!node) return;
+  document.getElementById('sv-name').textContent = node.name;
+  const badge = document.getElementById('sv-status-badge');
+  badge.className = 'status-badge status-' + node.status;
+  badge.textContent = getStatusLabel(node.status);
+  document.getElementById('sv-url').textContent = node.url || '';
+  showShareSection('description', node.description);
+  showShareSection('memo', node.memo);
+  showShareSection('target', node.target);
+  showShareSection('goal', node.goal);
+  showShareSection('kpi', node.kpi);
+  document.getElementById('share-view').classList.add('active');
+}
+
+// Share button click → copy URL + toast
+document.getElementById('btn-share-page').addEventListener('click', () => {
+  if (!selectedId) return;
+  const url = location.origin + location.pathname + '?share=' + encodeURIComponent(selectedId);
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('🔗 共有URLをコピーしました');
+  }).catch(() => {
+    prompt('共有URL:', url);
+  });
+});
+
+// Check for ?share= on load
+const _shareParam = new URLSearchParams(location.search).get('share');
+if (_shareParam) {
+  // Wait for data to be ready, then show share view
+  setTimeout(() => renderShareView(_shareParam), 100);
+}
 </script>
+
+<!-- ========== SHARE VIEW (read-only) ========== -->
+<div id="share-view">
+  <div class="share-header">
+    <div>
+      <div class="share-brand">eye care lab — サイトマップ</div>
+      <h1 id="sv-name">ページ名</h1>
+    </div>
+    <div id="sv-status-badge" class="status-badge"></div>
+  </div>
+  <div class="share-body">
+    <div class="share-status-row">
+      <span class="share-url" id="sv-url"></span>
+    </div>
+    <div class="share-section" id="sv-sec-description">
+      <div class="share-section-label">ディスクリプション</div>
+      <div class="share-section-value" id="sv-description"></div>
+    </div>
+    <div class="share-section" id="sv-sec-memo">
+      <div class="share-section-label">メモ</div>
+      <div class="share-section-value" id="sv-memo"></div>
+    </div>
+    <div class="share-section" id="sv-sec-target">
+      <div class="share-section-label">ターゲット</div>
+      <div class="share-section-value" id="sv-target"></div>
+    </div>
+    <div class="share-section" id="sv-sec-goal">
+      <div class="share-section-label">目的</div>
+      <div class="share-section-value" id="sv-goal"></div>
+    </div>
+    <div class="share-section" id="sv-sec-kpi">
+      <div class="share-section-label">KPI</div>
+      <div class="share-section-value" id="sv-kpi"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
