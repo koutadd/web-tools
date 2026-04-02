@@ -1010,6 +1010,7 @@ let selectedIds = new Set();   // multi-select
 let dirty = false;
 let dragSrc = null;   // { node, parentArr, index }
 let ctxTargetId = null;
+let _rightTab = 'detail'; // must be declared before renderTree() is called
 
 // ============================================================
 //  UTILS
@@ -2258,7 +2259,6 @@ if (_shareParam) {
 }
 
 /* ===== RIGHT TAB SWITCHING ===== */
-let _rightTab = 'detail';
 function switchRightTab(tab) {
   _rightTab = tab;
   document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
