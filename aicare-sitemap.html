@@ -942,17 +942,15 @@ async function syncFromCloud() {
     const remote = await res.json();
     if (!remote || !remote.data || !Array.isArray(remote.data)) { _syncing = false; return; }
     const cloudTs = remote.updatedAt || 0;
-    const localTs = _lastSaveTime;
-    if (cloudTs <= localTs) { _syncing = false; return; }
-    // Don't overwrite if user is actively editing
-    if (Date.now() - _lastSaveTime < 8000) { _syncing = false; return; }
+    if (cloudTs <= _lastSaveTime) { _syncing = false; return; }
+    // Don't overwrite if user is actively editing (input focused)
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) { _syncing = false; return; }
     // Apply remote data
     _lastSaveTime = cloudTs;
     siteData = remote.data;
     siteData.forEach(ensureFields);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(siteData));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: siteData, updatedAt: cloudTs }));
     renderTree();
     renderDetail();
     markClean();
@@ -1659,8 +1657,8 @@ setInterval(() => {
   }
 }, 5000);
 
-// Cloud sync every 20 seconds (pick up changes from other browsers)
-setInterval(syncFromCloud, 20000);
+// Cloud sync every 5 seconds (pick up changes from other browsers)
+setInterval(syncFromCloud, 5000);
 syncFromCloud(); // initial sync on load
 
 // タブ切替・閉じる時も即保存
