@@ -11,7 +11,7 @@
 /* ===================== COMMON NAV ===================== */
 #aicare-common-nav {
   position: sticky; top: 0; z-index: 99999;
-  background: #040c18;
+  background: var(--bg);
   border-bottom: 1px solid rgba(245,158,11,0.18);
   display: flex; align-items: center; gap: 6px;
   padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
@@ -31,13 +31,13 @@
 
 /* ===================== DESIGN SYSTEM ===================== */
 :root {
-  --bg: #080c14;
-  --surface: #111827;
-  --surface2: #1e2740;
-  --border: #253047;
-  --text: #f0f4ff;
-  --muted: #7c8fa8;
-  --accent: #f59e0b;
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #e8edf3;
+  --border: #d1dae6;
+  --text: #1a2535;
+  --muted: #6b7c93;
+  --accent: #2563eb;
   --radius: 10px;
 }
 
@@ -299,7 +299,7 @@ body {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  background: #1e2236;
+  background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
   z-index: 100;
@@ -424,7 +424,7 @@ body {
 }
 .modal-overlay.open { display: flex; }
 .modal-card {
-  background: #1a1d27;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   width: 100%;
@@ -485,7 +485,7 @@ body {
   border-color: rgba(245,158,11,0.5);
 }
 .form-group textarea { resize: vertical; min-height: 80px; }
-.form-group select option { background: #1a1d27; }
+.form-group select option { background: var(--surface); }
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
@@ -511,7 +511,7 @@ body {
 }
 .confirm-overlay.open { display: flex; }
 .confirm-card {
-  background: #1a1d27;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 28px;
@@ -625,7 +625,7 @@ body {
 /* Assignee / person dropdown */
 #pde-person-dd {
   display: none; position: fixed; z-index: 9500;
-  background: #0f1623; border: 1px solid rgba(245,158,11,0.35);
+  background: var(--surface); border: 1px solid rgba(245,158,11,0.35);
   border-radius: 12px; padding: 6px; min-width: 200px; max-width: 260px;
   box-shadow: 0 14px 40px rgba(0,0,0,0.75);
   animation: pdeDdIn 0.12s ease;
@@ -744,7 +744,7 @@ body {
   transition: background 0.12s, border-color 0.12s;
   min-height: 52px;
 }
-.proj-row:hover { background: #161d2e; border-color: #3a4a6a; }
+.proj-row:hover { background: var(--surface2); border-color: #3a4a6a; }
 .proj-row.dim { opacity: 0.42; }
 .proj-row .proj-row-name {
   flex: 1; font-size: 14px; font-weight: 600;
@@ -871,7 +871,7 @@ body {
 .task-item.drop-after::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:3px; background:#60a5fa; border-radius:2px; z-index:10; }
 .task-item.drop-child { border-color:#a78bfa !important; background:#2d1f4e !important; }
 .task-children { margin-left:28px; margin-top:6px; padding-left:12px; border-left:2px solid #374151; }
-.task-children .task-item { background:#16162a; }
+.task-children .task-item { background:var(--surface2); }
 
 /* ===================== TASK DETAIL EXPAND ===================== */
 .task-wrap { margin-bottom: 6px; }
@@ -879,7 +879,7 @@ body {
 .task-item:hover { border-color: rgba(245,158,11,0.3); }
 .task-detail {
   display: none;
-  background: #0e1520;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 10px 10px;
@@ -1464,12 +1464,18 @@ function renderMembers() {
 
   // プロジェクトを assignee で分類（カンマ区切りも分割）
   const grouped = {};
+  function addToGroup(name, p) {
+    if (!name || name === '未設定') return;
+    if (!grouped[name]) grouped[name] = [];
+    if (!grouped[name].includes(p)) grouped[name].push(p);
+  }
   projects.forEach(p => {
-    const names = (p.assignee || '未設定').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean);
-    names.forEach(name => {
-      if (!grouped[name]) grouped[name] = [];
-      grouped[name].push(p);
-    });
+    // assignee と members 両方から人名を収集
+    const assigneeNames = (p.assignee || '').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean);
+    const memberNames  = (p.members  || '').split(/[、,，\s]+/).map(n => n.trim()).filter(Boolean);
+    const allNames = [...new Set([...assigneeNames, ...memberNames])];
+    if (allNames.length === 0) addToGroup('未設定', p);
+    else allNames.forEach(name => addToGroup(name, p));
   });
 
   const people = Object.keys(grouped).sort();
@@ -1921,10 +1927,10 @@ function renderDashboard() {
   });
 
   const sectionHead = (emoji, label, sub) => `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1e2a40;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);">
       <span style="font-size:18px;line-height:1;">${emoji}</span>
       <span style="font-size:15px;font-weight:800;color:#e8f0ff;letter-spacing:-0.2px;">${label}</span>
-      ${sub ? `<span style="font-size:11px;color:var(--muted);margin-left:auto;background:#1a2235;padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
+      ${sub ? `<span style="font-size:11px;color:var(--muted);margin-left:auto;background:var(--surface2);padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
     </div>`;
 
   return `
@@ -2059,7 +2065,7 @@ function renderDashboard() {
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-            ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:#7db8ff;border:1px solid rgba(59,130,246,0.3);">進行中 ${doing}</span>` : ''}
+            ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);">進行中 ${doing}</span>` : ''}
             ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">要確認 ${review}</span>` : ''}
             ${todo   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(107,114,128,0.12);color:#94a3b8;border:1px solid rgba(107,114,128,0.25);">未着手 ${todo}</span>` : ''}
             ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);color:#4ade80;border:1px solid rgba(16,185,129,0.25);">完了 ${done}</span>` : ''}
@@ -2167,7 +2173,7 @@ function renderProjectRow(p) {
   <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
   <span style="width:68px;flex-shrink:0;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:#94a3b8;" onclick="event.stopPropagation();startInlineEdit('${p.id}','assignee',this)" title="主担当をクリックで編集">
     ${assigneeVal
-      ? `<span style="width:20px;height:20px;border-radius:50%;background:#1e3a5a;color:#7db8ff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
+      ? `<span style="width:20px;height:20px;border-radius:50%;background:#1e3a5a;color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
       : `<span style="color:#2a3a52;font-style:italic;">担当者</span>`}
   </span>
   <div style="width:72px;flex-shrink:0;" onclick="event.stopPropagation()">${statusDropdownHtml(p)}</div>
@@ -3353,7 +3359,7 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 /* ── Tour card ── */
 #tour-card {
   position: fixed; z-index: 100000;
-  background: #0f1623; border: 1px solid rgba(245,158,11,0.35);
+  background: var(--surface); border: 1px solid rgba(245,158,11,0.35);
   border-radius: 16px; padding: 22px 24px;
   width: 360px; max-width: calc(100vw - 32px);
   box-shadow: 0 24px 64px rgba(0,0,0,0.95), 0 0 0 1px rgba(245,158,11,0.1);
@@ -3376,7 +3382,7 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 .tc-dot:hover:not(.on) { background: rgba(245,158,11,0.4); }
 .tc-nav    { display: flex; align-items: center; gap: 8px; }
 .tc-count  { font-size: 11px; color: #3d5070; min-width: 34px; text-align: center; }
-.tc-prev   { background: #1a2236; border: 1px solid #253047; border-radius: 7px; padding: 6px 12px; font-size: 12px; color: #6b7fa0; cursor: pointer; transition: all 0.15s; }
+.tc-prev   { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 12px; color: #6b7fa0; cursor: pointer; transition: all 0.15s; }
 .tc-prev:hover { color: #f0f4ff; border-color: #3a4a6a; }
 .tc-next   { background: #f59e0b; border: none; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; transition: background 0.15s; }
 .tc-next:hover { background: #fbbf24; }
