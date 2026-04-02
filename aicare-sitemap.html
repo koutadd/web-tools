@@ -522,6 +522,97 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #c0c4ce; }
+
+    /* ===== RIGHT TABS ===== */
+    #right-tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+      flex-shrink: 0;
+    }
+    .right-tab-btn {
+      flex: 1;
+      padding: 10px 0;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+      font-family: inherit;
+    }
+    .right-tab-btn:hover { color: var(--navy); }
+    .right-tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+    /* ===== STRUCTURE CANVAS ===== */
+    #struct-panel {
+      background: #f0f4f8;
+    }
+    #struct-canvas {
+      padding: 40px 40px 80px;
+    }
+    .sc-node {
+      position: absolute;
+      width: 200px;
+      background: var(--white);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-left: 3px solid #94a3b8;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+      cursor: pointer;
+      transition: box-shadow .15s, transform .15s;
+      user-select: none;
+      overflow: hidden;
+    }
+    .sc-node:hover { box-shadow: 0 4px 14px rgba(0,0,0,.14); transform: translateY(-1px); }
+    .sc-node.sc-selected { outline: 2px solid var(--navy); outline-offset: 2px; }
+    .sc-node.sc-live    { border-left-color: var(--live); }
+    .sc-node.sc-draft   { border-left-color: var(--draft); }
+    .sc-node.sc-planned { border-left-color: var(--planned); }
+    .sc-node.sc-deprecated { border-left-color: var(--deprecated); }
+    .sc-node-inner { padding: 10px 12px 8px; }
+    .sc-node-head { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .sc-node-name { font-size: 12.5px; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+    .sc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sc-live-dot    { background: var(--live); }
+    .sc-draft-dot   { background: var(--draft); }
+    .sc-planned-dot { background: var(--planned); }
+    .sc-deprecated-dot { background: var(--deprecated); }
+    .sc-node-url { font-size: 10px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 6px; min-height: 14px; }
+    .sc-node-actions { display: flex; gap: 4px; border-top: 1px solid var(--border); padding: 5px 8px; background: #fafbfd; }
+    .sc-btn {
+      flex: 1;
+      padding: 3px 0;
+      font-size: 10px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--white);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background .1s, color .1s, border-color .1s;
+      font-family: inherit;
+    }
+    .sc-btn:hover { background: var(--bg); color: var(--text); }
+    .sc-btn.sc-btn-add:hover { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+    .sc-btn.sc-btn-del:hover { background: #fff0f0; border-color: #fca5a5; color: #dc2626; }
+    .sc-add-root {
+      display: block;
+      margin: 20px auto 0;
+      padding: 8px 24px;
+      background: var(--white);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .sc-add-root:hover { border-color: var(--navy); color: var(--navy); background: var(--navy-pale); }
   </style>
 </head>
 <body>
@@ -667,7 +758,16 @@
 
   <!-- Detail Panel -->
   <div id="detail-panel">
+    <!-- Tab bar -->
+    <div id="right-tab-bar">
+      <button class="right-tab-btn active" data-tab="detail" onclick="switchRightTab('detail')">詳細</button>
+      <button class="right-tab-btn" data-tab="structure" onclick="switchRightTab('structure')">サイト構成</button>
+    </div>
     <button id="btn-share-page" title="このページを共有">🔗 共有</button>
+    <!-- Structure panel -->
+    <div id="struct-panel" style="display:none; flex:1; overflow:auto; position:relative;">
+      <div id="struct-canvas" style="position:relative; min-width:100%; min-height:100%;"></div>
+    </div>
     <div id="detail-scroll">
       <div id="detail-empty">
         <div class="empty-icon">&#128450;</div>
@@ -1066,6 +1166,7 @@ function renderTree() {
     root.appendChild(renderNode(node, 0));
   });
   updateToolbar();
+  if (_rightTab === 'structure') setTimeout(renderStructureTab, 50);
 }
 
 function renderNode(node, depth) {
@@ -2154,6 +2255,144 @@ const _shareParam = new URLSearchParams(location.search).get('share');
 if (_shareParam) {
   // Wait for data to be ready, then show share view
   setTimeout(() => renderShareView(_shareParam), 100);
+}
+
+/* ===== RIGHT TAB SWITCHING ===== */
+let _rightTab = 'detail';
+function switchRightTab(tab) {
+  _rightTab = tab;
+  document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  const detailScroll = document.getElementById('detail-scroll');
+  const structPanel = document.getElementById('struct-panel');
+  if (tab === 'detail') {
+    if (detailScroll) detailScroll.style.display = '';
+    if (structPanel) structPanel.style.display = 'none';
+  } else {
+    if (detailScroll) detailScroll.style.display = 'none';
+    if (structPanel) { structPanel.style.display = 'flex'; structPanel.style.flexDirection = 'column'; }
+    renderStructureTab();
+  }
+}
+
+/* ===== STRUCTURE TAB RENDERER ===== */
+function renderStructureTab() {
+  const canvas = document.getElementById('struct-canvas');
+  if (!canvas) return;
+
+  const NODE_W = 200;
+  const NODE_H = 82;
+  const H_GAP = 20;
+  const V_GAP = 80;
+
+  function calcWidth(node) {
+    if (!node.children || !node.children.length) return NODE_W;
+    const childrenWidth = node.children.reduce((sum, c) => sum + calcWidth(c) + H_GAP, -H_GAP);
+    return Math.max(NODE_W, childrenWidth);
+  }
+
+  const positions = {};
+  function assignPositions(node, x, y) {
+    const w = calcWidth(node);
+    const nx = x + (w - NODE_W) / 2;
+    positions[node.id] = { x: nx, y };
+    if (node.children && node.children.length) {
+      let cx = x;
+      node.children.forEach(child => {
+        const cw = calcWidth(child);
+        assignPositions(child, cx, y + NODE_H + V_GAP);
+        cx += cw + H_GAP;
+      });
+    }
+  }
+
+  const roots = siteData;
+  let totalX = 40;
+  roots.forEach(root => {
+    const w = calcWidth(root);
+    assignPositions(root, totalX, 40);
+    totalX += w + H_GAP * 2;
+  });
+
+  let maxX = 200, maxY = 200;
+  Object.values(positions).forEach(p => {
+    maxX = Math.max(maxX, p.x + NODE_W + 80);
+    maxY = Math.max(maxY, p.y + NODE_H + 80);
+  });
+
+  let nodesHtml = '';
+  let lines = [];
+
+  function renderScNode(node) {
+    const pos = positions[node.id];
+    if (!pos) return;
+    const isSelected = selectedId === node.id;
+    const dotClass = 'sc-' + (node.status || 'planned') + '-dot';
+    nodesHtml += '<div class="sc-node sc-' + (node.status || 'planned') + (isSelected ? ' sc-selected' : '') + '"'
+      + ' id="sc-node-' + node.id + '"'
+      + ' style="left:' + pos.x + 'px;top:' + pos.y + 'px;"'
+      + ' onclick="scSelectNode(\'' + node.id + '\')">'
+      + '<div class="sc-node-inner">'
+      + '<div class="sc-node-head">'
+      + '<div class="sc-status-dot ' + dotClass + '"></div>'
+      + '<div class="sc-node-name" title="' + escHtml(node.name) + '">' + escHtml(node.name) + '</div>'
+      + '</div>'
+      + '<div class="sc-node-url" title="' + escHtml(node.url || '') + '">' + escHtml(node.url || '\uFF08URL\u672A\u8A2D\u5B9A\uFF09') + '</div>'
+      + '</div>'
+      + '<div class="sc-node-actions">'
+      + '<button class="sc-btn sc-btn-add" onclick="event.stopPropagation();scAddChild(\'' + node.id + '\')">＋ 子ページ</button>'
+      + '<button class="sc-btn sc-btn-del" onclick="event.stopPropagation();scDeleteNode(\'' + node.id + '\')">✕</button>'
+      + '</div></div>';
+
+    if (node.children && node.children.length) {
+      const px = pos.x + NODE_W / 2;
+      const py = pos.y + NODE_H;
+      node.children.forEach(child => {
+        const cp = positions[child.id];
+        if (!cp) return;
+        const cx2 = cp.x + NODE_W / 2;
+        const cy = cp.y;
+        const my = py + V_GAP / 2;
+        lines.push('<path d="M' + px + ',' + py + ' L' + px + ',' + my + ' L' + cx2 + ',' + my + ' L' + cx2 + ',' + cy + '" stroke="#c8d4e6" stroke-width="1.5" fill="none"/>');
+      });
+    }
+    (node.children || []).forEach(renderScNode);
+  }
+
+  roots.forEach(renderScNode);
+
+  canvas.style.width = maxX + 'px';
+  canvas.style.height = maxY + 'px';
+  canvas.innerHTML = '<svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;" xmlns="http://www.w3.org/2000/svg">'
+    + lines.join('\n')
+    + '</svg>'
+    + nodesHtml
+    + '<button class="sc-add-root" onclick="scAddRoot()" style="position:absolute;left:40px;top:' + (maxY - 60) + 'px;">＋ ルートページを追加</button>';
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function scSelectNode(id) {
+  selectNode(id);
+  switchRightTab('detail');
+}
+
+function scAddChild(parentId) {
+  selectNode(parentId);
+  document.getElementById('btn-add-child') && document.getElementById('btn-add-child').click();
+  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
+}
+
+function scAddRoot() {
+  document.getElementById('btn-add-root') && document.getElementById('btn-add-root').click();
+  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
+}
+
+function scDeleteNode(id) {
+  selectNode(id);
+  document.getElementById('btn-delete') && document.getElementById('btn-delete').click();
+  setTimeout(function() { if (_rightTab === 'structure') renderStructureTab(); }, 100);
 }
 </script>
 
