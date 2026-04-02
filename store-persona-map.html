@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>店舗別 ペルソナ分布マップ — アイケアラボ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07101f; --panel: #0c1b2e; --card: #0f2035; --border: rgba(255,255,255,.06);
+      --text: #c8d8e8; --muted: #3a5470; --mono: 'DM Mono', monospace; --body: 'Noto Sans JP', sans-serif;
+      --p1: #8b5cf6; --p2: #3b82f6; --p3: #f59e0b; --green: #10b981; --red: #f87171;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 48px; background: rgba(7,16,31,.96); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px; padding: 0 24px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    }
+    .nav a { color: var(--muted); text-decoration: none; padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(148,163,184,.1); transition: color .15s; white-space: nowrap; }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: #a78bfa; border-color: rgba(139,92,246,.35); background: rgba(139,92,246,.08); }
+    .nav-sep { color: #1e3048; }
+
+    /* LAYOUT */
+    .page { max-width: 1280px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* HEADER */
+    .hd { margin-bottom: 32px; }
+    .hd h1 { font-size: 22px; font-weight: 700; color: #e8f0f8; margin-bottom: 6px; }
+    .hd p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .data-note { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-family: var(--mono); font-size: 9.5px; color: #2a4060; background: rgba(139,92,246,.06); border: 1px solid rgba(139,92,246,.12); border-radius: 4px; padding: 4px 10px; }
+
+    /* LEGEND */
+    .legend { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; padding: 14px 18px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border); }
+    .leg-item { display: flex; align-items: center; gap: 8px; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .leg-label { font-size: 12px; color: var(--text); }
+    .leg-sub { font-size: 10.5px; color: var(--muted); }
+
+    /* FILTERS */
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .05em;
+      padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(255,255,255,.08);
+      background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .filter-btn:hover { color: var(--text); border-color: rgba(255,255,255,.15); }
+    .filter-btn.active { background: rgba(139,92,246,.12); border-color: rgba(139,92,246,.3); color: #a78bfa; }
+
+    /* SORT */
+    .sort-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .sort-label { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .sort-btn {
+      font-family: var(--mono); font-size: 9.5px; padding: 3px 10px; border-radius: 3px;
+      border: 1px solid rgba(255,255,255,.06); background: transparent; color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .sort-btn:hover { color: var(--text); }
+    .sort-btn.active { color: #a78bfa; border-color: rgba(139,92,246,.25); background: rgba(139,92,246,.08); }
+
+    /* GRID */
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+
+    /* STORE CARD */
+    .store-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 16px 14px; transition: border-color .2s, transform .2s;
+      cursor: default;
+    }
+    .store-card:hover { border-color: rgba(139,92,246,.2); transform: translateY(-1px); }
+    .store-card.hidden { display: none; }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .store-name { font-size: 13.5px; font-weight: 700; color: #e8f0f8; margin-bottom: 2px; }
+    .store-area { font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+    .store-region { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 3px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.06); color: var(--muted); white-space: nowrap; }
+
+    /* TOTAL SCORE */
+    .total-score {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    }
+    .score-num { font-family: var(--mono); font-size: 22px; font-weight: 500; }
+    .score-pct { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .score-grade { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
+    .grade-s { color: #10b981; border-color: rgba(16,185,129,.3); background: rgba(16,185,129,.08); }
+    .grade-a { color: #a78bfa; border-color: rgba(139,92,246,.3); background: rgba(139,92,246,.08); }
+    .grade-b { color: #3b82f6; border-color: rgba(59,130,246,.25); background: rgba(59,130,246,.07); }
+    .grade-c { color: var(--muted); border-color: rgba(255,255,255,.08); background: rgba(0,0,0,.2); }
+
+    /* BAR CHART */
+    .bars { display: flex; flex-direction: column; gap: 7px; }
+    .bar-row { display: flex; align-items: center; gap: 8px; }
+    .bar-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); width: 62px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 7px; background: rgba(0,0,0,.35); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+    .bar-val { font-family: var(--mono); font-size: 9px; color: var(--text); width: 28px; text-align: right; flex-shrink: 0; }
+
+    /* COMBINED BAR */
+    .combo-bar { margin-top: 10px; }
+    .combo-track { height: 5px; border-radius: 3px; overflow: hidden; display: flex; background: rgba(0,0,0,.3); }
+    .combo-seg { height: 100%; transition: width .6s ease; }
+    .combo-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+    .combo-label { font-family: var(--mono); font-size: 8px; color: var(--muted); }
+
+    /* TABLE VIEW */
+    #table-view { display: none; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    thead th {
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sort-asc::after { content: ' ↑'; }
+    thead th.sort-desc::after { content: ' ↓'; }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,.03); transition: background .15s; }
+    tbody tr:hover { background: rgba(139,92,246,.04); }
+    tbody td { padding: 10px 14px; color: var(--text); }
+    .td-name { font-weight: 600; color: #e8f0f8; }
+    .td-area { font-size: 11px; color: var(--muted); }
+    .td-pct { font-family: var(--mono); }
+    .td-bar { width: 80px; }
+    .mini-bar { height: 4px; border-radius: 2px; background: currentColor; opacity: .7; }
+    .td-total { font-family: var(--mono); font-weight: 600; }
+
+    /* VIEW TOGGLE */
+    .view-toggle { display: flex; gap: 4px; margin-left: auto; }
+    .view-btn { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 3px; border: 1px solid rgba(255,255,255,.08); background: transparent; color: var(--muted); cursor: pointer; transition: all .15s; }
+    .view-btn.active { color: #a78bfa; border-color: rgba(139,92,246,.25); background: rgba(139,92,246,.08); }
+
+    /* STATS */
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px; }
+    .stat-box { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: .12em; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-family: var(--mono); font-size: 24px; font-weight: 500; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* TARGET OVERVIEW */
+    .target-overview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .to-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .to-card:hover { transform: translateY(-2px); }
+    .to-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .to-card.primary-card::before { background: var(--p1); }
+    .to-card.secondary-card::before { background: var(--p2); }
+    .to-card.tertiary-card::before { background: var(--p3); }
+    .to-card.primary-card   { border-color: rgba(139,92,246,.2); }
+    .to-card.secondary-card { border-color: rgba(59,130,246,.2); }
+    .to-card.tertiary-card  { border-color: rgba(245,158,11,.2); }
+    .to-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+      padding: 3px 9px; border-radius: 3px; border: 1px solid;
+      margin-bottom: 12px; font-weight: 500;
+    }
+    .to-badge.p1 { color: #a78bfa; border-color: rgba(139,92,246,.3); background: rgba(139,92,246,.1); }
+    .to-badge.p2 { color: #60a5fa; border-color: rgba(59,130,246,.3); background: rgba(59,130,246,.1); }
+    .to-badge.p3 { color: #fbbf24; border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.1); }
+    .to-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .to-name { font-size: 16px; font-weight: 700; color: #e8f0f8; margin-bottom: 4px; letter-spacing: -.01em; }
+    .to-age  { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+    .to-attrs { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+    .to-attr {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 12px; color: var(--text); line-height: 1.5;
+    }
+    .to-attr-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+    .to-why {
+      font-size: 11px; color: var(--muted); line-height: 1.6;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.25);
+      border-radius: 6px;
+      border-left: 2px solid;
+    }
+    .primary-card   .to-why { border-color: rgba(139,92,246,.4); }
+    .secondary-card .to-why { border-color: rgba(59,130,246,.4); }
+    .tertiary-card  .to-why { border-color: rgba(245,158,11,.4); }
+    .to-section-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .to-section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .store-grid { grid-template-columns: 1fr; }
+      .page { padding: 20px 16px 60px; }
+      .target-overview { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .target-overview { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<nav class="nav">
+  <span style="color:#1e3048">eye care lab</span>
+  <span class="nav-sep">/</span>
+  <a href="aicare-top-prototype.html">サイト</a>
+  <a href="persona-dashboard.html">ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html" class="active">店舗ペルソナ分布</a>
+  <a href="project-board.html" style="color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.07);">PJボード</a>
+</nav>
+
+<div class="page">
+
+  <!-- TARGET OVERVIEW -->
+  <div class="to-section-label">TARGET PERSONA OVERVIEW</div>
+  <div class="target-overview">
+
+    <!-- PRIMARY -->
+    <div class="to-card primary-card">
+      <div class="to-badge p1"><span class="to-dot"></span>PRIMARY</div>
+      <div class="to-name">ナレッジワーカー</div>
+      <div class="to-age">25〜38歳 ／ 男女</div>
+      <div class="to-attrs">
+        <div class="to-attr"><span class="to-attr-icon">💼</span><span>IT・デザイナー・マーケター・エンジニア</span></div>
+        <div class="to-attr"><span class="to-attr-icon">💻</span><span>PC・スマホを1日8時間以上使用、眼精疲労が深刻</span></div>
+        <div class="to-attr"><span class="to-attr-icon">💰</span><span>購買力高め、品質・機能に対し価値投資を惜しまない</span></div>
+        <div class="to-attr"><span class="to-attr-icon">📍</span><span>都市部オフィス集積エリア・リモートワーク居住者</span></div>
+      </div>
+      <div class="to-why">アイケアグラスの主要顧客層。ブルーライト・疲れ目ケアへの感度が最も高く、LTV・口コミ波及力も最大。</div>
+    </div>
+
+    <!-- SECONDARY -->
+    <div class="to-card secondary-card">
+      <div class="to-badge p2"><span class="to-dot"></span>SECONDARY</div>
+      <div class="to-name">パフォーマンス追求型</div>
+      <div class="to-age">18〜25歳 ／ 男女</div>
+      <div class="to-attrs">
+        <div class="to-attr"><span class="to-attr-icon">🎓</span><span>受験生・大学生・新卒〜若手社会人</span></div>
+        <div class="to-attr"><span class="to-attr-icon">⚡</span><span>集中力・認知パフォーマンス向上に強い関心</span></div>
+        <div class="to-attr"><span class="to-attr-icon">📱</span><span>SNS情報感度が高く、トレンドへの反応が早い</span></div>
+        <div class="to-attr"><span class="to-attr-icon">💡</span><span>コスパ重視だが効果実感があれば継続購入する</span></div>
+      </div>
+      <div class="to-why">長期育成層。学生〜若手就業者に支持を広げることで次世代のPRIMARY予備軍を取り込む。</div>
+    </div>
+
+    <!-- TERTIARY -->
+    <div class="to-card tertiary-card">
+      <div class="to-badge p3"><span class="to-dot"></span>TERTIARY</div>
+      <div class="to-name">健康意識高め女性</div>
+      <div class="to-age">35〜50歳 ／ 女性</div>
+      <div class="to-attrs">
+        <div class="to-attr"><span class="to-attr-icon">📲</span><span>スマホ・タブレットのヘビーユーザー、眼疲れ自覚あり</span></div>
+        <div class="to-attr"><span class="to-attr-icon">🌿</span><span>根本ケア・予防医療志向、健康投資意欲が高い</span></div>
+        <div class="to-attr"><span class="to-attr-icon">🛍️</span><span>美容・ウェルネス分野への支出を惜しまない富裕層寄り</span></div>
+        <div class="to-attr"><span class="to-attr-icon">🗣️</span><span>口コミ・紹介購買の起点となりやすい影響力層</span></div>
+      </div>
+      <div class="to-why">高所得エリア（港区・渋谷区・自由が丘など）で濃度が高く、単価・継続率ともに安定した収益貢献層。</div>
+    </div>
+
+  </div>
+
+  <!-- HEADER -->
+  <div class="hd">
+    <h1>店舗別 ターゲットペルソナ 周辺分布</h1>
+    <p>各店舗エリアの周辺人口（昼間人口ベース）に占めるターゲット層の推計割合。<br>集客戦略・投資優先度の参考指標として活用。</p>
+    <div class="data-note">
+      📊 出典推計ベース: 就業構造基本調査 2022（最新）· 住民基本台帳人口移動報告 2024 · 労働力調査 2024年平均 · 情報通信業就業者数 2024
+      ／ 国勢調査2025は調査中のため2020確定値で補完 ／ ターゲット定義はアイケアグラス ブランディング資料 v1.0 準拠
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="leg-item">
+      <div class="leg-dot" style="background:var(--p1)"></div>
+      <div>
+        <div class="leg-label">PRIMARY — ナレッジワーカー</div>
+        <div class="leg-sub">25〜38歳 / IT・デザイナー・マーケター / PC長時間 / 購買力高め</div>
+      </div>
+    </div>
+    <div class="leg-item">
+      <div class="leg-dot" style="background:var(--p2)"></div>
+      <div>
+        <div class="leg-label">SECONDARY — パフォーマンス追求型</div>
+        <div class="leg-sub">18〜25歳 / 受験生・新卒〜若手 / 集中力・効率志向</div>
+      </div>
+    </div>
+    <div class="leg-item">
+      <div class="leg-dot" style="background:var(--p3)"></div>
+      <div>
+        <div class="leg-label">TERTIARY — 健康意識高め女性</div>
+        <div class="leg-sub">35〜50歳 / スマホヘビーユーザー / 根本ケア志向</div>
+      </div>
+    </div>
+    <div class="leg-item" style="margin-left:auto;flex-direction:column;gap:4px;align-items:flex-end">
+      <div style="display:flex;gap:8px">
+        <span class="score-grade grade-s">S ≥38%</span>
+        <span class="score-grade grade-a">A 33〜37%</span>
+        <span class="score-grade grade-b">B 28〜32%</span>
+        <span class="score-grade grade-c">C &lt;28%</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted)">ターゲット合計スコア</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-row" id="stat-row"></div>
+
+  <!-- CONTROLS -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px;">
+    <div class="filters" id="region-filters" style="margin-bottom:0;flex:1;">
+      <button class="filter-btn active" data-region="all">すべて</button>
+      <button class="filter-btn" data-region="東京">東京</button>
+      <button class="filter-btn" data-region="大阪">大阪</button>
+      <button class="filter-btn" data-region="福岡">福岡</button>
+      <button class="filter-btn" data-region="関東他">関東他</button>
+      <button class="filter-btn" data-region="その他">その他</button>
+    </div>
+    <div class="sort-row" style="margin-bottom:0;">
+      <span class="sort-label">並び替え:</span>
+      <button class="sort-btn active" data-sort="total">合計↓</button>
+      <button class="sort-btn" data-sort="p1">PRIMARY↓</button>
+      <button class="sort-btn" data-sort="name">名前</button>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-card">カード</button>
+      <button class="view-btn" id="btn-table">テーブル</button>
+    </div>
+  </div>
+
+  <!-- CARD VIEW -->
+  <div class="store-grid" id="card-view"></div>
+
+  <!-- TABLE VIEW -->
+  <div id="table-view">
+    <table id="store-table">
+      <thead>
+        <tr>
+          <th data-col="name">店舗</th>
+          <th data-col="region">エリア</th>
+          <th data-col="p1">PRIMARY<br><span style="font-weight:400;opacity:.6">25〜38歳 KW</span></th>
+          <th data-col="p2">SECONDARY<br><span style="font-weight:400;opacity:.6">18〜25歳</span></th>
+          <th data-col="p3">TERTIARY<br><span style="font-weight:400;opacity:.6">35〜50歳♀</span></th>
+          <th data-col="total">合計</th>
+          <th>内訳</th>
+          <th data-col="note">エリア特性</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+//  推計ベース:
+//  ・就業構造基本調査 2022（総務省統計局）— 産業×年齢×地域の最新確定値
+//  ・住民基本台帳人口移動報告 2024（総務省）— 転入・転出トレンド反映
+//  ・労働力調査 2024年平均（総務省統計局）— 職業別就業者数
+//  ・国勢調査2025は調査中のため2020確定値（令和2年）で地域構成を補完
+//  PRIMARY: 25〜38歳の専門的・技術的職業従事者 + 情報通信業従事者（エリア昼間人口比）
+//  SECONDARY: 18〜25歳の学生・若手就業者（エリア人口比）
+//  TERTIARY: 35〜50歳女性のうち健康・美容・ライフスタイル高関与層（エリア人口比）
+// ══════════════════════════════════════════════════
+const STORES = [
+  // ── 東京 ──
+  // 渋谷区: 情報通信業就業者15.2%（国勢調査2020）、学術研究・専門技術11.9%、25〜39歳居住者47%
+  { name:'代々木本店',        area:'渋谷区代々木',      region:'東京', p1:24, p2:9, p3:8, note:'情報通信業就業者15.2%（区内常住）＋学術研究・専門技術11.9%。「ビットバレー」擁するIT最集積エリア。25〜39歳人口が居住者の47%を占め都内屈指の若年層比率。昼間就業者ベースではさらに高い。' },
+  { name:'代々木アネックス店', area:'渋谷区千駄ヶ谷',    region:'東京', p1:23, p2:9, p3:8, note:'渋谷区内の千駄ヶ谷エリア。広告・メディア・ファッション系企業が集積し、情報通信業就業者比率は渋谷区全体水準（15.2%）に準じる。原宿・新宿南口圏の若手クリエイター層が厚い。' },
+  { name:'代々木上原駅前店',   area:'渋谷区西原',        region:'東京', p1:22, p2:8, p3:9, note:'渋谷区西部の閑静な住宅エリア。情報通信業就業者比率は渋谷区平均以下だが、在宅フリーランス・リモートワーカー比率高め。高収入ファミリー層で健康意識高い女性も多い。' },
+  // 港区: 情報通信業就業者13.1%（常住）、昼間人口118万人（都内最大）
+  { name:'虎ノ門駅前店',       area:'港区虎ノ門',        region:'東京', p1:22, p2:7, p3:8, note:'港区は情報通信業13.1%（常住）、昼間人口118万人（東京都最大）。コンサル・外資IT・メガバンク集積。昼間就業者ベースでは専門職比率がさらに大幅上昇。購買力の高い高所得層が主体。' },
+  { name:'AMOR麻布十番店',     area:'港区麻布十番',      region:'東京', p1:21, p2:7, p3:11, note:'港区の高級住宅商業地。外資系企業勤務者・富裕層が多く高所得専門職（PRIMARY）比率が安定している。35〜50歳高収入女性（TERTIARY）の健康投資意欲は港区でも特に高いエリア。' },
+  { name:'恵比寿駅前店',       area:'渋谷区恵比寿',      region:'東京', p1:23, p2:8, p3:10, note:'渋谷区で情報通信業15.2%、広告・メディア・クリエイター系が特に集積する恵比寿エリア。居住者は高所得30〜40代多め。TERTIARY（健康意識高め女性）は渋谷区内でも比率高い。' },
+  // 品川区: 情報通信業12.1%
+  { name:'目黒店',             area:'品川区上大崎',      region:'東京', p1:18, p2:7, p3:10, note:'品川区の情報通信業就業者は12.1%。目黒駅圏はオフィスと住宅が混在し、IT・クリエイター系就業者の居住も多い。30代共働きナレッジワーカー層が厚く、健康意識高め女性層も一定数。' },
+  // 世田谷区: 情報通信業12.8%、総人口約94万人（東京最大区）
+  { name:'成城学園駅前店',     area:'世田谷区成城',      region:'東京', p1:15, p2:7, p3:13, note:'世田谷区の情報通信業12.8%。成城エリアは高所得住宅地で平均所得都内上位。TERTIARY（健康意識高め富裕層女性）の濃度が特に高い。リモートワーク増加により在宅ITワーカーも増加中。' },
+  // 中央区: 情報通信業13.5%（常住）、昼間就業者71万人
+  { name:'日本橋馬喰町店',     area:'中央区東日本橋',    region:'東京', p1:18, p2:8, p3:9, note:'中央区の情報通信業就業者13.5%（常住）、昼間就業者71万人。問屋街からIT・フィンテック・スタートアップへの転換が進むエリア。大手企業本社集積で昼間の専門職比率高い。' },
+  // 千代田区: 情報通信業11.5%（常住）、昼間人口116万人・昼夜比1753%で全国最大
+  { name:'神田駅前店',         area:'千代田区内神田',    region:'東京', p1:20, p2:8, p3:7, note:'千代田区は情報通信業11.5%（常住）、昼間人口116万人・昼夜比1753倍（全国最大）。神田エリアはIT・クラウド系ベンチャーが急増中。昼間就業者ベースでの情報通信・専門職比率は常住ベースより大幅上昇。' },
+  // 文京区: 情報通信業11.8%、学術研究・専門技術10.9%、医療福祉12.2%
+  { name:'江戸川橋駅前店',     area:'文京区関口',        region:'東京', p1:16, p2:11, p3:10, note:'文京区の情報通信業11.8%、学術研究・専門技術10.9%。東大・東京医科歯科大・東京理科大圏。SECONDARY（学生・若手社会人）比率が都内で特に高いエリア。研究者・専門職居住者も多い。' },
+  { name:'新大塚護国寺店',     area:'文京区大塚',        region:'東京', p1:16, p2:10, p3:10, note:'文京区（情報通信業11.8%、学術研究10.9%）の大塚エリア。大学・出版・教育系の知的職業従事者・研究者比率高め。護国寺周辺は比較的落ち着いた住宅街でリモートワーカー層も居住。' },
+  { name:'新富町駅前店',       area:'中央区新富',        region:'東京', p1:19, p2:8, p3:9, note:'中央区の情報通信業13.5%（常住）。銀座東・東銀座エリアに隣接し、金融・IT・メディア系のオフィスが点在。昼間就業者ベースでの専門職比率は常住ベースより高い。' },
+  { name:'白金高輪駅前店',     area:'港区高輪',          region:'東京', p1:20, p2:7, p3:12, note:'港区（情報通信業13.1%、昼間人口118万人）の白金エリア。高収入・健康意識高め女性の居住密度が港区でも特に高い。外資系勤務の30〜40代専門職層の居住比率も高く、購買力は都内トップクラス。' },
+  // 世田谷区: 情報通信業12.8%
+  { name:'三軒茶屋駅前店',     area:'世田谷区太子堂',    region:'東京', p1:17, p2:9, p3:11, note:'世田谷区（情報通信業12.8%）の三軒茶屋エリア。若いクリエイター・フリーランス居住者が多く、飲食・デザイン・IT系在住者が厚い。成城エリアより若年単身世帯が多くSECONDARY層も安定。' },
+  // 中野区: 情報通信業14.1%（23区内屈指）、20〜30代人口比38.5%
+  { name:'中野駅前店',         area:'中野区中野',        region:'東京', p1:19, p2:10, p3:9, note:'中野区は情報通信業就業者14.1%（23区内屈指の高水準）、20〜30代人口比38.5%（23区内上位）。コンテンツ・IT系企業集積、若年単身世帯多くSECONDARY層も厚い。テレワーク普及で在宅ナレッジワーカーが増加中。' },
+  // 目黒区: 情報通信業13.7%
+  { name:'自由が丘店',         area:'目黒区自由が丘',    region:'東京', p1:17, p2:7, p3:12, note:'目黒区の情報通信業13.7%。自由が丘は高所得女性・フリーランス比率高く、TERTIARY（健康意識高め女性）の絶好立地として関東でも随一の水準。IT系スタートアップのオフィスも増加。' },
+  // 杉並区: 情報通信業13.6%
+  { name:'荻窪店',             area:'杉並区上荻',        region:'東京', p1:16, p2:8, p3:10, note:'杉並区の情報通信業13.6%。居住者ベースのIT就業者が多く、テレワーク需要が高い。荻窪は中央線沿線の落ち着いた住宅街でフリーランス・リモートワーカー増加。健康意識高め主婦層も一定数。' },
+
+  // ── 神奈川・関東他 ──
+  // 川崎市: 情報通信業11.4%（政令市の中では高水準）
+  { name:'川崎駅前店',         area:'神奈川県川崎市',    region:'関東他', p1:14, p2:9, p3:9, note:'川崎市の情報通信業11.4%（政令市中高水準）。富士通・NEC・東芝など大手IT系研究開発拠点あり。川崎駅前は東京直結ターミナル、30代ITワーカー居住者が多い（昼間は東京通勤、夜間居住型）。' },
+  { name:'朝霞台駅前店',       area:'埼玉県朝霞市',      region:'関東他', p1:11, p2:9, p3:8, note:'東武東上線の居住エリア。都心（池袋・渋谷）へ通勤するナレッジワーカー居住者が多い。ベッドタウン特性が強く昼間のPRIMARY密度は低いが、夜間居住ベースでは都心通勤者層が厚い。' },
+  // さいたま市: 情報通信業6.2%
+  { name:'大宮店',             area:'埼玉県さいたま市',  region:'関東他', p1:10, p2:9, p3:8, note:'さいたま市の情報通信業6.2%。大宮区は商業・流通・行政が主体。東京通勤のベッドタウンとして30代ITワーカー居住比率は一定あるが、昼間の専門職集積は都心に大きく劣る。' },
+  { name:'柏西口店',           area:'千葉県柏市',        region:'関東他', p1:10, p2:9, p3:8, note:'TX沿線（つくばエクスプレス）の開発が進む居住エリア。子育て世代・共働きナレッジワーカーが増加傾向。都心通勤者比率高く夜間居住型の構成。若いファミリー層が多い。' },
+  { name:'船橋駅前店',         area:'千葉県船橋市',      region:'関東他', p1:11, p2:9, p3:8, note:'千葉最大級の商業ターミナルエリア。都心通勤のベッドタウンとしてIT・サービス業就業者が居住。商業集積により昼間人口も多く、PRIMARY層の認知接点として有効なエリア。' },
+
+  // ── 大阪 ──
+  // 大阪市西区: 昼間就業者11.6万人・増加率14.5%（大阪市最高）
+  { name:'堀江店',             area:'大阪市西区',        region:'大阪', p1:16, p2:9, p3:10, note:'大阪市西区は昼間就業者11.6万人、増加率14.5%（大阪市最高）。堀江はデザイン・クリエイター・ウェブ系事務所集積地で、25〜39歳の転入超過率が高く若年クリエイター比率大。感度高い女性層も集まる関西有数のエリア。' },
+  // 大阪市中央区: 昼間就業者38万人（21%、市内最大）
+  { name:'本町店',             area:'大阪市中央区',      region:'大阪', p1:17, p2:8, p3:9, note:'大阪市最大の昼間就業地（38万人・21%）。卸売・金融・コンサル系が主体だが、情報通信系企業が本町・堺筋本町エリアに集積。昼間就業者ベースでのIT・専門職比率は常住ベースより大幅に高い。' },
+  { name:'江坂駅前店',         area:'大阪府吹田市',      region:'大阪', p1:15, p2:8, p3:9, note:'吹田市の江坂エリア。IT系企業の大阪オフィスが多く集積。大阪市内へのアクセスも良く30代ナレッジワーカーの居住・通勤エリアとして機能。地価が梅田より低く若手層にとって住みやすい。' },
+  // 大阪市北区: 昼間就業者32万人（大阪市2位）、人口増加率12.7%
+  { name:'梅田中津店',         area:'大阪市北区',        region:'大阪', p1:16, p2:9, p3:9, note:'大阪市北区は昼間就業者32万人（市内2位）、人口増加率12.7%で若年層流入継続。梅田はIT・メディア・コンサル系企業の大阪オフィス集積地。中津エリアは若年クリエイター・スタートアップが急増中。' },
+
+  // ── 兵庫・関西他 ──
+  { name:'西宮北口駅前店',     area:'兵庫県西宮市',      region:'その他', p1:13, p2:7, p3:11, note:'阪急沿線の高所得住宅地。西宮・芦屋・宝塚エリアの富裕層居住地として知られ、健康意識高い30〜50代女性の居住密度が高い。大阪都心への通勤ナレッジワーカーが居住するベッドタウン型。' },
+  { name:'宇治店',             area:'京都府宇治市',      region:'その他', p1:10, p2:8, p3:10, note:'京都南部の住宅エリア。情報通信業比率は全国平均に近い。健康意識高めの主婦・女性フリーランス層が一定数居住。観光・伝統産業が主体の地域特性だが、近鉄・JR沿線で大阪・京都への通勤者も多い。' },
+  { name:'桂店',               area:'京都市西京区',      region:'その他', p1:10, p2:8, p3:9, note:'京都市西部の住宅・商業エリア。桂川沿いに住宅が広がり、京都市内のIT・観光・教育業就業者の居住地。阪急京都線沿線で大阪・京都両都市へのアクセスが良く、若手ITワーカーの居住も見られる。' },
+
+  // ── 福岡 ──
+  // 福岡市: 情報通信業5.0%
+  { name:'博多駅前店',         area:'福岡市博多区',      region:'福岡', p1:12, p2:9, p3:8, note:'福岡市全体の情報通信業5.0%。博多駅前はIT企業・コンサル系オフィスが集積し「九州のIT拠点」として20代後半〜30代比率高め。SECONDARY層（学生・新卒）は天神エリアと相互流動。購買力高め。' },
+  { name:'大名店',             area:'福岡市中央区',      region:'福岡', p1:13, p2:10, p3:8, note:'福岡のクリエイター・IT・スタートアップが集まる天神・大名エリア。若手感度高い層に強く、地方都市の中では情報通信業・専門職比率が相対的に高い。SECONDARY（若手）層も厚い。' },
+
+  // ── 北海道・東北 ──
+  { name:'札幌大通店',         area:'北海道札幌市',      region:'その他', p1:9, p2:9, p3:8, note:'北海道最大のビジネス拠点。IT企業のリモートワーク移住先として注目され就業構造が変化中だが、情報通信業比率は全国平均水準。大通エリアは商業・金融・公務員が主体。' },
+  // 仙台市: 情報通信業4.0%（50万就業者中約2万人）
+  { name:'仙台店',             area:'宮城県仙台市',      region:'その他', p1:8, p2:9, p3:8, note:'仙台市の情報通信業4.0%（50万就業者中約2万人）。東北最大都市として地場IT・公共系システム企業が集積。青葉区は大学・官公庁が多くSECONDARY（学生）比率高め。東北圏の購買力中心地として絶対数は一定ある。' },
+
+  // ── 北関東 ──
+  { name:'太田店',             area:'群馬県太田市',      region:'その他', p1:7, p2:7, p3:8, note:'製造業・自動車産業（スバル工場）中心の工業都市。情報通信業・専門技術職比率は低く、ナレッジワーカー層の絶対数は少ない。製造業エンジニア（PRIMARY隣接層）が一定数存在。' },
+  { name:'前橋店',             area:'群馬県前橋市',      region:'その他', p1:7, p2:8, p3:8, note:'群馬県庁所在地。行政・教育・サービス業中心で標準的な人口構成。情報通信業比率は全国平均以下だが、近年ITサービス系企業の地方拠点設置が増加傾向。' },
+  { name:'富山店',             area:'富山県富山市',      region:'その他', p1:6, p2:7, p3:8, note:'製造業・医療・薬業中心の産業構造でナレッジワーカー比率は低め。ただし「健康都市」として全国的に知られ、健康意識は比較的高い地域特性を持つ。TERTIARY（健康意識高め女性）の感度は期待できる。' },
+
+  // ── 広島・四国 ──
+  { name:'広島店',             area:'広島県広島市',      region:'その他', p1:9, p2:8, p3:8, note:'中国地方の中心都市。IT・製造・公務員が主体で情報通信業比率は全国平均水準。広島駅周辺は再開発が進みIT企業誘致が活発化。地域の絶対市場規模として安定した需要がある。' },
+  { name:'高松店',             area:'香川県高松市',      region:'その他', p1:7, p2:7, p3:8, note:'四国の商業拠点。サービス業・流通業中心で情報通信業比率は低め。テレワーク移住先として注目されITワーカーの流入は増加傾向だが、絶対数はまだ少ない。' },
+
+  // ── 九州他 ──
+  { name:'ONE MORE店（宮崎）', area:'宮崎県宮崎市',      region:'その他', p1:6, p2:7, p3:8, note:'農業・観光・サービス業中心。情報通信業・ナレッジワーカー比率は地方都市の中でも低い。地域密着型の集客が中心となる店舗。' },
+  { name:'辛島町店（熊本）',   area:'熊本県熊本市',      region:'その他', p1:8, p2:8, p3:8, note:'TSMC菊陽工場誘致により半導体・IT系エンジニアが急増中。2024〜2025年にかけてナレッジワーカー流入が継続しており、今後PRIMARY比率が大きく上昇する可能性あり。現時点は過渡期。' },
+];
+
+// ── DERIVED ──
+STORES.forEach(s => {
+  s.total = s.p1 + s.p2 + s.p3;
+  // グレード: 実データ反映（最高が渋谷区40%台）
+  s.grade = s.total >= 38 ? 'S' : s.total >= 33 ? 'A' : s.total >= 28 ? 'B' : 'C';
+});
+
+// ── STATE ──
+let currentRegion = 'all';
+let currentSort   = 'total';
+let sortDir       = -1; // -1 = desc
+
+// ── STATS ──
+function renderStats(stores) {
+  const avg = t => (stores.reduce((a,s) => a+s[t], 0) / stores.length).toFixed(1);
+  const top = stores.slice().sort((a,b)=>b.total-a.total)[0];
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box"><div class="stat-label">表示店舗数</div><div class="stat-val" style="color:#a78bfa">${stores.length}</div><div class="stat-sub">フィルター適用後</div></div>
+    <div class="stat-box"><div class="stat-label">平均合計スコア</div><div class="stat-val" style="color:#10b981">${avg('total')}%</div><div class="stat-sub">ターゲット3層合計</div></div>
+    <div class="stat-box"><div class="stat-label">平均 PRIMARY</div><div class="stat-val" style="color:var(--p1)">${avg('p1')}%</div><div class="stat-sub">ナレッジワーカー</div></div>
+    <div class="stat-box"><div class="stat-label">最高スコア店舗</div><div class="stat-val" style="font-size:14px;color:#e8f0f8;padding-top:6px">${top.name}</div><div class="stat-sub" style="font-family:var(--mono);font-size:10px">${top.total}% / ${top.grade}ランク</div></div>
+  `;
+}
+
+// ── GRADE ──
+const gradeClass = { S:'grade-s', A:'grade-a', B:'grade-b', C:'grade-c' };
+
+// ── CARD RENDER ──
+function renderCards(stores) {
+  const cv = document.getElementById('card-view');
+  cv.innerHTML = '';
+  stores.forEach(s => {
+    const maxPct = 50; // bar max width reference (50% fills full bar)
+    const card = document.createElement('div');
+    card.className = 'store-card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="store-name">${s.name}</div>
+          <div class="store-area">${s.area}</div>
+        </div>
+        <div class="store-region">${s.region}</div>
+      </div>
+      <div class="total-score">
+        <span class="score-num" style="color:${s.grade==='S'?'#10b981':s.grade==='A'?'#a78bfa':s.grade==='B'?'#3b82f6':'var(--muted)'}">${s.total}%</span>
+        <span class="score-pct">ターゲット合計</span>
+        <span class="score-grade ${gradeClass[s.grade]}">${s.grade}</span>
+      </div>
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-lbl">PRIMARY</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(s.p1/maxPct*100).toFixed(1)}%;background:var(--p1)"></div></div>
+          <div class="bar-val">${s.p1}%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl">SECONDARY</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(s.p2/maxPct*100).toFixed(1)}%;background:var(--p2)"></div></div>
+          <div class="bar-val">${s.p2}%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-lbl">TERTIARY</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(s.p3/maxPct*100).toFixed(1)}%;background:var(--p3)"></div></div>
+          <div class="bar-val">${s.p3}%</div>
+        </div>
+      </div>
+      <div class="combo-bar">
+        <div class="combo-track">
+          <div class="combo-seg" style="width:${s.p1}%;background:var(--p1);opacity:.7"></div>
+          <div class="combo-seg" style="width:${s.p2}%;background:var(--p2);opacity:.7"></div>
+          <div class="combo-seg" style="width:${s.p3}%;background:var(--p3);opacity:.7"></div>
+        </div>
+        <div class="combo-labels">
+          <span class="combo-label" style="color:rgba(139,92,246,.5)">▌PRIMARY</span>
+          <span class="combo-label" style="color:rgba(59,130,246,.5)">▌SECONDARY</span>
+          <span class="combo-label" style="color:rgba(245,158,11,.5)">▌TERTIARY</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.65">${s.note}</div>
+    `;
+    cv.appendChild(card);
+  });
+}
+
+// ── TABLE RENDER ──
+function renderTable(stores) {
+  const tb = document.getElementById('table-body');
+  tb.innerHTML = '';
+  stores.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="td-name">${s.name}</div><div class="td-area">${s.area}</div></td>
+      <td><span style="font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);color:var(--muted)">${s.region}</span></td>
+      <td class="td-pct" style="color:var(--p1)">${s.p1}%
+        <div class="td-bar"><div class="mini-bar" style="width:${(s.p1/42*100).toFixed(0)}%;color:var(--p1)"></div></div>
+      </td>
+      <td class="td-pct" style="color:var(--p2)">${s.p2}%
+        <div class="td-bar"><div class="mini-bar" style="width:${(s.p2/42*100).toFixed(0)}%;color:var(--p2)"></div></div>
+      </td>
+      <td class="td-pct" style="color:var(--p3)">${s.p3}%
+        <div class="td-bar"><div class="mini-bar" style="width:${(s.p3/42*100).toFixed(0)}%;color:var(--p3)"></div></div>
+      </td>
+      <td class="td-total" style="color:${s.grade==='S'?'#10b981':s.grade==='A'?'#a78bfa':s.grade==='B'?'#3b82f6':'var(--muted)'}">
+        ${s.total}% <span class="score-grade ${gradeClass[s.grade]}" style="margin-left:4px">${s.grade}</span>
+      </td>
+      <td>
+        <div style="display:flex;gap:2px;width:80px;height:6px;border-radius:3px;overflow:hidden">
+          <div style="flex:${s.p1};background:var(--p1);opacity:.7"></div>
+          <div style="flex:${s.p2};background:var(--p2);opacity:.7"></div>
+          <div style="flex:${s.p3};background:var(--p3);opacity:.7"></div>
+        </div>
+      </td>
+      <td style="font-size:11px;color:var(--muted);max-width:240px;line-height:1.5">${s.note}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+// ── FILTER & SORT ──
+function getFiltered() {
+  let data = STORES.slice();
+  if (currentRegion !== 'all') data = data.filter(s => s.region === currentRegion);
+  data.sort((a,b) => {
+    if (currentSort === 'name') return a.name.localeCompare(b.name, 'ja') * sortDir * -1;
+    return (b[currentSort] - a[currentSort]) * sortDir * -1;
+  });
+  return data;
+}
+
+function render() {
+  const filtered = getFiltered();
+  renderStats(filtered);
+  renderCards(filtered);
+  renderTable(filtered);
+}
+
+// ── EVENTS ──
+document.getElementById('region-filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn'); if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRegion = btn.dataset.region;
+  render();
+});
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (currentSort === btn.dataset.sort) { sortDir *= -1; }
+    else { currentSort = btn.dataset.sort; sortDir = -1; }
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+document.getElementById('btn-card').addEventListener('click', () => {
+  document.getElementById('card-view').style.display = '';
+  document.getElementById('table-view').style.display = 'none';
+  document.getElementById('btn-card').classList.add('active');
+  document.getElementById('btn-table').classList.remove('active');
+});
+document.getElementById('btn-table').addEventListener('click', () => {
+  document.getElementById('card-view').style.display = 'none';
+  document.getElementById('table-view').style.display = '';
+  document.getElementById('btn-table').classList.add('active');
+  document.getElementById('btn-card').classList.remove('active');
+});
+
+// ── TABLE HEADER SORT ──
+document.querySelectorAll('thead th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (currentSort === col) sortDir *= -1; else { currentSort = col; sortDir = -1; }
+    document.querySelectorAll('thead th').forEach(h => { h.classList.remove('sort-asc','sort-desc'); });
+    th.classList.add(sortDir === -1 ? 'sort-desc' : 'sort-asc');
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
