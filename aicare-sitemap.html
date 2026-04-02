@@ -1082,6 +1082,7 @@ function renderNode(node, depth) {
   });
   row.addEventListener('dragover', e => {
     if (!dragSrc || dragSrc === node.id) return;
+    if (selectedIds.has(node.id)) return; // can't drop onto a selected node
     if (isDescendantOf(node.id, dragSrc)) return;
     e.preventDefault();
     e.stopPropagation();
@@ -1535,7 +1536,49 @@ function isDescendantOf(nodeId, ancestorId) {
   return check(anc);
 }
 
+function flattenIds(nodes, acc = []) {
+  nodes.forEach(n => { acc.push(n.id); flattenIds(n.children, acc); });
+  return acc;
+}
+
 function performMove(srcId, targetId, intent) {
+  // If multi-select and dragged node is among selected → batch move
+  if (selectedIds.size > 0 && selectedIds.has(srcId)) {
+    const order = flattenIds(siteData);
+    const sorted = [...selectedIds].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+    // Remove all in reverse order (deepest index first to avoid splice shift issues)
+    const nodesToMove = [];
+    for (const id of [...sorted].reverse()) {
+      if (id === targetId) continue; // skip if target is in selection
+      const info = findParentArr(id, siteData, null);
+      if (!info) continue;
+      const [node] = info.arr.splice(info.index, 1);
+      nodesToMove.unshift(node);
+    }
+    if (nodesToMove.length === 0) return;
+
+    if (intent === 'child') {
+      const target = findNode(targetId, siteData);
+      if (!target) return;
+      nodesToMove.forEach(n => target.children.push(n));
+      target._open = true;
+    } else {
+      const refInfo = findParentArr(targetId, siteData, null);
+      if (!refInfo) return;
+      const insertIdx = intent === 'before' ? refInfo.index : refInfo.index + 1;
+      nodesToMove.forEach((n, i) => refInfo.arr.splice(insertIdx + i, 0, n));
+    }
+
+    selectedIds.clear();
+    markDirty();
+    renderTree();
+    renderDetail();
+    updateToolbar();
+    return;
+  }
+
+  // Single node move
   const srcInfo = findParentArr(srcId, siteData, null);
   if (!srcInfo) return;
   const [moved] = srcInfo.arr.splice(srcInfo.index, 1);
