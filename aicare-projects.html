@@ -1822,6 +1822,19 @@ function renderDashboard() {
     </div>`;
   }
 
+  // 今日・期限切れのタスク（子タスク含む）
+  const todayTasks = [];
+  function collectTodayTasks(taskList, proj) {
+    (taskList || []).forEach(t => {
+      if (t.status !== '完了') {
+        const d = daysUntil(t.deadline);
+        if (d !== null && d <= 0) todayTasks.push({ t, proj });
+      }
+      if (t.children) collectTodayTasks(t.children, proj);
+    });
+  }
+  active.forEach(p => collectTodayTasks(p.tasks, p));
+
   const d3Html = todayGroup('期限3日以内', '#ef4444', 0.08, '🔴', deadline3, p => {
     const d = daysUntil(p.deadline);
     return `<span style="color:${d < 0 ? '#f87171' : '#fb923c'};font-weight:700;">${d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`}</span>`;
@@ -1829,7 +1842,29 @@ function renderDashboard() {
   const revHtml = todayGroup('要確認', '#f59e0b', 0.07, '🟡', review, null);
   const meHtml = todayGroup('こうた待ち', '#fb923c', 0.06, '👤', waitMe, p => `<span style="color:#fdba74;">${p.waitingFor}</span>`);
   const otherHtml = todayGroup('他メンバー待ち', '#3b82f6', 0.07, '👥', waitOther, p => `<span style="color:#93c5fd;">${p.waitingFor}</span>`);
-  const todayContent = d3Html + revHtml + meHtml + otherHtml ||
+
+  // 今日のタスクパネル
+  let taskTodayHtml = '';
+  if (todayTasks.length) {
+    taskTodayHtml = `<div class="today-panel" style="background:rgba(167,139,250,0.07);border-color:rgba(167,139,250,0.35);border-left:3px solid #a78bfa;margin-bottom:8px;">
+      <div class="today-panel-title" style="color:#a78bfa;">📌 今日期限のタスク <span style="opacity:0.65;font-weight:500;font-size:12px;">${todayTasks.length}件</span></div>
+      ${todayTasks.map(({ t, proj }) => {
+        const d = daysUntil(t.deadline);
+        const dlColor = d < 0 ? '#f87171' : '#fb923c';
+        return `<div class="priority-item" style="border-left-color:rgba(167,139,250,0.6);" onclick="navigate('#/project/${proj.id}')">
+          <span class="pi-name">📌 ${t.name}</span>
+          <div class="pi-meta">
+            <span style="font-size:11px;color:var(--muted);">${proj.name}</span>
+            ${t.assignee ? `<span style="font-size:11px;color:#c4b5fd;">👤 ${t.assignee}</span>` : ''}
+            <span style="color:${dlColor};font-weight:700;font-size:11px;">${d < 0 ? `${Math.abs(d)}日超過` : '今日期限'}</span>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();navigate('#/project/${proj.id}')">今見る →</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  const todayContent = taskTodayHtml + d3Html + revHtml + meHtml + otherHtml ||
     `<div style="color:var(--muted);padding:12px;font-size:13px;">✅ 本日の緊急対応なし</div>`;
 
   // ② 詰まり
