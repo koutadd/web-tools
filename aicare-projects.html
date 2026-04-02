@@ -1936,7 +1936,7 @@ function renderDashboard() {
   const sectionHead = (emoji, label, sub) => `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);">
       <span style="font-size:18px;line-height:1;">${emoji}</span>
-      <span style="font-size:15px;font-weight:800;color:#e8f0ff;letter-spacing:-0.2px;">${label}</span>
+      <span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;">${label}</span>
       ${sub ? `<span style="font-size:11px;color:var(--muted);margin-left:auto;background:var(--surface2);padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
     </div>`;
 
@@ -2060,11 +2060,11 @@ function renderDashboard() {
           transition:background 0.15s, border-color 0.15s;
           position:relative;
           overflow:hidden;
-        " onmouseenter="this.style.background='#161d2e'" onmouseleave="this.style.background='var(--surface)'">
+        " onmouseenter="this.style.background='var(--surface2)'" onmouseleave="this.style.background='var(--surface)'">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;">
             <div>
               <div style="font-size:22px;margin-bottom:4px;">${cat.icon}</div>
-              <div style="font-size:15px;font-weight:800;color:#e8f0ff;">${cat.name}</div>
+              <div style="font-size:15px;font-weight:800;color:var(--text);">${cat.name}</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:28px;font-weight:900;color:${cat.color};line-height:1;">${count}</div>
@@ -2072,10 +2072,10 @@ function renderDashboard() {
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-            ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);">進行中 ${doing}</span>` : ''}
-            ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:#b45309;border:1px solid rgba(180,83,9,0.3);">要確認 ${review}</span>` : ''}
-            ${todo   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(107,114,128,0.12);color:#94a3b8;border:1px solid rgba(107,114,128,0.25);">未着手 ${todo}</span>` : ''}
-            ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);color:#059669;border:1px solid rgba(5,150,105,0.3);">完了 ${done}</span>` : ''}
+            ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(37,99,235,0.1);color:#1d4ed8;border:1px solid rgba(37,99,235,0.25);">進行中 ${doing}</span>` : ''}
+            ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(217,119,6,0.1);color:#b45309;border:1px solid rgba(180,83,9,0.25);">要確認 ${review}</span>` : ''}
+            ${todo   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(107,114,128,0.1);color:#4b5563;border:1px solid rgba(107,114,128,0.2);">未着手 ${todo}</span>` : ''}
+            ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(5,150,105,0.25);">完了 ${done}</span>` : ''}
           </div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">${cat.desc || ''}</div>
           <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;pointer-events:none;font-size:12px;">今見る →</button>
