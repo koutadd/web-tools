@@ -593,6 +593,60 @@ body {
 .priority-row .pr-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .priority-row .pr-cat { font-size: 11px; color: var(--muted); }
 
+/* ===================== PROJECT DETAIL INLINE EDIT ===================== */
+.pde-field {
+  cursor: pointer; padding: 3px 8px; border-radius: 7px;
+  border: 1px dashed transparent; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.pde-field:hover { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.07); }
+.pde-field.empty { color: var(--muted); font-style: italic; font-size: 12px; }
+.pde-name-field {
+  cursor: pointer; padding: 2px 6px; border-radius: 6px;
+  border-bottom: 2px dashed transparent; transition: all 0.15s;
+}
+.pde-name-field:hover { border-bottom-color: rgba(245,158,11,0.5); }
+.pde-name-input {
+  font-size: 22px; font-weight: 800; width: 100%;
+  background: var(--surface2); border: 2px solid rgba(245,158,11,0.5);
+  border-radius: 8px; color: var(--text); padding: 4px 10px; outline: none;
+}
+.pde-text-input {
+  font-size: 13px; background: var(--surface2);
+  border: 1px solid rgba(245,158,11,0.45); border-radius: 7px;
+  color: var(--text); padding: 4px 10px; outline: none;
+  min-width: 140px;
+}
+.pde-select {
+  font-size: 12px; background: var(--surface2);
+  border: 1px solid rgba(245,158,11,0.4); border-radius: 7px;
+  color: var(--text); padding: 3px 8px; outline: none; cursor: pointer;
+}
+/* Assignee / person dropdown */
+#pde-person-dd {
+  display: none; position: fixed; z-index: 9500;
+  background: #0f1623; border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 12px; padding: 6px; min-width: 200px; max-width: 260px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.75);
+  animation: pdeDdIn 0.12s ease;
+}
+@keyframes pdeDdIn { from { opacity:0; transform:translateY(-6px) scale(0.97); } to { opacity:1; transform:none; } }
+.pde-dd-label { padding: 4px 10px 6px; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.pde-dd-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; transition: background 0.1s;
+}
+.pde-dd-item:hover { background: var(--surface2); }
+.pde-dd-item.sel { color: var(--accent); }
+.pde-dd-check { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pde-dd-sep { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+.pde-add-input {
+  width: 100%; padding: 5px 9px; background: var(--surface);
+  border: 1px solid rgba(245,158,11,0.4); border-radius: 6px;
+  color: var(--text); font-size: 12px; outline: none; margin: 2px 0;
+}
+
 /* ===================== HEADER INFO BAR ===================== */
 .proj-header-bar {
   background: var(--surface);
@@ -778,6 +832,19 @@ body {
   margin-bottom: 10px;
   display: flex; align-items: center; gap: 6px;
 }
+
+/* ===================== TASK DONE CHECKBOX ===================== */
+.task-done-cb {
+  width: 17px; height: 17px; cursor: pointer; flex-shrink: 0;
+  accent-color: #10b981; border-radius: 4px;
+}
+.task-item.is-done { opacity: 0.42; }
+.task-item.is-done .task-name { text-decoration: line-through; color: var(--muted); }
+@keyframes taskDoneFlash {
+  0%   { background: rgba(16,185,129,0.2); }
+  100% { background: transparent; }
+}
+.task-item.done-anim { animation: taskDoneFlash 0.5s ease; }
 
 /* ===================== BULK SELECT ===================== */
 .task-select-cb {
@@ -972,6 +1039,10 @@ body {
       <div class="form-group">
         <label>完了条件 / KGI</label>
         <textarea id="pf-completionCriteria" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>KPI（数値目標・指標）</label>
+        <textarea id="pf-kpi" rows="2" placeholder="例: CVR 3%以上、月間PV 10,000、ローンチ期日 5/24"></textarea>
       </div>
       <div class="form-group">
         <label>備考・メモ</label>
@@ -1918,6 +1989,137 @@ function priorityDropdownHtml(p) {
 // ===================== PROJECT DETAIL =====================
 let currentTab = 'tasks';
 
+// ══════════════════════════════ PROJECT DETAIL INLINE EDIT ══════════════════════════
+const DEFAULT_PEOPLE = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
+function getPeople() { return APP.people && APP.people.length ? APP.people : [...DEFAULT_PEOPLE]; }
+
+function startProjDetailEdit(pid, field, el) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  const cur = p[field] || '';
+
+  let input;
+  if (field === 'name') {
+    input = document.createElement('input');
+    input.type = 'text'; input.className = 'pde-name-input'; input.value = cur;
+  } else if (field === 'deadline') {
+    input = document.createElement('input');
+    input.type = 'date'; input.className = 'pde-text-input'; input.value = cur;
+  } else if (field === 'urgency' || field === 'importance') {
+    input = document.createElement('select');
+    input.className = 'pde-select';
+    ['', '高', '中', '低'].forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v || '（未設定）'; o.selected = v === cur;
+      input.appendChild(o);
+    });
+  } else {
+    input = document.createElement('input');
+    input.type = 'text'; input.className = 'pde-text-input'; input.value = cur;
+    input.placeholder = field === 'nextAction' ? '次アクションを入力…' : '';
+  }
+
+  let saved = false;
+  const save = () => {
+    if (saved) return; saved = true;
+    const newVal = input.value;
+    if (p[field] !== newVal) { p[field] = newVal; saveData(APP); }
+    navigate('#/project/' + pid);
+  };
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { saved = true; navigate('#/project/' + pid); }
+  });
+  if (field === 'urgency' || field === 'importance') {
+    input.addEventListener('change', save);
+  }
+
+  el.replaceWith(input);
+  input.focus();
+  if (input.select && field !== 'deadline') input.select();
+}
+
+function showPersonDropdown(pid, field, triggerEl) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  const people = getPeople();
+  const extras = field === 'waitingFor' ? ['外部', '確認待ち', '素材待ち'] : [];
+  const cur = p[field] || '';
+  const dd = document.getElementById('pde-person-dd');
+
+  const allOptions = [...people, ...extras];
+  dd.innerHTML = `
+    <div class="pde-dd-label">${field === 'assignee' ? '主担当を選択' : '誰待ちを設定'}</div>
+    ${allOptions.map(name => `
+      <div class="pde-dd-item${cur === name ? ' sel' : ''}" onclick="selectPersonField('${pid}','${field}','${name}')">
+        <span class="pde-dd-check" style="background:${cur===name?'var(--accent)':'transparent'};border:1.5px solid ${cur===name?'var(--accent)':'var(--border)'};"></span>
+        <span>${name}</span>
+        ${cur === name ? '<span style="margin-left:auto;font-size:11px;color:var(--accent)">✓</span>' : ''}
+      </div>`).join('')}
+    <hr class="pde-dd-sep">
+    <div id="pde-add-trigger" class="pde-dd-item" onclick="showPdeAddInput('${pid}','${field}')">
+      <span style="color:var(--accent);font-size:14px;">＋</span>
+      <span style="color:var(--muted);font-size:12px;">新しく追加</span>
+    </div>
+    <div id="pde-add-area" style="display:none;padding:4px 4px 2px;">
+      <input id="pde-new-name" class="pde-add-input" type="text" placeholder="名前を入力…"
+             onkeydown="if(event.key==='Enter')confirmPdeAdd('${pid}','${field}');if(event.key==='Escape')closePdeAdd();">
+      <div style="display:flex;gap:4px;margin-top:4px;">
+        <button onclick="confirmPdeAdd('${pid}','${field}')" style="flex:1;padding:5px;background:var(--accent);border:none;border-radius:6px;font-size:11px;font-weight:700;color:#000;cursor:pointer;">追加して選択</button>
+        <button onclick="closePdeAdd()" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);cursor:pointer;">×</button>
+      </div>
+    </div>
+    <hr class="pde-dd-sep">
+    <div class="pde-dd-item" onclick="selectPersonField('${pid}','${field}','')">
+      <span class="pde-dd-check" style="border:1.5px solid var(--border);"></span>
+      <span style="color:var(--muted);font-size:12px;">クリア（なし）</span>
+    </div>`;
+
+  const rect = triggerEl.getBoundingClientRect();
+  dd.style.top  = (rect.bottom + 6) + 'px';
+  dd.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 268)) + 'px';
+  dd.style.display = 'block';
+
+  const close = (e) => {
+    if (!dd.contains(e.target) && e.target !== triggerEl) {
+      dd.style.display = 'none';
+      document.removeEventListener('mousedown', close);
+    }
+  };
+  setTimeout(() => document.addEventListener('mousedown', close), 10);
+}
+
+function selectPersonField(pid, field, value) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  p[field] = value;
+  saveData(APP);
+  document.getElementById('pde-person-dd').style.display = 'none';
+  navigate('#/project/' + pid);
+}
+
+function showPdeAddInput(pid, field) {
+  document.getElementById('pde-add-trigger').style.display = 'none';
+  document.getElementById('pde-add-area').style.display = 'block';
+  setTimeout(() => document.getElementById('pde-new-name').focus(), 30);
+}
+
+function closePdeAdd() {
+  document.getElementById('pde-add-area').style.display = 'none';
+  const t = document.getElementById('pde-add-trigger');
+  if (t) t.style.display = '';
+}
+
+function confirmPdeAdd(pid, field) {
+  const input = document.getElementById('pde-new-name');
+  const name = (input && input.value || '').trim();
+  if (!name) return;
+  if (!APP.people) APP.people = [...DEFAULT_PEOPLE];
+  if (!APP.people.includes(name)) { APP.people.push(name); saveData(APP); }
+  selectPersonField(pid, field, name);
+}
+
 function renderProject(id, tab) {
   currentTab = tab || 'tasks';
   const p = getProjectById(id);
@@ -1942,24 +2144,33 @@ function renderProject(id, tab) {
   </div>
 
   <!-- Project Header -->
-  <div class="proj-header-bar" style="margin-bottom:16px;border-left:4px solid ${projectRowBorderColor(p)};">
+  <div class="proj-header-bar" id="proj-detail-header" style="margin-bottom:16px;border-left:4px solid ${projectRowBorderColor(p)};">
     <div class="phb-top">
-      <div class="phb-name">${p.name}</div>
+      <div class="phb-name pde-name-field" onclick="startProjDetailEdit('${p.id}','name',this)" title="クリックでプロジェクト名を編集">${p.name}</div>
     </div>
     <div class="phb-badges">
       ${catBadge(p.categoryId)}
       ${statusDropdownHtml(p)}
       ${priorityDropdownHtml(p)}
-      ${p.urgency ? `<span class="badge" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);">緊急度: ${p.urgency}</span>` : ''}
-      ${p.importance ? `<span class="badge" style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);">重要度: ${p.importance}</span>` : ''}
+      <span class="badge pde-field${p.urgency?'':' empty'}" style="${p.urgency?'background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);':''}" onclick="startProjDetailEdit('${p.id}','urgency',this)" title="緊急度をクリックで変更">${p.urgency ? '緊急度: '+p.urgency : '緊急度 +'}</span>
+      <span class="badge pde-field${p.importance?'':' empty'}" style="${p.importance?'background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);':''}" onclick="startProjDetailEdit('${p.id}','importance',this)" title="重要度をクリックで変更">${p.importance ? '重要度: '+p.importance : '重要度 +'}</span>
     </div>
     <div class="phb-meta" style="margin-top:10px;">
-      ${p.assignee ? `<span>👤 <strong>${p.assignee}</strong></span>` : ''}
-      ${p.deadline ? `<span style="color:${dlColor};">📅 ${formatDate(p.deadline)}${d !== null ? (d < 0 ? ` (${Math.abs(d)}日超過)` : d === 0 ? ' (今日!)' : ` (あと${d}日)`) : ''}</span>` : '<span style="color:var(--muted);">📅 期限未設定</span>'}
-      ${p.waitingFor ? `<span style="color:#fb923c;">⏳ ${p.waitingFor}待ち</span>` : ''}
-      ${leadRole ? `<span>🎯 ${leadRole.label}</span>` : ''}
+      <span class="pde-field${p.assignee?'':' empty'}" onclick="showPersonDropdown('${p.id}','assignee',this)" title="クリックで担当者を変更">
+        👤 <strong>${p.assignee || '担当者を設定'}</strong>
+      </span>
+      <span class="pde-field" style="${p.deadline?'color:'+dlColor+';':''}" onclick="startProjDetailEdit('${p.id}','deadline',this)" title="クリックで期限を変更">
+        📅 ${p.deadline ? formatDate(p.deadline)+(d !== null ? (d < 0 ? ` (${Math.abs(d)}日超過)` : d === 0 ? ' (今日!)' : ` (あと${d}日)`) : '') : '<span style="color:var(--muted)">期限を設定</span>'}
+      </span>
+      <span class="pde-field${p.waitingFor?'':' empty'}" style="${p.waitingFor?'color:#fb923c;':''}" onclick="showPersonDropdown('${p.id}','waitingFor',this)" title="クリックで誰待ちを変更">
+        ⏳ ${p.waitingFor ? p.waitingFor+'待ち' : '誰待ちを設定'}
+      </span>
     </div>
-    ${p.nextAction ? `<div class="next-action-bar">▶ 次アクション: ${p.nextAction}</div>` : ''}
+    <div class="pde-field" style="margin-top:8px;display:flex;" onclick="startProjDetailEdit('${p.id}','nextAction',this)" title="クリックで次アクションを編集">
+      ${p.nextAction
+        ? `<div class="next-action-bar" style="flex:1;margin:0;">▶ 次アクション: ${p.nextAction}</div>`
+        : `<span style="font-size:12px;color:#3d5070;padding:4px 8px;border-radius:6px;">▶ 次アクションを入力…</span>`}
+    </div>
   </div>
 
   <!-- Info grid -->
@@ -1967,7 +2178,13 @@ function renderProject(id, tab) {
     <div class="card">
       ${p.purpose ? `<div class="info-item" style="margin-bottom:12px;"><div class="info-label">目的</div><div class="info-value" style="font-size:13px;">${p.purpose}</div></div>` : ''}
       ${p.deliverables ? `<div class="info-item"><div class="info-label">成果物</div><div class="info-value" style="font-size:12px;color:var(--muted);">${p.deliverables}</div></div>` : ''}
-      ${p.completionCriteria ? `<div class="info-item" style="margin-top:12px;"><div class="info-label">KGI / 完了条件</div><div class="info-block" style="font-size:12px;">${p.completionCriteria}</div></div>` : ''}
+      ${p.completionCriteria ? `<div class="info-item" style="margin-top:12px;"><div class="info-label">KGI / 完了条件</div><div class="info-block pde-field" style="font-size:12px;" onclick="startProjDetailEdit('${p.id}','completionCriteria',this)">${p.completionCriteria}</div></div>` : ''}
+      <div class="info-item" style="margin-top:8px;">
+        <div class="info-label" style="color:#a78bfa;">KPI</div>
+        ${p.kpi
+          ? `<div class="info-block pde-field" style="font-size:12px;border-left:3px solid #7c3aed;" onclick="startKpiEdit('${p.id}',this)">${p.kpi}</div>`
+          : `<div class="pde-field empty" style="font-size:12px;display:inline-block;" onclick="startKpiEdit('${p.id}',this)">＋ KPIを入力…</div>`}
+      </div>
     </div>
     <div class="card">
       ${p.thisWeek ? `<div class="info-item" style="margin-bottom:12px;"><div class="info-label" style="color:#60a5fa;">今週やること</div><div class="info-block" style="font-size:13px;border-left:3px solid #3b82f6;">${p.thisWeek}</div></div>` : ''}
@@ -2127,6 +2344,57 @@ function clearTaskSelection(projectId) {
   if (countEl) countEl.textContent = '0件選択中';
 }
 
+function toggleTaskDone(taskId, projectId, cb) {
+  const p = getProjectById(projectId);
+  if (!p) return;
+  function find(tasks) {
+    for (const t of tasks) {
+      if (String(t.id) === String(taskId)) return t;
+      const found = t.children && find(t.children);
+      if (found) return found;
+    }
+  }
+  const task = find(p.tasks || []);
+  if (!task) return;
+  const newStatus = cb.checked ? '完了' : '未着手';
+  task.status = newStatus;
+  saveData(APP);
+  const safeId = taskId.replace(/[^a-z0-9]/gi, '_');
+  const el = document.getElementById('task-item-' + safeId);
+  if (el) {
+    el.classList.toggle('is-done', newStatus === '完了');
+    if (newStatus === '完了') {
+      el.classList.add('done-anim');
+      setTimeout(() => el.classList.remove('done-anim'), 600);
+    }
+    // Update status badge
+    const badge = el.querySelector('.badge');
+    if (badge) { badge.className = 'badge status-' + newStatus; badge.textContent = newStatus + ' ▾'; }
+  }
+}
+
+function startKpiEdit(pid, el) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  const ta = document.createElement('textarea');
+  ta.value = p.kpi || '';
+  ta.placeholder = '例: CVR 3%以上、月間PV 10,000…';
+  ta.rows = 2;
+  ta.className = 'pde-text-input';
+  ta.style.cssText = 'width:100%;font-size:12px;resize:vertical;';
+  let saved = false;
+  const save = () => {
+    if (saved) return; saved = true;
+    p.kpi = ta.value.trim();
+    saveData(APP);
+    navigate('#/project/' + pid);
+  };
+  ta.addEventListener('blur', save);
+  ta.addEventListener('keydown', e => { if (e.key === 'Escape') { saved = true; navigate('#/project/'+pid); } });
+  el.replaceWith(ta);
+  ta.focus(); ta.select();
+}
+
 function bulkChangeAssignee(projectId) {
   const sel = document.getElementById('bulk-assignee-sel');
   if (!sel || !sel.value) {
@@ -2199,9 +2467,10 @@ function renderTaskItem(projectId, t, isChild) {
   </div>`;
 
   const isSelected = selectedTaskIds.has(t.id);
+  const isDone = t.status === '完了';
   return `
   <div class="task-wrap" id="task-wrap-${safeId}">
-    <div class="task-item${isSelected ? ' bulk-selected' : ''}" data-task-id="${t.id}" data-project-id="${projectId}"
+    <div class="task-item${isSelected ? ' bulk-selected' : ''}${isDone ? ' is-done' : ''}" data-task-id="${t.id}" data-project-id="${projectId}"
          id="task-item-${safeId}"
          draggable="${bulkSelectMode ? 'false' : 'true'}"
          ondragstart="${bulkSelectMode ? '' : `taskDragStart(event,'${projectId}','${t.id}')`}"
@@ -2212,7 +2481,8 @@ function renderTaskItem(projectId, t, isChild) {
          onclick="${bulkSelectMode ? `toggleTaskSelect('${t.id}','${projectId}')` : `toggleTaskDetail('${safeId}')`}">
       ${bulkSelectMode
         ? `<input type="checkbox" class="task-select-cb" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation();toggleTaskSelect('${t.id}','${projectId}')">`
-        : `<span class="task-drag-handle" onclick="event.stopPropagation()">⠿</span>`}
+        : `<input type="checkbox" class="task-done-cb" ${isDone ? 'checked' : ''} onclick="event.stopPropagation();toggleTaskDone('${t.id}','${projectId}',this)" title="完了にする">
+           <span class="task-drag-handle" onclick="event.stopPropagation()">⠿</span>`}
       <div onclick="event.stopPropagation()">
         <div class="status-dropdown-wrap" id="tsdw-${safeId}">
           <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}','${projectId}')">${t.status} ▾</span>
@@ -2432,6 +2702,7 @@ function openProjectModal(id, defaultCat) {
     document.getElementById('pf-purpose').value = p.purpose || '';
     document.getElementById('pf-deliverables').value = p.deliverables || '';
     document.getElementById('pf-completionCriteria').value = p.completionCriteria || '';
+    document.getElementById('pf-kpi').value = p.kpi || '';
     document.getElementById('pf-notes').value = p.notes || '';
   } else {
     title.textContent = 'プロジェクト追加';
@@ -2467,6 +2738,7 @@ function saveProject(e) {
     purpose: document.getElementById('pf-purpose').value.trim(),
     deliverables: document.getElementById('pf-deliverables').value.trim(),
     completionCriteria: document.getElementById('pf-completionCriteria').value.trim(),
+    kpi: document.getElementById('pf-kpi').value.trim(),
     notes: document.getElementById('pf-notes').value.trim(),
   };
 
@@ -2873,6 +3145,9 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 .tc-next   { background: #f59e0b; border: none; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; transition: background 0.15s; }
 .tc-next:hover { background: #fbbf24; }
 </style>
+
+<!-- Person picker dropdown (persists across renders) -->
+<div id="pde-person-dd"></div>
 
 <button id="tour-btn" onclick="startTour()">❓ 使い方ガイド</button>
 
