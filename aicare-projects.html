@@ -779,6 +779,23 @@ body {
   display: flex; align-items: center; gap: 6px;
 }
 
+/* ===================== BULK SELECT ===================== */
+.task-select-cb {
+  width: 16px; height: 16px; cursor: pointer; flex-shrink: 0;
+  accent-color: var(--accent); border-radius: 4px;
+}
+.bulk-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; margin-bottom: 12px;
+}
+.bulk-count { font-size: 13px; font-weight: 700; color: var(--accent); }
+.bulk-assignee-sel {
+  padding: 5px 10px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 12px;
+}
+.task-item.bulk-selected { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.05); }
+
 /* ===================== DRAG & DROP ===================== */
 .task-item { position: relative; }
 .task-drag-handle { cursor: grab; color: #6b7280; padding: 0 6px; font-size: 16px; user-select: none; flex-shrink: 0; }
@@ -1977,6 +1994,8 @@ function renderTabContent(p, tab) {
 let taskFilter = '全て';
 let taskSort = '優先度順';
 let blockerFilter = '全て';
+let bulkSelectMode = false;
+let selectedTaskIds = new Set();
 
 function renderTaskTab(p) {
   const statuses = ['全て','未着手','進行中','完了','要確認','保留'];
@@ -1992,13 +2011,29 @@ function renderTaskTab(p) {
     return new Date(a.deadline) - new Date(b.deadline);
   });
 
+  const bulkBar = bulkSelectMode ? `
+  <div class="bulk-bar">
+    <button class="btn btn-ghost btn-sm" onclick="selectAllVisibleTasks('${p.id}')">☑ 全選択</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearTaskSelection('${p.id}')">☐ 全解除</button>
+    <span class="bulk-count" id="bulk-count-${p.id}">${selectedTaskIds.size}件選択中</span>
+    <div style="flex:1;"></div>
+    <span style="font-size:12px;color:var(--muted);">担当者を変更:</span>
+    <select class="bulk-assignee-sel" id="bulk-assignee-sel">
+      <option value="">選択してください</option>
+      ${['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'].map(person => `<option value="${person}">${person}</option>`).join('')}
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="bulkChangeAssignee('${p.id}')">変更する</button>
+    <button class="btn btn-secondary btn-sm" onclick="toggleBulkMode('${p.id}')">キャンセル</button>
+  </div>` : '';
+
   return `
   <div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
       <div class="filter-bar" style="margin-bottom:0;">
         ${statuses.map(s => `<button class="filter-btn ${taskFilter===s?'active':''}" onclick="setTaskFilter('${p.id}','${s}')">${s}</button>`).join('')}
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-ghost btn-sm${bulkSelectMode?' active':''}" onclick="toggleBulkMode('${p.id}')" style="${bulkSelectMode?'color:var(--accent);border-color:rgba(245,158,11,0.4);':''}" title="複数タスクを選択して一括操作">☑ 一括選択</button>
         <select onchange="setTaskSort('${p.id}',this.value)" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;">
           <option ${taskSort==='優先度順'?'selected':''}>優先度順</option>
           <option ${taskSort==='期限順'?'selected':''}>期限順</option>
@@ -2006,6 +2041,7 @@ function renderTaskTab(p) {
         <button class="btn btn-primary btn-sm" onclick="openTaskModal('${p.id}', null)">＋ タスク追加</button>
       </div>
     </div>
+    ${bulkBar}
     ${tasks.length === 0 ? `<div class="empty-state"><div class="empty-icon">📋</div><p>タスクがありません</p></div>` :
       tasks.map(t => renderTaskItem(p.id, t)).join('')
     }
@@ -2015,6 +2051,81 @@ function renderTaskTab(p) {
 function toggleTaskDetail(safeId) {
   const wrap = document.getElementById('task-wrap-' + safeId);
   if (wrap) wrap.classList.toggle('expanded');
+}
+
+// ── Bulk select ──────────────────────────────────────────────────
+function toggleBulkMode(projectId) {
+  bulkSelectMode = !bulkSelectMode;
+  selectedTaskIds.clear();
+  const p = getProjectById(projectId);
+  if (p) document.getElementById('tab-content').innerHTML = renderTabContent(p, 'tasks');
+}
+
+function toggleTaskSelect(taskId, projectId) {
+  if (selectedTaskIds.has(taskId)) {
+    selectedTaskIds.delete(taskId);
+  } else {
+    selectedTaskIds.add(taskId);
+  }
+  // Update visual state of the row
+  const safeId = taskId.replace(/[^a-z0-9]/gi, '_');
+  const el = document.getElementById('task-item-' + safeId);
+  if (el) el.classList.toggle('bulk-selected', selectedTaskIds.has(taskId));
+  const cb = el && el.querySelector('.task-select-cb');
+  if (cb) cb.checked = selectedTaskIds.has(taskId);
+  const countEl = document.getElementById('bulk-count-' + projectId);
+  if (countEl) countEl.textContent = selectedTaskIds.size + '件選択中';
+}
+
+function selectAllVisibleTasks(projectId) {
+  const p = getProjectById(projectId);
+  if (!p) return;
+  let tasks = p.tasks || [];
+  if (taskFilter !== '全て') tasks = tasks.filter(t => t.status === taskFilter);
+  function collectIds(ts) {
+    ts.forEach(t => {
+      selectedTaskIds.add(t.id);
+      if (t.children) collectIds(t.children);
+    });
+  }
+  collectIds(tasks);
+  document.querySelectorAll('.task-select-cb').forEach(cb => { cb.checked = true; });
+  document.querySelectorAll('.task-item').forEach(el => el.classList.add('bulk-selected'));
+  const countEl = document.getElementById('bulk-count-' + projectId);
+  if (countEl) countEl.textContent = selectedTaskIds.size + '件選択中';
+}
+
+function clearTaskSelection(projectId) {
+  selectedTaskIds.clear();
+  document.querySelectorAll('.task-select-cb').forEach(cb => { cb.checked = false; });
+  document.querySelectorAll('.task-item').forEach(el => el.classList.remove('bulk-selected'));
+  const countEl = document.getElementById('bulk-count-' + projectId);
+  if (countEl) countEl.textContent = '0件選択中';
+}
+
+function bulkChangeAssignee(projectId) {
+  const sel = document.getElementById('bulk-assignee-sel');
+  if (!sel || !sel.value) {
+    if (sel) { sel.style.borderColor = '#ef4444'; setTimeout(() => { sel.style.borderColor = ''; }, 1000); }
+    return;
+  }
+  if (selectedTaskIds.size === 0) return;
+  const newAssignee = sel.value;
+  const p = getProjectById(projectId);
+  if (!p) return;
+  function updateTasks(tasks) {
+    tasks.forEach(t => {
+      if (selectedTaskIds.has(t.id)) t.assignee = newAssignee;
+      if (t.children) updateTasks(t.children);
+    });
+  }
+  updateTasks(p.tasks || []);
+  const count = selectedTaskIds.size;
+  saveData(APP);
+  bulkSelectMode = false;
+  selectedTaskIds.clear();
+  document.getElementById('tab-content').innerHTML = renderTabContent(p, 'tasks');
+  showSaveIndicator(`✅ ${count}件の担当者を ${newAssignee} に変更`, '#10b981');
 }
 
 function renderTaskItem(projectId, t, isChild) {
@@ -2063,18 +2174,21 @@ function renderTaskItem(projectId, t, isChild) {
     </div>
   </div>`;
 
+  const isSelected = selectedTaskIds.has(t.id);
   return `
   <div class="task-wrap" id="task-wrap-${safeId}">
-    <div class="task-item" data-task-id="${t.id}" data-project-id="${projectId}"
+    <div class="task-item${isSelected ? ' bulk-selected' : ''}" data-task-id="${t.id}" data-project-id="${projectId}"
          id="task-item-${safeId}"
-         draggable="true"
-         ondragstart="taskDragStart(event,'${projectId}','${t.id}')"
-         ondragover="taskDragOver(event,'${projectId}','${t.id}')"
-         ondragleave="taskDragLeave(event,'${t.id}')"
-         ondrop="taskDrop(event,'${projectId}','${t.id}')"
-         ondragend="taskDragEnd()"
-         onclick="toggleTaskDetail('${safeId}')">
-      <span class="task-drag-handle" onclick="event.stopPropagation()">⠿</span>
+         draggable="${bulkSelectMode ? 'false' : 'true'}"
+         ondragstart="${bulkSelectMode ? '' : `taskDragStart(event,'${projectId}','${t.id}')`}"
+         ondragover="${bulkSelectMode ? '' : `taskDragOver(event,'${projectId}','${t.id}')`}"
+         ondragleave="${bulkSelectMode ? '' : `taskDragLeave(event,'${t.id}')`}"
+         ondrop="${bulkSelectMode ? '' : `taskDrop(event,'${projectId}','${t.id}')`}"
+         ondragend="${bulkSelectMode ? '' : 'taskDragEnd()'}"
+         onclick="${bulkSelectMode ? `toggleTaskSelect('${t.id}','${projectId}')` : `toggleTaskDetail('${safeId}')`}">
+      ${bulkSelectMode
+        ? `<input type="checkbox" class="task-select-cb" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation();toggleTaskSelect('${t.id}','${projectId}')">`
+        : `<span class="task-drag-handle" onclick="event.stopPropagation()">⠿</span>`}
       <div onclick="event.stopPropagation()">
         <div class="status-dropdown-wrap" id="tsdw-${safeId}">
           <span class="badge status-${t.status}" style="cursor:pointer;font-size:10px;" onclick="toggleTaskStatusDropdown(event,'${t.id}','${projectId}')">${t.status} ▾</span>
