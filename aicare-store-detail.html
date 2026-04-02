@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>札幌大通店 | アイケアラボ 眼の整体院</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { navy: '#0D2B5E' } } }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      color: #1a1a2e;
+      line-height: 1.75;
+    }
+    .btn-navy { background:#0D2B5E; color:white; transition:opacity 0.2s; }
+    .btn-navy:hover { opacity:0.88; }
+    .btn-outline { border:1.5px solid #0D2B5E; color:#0D2B5E; transition:all 0.2s; }
+    .btn-outline:hover { background:#0D2B5E; color:white; }
+    .section-alt { background:#F5F6FA; }
+    .tab-btn { border-bottom:2px solid transparent; transition:all 0.2s; }
+    .tab-btn.active { border-bottom-color:#0D2B5E; color:#0D2B5E; font-weight:600; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .step-card { counter-increment: step-counter; }
+    .access-tab { display:none; }
+    .access-tab.active { display:block; }
+    @media (max-width:767px) { body { padding-bottom:56px; } }
+  </style>
+</head>
+<body class="bg-white">
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<!-- ================================================
+  HEADER
+================================================ -->
+<header id="header" class="sticky top-0 z-50 bg-white border-b border-gray-200" style="transition:box-shadow 0.3s;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16 md:h-20">
+      <a href="aicare-top-prototype.html" class="flex items-center flex-shrink-0">
+        <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-10 md:h-12 w-auto">
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-5 xl:gap-7">
+        <a href="aicare-top-prototype.html#about"     class="text-sm text-gray-600 hover:text-[#0D2B5E] transition-colors py-1">眼の整体院とは</a>
+        <a href="aicare-top-prototype.html#menu"      class="text-sm text-gray-600 hover:text-[#0D2B5E] transition-colors py-1">メニュー</a>
+        <a href="aicare-top-prototype.html#stores"    class="text-sm font-medium transition-colors py-1" style="color:#0D2B5E;">店舗一覧</a>
+        <a href="aicare-top-prototype.html#faq"       class="text-sm text-gray-600 hover:text-[#0D2B5E] transition-colors py-1">FAQ</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-3">
+        <div class="text-right mr-1">
+          <div class="text-xs text-gray-400 leading-none">受付 10:00〜21:00</div>
+          <div class="text-base font-bold tracking-wider" style="color:#0D2B5E;">0120-XXX-XXX</div>
+        </div>
+        <a href="#reserve" class="btn-navy px-5 py-2.5 text-sm rounded-sm font-medium">無料カウンセリング予約</a>
+      </div>
+
+      <button id="menu-btn" class="lg:hidden p-2 flex flex-col justify-center gap-1.5 w-10 h-10" aria-label="メニュー">
+        <span class="w-6 h-px bg-gray-700 block transition-all" id="ham-1"></span>
+        <span class="w-6 h-px bg-gray-700 block transition-all" id="ham-2"></span>
+        <span class="w-6 h-px bg-gray-700 block transition-all" id="ham-3"></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-100 shadow-xl">
+    <div class="max-w-7xl mx-auto px-5 py-6 space-y-1">
+      <a href="aicare-top-prototype.html#about"  class="block text-gray-700 py-3 border-b border-gray-100 text-sm">眼の整体院とは</a>
+      <a href="aicare-top-prototype.html#menu"   class="block text-gray-700 py-3 border-b border-gray-100 text-sm">メニュー</a>
+      <a href="aicare-top-prototype.html#stores" class="block text-gray-700 py-3 border-b border-gray-100 text-sm">店舗一覧</a>
+      <a href="aicare-top-prototype.html#faq"    class="block text-gray-700 py-3 border-b border-gray-100 text-sm">FAQ</a>
+      <div class="pt-4 space-y-3">
+        <div class="text-center pb-1">
+          <div class="text-xs text-gray-400">受付時間 10:00〜21:00</div>
+          <div class="text-xl font-bold" style="color:#0D2B5E;">0120-XXX-XXX</div>
+        </div>
+        <a href="#reserve" class="btn-navy block text-center py-3.5 rounded-sm font-medium text-sm">無料カウンセリング予約</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- ================================================
+  パンくずリスト
+================================================ -->
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+    <ol class="flex items-center gap-1.5 text-xs text-gray-400">
+      <li><a href="aicare-top-prototype.html" class="hover:text-[#0D2B5E] transition-colors">トップ</a></li>
+      <li><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 2l4 3-4 3" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg></li>
+      <li><a href="aicare-top-prototype.html#stores" class="hover:text-[#0D2B5E] transition-colors">店舗一覧</a></li>
+      <li><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 2l4 3-4 3" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg></li>
+      <li><span style="color:#0D2B5E;">札幌大通店</span></li>
+    </ol>
+  </div>
+</div>
+
+
+<!-- ================================================
+  SECTION 1 — 店舗ヒーロー
+================================================ -->
+<section style="background:linear-gradient(135deg,#eef2ff 0%,#f8faff 60%,#fff 100%);">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16">
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-14 items-start">
+
+      <!-- 左: 店舗情報 -->
+      <div class="flex-1">
+        <!-- エリアタグ -->
+        <div class="inline-flex items-center gap-2 mb-4">
+          <span class="text-xs font-medium px-2.5 py-0.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">北海道</span>
+          <span class="text-xs text-gray-400">北海道・東北エリア</span>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color:#0D2B5E; letter-spacing:0.06em;">
+          アイケアラボ 札幌大通店
+        </h1>
+        <p class="text-sm text-gray-400 mb-6 tracking-wider">AICARE LaBo Sapporo Odori</p>
+
+        <!-- キー情報グリッド -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-7">
+          <div class="flex items-start gap-3 p-3.5 bg-white rounded-sm border border-gray-100">
+            <svg class="flex-shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C6.1 1.5 3.75 3.85 3.75 6.75c0 4.25 5.25 9.75 5.25 9.75s5.25-5.5 5.25-9.75C14.25 3.85 11.9 1.5 9 1.5Z" stroke="#0D2B5E" stroke-width="1.3"/><circle cx="9" cy="6.75" r="2" stroke="#0D2B5E" stroke-width="1.3"/></svg>
+            <div>
+              <div class="text-xs text-gray-400 mb-0.5">住所</div>
+              <div class="text-sm font-medium text-gray-800">北海道札幌市中央区大通西4丁目<br>●●ビル 3F</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3.5 bg-white rounded-sm border border-gray-100">
+            <svg class="flex-shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="#0D2B5E" stroke-width="1.3"/><path d="M9 4.5v5l3 2" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div>
+              <div class="text-xs text-gray-400 mb-0.5">営業時間</div>
+              <div class="text-sm font-medium text-gray-800">10:00〜21:00<br><span class="text-xs text-gray-400">最終受付 20:00 ／ 不定休</span></div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3.5 bg-white rounded-sm border border-gray-100">
+            <svg class="flex-shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="4" width="15" height="11" rx="1.5" stroke="#0D2B5E" stroke-width="1.3"/><path d="M1.5 8h15M6 4V2M12 4V2" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div>
+              <div class="text-xs text-gray-400 mb-0.5">アクセス</div>
+              <div class="text-sm font-medium text-gray-800">地下鉄大通駅 1番出口<br><span class="font-bold" style="color:#0D2B5E;">徒歩1分</span></div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3.5 bg-white rounded-sm border border-gray-100">
+            <svg class="flex-shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M16.5 12.5c0 .3-.07.6-.22.86-.14.27-.35.52-.62.72-.45.36-.95.53-1.46.53-.38 0-.8-.1-1.23-.28-.43-.18-.87-.45-1.3-.78A20 20 0 0 1 10.1 12a20 20 0 0 1-1.07-1.25c-.33-.44-.59-.88-.78-1.3-.18-.43-.27-.85-.27-1.24 0-.5.17-.98.5-1.46.2-.27.44-.5.7-.66.27-.15.57-.23.9-.23.13 0 .25.02.38.08.13.05.25.14.34.27l1.14 1.6c.1.12.17.24.22.36.05.11.08.21.08.3 0 .12-.03.24-.1.36-.07.12-.16.24-.28.36l-.38.4a.27.27 0 0 0-.08.2c0 .04 0 .07.02.11.01.03.03.06.04.08.1.17.25.39.47.63.22.25.45.52.71.78.26.26.52.5.77.7.25.21.47.36.65.46.03 0 .05.02.08.03.04.01.08.02.11.02.08 0 .16-.03.2-.08l.38-.39c.13-.13.25-.22.37-.27.12-.06.24-.09.37-.09.09 0 .2.02.31.08.1.05.23.12.35.21l1.62 1.16c.12.08.2.19.26.32.04.13.07.27.07.41Z" stroke="#0D2B5E" stroke-width="1.2"/></svg>
+            <div>
+              <div class="text-xs text-gray-400 mb-0.5">電話番号</div>
+              <div class="text-sm font-medium text-gray-800">0120-XXX-XXX<br><span class="text-xs text-gray-400">受付 10:00〜21:00</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTAボタン -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href="#reserve" class="btn-navy inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-sm text-sm font-medium shadow-md flex-1 sm:flex-none">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="1.5" stroke="white" stroke-width="1.3"/><path d="M4.5 1v2.5M11.5 1v2.5M1 6.5h14" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+            WEBで無料予約する
+          </a>
+          <a href="tel:0120XXXXXX" class="btn-outline inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-sm text-sm font-medium flex-1 sm:flex-none">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14.67 11.11c0 .27-.06.53-.2.78-.12.24-.3.46-.52.65-.38.32-.8.48-1.23.48-.32 0-.67-.08-1.04-.25-.37-.16-.74-.4-1.12-.68a17.5 17.5 0 0 1-1.1-1.03 17 17 0 0 1-1.02-1.1c-.28-.37-.5-.74-.67-1.1-.16-.37-.25-.72-.25-1.05 0-.36.12-.7.37-1.04.17-.23.38-.43.62-.57.24-.14.5-.21.78-.21.1 0 .2.02.3.06.1.05.19.12.27.22L11 7.6c.08.1.14.2.18.29.04.1.07.18.07.26 0 .1-.03.2-.08.3-.05.1-.13.2-.23.3l-.31.33a.22.22 0 0 0-.06.16c0 .03 0 .06.01.08.02.03.03.06.04.08.1.15.22.33.38.52.17.2.35.41.54.62.2.2.4.38.6.55.2.16.38.29.53.37l.07.03c.03 0 .06.01.08.01.07 0 .13-.02.17-.07l.31-.32c.1-.1.2-.18.3-.23.1-.04.19-.07.3-.07.08 0 .16.02.25.06.09.04.18.1.28.17l1.32.94c.1.07.17.16.22.26.04.1.06.2.06.32Z" stroke="#0D2B5E" stroke-width="1.2"/></svg>
+            電話で予約する
+          </a>
+        </div>
+      </div>
+
+      <!-- 右: 店舗外観イメージ -->
+      <div class="w-full lg:w-5/12 flex-shrink-0">
+        <div class="relative rounded overflow-hidden" style="aspect-ratio:4/3; background:linear-gradient(145deg,#dce8f5,#eef2ff);">
+          <svg width="100%" height="100%" viewBox="0 0 480 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- ビル外観 -->
+            <rect width="480" height="360" fill="#EEF2FF"/>
+            <rect x="60" y="40" width="360" height="260" fill="white" rx="2"/>
+            <rect x="60" y="40" width="360" height="260" stroke="#C7D5EE" stroke-width="1.5" rx="2"/>
+            <!-- 窓 -->
+            <rect x="90" y="80" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="170" y="80" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="250" y="80" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="330" y="80" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="90" y="150" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="170" y="150" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="250" y="150" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <rect x="330" y="150" width="60" height="50" fill="#dce8f5" rx="1"/>
+            <!-- エントランス -->
+            <rect x="190" y="230" width="100" height="70" fill="#C7D5EE" rx="1"/>
+            <rect x="200" y="238" width="35" height="62" fill="#EEF2FF" rx="1"/>
+            <rect x="245" y="238" width="35" height="62" fill="#EEF2FF" rx="1"/>
+            <!-- 看板 -->
+            <rect x="155" y="210" width="170" height="26" fill="#0D2B5E" rx="2"/>
+            <text x="240" y="228" font-family="sans-serif" font-size="11" fill="white" text-anchor="middle" letter-spacing="1">アイケアラボ 札幌大通店</text>
+            <!-- 地面 -->
+            <rect x="0" y="300" width="480" height="60" fill="#E2EAF3"/>
+            <!-- 看板ポール -->
+            <rect x="60" y="260" width="80" height="10" fill="#0D2B5E" rx="1"/>
+            <rect x="98" y="268" width="4" height="32" fill="#4A6FA5"/>
+            <!-- 樹木シルエット -->
+            <ellipse cx="380" cy="275" rx="30" ry="25" fill="#C7D5EE"/>
+            <rect x="378" y="280" width="4" height="20" fill="#A4BAD4"/>
+            <ellipse cx="415" cy="285" rx="22" ry="18" fill="#D4E2F0"/>
+            <rect x="413" y="290" width="4" height="10" fill="#A4BAD4"/>
+          </svg>
+          <!-- 3F ラベル -->
+          <div class="absolute top-3 left-3 text-xs font-medium px-2 py-0.5 rounded" style="background:#0D2B5E; color:white;">3F</div>
+          <!-- 写真プレースホルダー表示 -->
+          <div class="absolute bottom-3 right-3 text-xs text-gray-400 bg-white bg-opacity-70 px-2 py-0.5 rounded">店舗外観イメージ</div>
+        </div>
+
+        <!-- インスタグラム風ギャラリープレビュー -->
+        <div class="grid grid-cols-3 gap-1.5 mt-1.5">
+          <div class="rounded" style="aspect-ratio:1; background:linear-gradient(135deg,#dce8f5,#c7d5ee);"></div>
+          <div class="rounded" style="aspect-ratio:1; background:linear-gradient(135deg,#c7d5ee,#b0c8e4);"></div>
+          <div class="rounded flex items-center justify-center" style="aspect-ratio:1; background:linear-gradient(135deg,#eef2ff,#dce8f5);">
+            <span class="text-xs text-gray-400">＋もっと見る</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+  SECTION 2 — タブナビゲーション
+================================================ -->
+<nav class="sticky bg-white border-b border-gray-200" style="top:64px; z-index:40;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex overflow-x-auto" style="scrollbar-width:none;">
+      <button class="tab-btn active whitespace-nowrap px-5 py-4 text-sm text-gray-500" data-tab="info">店舗情報</button>
+      <button class="tab-btn whitespace-nowrap px-5 py-4 text-sm text-gray-500" data-tab="hours">営業時間</button>
+      <button class="tab-btn whitespace-nowrap px-5 py-4 text-sm text-gray-500" data-tab="access">アクセス</button>
+      <button class="tab-btn whitespace-nowrap px-5 py-4 text-sm text-gray-500" data-tab="staff">スタッフ</button>
+      <button class="tab-btn whitespace-nowrap px-5 py-4 text-sm text-gray-500" data-tab="menu">メニュー</button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ================================================
+  SECTION 3 — 店舗情報タブ
+================================================ -->
+<div id="tab-info" class="tab-content active">
+  <section class="py-14 md:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-col lg:flex-row gap-12">
+
+        <!-- 左: 店舗紹介文 -->
+        <div class="flex-1">
+          <div class="text-xs font-medium tracking-[0.4em] mb-2" style="color:#0D2B5E;">ABOUT THIS STORE</div>
+          <h2 class="text-2xl md:text-3xl font-bold mb-5" style="color:#0D2B5E; letter-spacing:0.06em;">当店について</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            アイケアラボ 札幌大通店は、北海道初の「眼の整体院」として、地下鉄大通駅から徒歩1分の好立地にオープンしました。
+          </p>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            北海道の長い冬、ブルーライトを浴び続ける日々の中で、眼の疲れを感じている方へ。私たちは眼周囲の筋肉・骨格・自律神経という三つのアプローチで、視界の根本から整えます。
+          </p>
+          <p class="text-gray-600 leading-relaxed">
+            はじめての方もお気軽にご来店ください。無料カウンセリングから始めることができます。
+          </p>
+
+          <!-- 特徴タグ -->
+          <div class="flex flex-wrap gap-2 mt-6">
+            <span class="text-xs px-3 py-1.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">大通駅 徒歩1分</span>
+            <span class="text-xs px-3 py-1.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">個室施術</span>
+            <span class="text-xs px-3 py-1.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">女性スタッフ在籍</span>
+            <span class="text-xs px-3 py-1.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">ビル3F・エレベーター有</span>
+            <span class="text-xs px-3 py-1.5 rounded-sm" style="background:#EEF2FF; color:#0D2B5E;">当日予約OK</span>
+          </div>
+        </div>
+
+        <!-- 右: 店舗詳細テーブル -->
+        <div class="lg:w-5/12 flex-shrink-0">
+          <div class="border border-gray-200 rounded overflow-hidden">
+            <div class="py-3 px-5 text-sm font-medium text-white" style="background:#0D2B5E;">店舗詳細</div>
+            <table class="w-full text-sm">
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap w-24 bg-gray-50">店舗名</td>
+                  <td class="py-3.5 px-4 text-gray-700">アイケアラボ 札幌大通店</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50">住所</td>
+                  <td class="py-3.5 px-4 text-gray-700">〒060-0042<br>北海道札幌市中央区大通西4丁目 ●●ビル 3F</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50">最寄駅</td>
+                  <td class="py-3.5 px-4 text-gray-700">地下鉄大通駅 1番出口 徒歩1分<br>地下鉄さっぽろ駅 徒歩5分</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50">営業時間</td>
+                  <td class="py-3.5 px-4 text-gray-700">10:00〜21:00<br><span class="text-xs text-gray-400">最終受付 20:00</span></td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50">休業日</td>
+                  <td class="py-3.5 px-4 text-gray-700">不定休（要確認）</td>
+                </tr>
+                <tr>
+                  <td class="py-3.5 px-4 text-xs font-medium text-gray-400 whitespace-nowrap bg-gray-50">電話</td>
+                  <td class="py-3.5 px-4"><a href="tel:0120XXXXXX" class="font-bold hover:opacity-80" style="color:#0D2B5E;">0120-XXX-XXX</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 写真ギャラリー -->
+  <section class="section-alt py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">GALLERY</div>
+      <h3 class="text-xl font-bold text-center mb-8" style="color:#0D2B5E;">店内ギャラリー</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
+        <!-- 施術室 -->
+        <div class="rounded overflow-hidden" style="aspect-ratio:4/3; background:linear-gradient(145deg,#e8f0fa,#d0e2f4);">
+          <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="8" width="22" height="15" rx="2" fill="#C7D5EE"/><rect x="6" y="11" width="7" height="9" rx="1" fill="#0D2B5E" fill-opacity="0.15"/><rect x="15" y="11" width="7" height="4" rx="1" fill="#0D2B5E" fill-opacity="0.1"/><rect x="15" y="17" width="7" height="3" rx="1" fill="#0D2B5E" fill-opacity="0.1"/><rect x="0" y="22" width="28" height="3" rx="1" fill="#A4BAD4"/></svg>
+            <span class="text-xs text-gray-400">施術室</span>
+          </div>
+        </div>
+        <div class="rounded overflow-hidden" style="aspect-ratio:4/3; background:linear-gradient(145deg,#dce8f5,#c8d9ee);">
+          <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 10C4 8 6 6 8 6h12c2 0 4 2 4 4v8c0 2-2 4-4 4H8c-2 0-4-2-4-4V10Z" fill="#C7D5EE"/><circle cx="14" cy="14" r="4" fill="#EEF2FF"/><circle cx="14" cy="14" r="2" fill="#4A6FA5"/></svg>
+            <span class="text-xs text-gray-400">受付</span>
+          </div>
+        </div>
+        <div class="rounded overflow-hidden" style="aspect-ratio:4/3; background:linear-gradient(145deg,#d4e5f7,#bcd4eb);">
+          <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="12" width="16" height="10" rx="1.5" fill="#C7D5EE"/><path d="M10 12V9a4 4 0 0 1 8 0v3" stroke="#4A6FA5" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="text-xs text-gray-400">待合室</span>
+          </div>
+        </div>
+        <div class="rounded overflow-hidden" style="aspect-ratio:4/3; background:linear-gradient(145deg,#eef2ff,#dce8f5);">
+          <div class="w-full h-full flex flex-col items-center justify-center gap-1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="4" width="24" height="18" rx="2" fill="#C7D5EE"/><circle cx="14" cy="13" r="5" fill="#EEF2FF"/><circle cx="14" cy="13" r="3" fill="#4A6FA5"/></svg>
+            <span class="text-xs text-gray-400">カウンセリングルーム</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">MAP</div>
+      <h3 class="text-xl font-bold text-center mb-8" style="color:#0D2B5E;">地図</h3>
+      <!-- Googleマップ埋め込みプレースホルダー -->
+      <div class="relative rounded overflow-hidden border border-gray-200" style="height:360px; background:#e8eef5;">
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 4C13.4 4 8 9.4 8 16c0 9.4 12 20 12 20s12-10.6 12-20C32 9.4 26.6 4 20 4Z" fill="#0D2B5E" fill-opacity="0.15" stroke="#0D2B5E" stroke-width="1.5"/><circle cx="20" cy="16" r="4" fill="#0D2B5E" fill-opacity="0.6"/></svg>
+          <div class="text-center">
+            <div class="text-sm font-medium" style="color:#0D2B5E;">北海道札幌市中央区大通西4丁目 ●●ビル 3F</div>
+            <div class="text-xs text-gray-400 mt-1">地下鉄大通駅 1番出口 徒歩1分</div>
+          </div>
+          <a href="https://maps.google.com" target="_blank" class="btn-outline px-4 py-2 text-xs rounded-sm font-medium mt-1">Googleマップで開く</a>
+        </div>
+        <!-- グリッドライン（地図風） -->
+        <svg class="absolute inset-0 opacity-20" width="100%" height="100%">
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0D2B5E" stroke-width="0.5"/>
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#grid)"/>
+          <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#0D2B5E" stroke-width="2"/>
+          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#0D2B5E" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================================================
+  SECTION 4 — 営業時間タブ
+================================================ -->
+<div id="tab-hours" class="tab-content">
+  <section class="py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">BUSINESS HOURS</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-10" style="color:#0D2B5E; letter-spacing:0.06em;">営業時間</h2>
+
+      <!-- 時間サマリー -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-10">
+        <div class="flex-1 text-center p-6 rounded border border-gray-200">
+          <div class="text-xs text-gray-400 mb-1 tracking-wider">施術受付時間</div>
+          <div class="text-2xl font-bold" style="color:#0D2B5E;">10:00 〜 21:00</div>
+        </div>
+        <div class="flex-1 text-center p-6 rounded border border-gray-200">
+          <div class="text-xs text-gray-400 mb-1 tracking-wider">最終受付</div>
+          <div class="text-2xl font-bold" style="color:#0D2B5E;">20:00</div>
+        </div>
+        <div class="flex-1 text-center p-6 rounded border border-gray-200">
+          <div class="text-xs text-gray-400 mb-1 tracking-wider">休業日</div>
+          <div class="text-2xl font-bold" style="color:#0D2B5E;">不定休</div>
+        </div>
+      </div>
+
+      <!-- 週間カレンダー -->
+      <div class="border border-gray-200 rounded overflow-hidden mb-6">
+        <div class="py-3 px-5 text-sm font-medium text-white text-center" style="background:#0D2B5E;">週間スケジュール</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-center">
+            <thead>
+              <tr class="bg-gray-50">
+                <td class="py-3 px-3 text-xs text-gray-400 font-medium w-28 text-left pl-4">施術</td>
+                <td class="py-3 px-2 text-xs font-bold text-gray-700">月</td>
+                <td class="py-3 px-2 text-xs font-bold text-gray-700">火</td>
+                <td class="py-3 px-2 text-xs font-bold text-gray-700">水</td>
+                <td class="py-3 px-2 text-xs font-bold text-gray-700">木</td>
+                <td class="py-3 px-2 text-xs font-bold text-gray-700">金</td>
+                <td class="py-3 px-2 text-xs font-bold text-blue-500">土</td>
+                <td class="py-3 px-2 text-xs font-bold text-red-400">日</td>
+                <td class="py-3 px-2 text-xs font-bold text-red-300">祝</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t border-gray-100">
+                <td class="py-3.5 px-3 text-xs text-gray-500 text-left pl-4">眼の整体</td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+              </tr>
+              <tr class="border-t border-gray-100">
+                <td class="py-3.5 px-3 text-xs text-gray-500 text-left pl-4">カウンセリング</td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+                <td class="py-3.5"><span class="text-base font-medium" style="color:#0D2B5E;">●</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400">※ 祝日・年末年始の営業時間は変更になる場合があります。最新情報は店舗にお問い合わせください。</p>
+      <p class="text-xs text-gray-400">※ 最終施術受付は閉院の1時間前（20:00）となります。</p>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================================================
+  SECTION 5 — アクセスタブ
+================================================ -->
+<div id="tab-access" class="tab-content">
+  <section class="py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">ACCESS</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-3" style="color:#0D2B5E; letter-spacing:0.06em;">アクセス</h2>
+      <p class="text-center text-sm text-gray-500 mb-10">北海道札幌市中央区大通西4丁目 ●●ビル 3F</p>
+
+      <!-- 路線タブ -->
+      <div class="flex gap-0 mb-8 border border-gray-200 rounded overflow-hidden">
+        <button class="access-tab-btn flex-1 py-3 text-sm font-medium transition-all text-center active-access" id="abtn-0" onclick="switchAccess(0)">地下鉄大通駅から</button>
+        <button class="access-tab-btn flex-1 py-3 text-sm font-medium transition-all text-center" id="abtn-1" style="border-left:1px solid #e5e7eb;" onclick="switchAccess(1)">地下鉄さっぽろ駅から</button>
+        <button class="access-tab-btn flex-1 py-3 text-sm font-medium transition-all text-center" id="abtn-2" style="border-left:1px solid #e5e7eb;" onclick="switchAccess(2)">JR札幌駅から</button>
+      </div>
+
+      <!-- ルート0: 大通駅 -->
+      <div id="access-route-0">
+        <div class="flex items-center gap-3 mb-6 p-4 rounded" style="background:#EEF2FF;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#0D2B5E" stroke-width="1.3"/><path d="M7 10h6M10 7v6" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="text-sm font-medium" style="color:#0D2B5E;">地下鉄大通駅 1番出口から <strong>徒歩約1分</strong></div>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">1</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">地下鉄大通駅に到着</div>
+              <div class="text-xs text-gray-500">東西線・南北線・東豊線いずれからもアクセス可能です</div>
+              <div class="mt-2 rounded overflow-hidden h-24 flex items-center justify-center text-xs text-gray-400" style="background:#f0f4fa; border:1px solid #e5e7eb;">[ 駅改札イメージ ]</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">2</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">1番出口を出て右折</div>
+              <div class="text-xs text-gray-500">「大通西4」の交差点に向かって直進します</div>
+              <div class="mt-2 rounded overflow-hidden h-24 flex items-center justify-center text-xs text-gray-400" style="background:#f0f4fa; border:1px solid #e5e7eb;">[ 出口案内イメージ ]</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">3</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">●●ビルの3Fへ</div>
+              <div class="text-xs text-gray-500">エレベーターで3Fへお上がりください。受付にてスタッフがお迎えします</div>
+              <div class="mt-2 rounded overflow-hidden h-24 flex items-center justify-center text-xs text-gray-400" style="background:#f0f4fa; border:1px solid #e5e7eb;">[ ビル入口イメージ ]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ルート1: さっぽろ駅 -->
+      <div id="access-route-1" style="display:none;">
+        <div class="flex items-center gap-3 mb-6 p-4 rounded" style="background:#EEF2FF;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#0D2B5E" stroke-width="1.3"/><path d="M7 10h6M10 7v6" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="text-sm font-medium" style="color:#0D2B5E;">地下鉄さっぽろ駅から <strong>徒歩約5分</strong></div>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">1</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">地下鉄さっぽろ駅 南口を出る</div>
+              <div class="text-xs text-gray-500">南北線・東豊線さっぽろ駅 南口より出てください</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">2</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">大通公園方向へ南下</div>
+              <div class="text-xs text-gray-500">大通公園沿いに西4丁目方向へ約5分歩きます</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">3</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">●●ビルの3Fへ</div>
+              <div class="text-xs text-gray-500">エレベーターで3Fにお上がりください</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ルート2: JR札幌駅 -->
+      <div id="access-route-2" style="display:none;">
+        <div class="flex items-center gap-3 mb-6 p-4 rounded" style="background:#EEF2FF;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#0D2B5E" stroke-width="1.3"/><path d="M7 10h6M10 7v6" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="text-sm font-medium" style="color:#0D2B5E;">JR札幌駅から <strong>徒歩約10分</strong></div>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">1</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">JR札幌駅 南口を出る</div>
+              <div class="text-xs text-gray-500">南口改札を出て、正面の大通り方向へ進みます</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">2</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">地下通路（チ・カ・ホ）を利用</div>
+              <div class="text-xs text-gray-500">雨・雪の日は大通駅まで地下を通ってください（大通駅まで地下直結）</div>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:#0D2B5E;">3</div>
+            <div class="flex-1 pt-2">
+              <div class="font-medium text-gray-800 text-sm mb-1">大通駅 1番出口から徒歩1分</div>
+              <div class="text-xs text-gray-500">●●ビル 3Fがアイケアラボ 札幌大通店です</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================================================
+  SECTION 6 — スタッフタブ
+================================================ -->
+<div id="tab-staff" class="tab-content">
+  <section class="py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">STAFF</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-10" style="color:#0D2B5E; letter-spacing:0.06em;">スタッフ紹介</h2>
+
+      <!-- 店長 -->
+      <div class="flex flex-col md:flex-row gap-8 mb-12 p-8 rounded border border-gray-200">
+        <!-- アバター -->
+        <div class="flex-shrink-0 flex flex-col items-center gap-3">
+          <div class="w-32 h-32 rounded-full overflow-hidden" style="background:linear-gradient(145deg,#c7d5ee,#eef2ff);">
+            <svg width="128" height="128" viewBox="0 0 128 128" fill="none">
+              <circle cx="64" cy="64" r="64" fill="#EEF2FF"/>
+              <circle cx="64" cy="52" r="20" fill="#C7D5EE"/>
+              <ellipse cx="64" cy="105" rx="32" ry="20" fill="#C7D5EE"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-white font-medium px-3 py-0.5 rounded-sm" style="background:#0D2B5E;">店長</div>
+          </div>
+        </div>
+        <!-- プロフィール -->
+        <div class="flex-1">
+          <div class="text-xs text-gray-400 mb-0.5 tracking-widest">STORE MANAGER</div>
+          <h3 class="text-xl font-bold mb-0.5" style="color:#0D2B5E;">山田 ●● （Yamada ●●）</h3>
+          <div class="text-xs text-gray-400 mb-4">アイケアラボ認定 眼整体士 1級</div>
+          <div class="space-y-1.5 text-sm text-gray-600 mb-4">
+            <div class="flex gap-2"><span class="text-gray-400 text-xs w-16 pt-0.5 flex-shrink-0">経歴</span><span>鍼灸師・整体師資格取得後、眼専門ケアの研究に従事。アイケアラボ創業メンバーとして独自メソッドの開発に携わる。</span></div>
+            <div class="flex gap-2"><span class="text-gray-400 text-xs w-16 pt-0.5 flex-shrink-0">得意施術</span><span>眼周囲の深層筋ほぐし・骨格バランス調整・自律神経ケア</span></div>
+            <div class="flex gap-2"><span class="text-gray-400 text-xs w-16 pt-0.5 flex-shrink-0">メッセージ</span><span>「北海道の長い冬、目を頑張らせている方に寄り添いたい。初めての方も、リラックスしてお越しください。」</span></div>
+          </div>
+          <div class="flex gap-2">
+            <a href="#" class="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0D2B5E] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.1"/><circle cx="7" cy="7" r="2.6" stroke="currentColor" stroke-width="1.1"/><circle cx="10.2" cy="3.8" r="0.7" fill="currentColor"/></svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- スタッフ一覧 -->
+      <h4 class="text-base font-bold mb-5" style="color:#0D2B5E;">在籍スタッフ</h4>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded border border-gray-100 text-center">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background:linear-gradient(145deg,#dce8f5,#c7d5ee);">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="32" fill="#EEF2FF"/><circle cx="32" cy="26" r="10" fill="#C7D5EE"/><ellipse cx="32" cy="52" rx="16" ry="10" fill="#C7D5EE"/></svg>
+          </div>
+          <div class="text-sm font-medium text-gray-800">佐藤 ●●</div>
+          <div class="text-xs text-gray-400 mt-0.5">認定眼整体士</div>
+        </div>
+        <div class="p-4 rounded border border-gray-100 text-center">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background:linear-gradient(145deg,#dce8f5,#c7d5ee);">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="32" fill="#EEF2FF"/><circle cx="32" cy="26" r="10" fill="#C7D5EE"/><ellipse cx="32" cy="52" rx="16" ry="10" fill="#C7D5EE"/></svg>
+          </div>
+          <div class="text-sm font-medium text-gray-800">鈴木 ●●</div>
+          <div class="text-xs text-gray-400 mt-0.5">認定眼整体士</div>
+        </div>
+        <div class="p-4 rounded border border-gray-100 text-center">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background:linear-gradient(145deg,#dce8f5,#c7d5ee);">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="32" fill="#EEF2FF"/><circle cx="32" cy="26" r="10" fill="#C7D5EE"/><ellipse cx="32" cy="52" rx="16" ry="10" fill="#C7D5EE"/></svg>
+          </div>
+          <div class="text-sm font-medium text-gray-800">田中 ●●</div>
+          <div class="text-xs text-gray-400 mt-0.5">認定眼整体士</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================================================
+  SECTION 7 — メニュータブ
+================================================ -->
+<div id="tab-menu" class="tab-content">
+  <section class="py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">MENU</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-3" style="color:#0D2B5E; letter-spacing:0.06em;">当店のメニュー</h2>
+      <p class="text-center text-sm text-gray-500 mb-10">札幌大通店でご利用いただけるコース・料金一覧</p>
+
+      <div class="space-y-4 mb-10">
+        <!-- 初回 -->
+        <div class="border border-gray-200 rounded overflow-hidden flex flex-col md:flex-row">
+          <div class="md:w-2 flex-shrink-0" style="background:#0D2B5E;"></div>
+          <div class="flex-1 p-5 md:p-6">
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="inline-block text-xs text-white px-2 py-0.5 rounded mb-2" style="background:#0D2B5E;">初めての方</div>
+                <h4 class="text-lg font-bold mb-1" style="color:#0D2B5E;">初回体験コース</h4>
+                <p class="text-sm text-gray-500 mb-3">まずはお試しに。視界の変化を体感してください。</p>
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>視界・状態カウンセリング</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>眼の整体ベーシック施術</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>セルフケアアドバイス</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 text-right md:text-right">
+                <div class="text-2xl font-bold" style="color:#0D2B5E;">¥3,980</div>
+                <div class="text-xs text-gray-400">税込 / 約60分</div>
+                <a href="#reserve" class="btn-navy inline-block mt-3 px-5 py-2 text-xs rounded-sm font-medium">予約する</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 通常 -->
+        <div class="border-2 rounded overflow-hidden flex flex-col md:flex-row" style="border-color:#0D2B5E;">
+          <div class="md:w-2 flex-shrink-0" style="background:#0D2B5E;"></div>
+          <div class="flex-1 p-5 md:p-6 relative">
+            <div class="absolute top-3 right-3 text-xs text-white px-2.5 py-0.5 rounded-sm font-medium" style="background:#0D2B5E;">人気No.1</div>
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="inline-block text-xs px-2 py-0.5 rounded mb-2" style="background:#EEF2FF; color:#0D2B5E;">定期ケア</div>
+                <h4 class="text-lg font-bold mb-1" style="color:#0D2B5E;">通常コース（プレミアム）</h4>
+                <p class="text-sm text-gray-500 mb-3">眼の整体フルコース。骨格バランス+自律神経ケアを含む本格コースです。</p>
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>詳細カウンセリング</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>眼の整体フルコース</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>骨格バランス調整</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>自律神経ケア</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 text-right">
+                <div class="text-2xl font-bold" style="color:#0D2B5E;">¥9,800</div>
+                <div class="text-xs text-gray-400">税込 / 約90分</div>
+                <a href="#reserve" class="btn-navy inline-block mt-3 px-5 py-2 text-xs rounded-sm font-medium">予約する</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 継続 -->
+        <div class="border border-gray-200 rounded overflow-hidden flex flex-col md:flex-row">
+          <div class="md:w-2 flex-shrink-0" style="background:#4A6FA5;"></div>
+          <div class="flex-1 p-5 md:p-6">
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="inline-block text-xs px-2 py-0.5 rounded mb-2" style="background:#EEF2FF; color:#0D2B5E;">根本改善</div>
+                <h4 class="text-lg font-bold mb-1" style="color:#0D2B5E;">継続ケアプラン</h4>
+                <p class="text-sm text-gray-500 mb-3">月4回の定期施術で、視界を根本から変えていきます。専属担当制。</p>
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>月4回施術</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>専属担当セラピスト</span>
+                  <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>月次状態レポート</span>
+                </div>
+              </div>
+              <div class="flex-shrink-0 text-right">
+                <div class="text-2xl font-bold" style="color:#0D2B5E;">¥29,800</div>
+                <div class="text-xs text-gray-400">税込 / 月（90分×4回）</div>
+                <a href="#reserve" class="btn-outline inline-block mt-3 px-5 py-2 text-xs rounded-sm font-medium">詳しく相談する</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-400">※ 料金はすべて税込表示。初回体験コースは1人1回限り。継続ケアプランは最低3ヶ月からのご契約となります。</p>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================================================
+  SECTION 8 — 予約CTA（全タブ共通）
+================================================ -->
+<section id="reserve" class="py-14 md:py-20" style="background:#0D2B5E;">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+    <div class="text-xs font-medium tracking-[0.4em] text-blue-300 mb-3">RESERVATION</div>
+    <h2 class="text-2xl md:text-3xl font-bold text-white mb-3" style="letter-spacing:0.06em;">無料カウンセリング予約</h2>
+    <p class="text-blue-200 text-sm mb-8">
+      視界のお悩みや気になることを、専任スタッフが丁寧にお聞きします。<br>
+      強引な勧誘は一切ありません。
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="#" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-medium rounded-sm bg-white" style="color:#0D2B5E;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="1.5" stroke="#0D2B5E" stroke-width="1.3"/><path d="M4.5 1v2.5M11.5 1v2.5M1 6.5h14" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+        WEBで予約する（24時間受付）
+      </a>
+      <a href="tel:0120XXXXXX" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-medium rounded-sm border border-white border-opacity-40 text-white hover:bg-white hover:bg-opacity-10 transition-all">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14.67 11.11c0 .27-.06.53-.2.78-.12.24-.3.46-.52.65-.38.32-.8.48-1.23.48-.32 0-.67-.08-1.04-.25-.37-.16-.74-.4-1.12-.68A17 17 0 0 1 2.5 5.27c0-.36.12-.7.37-1.04.17-.23.38-.43.62-.57.24-.14.5-.21.78-.21.1 0 .2.02.3.06.1.05.19.12.27.22L5.86 5.3c.08.1.14.2.18.29.04.1.07.18.07.26 0 .1-.03.2-.08.3-.05.1-.13.2-.23.3l-.31.33c-.04.04-.06.1-.06.16 0 .03 0 .06.01.08.02.03.03.06.04.08.1.15.22.33.38.52.17.2.35.41.54.62.2.2.4.38.6.55.2.16.38.29.53.37l.07.03c.03 0 .06.01.08.01.07 0 .13-.02.17-.07l.31-.32c.1-.1.2-.18.3-.23.1-.04.19-.07.3-.07.08 0 .16.02.25.06.09.04.18.1.28.17l1.32.94c.1.07.17.16.22.26.04.1.06.2.06.32Z" stroke="white" stroke-width="1.2"/></svg>
+        0120-XXX-XXX（受付 10:00〜21:00）
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+  SECTION 9 — 近隣店舗
+================================================ -->
+<section class="py-14 md:py-20 section-alt">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-xs font-medium tracking-[0.4em] mb-2 text-center" style="color:#0D2B5E;">NEARBY STORES</div>
+    <h2 class="text-xl md:text-2xl font-bold text-center mb-8" style="color:#0D2B5E; letter-spacing:0.06em;">近隣の店舗</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <a href="#" class="bg-white rounded border border-gray-200 p-5 hover:border-[#0D2B5E] hover:shadow-md transition-all block">
+        <div class="text-xs text-gray-400 mb-1">宮城県</div>
+        <div class="font-bold text-gray-800 mb-1">仙台店</div>
+        <div class="text-xs text-gray-500 mb-2">2026年4月OPEN予定</div>
+        <div class="text-xs" style="color:#0D2B5E;">詳細を見る →</div>
+      </a>
+      <a href="#" class="bg-white rounded border border-gray-200 p-5 hover:border-[#0D2B5E] hover:shadow-md transition-all block">
+        <div class="text-xs text-gray-400 mb-1">福島県</div>
+        <div class="font-bold text-gray-800 mb-1">郡山支店</div>
+        <div class="text-xs text-gray-500 mb-2">2026年5月OPEN予定</div>
+        <div class="text-xs" style="color:#0D2B5E;">詳細を見る →</div>
+      </a>
+      <a href="aicare-top-prototype.html#stores" class="bg-white rounded border border-gray-200 p-5 hover:border-[#0D2B5E] hover:shadow-md transition-all block flex items-center justify-center">
+        <div class="text-center">
+          <div class="text-sm font-medium mb-1" style="color:#0D2B5E;">全店舗を見る</div>
+          <div class="text-xs text-gray-400">全国の店舗一覧はこちら</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+  FOOTER
+================================================ -->
+<footer class="pt-14 pb-8" style="background:#0D2B5E;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-white border-opacity-10">
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2.5 mb-4">
+          <svg width="32" height="32" viewBox="0 0 38 38" fill="none">
+            <circle cx="19" cy="19" r="17.5" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+            <circle cx="19" cy="19" r="7" fill="#C7D5EE" fill-opacity="0.5"/>
+            <circle cx="19" cy="19" r="5" fill="#4A6FA5"/>
+            <circle cx="19" cy="19" r="3" fill="white" fill-opacity="0.9"/>
+          </svg>
+          <div>
+            <div class="text-base font-bold tracking-widest text-white">アイケアラボ</div>
+            <div class="text-xs text-blue-300" style="margin-top:-2px;">眼の整体院</div>
+          </div>
+        </div>
+        <p class="text-sm text-blue-200 leading-relaxed mb-5">視界を整え、毎日の質を変える。</p>
+        <div class="flex gap-2">
+          <a href="#" class="w-8 h-8 rounded bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition-all">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2.5" stroke="white" stroke-opacity="0.7" stroke-width="1.1"/><circle cx="7" cy="7" r="2.8" stroke="white" stroke-opacity="0.7" stroke-width="1.1"/><circle cx="10.5" cy="3.5" r="0.7" fill="white" fill-opacity="0.7"/></svg>
+          </a>
+          <a href="#" class="w-8 h-8 rounded bg-white bg-opacity-10 flex items-center justify-center hover:bg-opacity-20 transition-all">
+            <svg width="12" height="10" viewBox="0 0 14 12"><path d="M4 8.5V3.5l6 2.5-6 2.5Z" fill="white" fill-opacity="0.8"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold text-white mb-4 tracking-wider">店舗情報</h4>
+        <ul class="space-y-2 text-sm text-blue-200">
+          <li><a href="#tab-info" class="hover:text-white transition-colors" onclick="switchTab('info')">当店について</a></li>
+          <li><a href="#tab-hours" class="hover:text-white transition-colors" onclick="switchTab('hours')">営業時間</a></li>
+          <li><a href="#tab-access" class="hover:text-white transition-colors" onclick="switchTab('access')">アクセス</a></li>
+          <li><a href="#tab-staff" class="hover:text-white transition-colors" onclick="switchTab('staff')">スタッフ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold text-white mb-4 tracking-wider">メニュー</h4>
+        <ul class="space-y-2 text-sm text-blue-200">
+          <li><a href="#tab-menu" class="hover:text-white transition-colors" onclick="switchTab('menu')">初回体験コース</a></li>
+          <li><a href="#tab-menu" class="hover:text-white transition-colors" onclick="switchTab('menu')">通常コース</a></li>
+          <li><a href="#tab-menu" class="hover:text-white transition-colors" onclick="switchTab('menu')">継続ケアプラン</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs font-bold text-white mb-4 tracking-wider">その他</h4>
+        <ul class="space-y-2 text-sm text-blue-200">
+          <li><a href="aicare-top-prototype.html" class="hover:text-white transition-colors">トップページ</a></li>
+          <li><a href="aicare-top-prototype.html#stores" class="hover:text-white transition-colors">全店舗一覧</a></li>
+          <li><a href="aicare-top-prototype.html#faq" class="hover:text-white transition-colors">よくある質問</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-7 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="text-xs text-blue-400">© 2024 アイケアラボ All Rights Reserved.</div>
+      <div class="text-xs text-blue-400">アイケアラボ 札幌大通店</div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ================================================
+  SP固定CTAバー
+================================================ -->
+<div class="fixed bottom-0 left-0 right-0 z-40 md:hidden" style="box-shadow:0 -2px 16px rgba(0,0,0,0.15);">
+  <div class="flex h-14">
+    <a href="tel:0120XXXXXX" class="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium text-white" style="background:#0D2B5E; border-right:1px solid rgba(255,255,255,0.15);">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M13.5 10c0 .25-.06.5-.18.72-.12.22-.3.43-.52.6-.38.3-.8.44-1.22.44-.32 0-.66-.08-1.02-.23-.36-.16-.73-.38-1.09-.65A17 17 0 0 1 2.2 4.3c0-.32.09-.66.25-1.02.16-.35.38-.68.65-1.02C3.44 1.87 3.87 1.7 4.3 1.7c.11 0 .22.02.32.07.11.04.2.12.28.22l.95 1.34c.08.1.13.2.18.3.04.09.07.17.07.25 0 .1-.03.2-.08.3-.06.1-.13.2-.23.3l-.32.33a.22.22 0 0 0-.07.17c0 .03 0 .06.02.09.01.02.02.05.03.07.08.14.21.32.39.53.18.21.38.43.59.65.21.21.43.4.64.58.21.17.4.3.54.38.02 0 .04.02.07.03.04 0 .06.01.09.01.07 0 .13-.02.17-.07l.32-.32c.11-.11.21-.19.31-.23.1-.05.2-.07.31-.07.08 0 .17.02.25.07.09.04.19.1.29.17l1.36.97c.1.07.17.16.22.27.04.11.07.22.07.34Z" fill="white"/></svg>
+      電話する
+    </a>
+    <a href="#reserve" class="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium bg-white" style="color:#0D2B5E;">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="2" width="13" height="11" rx="1.5" stroke="#0D2B5E" stroke-width="1.3"/><path d="M4 1v2.5M11 1v2.5M1 6.5h13" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+      無料予約
+    </a>
+  </div>
+</div>
+
+
+<!-- ================================================
+  JavaScript
+================================================ -->
+<script>
+// ===== ハンバーガー =====
+(function(){
+  const btn = document.getElementById('menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const h1 = document.getElementById('ham-1');
+  const h2 = document.getElementById('ham-2');
+  const h3 = document.getElementById('ham-3');
+  let open = false;
+  function setMenu(state) {
+    open = state;
+    menu.classList.toggle('hidden', !open);
+    h1.style.cssText = open ? 'transform:rotate(45deg) translate(3px,4px)' : '';
+    h2.style.cssText = open ? 'opacity:0' : '';
+    h3.style.cssText = open ? 'transform:rotate(-45deg) translate(3px,-4px)' : '';
+  }
+  btn.addEventListener('click', () => setMenu(!open));
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+})();
+
+// ===== スクロール影 =====
+(function(){
+  const h = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    h.style.boxShadow = window.scrollY > 8 ? '0 2px 24px rgba(0,0,0,0.08)' : '';
+  }, { passive: true });
+})();
+
+// ===== タブ切り替え =====
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('tab-' + tabId);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.dataset.tab === tabId) b.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// ===== アクセスルート切り替え =====
+function switchAccess(idx) {
+  [0, 1, 2].forEach(i => {
+    const el = document.getElementById('access-route-' + i);
+    const btn = document.getElementById('abtn-' + i);
+    if (el) el.style.display = i === idx ? 'block' : 'none';
+    if (btn) {
+      if (i === idx) {
+        btn.style.background = '#0D2B5E';
+        btn.style.color = 'white';
+      } else {
+        btn.style.background = '';
+        btn.style.color = '';
+      }
+    }
+  });
+}
+// 初期状態
+switchAccess(0);
+</script>
+</body>
+</html>

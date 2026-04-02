@@ -1,0 +1,18 @@
+{
+  "name": "gdrive-merger",
+  "version": "1.0.0",
+  "description": "Google Drive 重複案件フォルダ統合ツール",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node server.js",
+    "dry-run": "node index.js --dry-run",
+    "apply": "node index.js --apply",
+    "auth": "node auth.js"
+  },
+  "dependencies": {
+    "csv-stringify": "^6.5.1",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0"
+  }
+}

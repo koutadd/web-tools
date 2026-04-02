@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>参考サイト集｜アイケアラボ サイト刷新プロジェクト</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;900&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0a1628;
+      --bg-mid:      #0c1e38;
+      --card:        #0f2035;
+      --card2:       #122540;
+      --border:      rgba(59,130,246,0.10);
+      --border2:     rgba(59,130,246,0.20);
+      --border3:     rgba(59,130,246,0.32);
+      --blue:        #3b82f6;
+      --blue-lt:     #60a5fa;
+      --blue-dim:    rgba(59,130,246,0.12);
+      --amber:       #f59e0b;
+      --amber-lt:    #fbbf24;
+      --amber-dim:   rgba(245,158,11,0.10);
+      --amber-border:rgba(245,158,11,0.30);
+      --green:       #10b981;
+      --green-dim:   rgba(16,185,129,0.10);
+      --teal:        #14b8a6;
+      --teal-dim:    rgba(20,184,166,0.10);
+      --purple:      #8b5cf6;
+      --purple-dim:  rgba(139,92,246,0.10);
+      --pink:        #ec4899;
+      --pink-dim:    rgba(236,72,153,0.10);
+      --orange:      #f97316;
+      --orange-dim:  rgba(249,115,22,0.10);
+      --slate:       #64748b;
+      --text:        #e2eaf4;
+      --text2:       #94a3b8;
+      --text3:       #4a6080;
+      --mono:        'DM Mono', monospace;
+      --head:        'Syne', 'Noto Sans JP', sans-serif;
+      --body:        'Noto Sans JP', sans-serif;
+      --r:           10px;
+      --r-sm:        6px;
+      --r-lg:        14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 13px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Keyframes ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes cardFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fu { animation: fadeUp 0.55s cubic-bezier(.22,.61,.36,1) both; }
+    .d1 { animation-delay: 0.06s; }
+    .d2 { animation-delay: 0.12s; }
+    .d3 { animation-delay: 0.18s; }
+    .d4 { animation-delay: 0.24s; }
+
+    /* ── Back button ── */
+    .back-btn {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .back-btn:hover {
+      color: var(--blue-lt);
+      border-color: var(--border3);
+      background: var(--bg-mid);
+      transform: translateX(-2px);
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      max-width: 1680px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      padding-top: 40px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .header-eyebrow {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+    .header-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .page-title {
+      font-family: var(--head);
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.01em;
+      line-height: 1.15;
+    }
+    .page-subtitle {
+      font-size: 12px;
+      color: var(--text3);
+      letter-spacing: 0.05em;
+      padding-bottom: 3px;
+    }
+    .total-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-dim);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      padding: 7px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--blue-lt);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .total-badge strong {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ── Sticky filter bar ── */
+    .filter-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      margin: 0 -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .filter-inner {
+      max-width: 1680px;
+      margin: 0 auto;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .filter-inner::-webkit-scrollbar { display: none; }
+
+    .filter-tab {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .filter-tab:hover {
+      color: var(--text);
+      border-color: var(--border3);
+      background: var(--blue-dim);
+    }
+    .filter-tab.active {
+      background: var(--amber-dim);
+      border-color: var(--amber-border);
+      color: var(--amber);
+    }
+    .filter-tab .count {
+      font-size: 9.5px;
+      opacity: 0.7;
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-top: 36px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 18px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Card grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.22s cubic-bezier(.22,.61,.36,1),
+                  box-shadow 0.22s ease,
+                  border-color 0.22s ease;
+      animation: cardFade 0.4s cubic-bezier(.22,.61,.36,1) both;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Genre-specific hover glows */
+    .card.genre-top:hover    { border-color: rgba(245,158,11,0.55);  box-shadow: 0 8px 32px rgba(245,158,11,0.15); }
+    .card.genre-design:hover { border-color: rgba(139,92,246,0.55);  box-shadow: 0 8px 32px rgba(139,92,246,0.15); }
+    .card.genre-stretch:hover{ border-color: rgba(59,130,246,0.55);  box-shadow: 0 8px 32px rgba(59,130,246,0.15); }
+    .card.genre-seitai:hover { border-color: rgba(20,184,166,0.55);  box-shadow: 0 8px 32px rgba(20,184,166,0.15); }
+    .card.genre-gym:hover    { border-color: rgba(16,185,129,0.55);  box-shadow: 0 8px 32px rgba(16,185,129,0.15); }
+    .card.genre-beauty:hover { border-color: rgba(236,72,153,0.55);  box-shadow: 0 8px 32px rgba(236,72,153,0.15); }
+    .card.genre-fc:hover     { border-color: rgba(249,115,22,0.55);  box-shadow: 0 8px 32px rgba(249,115,22,0.15); }
+
+    /* Gold border on 代表指名 cards */
+    .card.genre-top {
+      border-color: rgba(245,158,11,0.28);
+    }
+
+    .card-inner {
+      padding: 16px 16px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      width: fit-content;
+      font-weight: 500;
+    }
+    .badge-top    { background: rgba(245,158,11,0.14); color: var(--amber);  border: 1px solid rgba(245,158,11,0.30); }
+    .badge-design { background: rgba(139,92,246,0.14); color: #a78bfa;        border: 1px solid rgba(139,92,246,0.30); }
+    .badge-stretch{ background: rgba(59,130,246,0.14); color: var(--blue-lt); border: 1px solid rgba(59,130,246,0.30); }
+    .badge-seitai { background: rgba(20,184,166,0.14); color: #2dd4bf;         border: 1px solid rgba(20,184,166,0.30); }
+    .badge-gym    { background: rgba(16,185,129,0.14); color: #34d399;         border: 1px solid rgba(16,185,129,0.30); }
+    .badge-beauty { background: rgba(236,72,153,0.14); color: #f472b6;         border: 1px solid rgba(236,72,153,0.30); }
+    .badge-fc     { background: rgba(249,115,22,0.14); color: #fb923c;         border: 1px solid rgba(249,115,22,0.30); }
+
+    /* ── Card name ── */
+    .card-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Card URL ── */
+    .card-url {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      color: var(--text3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Card action ── */
+    .card-action {
+      display: block;
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg-mid);
+      border: none;
+      border-top: 1px solid var(--border);
+      color: var(--text2);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      margin-top: auto;
+    }
+    .card.genre-top    .card-action:hover { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .card.genre-design .card-action:hover { background: rgba(139,92,246,0.12); color: #a78bfa; }
+    .card.genre-stretch .card-action:hover{ background: rgba(59,130,246,0.12); color: var(--blue-lt); }
+    .card.genre-seitai .card-action:hover { background: rgba(20,184,166,0.12); color: #2dd4bf; }
+    .card.genre-gym    .card-action:hover { background: rgba(16,185,129,0.12); color: #34d399; }
+    .card.genre-beauty .card-action:hover { background: rgba(236,72,153,0.12); color: #f472b6; }
+    .card.genre-fc     .card-action:hover { background: rgba(249,115,22,0.12); color: #fb923c; }
+
+    /* ── Fade transition for filtering ── */
+    .card.hidden {
+      display: none;
+    }
+    .card.visible {
+      animation: cardFade 0.3s cubic-bezier(.22,.61,.36,1) both;
+    }
+
+    /* ── Section hidden when all cards hidden ── */
+    .section.section-hidden {
+      display: none;
+    }
+
+    /* ── No results message ── */
+    .no-results {
+      display: none;
+      padding: 60px 0;
+      text-align: center;
+      color: var(--text3);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1200px) {
+      .card-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+      .page { padding: 0 16px 48px; }
+      .filter-bar { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+    }
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .header-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .total-badge { margin-left: 0; }
+      .back-btn { top: 12px; right: 12px; padding: 7px 12px; font-size: 10px; }
+    }
+
+    /* ── Top section accent line ── */
+    .section-top-accent {
+      height: 2px;
+      background: linear-gradient(90deg, rgba(245,158,11,0.5) 0%, transparent 100%);
+      margin-bottom: 16px;
+      border-radius: 2px;
+    }
+
+    /* ── Card thumbnail (thum.io screenshot) ── */
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      background: #fff;
+    }
+    .card-thumb img {
+      width: 100%;
+      height: auto;
+      min-height: 100%;
+      display: block;
+      transform: translateY(0);
+      transition: transform 6s ease-in-out;
+      object-fit: cover;
+      object-position: top;
+    }
+    .card:hover .card-thumb img {
+      transform: translateY(-40%);
+    }
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<!-- ===== PROJECT NAV ===== -->
+<nav style="position:sticky;top:0;z-index:200;background:#060e1c;border-bottom:1px solid rgba(245,158,11,0.18);display:flex;align-items:center;gap:8px;padding:9px 20px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;">
+  <span style="color:#4a6080;margin-right:4px;">eye care lab /</span>
+  <a href="aicare-top-prototype.html" style="color:#94a3b8;text-decoration:none;padding:4px 12px;border-radius:4px;border:1px solid rgba(148,163,184,0.2);" onmouseover="this.style.color='#e2eaf4'" onmouseout="this.style.color='#94a3b8'">サイト</a>
+  <a href="persona-dashboard.html" style="color:#94a3b8;text-decoration:none;padding:4px 12px;border-radius:4px;border:1px solid rgba(148,163,184,0.2);" onmouseover="this.style.color='#e2eaf4'" onmouseout="this.style.color='#94a3b8'">ペルソナ</a>
+  <a href="reference-sites.html" style="color:#f59e0b;text-decoration:none;padding:4px 12px;border-radius:4px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.08);">参考サイト集</a>
+</nav>
+
+  <div class="page">
+
+    <!-- Page header -->
+    <header class="page-header fu">
+      <div class="header-eyebrow">eye care lab / site renewal project</div>
+      <div class="header-row">
+        <div>
+          <h1 class="page-title">参考サイト集</h1>
+          <p class="page-subtitle">アイケアラボ サイト刷新プロジェクト &nbsp;/&nbsp; 2026.03</p>
+        </div>
+        <div class="total-badge">
+          <strong id="total-count">55</strong> サイト
+        </div>
+      </div>
+    </header>
+
+    <!-- Sticky filter tabs -->
+    <div class="filter-bar">
+      <div class="filter-inner">
+        <button class="filter-tab active" data-filter="all">すべて <span class="count" id="cnt-all"></span></button>
+        <button class="filter-tab" data-filter="top">代表指名 <span class="count" id="cnt-top"></span></button>
+        <button class="filter-tab" data-filter="design">デザイン参考 <span class="count" id="cnt-design"></span></button>
+        <button class="filter-tab" data-filter="stretch">整体・ストレッチ <span class="count" id="cnt-stretch"></span></button>
+        <button class="filter-tab" data-filter="seitai">整骨院・骨格 <span class="count" id="cnt-seitai"></span></button>
+        <button class="filter-tab" data-filter="gym">フィットネス・ジム <span class="count" id="cnt-gym"></span></button>
+        <button class="filter-tab" data-filter="beauty">エステ・美容 <span class="count" id="cnt-beauty"></span></button>
+        <button class="filter-tab" data-filter="fc">FC・加盟募集 <span class="count" id="cnt-fc"></span></button>
+        <button class="filter-tab" id="add-genre-btn" onclick="openAddGenre()" style="border:1px dashed rgba(245,158,11,0.4);color:var(--amber);background:rgba(245,158,11,0.05);">＋ ジャンル追加</button>
+      </div>
+    </div>
+
+    <!-- ===== 代表指名参考サイト ===== -->
+    <section class="section" id="section-top" data-section="top">
+      <div class="section-header fu d1">
+        <div class="section-top-accent" style="width:3px;height:16px;border-radius:2px;background:var(--amber);flex-shrink:0;"></div>
+        <span class="section-label" style="color:var(--amber);letter-spacing:0.14em;">★ 代表指名参考サイト</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('top')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-top" data-genre="top" onclick="openPreview('https://www.katsube-dc.com/','カツベデンタルクリニック')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.katsube-dc.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-top">★ 代表指名</span>
+            <div class="card-name">カツベデンタルクリニック</div>
+            <div class="card-url">katsube-dc.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.katsube-dc.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-top" data-genre="top" onclick="openPreview('https://www.s-b-c.net/','SBCメディカルグループ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.s-b-c.net/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-top">★ 代表指名</span>
+            <div class="card-name">SBCメディカルグループ</div>
+            <div class="card-url">s-b-c.net</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.s-b-c.net/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-top" data-genre="top" onclick="openPreview('https://eyecarelabo.com/ec/','アイケアラボ EC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://eyecarelabo.com/ec/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-top">★ 代表指名</span>
+            <div class="card-name">アイケアラボ EC</div>
+            <div class="card-url">eyecarelabo.com/ec/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://eyecarelabo.com/ec/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== デザイン参考 ===== -->
+    <section class="section" id="section-design" data-section="design">
+      <div class="section-header fu d2">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--purple);flex-shrink:0;"></div>
+        <span class="section-label">デザイン参考・インスピレーション</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('design')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-design" data-genre="design" onclick="openPreview('https://goodwebdesignmagazine.com/holon-inc/','Holon Inc')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://goodwebdesignmagazine.com/holon-inc/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-design">Design</span>
+            <div class="card-name">Holon Inc</div>
+            <div class="card-url">goodwebdesignmagazine.com/holon-inc/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://goodwebdesignmagazine.com/holon-inc/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-design" data-genre="design" onclick="openPreview('https://corp.drenty.jp/','Drenty コーポレート')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://corp.drenty.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-design">Design</span>
+            <div class="card-name">Drenty コーポレート</div>
+            <div class="card-url">corp.drenty.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://corp.drenty.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-design" data-genre="design" onclick="openPreview('https://www.autotechnic.co.jp/recruit/new-graduate/','Autotechnic 採用')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.autotechnic.co.jp/recruit/new-graduate/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-design">Design</span>
+            <div class="card-name">Autotechnic 採用</div>
+            <div class="card-url">autotechnic.co.jp/recruit/new-graduate/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.autotechnic.co.jp/recruit/new-graduate/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-design" data-genre="design" onclick="openPreview('https://www.awwwards.com/casperbdv/collections/inspiration/','Awwwards: casperbdv')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.awwwards.com/casperbdv/collections/inspiration/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-design">Design</span>
+            <div class="card-name">Awwwards: casperbdv</div>
+            <div class="card-url">awwwards.com/casperbdv/collections/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.awwwards.com/casperbdv/collections/inspiration/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-design" data-genre="design" onclick="openPreview('https://jp.pinterest.com/pin/7529524373237834/','Pinterest インスピレーション')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://jp.pinterest.com/pin/7529524373237834/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-design">Design</span>
+            <div class="card-name">Pinterest インスピレーション</div>
+            <div class="card-url">jp.pinterest.com/pin/7529524373237834/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://jp.pinterest.com/pin/7529524373237834/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== 整体・ストレッチ ===== -->
+    <section class="section" id="section-stretch" data-section="stretch">
+      <div class="section-header fu d3">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--blue);flex-shrink:0;"></div>
+        <span class="section-label">整体・ストレッチ・マッサージ</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('stretch')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://karada39.com/','カラダ39')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://karada39.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">カラダ39</div>
+            <div class="card-url">karada39.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://karada39.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://stretchex.jp/','ストレッチエクス')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://stretchex.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ストレッチエクス</div>
+            <div class="card-url">stretchex.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://stretchex.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://www.stretch-up.jp/','ストレッチアップ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.stretch-up.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ストレッチアップ</div>
+            <div class="card-url">stretch-up.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.stretch-up.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://beestretch.jp/','BeeStretch')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://beestretch.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">BeeStretch</div>
+            <div class="card-url">beestretch.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://beestretch.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://karada-stretch.com/lp/','カラダストレッチ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://karada-stretch.com/lp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">カラダストレッチ</div>
+            <div class="card-url">karada-stretch.com/lp/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://karada-stretch.com/lp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://relxle.com/','relxle')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://relxle.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">relxle</div>
+            <div class="card-url">relxle.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://relxle.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://www.bodywork.co.jp/','ボディワーク')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.bodywork.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ボディワーク</div>
+            <div class="card-url">bodywork.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.bodywork.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://reraku.jp/','Re.Ra.Ku')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://reraku.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">Re.Ra.Ku</div>
+            <div class="card-url">reraku.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://reraku.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://www.asian-relaxation-villa.com/','Asian Relaxation Villa')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.asian-relaxation-villa.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">Asian Relaxation Villa</div>
+            <div class="card-url">asian-relaxation-villa.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.asian-relaxation-villa.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://www.gooit.jp/','ゴールイット')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.gooit.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ゴールイット</div>
+            <div class="card-url">gooit.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.gooit.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://hogushi-tj.com/','ほぐしの匠')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://hogushi-tj.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ほぐしの匠</div>
+            <div class="card-url">hogushi-tj.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://hogushi-tj.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://mominotakumi.com/','もみの匠')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://mominotakumi.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">もみの匠</div>
+            <div class="card-url">mominotakumi.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://mominotakumi.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://momi-kori.com/','momi&kori')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://momi-kori.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">momi&kori</div>
+            <div class="card-url">momi-kori.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://momi-kori.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://cocoro-group.com/','ここころグループ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://cocoro-group.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ここころグループ</div>
+            <div class="card-url">cocoro-group.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://cocoro-group.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://doctorstretch.com/','ドクターストレッチ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://doctorstretch.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">ドクターストレッチ</div>
+            <div class="card-url">doctorstretch.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://doctorstretch.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://www.zenplace.co.jp/','zen place')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.zenplace.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">zen place</div>
+            <div class="card-url">zenplace.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.zenplace.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://clubpilates.co.jp/','Club Pilates')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://clubpilates.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">Club Pilates</div>
+            <div class="card-url">clubpilates.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://clubpilates.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://la-pilates.jp/','La-Pilates')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://la-pilates.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">La-Pilates</div>
+            <div class="card-url">la-pilates.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://la-pilates.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-stretch" data-genre="stretch" onclick="openPreview('https://dep-pilates.com/','dep pilates')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://dep-pilates.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-stretch">整体</span>
+            <div class="card-name">dep pilates</div>
+            <div class="card-url">dep-pilates.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://dep-pilates.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== 整骨院・骨格系 ===== -->
+    <section class="section" id="section-seitai" data-section="seitai">
+      <div class="section-header fu d3">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--teal);flex-shrink:0;"></div>
+        <span class="section-label">整骨院・骨格系</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('seitai')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-seitai" data-genre="seitai" onclick="openPreview('https://www.genkido-s.com/','元気堂グループ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.genkido-s.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-seitai">整骨院</span>
+            <div class="card-name">元気堂グループ</div>
+            <div class="card-url">genkido-s.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.genkido-s.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-seitai" data-genre="seitai" onclick="openPreview('https://honegori-group.com/','ほねごりグループ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://honegori-group.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-seitai">整骨院</span>
+            <div class="card-name">ほねごりグループ</div>
+            <div class="card-url">honegori-group.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://honegori-group.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-seitai" data-genre="seitai" onclick="openPreview('https://www.honetsugi-group.com/','骨継グループ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.honetsugi-group.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-seitai">整骨院</span>
+            <div class="card-name">骨継グループ</div>
+            <div class="card-url">honetsugi-group.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.honetsugi-group.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-seitai" data-genre="seitai" onclick="openPreview('https://www.bodysh.net/','BodySH')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.bodysh.net/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-seitai">整骨院</span>
+            <div class="card-name">BodySH</div>
+            <div class="card-url">bodysh.net</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.bodysh.net/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-seitai" data-genre="seitai" onclick="openPreview('https://sss-kaneko.co.jp/','SSS金子')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://sss-kaneko.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-seitai">整骨院</span>
+            <div class="card-name">SSS金子</div>
+            <div class="card-url">sss-kaneko.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://sss-kaneko.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== フィットネス・ジム ===== -->
+    <section class="section" id="section-gym" data-section="gym">
+      <div class="section-header fu d4">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--green);flex-shrink:0;"></div>
+        <span class="section-label">フィットネス・ジム</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('gym')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://www.anytimefitness.co.jp/','Anytime Fitness')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.anytimefitness.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">Anytime Fitness</div>
+            <div class="card-url">anytimefitness.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.anytimefitness.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://chocozap.jp/','chocoZAP')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://chocozap.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">chocoZAP</div>
+            <div class="card-url">chocozap.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://chocozap.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://beyond-gym.com/','BEYOND GYM')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://beyond-gym.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">BEYOND GYM</div>
+            <div class="card-url">beyond-gym.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://beyond-gym.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://lava-intl.co.jp/','LAVA')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://lava-intl.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">LAVA</div>
+            <div class="card-url">lava-intl.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://lava-intl.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://joyfit.jp/','JOYFIT')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://joyfit.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">JOYFIT</div>
+            <div class="card-url">joyfit.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://joyfit.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://www.s-re.jp/','S-RECONCEPT')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.s-re.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">S-RECONCEPT</div>
+            <div class="card-url">s-re.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.s-re.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://www.central.co.jp/','セントラルスポーツ')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.central.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">セントラルスポーツ</div>
+            <div class="card-url">central.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.central.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://www.tipness.co.jp/','ティップネス')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.tipness.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">ティップネス</div>
+            <div class="card-url">tipness.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.tipness.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://hacogym.jp/','hacoGYM')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://hacogym.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">hacoGYM</div>
+            <div class="card-url">hacogym.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://hacogym.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://element-gym.com/','element gym')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://element-gym.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">element gym</div>
+            <div class="card-url">element-gym.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://element-gym.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://urbanfit.jp/','URBANFIT')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://urbanfit.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">URBANFIT</div>
+            <div class="card-url">urbanfit.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://urbanfit.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://fit365.jp/','FIT365')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fit365.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">FIT365</div>
+            <div class="card-url">fit365.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fit365.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://www.alltimefitness.jp/','ALL TIME FITNESS')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://www.alltimefitness.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">ALL TIME FITNESS</div>
+            <div class="card-url">alltimefitness.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://www.alltimefitness.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://heat24.jp/','HEAT24')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://heat24.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">HEAT24</div>
+            <div class="card-url">heat24.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://heat24.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://fastgym24.tipness.co.jp/','FastGym24')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fastgym24.tipness.co.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">FastGym24</div>
+            <div class="card-url">fastgym24.tipness.co.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fastgym24.tipness.co.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-gym" data-genre="gym" onclick="openPreview('https://fitplace.jp/lp202211/','FitPlace')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fitplace.jp/lp202211/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-gym">GYM</span>
+            <div class="card-name">FitPlace</div>
+            <div class="card-url">fitplace.jp/lp202211/</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fitplace.jp/lp202211/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== エステ・美容 ===== -->
+    <section class="section" id="section-beauty" data-section="beauty">
+      <div class="section-header fu d4">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--pink);flex-shrink:0;"></div>
+        <span class="section-label">エステ・美容</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('beauty')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-beauty" data-genre="beauty" onclick="openPreview('https://musee-pla.com/','ミュゼプラチナム')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://musee-pla.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-beauty">エステ</span>
+            <div class="card-name">ミュゼプラチナム</div>
+            <div class="card-url">musee-pla.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://musee-pla.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== FC・加盟募集 ===== -->
+    <section class="section" id="section-fc" data-section="fc">
+      <div class="section-header fu d4">
+        <div style="width:3px;height:16px;border-radius:2px;background:var(--orange);flex-shrink:0;"></div>
+        <span class="section-label">FC・加盟募集</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('fc')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59,130,246,0.3)'">＋ サイト追加</button>
+      </div>
+      <div class="card-grid">
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://nexus-gym-fc.com/','NEXUS GYM FC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://nexus-gym-fc.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">NEXUS GYM FC</div>
+            <div class="card-url">nexus-gym-fc.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://nexus-gym-fc.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://franchise.lien-lien.jp/','lien-lien FC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://franchise.lien-lien.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">lien-lien FC</div>
+            <div class="card-url">franchise.lien-lien.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://franchise.lien-lien.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://fc.smartfit100.site/index.html','SmartFit100 FC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fc.smartfit100.site/index.html" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">SmartFit100 FC</div>
+            <div class="card-url">fc.smartfit100.site</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fc.smartfit100.site/index.html" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://fc.ecofit24.com/','ecofit24 FC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fc.ecofit24.com/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">ecofit24 FC</div>
+            <div class="card-url">fc.ecofit24.com</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fc.ecofit24.com/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://w-fit24.jp/','W-FIT24')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://w-fit24.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">W-FIT24</div>
+            <div class="card-url">w-fit24.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://w-fit24.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+        <div class="card genre-fc" data-genre="fc" onclick="openPreview('https://fc.fitnexus.jp/','FitNexus FC')" style="cursor:pointer">
+          <div class="card-inner">
+        <div class="card-thumb"><img src="https://image.thum.io/get/width/600/crop/400/https://fc.fitnexus.jp/" alt="" loading="lazy" onerror="this.parentElement.style.background='#0a1628';this.style.display='none'"></div>
+            <span class="badge badge-fc">FC</span>
+            <div class="card-name">FitNexus FC</div>
+            <div class="card-url">fc.fitnexus.jp</div>
+          </div>
+          <a class="card-action" onclick="event.stopPropagation()" href="https://fc.fitnexus.jp/" target="_blank" rel="noopener">開く →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <div id="dynamic-sections"></div>
+
+  </div><!-- /page -->
+
+<!-- Add Genre Modal -->
+<div id="genre-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(6,14,28,0.85);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#0f2035;border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:32px;width:420px;max-width:90vw;">
+    <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#f59e0b;margin-bottom:16px;">＋ ジャンル追加</div>
+    <input id="genre-name-input" type="text" placeholder="ジャンル名（例：医療・クリニック）" style="width:100%;background:#0a1628;border:1px solid rgba(59,130,246,0.3);border-radius:6px;padding:10px 14px;color:#e2eaf4;font-family:'Noto Sans JP',sans-serif;font-size:13px;margin-bottom:12px;outline:none;">
+    <input id="genre-color-input" type="text" placeholder="アクセントカラー（例：#10b981）" style="width:100%;background:#0a1628;border:1px solid rgba(59,130,246,0.3);border-radius:6px;padding:10px 14px;color:#e2eaf4;font-family:'Noto Sans JP',sans-serif;font-size:13px;margin-bottom:20px;outline:none;" value="#6366f1">
+    <div style="display:flex;gap:10px;">
+      <button onclick="submitAddGenre()" style="flex:1;background:#f59e0b;color:#060e1c;border:none;border-radius:6px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">追加する</button>
+      <button onclick="closeAddGenre()" style="flex:1;background:transparent;color:#94a3b8;border:1px solid rgba(148,163,184,0.2);border-radius:6px;padding:10px;font-size:13px;cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Site Modal -->
+<div id="site-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(6,14,28,0.85);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#0f2035;border:1px solid rgba(59,130,246,0.25);border-radius:12px;padding:32px;width:460px;max-width:90vw;">
+    <div id="site-modal-title" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#3b82f6;margin-bottom:16px;">＋ サイト追加</div>
+    <input id="site-name-input" type="text" placeholder="サイト名（例：ストレッチ専門店〇〇）" style="width:100%;background:#0a1628;border:1px solid rgba(59,130,246,0.3);border-radius:6px;padding:10px 14px;color:#e2eaf4;font-family:'Noto Sans JP',sans-serif;font-size:13px;margin-bottom:12px;outline:none;">
+    <input id="site-url-input" type="url" placeholder="https://example.com/" style="width:100%;background:#0a1628;border:1px solid rgba(59,130,246,0.3);border-radius:6px;padding:10px 14px;color:#e2eaf4;font-family:'Noto Sans JP',sans-serif;font-size:13px;margin-bottom:20px;outline:none;">
+    <input type="hidden" id="site-target-genre">
+    <div style="display:flex;gap:10px;">
+      <button onclick="submitAddSite()" style="flex:1;background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">追加する</button>
+      <button onclick="closeAddSite()" style="flex:1;background:transparent;color:#94a3b8;border:1px solid rgba(148,163,184,0.2);border-radius:6px;padding:10px;font-size:13px;cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    (function () {
+      const tabs   = document.querySelectorAll('.filter-tab');
+      const cards  = document.querySelectorAll('.card');
+      const sections = document.querySelectorAll('section[data-section]');
+
+      // Genre counts (excluding "top" — always visible)
+      const genreCounts = {};
+      cards.forEach(c => {
+        const g = c.dataset.genre;
+        genreCounts[g] = (genreCounts[g] || 0) + 1;
+      });
+
+      const total = cards.length;
+      document.getElementById('total-count').textContent = total;
+      // Update static fallback in badge
+      const badge = document.querySelector('.total-badge strong');
+      if (badge) badge.textContent = total;
+
+      // Populate tab count labels
+      let allCount = 0;
+      Object.entries(genreCounts).forEach(([g, n]) => {
+        const el = document.getElementById('cnt-' + g);
+        if (el) el.textContent = '(' + n + ')';
+        allCount += n;
+      });
+      const allEl = document.getElementById('cnt-all');
+      if (allEl) allEl.textContent = '(' + allCount + ')';
+
+      function applyFilter(filter) {
+        // Update tab active states
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+
+        if (filter === 'all') {
+          // Show all cards and sections
+          cards.forEach(c => {
+            c.classList.remove('hidden');
+            c.classList.add('visible');
+          });
+          sections.forEach(s => s.classList.remove('section-hidden'));
+          return;
+        }
+
+        // Hide/show cards
+        cards.forEach(c => {
+          const g = c.dataset.genre;
+          const show = (g === filter) || (g === 'top');
+          if (show) {
+            c.classList.remove('hidden');
+            c.classList.add('visible');
+          } else {
+            c.classList.add('hidden');
+            c.classList.remove('visible');
+          }
+        });
+
+        // Hide sections that have no visible cards (except top section)
+        sections.forEach(s => {
+          const sGenre = s.dataset.section;
+          if (sGenre === 'top') {
+            s.classList.remove('section-hidden');
+            return;
+          }
+          const hasVisible = Array.from(s.querySelectorAll('.card'))
+            .some(c => !c.classList.contains('hidden'));
+          if (hasVisible) {
+            s.classList.remove('section-hidden');
+          } else {
+            s.classList.add('section-hidden');
+          }
+        });
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => applyFilter(tab.dataset.filter));
+      });
+
+      // Expose for dynamic genre tabs
+      window.setFilter = applyFilter;
+
+      // Expose updateCounts for dynamic additions
+      window.updateCounts = function() {
+        const allCards = document.querySelectorAll('.card');
+        const allSections = document.querySelectorAll('section[data-section]');
+        const gc = {};
+        allCards.forEach(c => {
+          const g = c.dataset.genre;
+          gc[g] = (gc[g] || 0) + 1;
+        });
+        const total = allCards.length;
+        const totalEl = document.getElementById('total-count');
+        if (totalEl) totalEl.textContent = total;
+        const badge2 = document.querySelector('.total-badge strong');
+        if (badge2) badge2.textContent = total;
+        let ac = 0;
+        Object.entries(gc).forEach(([g, n]) => {
+          const el = document.getElementById('cnt-' + g);
+          if (el) el.textContent = '(' + n + ')';
+          const tabEl = document.querySelector(`[data-filter="${g}"] .count`);
+          if (tabEl) tabEl.textContent = '(' + n + ')';
+          ac += n;
+        });
+        const allEl = document.getElementById('cnt-all');
+        if (allEl) allEl.textContent = '(' + ac + ')';
+      };
+
+      // Init
+      applyFilter('all');
+    })();
+
+// ── Add Genre/Site ──────────────────────────────
+let customGenres = JSON.parse(localStorage.getItem('ecl_genres') || '[]');
+let customSites  = JSON.parse(localStorage.getItem('ecl_sites')  || '[]');
+
+function openAddGenre() {
+  document.getElementById('genre-modal').style.display = 'flex';
+  document.getElementById('genre-name-input').focus();
+}
+function closeAddGenre() {
+  document.getElementById('genre-modal').style.display = 'none';
+  document.getElementById('genre-name-input').value = '';
+}
+function submitAddGenre() {
+  const name  = document.getElementById('genre-name-input').value.trim();
+  const color = document.getElementById('genre-color-input').value.trim() || '#6366f1';
+  if (!name) return;
+  const id = 'custom_' + Date.now();
+  customGenres.push({ id, name, color });
+  localStorage.setItem('ecl_genres', JSON.stringify(customGenres));
+  renderCustomGenres();
+  closeAddGenre();
+  updateCounts();
+}
+
+function renderCustomGenres() {
+  const container = document.getElementById('dynamic-sections');
+  container.innerHTML = '';
+  customGenres.forEach(g => {
+    const sites = customSites.filter(s => s.genre === g.id);
+    const section = document.createElement('section');
+    section.className = 'section';
+    section.id = 'section-' + g.id;
+    section.dataset.section = g.id;
+    section.innerHTML = `
+      <div class="section-header">
+        <div style="width:3px;height:16px;border-radius:2px;background:${g.color};flex-shrink:0;"></div>
+        <span class="section-label" style="color:${g.color};">${g.name}</span>
+        <div class="section-line"></div>
+        <button onclick="openAddSite('${g.id}')" style="margin-left:auto;background:transparent;border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:3px 10px;color:#3b82f6;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;">＋ サイト追加</button>
+      </div>
+      <div class="card-grid" id="grid-${g.id}">
+        ${sites.map(s => buildSiteCard(s.name, s.url, g.id, g.color)).join('')}
+        ${sites.length === 0 ? '<p style="color:#4a6080;font-size:12px;grid-column:1/-1;">まだサイトが追加されていません</p>' : ''}
+      </div>`;
+    container.appendChild(section);
+    // add filter tab if not exists
+    if (!document.querySelector(`[data-filter="${g.id}"]`)) {
+      const filterInner = document.querySelector('.filter-inner');
+      const addBtn = document.getElementById('add-genre-btn');
+      const tab = document.createElement('button');
+      tab.className = 'filter-tab';
+      tab.dataset.filter = g.id;
+      tab.innerHTML = `${g.name} <span class="count"></span>`;
+      tab.addEventListener('click', () => setFilter(g.id));
+      filterInner.insertBefore(tab, addBtn);
+    }
+  });
+}
+
+function buildSiteCard(name, url, genreId, color) {
+  const domain = (() => { try { return new URL(url).hostname; } catch(e) { return url; } })();
+  return `<div class="card" data-genre="${genreId}" style="border-left-color:${color}80">
+    <div class="card-inner">
+      <span class="badge" style="background:${color}18;color:${color};border-color:${color}40;">${genreId}</span>
+      <div class="card-name">${name || domain}</div>
+      <div class="card-url">${url}</div>
+      <a href="${url}" target="_blank" rel="noopener" class="card-link">開く →</a>
+    </div>
+  </div>`;
+}
+
+let _currentSiteGenre = '';
+function openAddSite(genreId) {
+  _currentSiteGenre = genreId;
+  document.getElementById('site-target-genre').value = genreId;
+  document.getElementById('site-modal').style.display = 'flex';
+  document.getElementById('site-name-input').focus();
+}
+function closeAddSite() {
+  document.getElementById('site-modal').style.display = 'none';
+  document.getElementById('site-name-input').value = '';
+  document.getElementById('site-url-input').value = '';
+}
+function submitAddSite() {
+  const name  = document.getElementById('site-name-input').value.trim();
+  const url   = document.getElementById('site-url-input').value.trim();
+  const genre = document.getElementById('site-target-genre').value;
+  if (!url) return;
+  // For built-in genres, build and inject a card directly
+  const builtInGrids = {top:'section-top', design:'section-design', stretch:'section-stretch', seitai:'section-seitai', gym:'section-gym', beauty:'section-beauty', fc:'section-fc'};
+  const siteData = { name, url, genre, id: Date.now() };
+  customSites.push(siteData);
+  localStorage.setItem('ecl_sites', JSON.stringify(customSites));
+
+  if (builtInGrids[genre]) {
+    const section = document.getElementById(builtInGrids[genre]);
+    if (section) {
+      const grid = section.querySelector('.card-grid');
+      if (grid) {
+        const color = {top:'#f59e0b',design:'#8b5cf6',stretch:'#3b82f6',seitai:'#14b8a6',gym:'#10b981',beauty:'#ec4899',fc:'#f97316'}[genre] || '#3b82f6';
+        const label = {top:'代表指名',design:'DESIGN',stretch:'整体',seitai:'整骨院',gym:'GYM',beauty:'エステ',fc:'FC'}[genre] || genre;
+        const domain = (() => { try { return new URL(url).hostname; } catch(e) { return url; } })();
+        const card = document.createElement('div');
+        card.className = `card genre-${genre}`;
+        card.dataset.genre = genre;
+        card.innerHTML = `<div class="card-inner"><span class="badge badge-${genre}">${label}</span><div class="card-name">${name || domain}</div><div class="card-url">${url}</div><a href="${url}" target="_blank" rel="noopener" class="card-link">開く →</a></div>`;
+        grid.appendChild(card);
+      }
+    }
+  } else {
+    renderCustomGenres();
+  }
+  closeAddSite();
+  updateCounts();
+}
+
+// ── Preview overlay ──────────────────────────────
+function openPreview(url, name) {
+  const overlay  = document.getElementById('preview-overlay');
+  const iframe   = document.getElementById('preview-iframe');
+  const title    = document.getElementById('preview-title');
+  const openLink = document.getElementById('preview-open-link');
+  const fallback = document.getElementById('preview-fallback');
+  const fbLink   = document.getElementById('preview-fallback-link');
+
+  overlay.style.display = 'block';
+  title.textContent = name + ' — ' + url;
+  openLink.href = url;
+  fbLink.href = url;
+  fallback.style.display = 'none';
+  iframe.style.display = 'block';
+  iframe.src = url;
+
+  // Detect iframe block via timeout — if blank or error after 4s, show fallback
+  let blockTimer = setTimeout(() => {
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc || doc.title === '' || doc.body === null || doc.body.innerHTML.trim() === '') {
+        showPreviewFallback();
+      }
+    } catch(e) {
+      // cross-origin = loaded fine
+    }
+  }, 4000);
+
+  iframe.onload = function() {
+    clearTimeout(blockTimer);
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc || doc.title === '' || (doc.body && doc.body.innerHTML.trim() === '')) {
+        showPreviewFallback();
+      }
+    } catch(e) { /* cross-origin = OK */ }
+  };
+  iframe.onerror = function() { clearTimeout(blockTimer); showPreviewFallback(); };
+
+  document.body.style.overflow = 'hidden';
+}
+function showPreviewFallback() {
+  const iframe   = document.getElementById('preview-iframe');
+  const fallback = document.getElementById('preview-fallback');
+  iframe.style.display = 'none';
+  fallback.style.display = 'flex';
+}
+function closePreview() {
+  const overlay = document.getElementById('preview-overlay');
+  const iframe  = document.getElementById('preview-iframe');
+  const fallback = document.getElementById('preview-fallback');
+  overlay.style.display = 'none';
+  iframe.src = '';
+  iframe.style.display = 'block';
+  fallback.style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePreview(); closeAddGenre(); closeAddSite(); } });
+
+// Init persisted custom genres on load
+renderCustomGenres();
+  </script>
+
+
+<!-- Preview Overlay -->
+<div id="preview-overlay" style="display:none;position:fixed;inset:0;z-index:1000;background:#0a1628;">
+  <!-- Floating close button — always on top -->
+  <button onclick="closePreview()" id="preview-close-float"
+    style="position:fixed;top:14px;right:20px;z-index:1200;
+           background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.45);
+           color:#ef4444;border-radius:6px;padding:7px 18px;
+           font-family:'DM Mono',monospace;font-size:13px;font-weight:700;
+           cursor:pointer;backdrop-filter:blur(12px);letter-spacing:.04em;">
+    ✕ 閉じる
+  </button>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;">
+    <!-- header bar -->
+    <div id="preview-bar" style="height:48px;background:#060e1c;border-bottom:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;">
+      <span id="preview-title" style="color:#94a3b8;font-family:'DM Mono',monospace;font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <a id="preview-open-link" href="#" target="_blank" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;border-radius:4px;padding:4px 12px;font-family:'DM Mono',monospace;font-size:11px;text-decoration:none;white-space:nowrap;">外部で開く ↗</a>
+    </div>
+    <!-- iframe area -->
+    <div style="flex:1;position:relative;background:#fff;">
+      <iframe id="preview-iframe" src="" style="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <!-- fallback shown when iframe is blocked -->
+      <div id="preview-fallback" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#0a1628;">
+        <div style="font-size:40px;">🚫</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:15px;color:#94a3b8;text-align:center;line-height:1.8;">
+          このサイトはiframe表示をブロックしています<br>
+          <span style="font-size:12px;color:#475569;">外部ブラウザで開いてください</span>
+        </div>
+        <a id="preview-fallback-link" href="#" target="_blank"
+          style="background:#3b82f6;color:#fff;border-radius:8px;padding:12px 32px;font-size:14px;text-decoration:none;font-family:'Noto Sans JP',sans-serif;font-weight:600;">
+          外部ブラウザで開く →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

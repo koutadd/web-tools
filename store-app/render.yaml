@@ -1,0 +1,59 @@
+# Render デプロイ設定
+# 参考: https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: aicare-store-app
+    runtime: node
+    plan: starter            # starter: $7/月, 無停止, 長時間リクエスト対応
+    # plan: free             # free はスリープあり・リクエスト上限あり（検証用途のみ）
+
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build:next
+    startCommand: npm start
+
+    # ヘルスチェック（Render がサービス起動確認に使用）
+    healthCheckPath: /api/version
+
+    # 自動デプロイ: main ブランチへの push で起動
+    autoDeploy: false         # 初回は手動。確認後 true に変更
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: NODE_VERSION
+        value: 20.18.0
+
+      # PostgreSQL 接続文字列（Render データベースから自動注入）
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aicare-db
+          property: connectionString
+
+      # Google サービスアカウント JSON（Render Dashboard の Environment から設定）
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false          # Dashboard から直接入力（gitに入れない）
+
+      # Google Drive 親フォルダ ID
+      - key: GOOGLE_DRIVE_PARENT_FOLDER_ID
+        value: 1ugm5wM_ShOQAN3YJrVsAP7a2LrfhtfHQ
+
+      # レビュー用パスコード（省略可: 空なら保護なし）
+      - key: REVIEW_PASSCODE
+        sync: false
+
+      # Google Sheets チャットログ ID（省略可）
+      - key: GOOGLE_SHEETS_CHAT_LOG_ID
+        sync: false
+
+      # Slack 通知 Webhook URL（省略可）
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+
+# PostgreSQL データベース
+databases:
+  - name: aicare-db
+    plan: free               # 無料: 1GB, 90日アクセスなしで削除注意
+    # plan: starter          # $7/月, 保持期限なし（本番推奨）
+    databaseName: aicare_production
+    user: aicare

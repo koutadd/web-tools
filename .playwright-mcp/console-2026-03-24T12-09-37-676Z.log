@@ -1,0 +1,5 @@
+[    2018ms] [WARNING] [TikTok Pixel] - Missing 'content_id' paramter
+Issue: The 'content_id' parameter isn't being received. This is required for Video Shopping Ads (VSA).
+Suggestion: Include the 'content_id' parameter in your source code. This is required for Video Shopping Ads (VSA). See https://ads.tiktok.com/help/article/standard-events-parameters?redirected=2 for more information. @ https://analytics.tiktok.com/i18n/pixel/static/main.MTEwMjY2ZTExOQ.js:0
+[    2507ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   10910ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 570127221907810. @ https://connect.facebook.net/en_US/fbevents.js:175

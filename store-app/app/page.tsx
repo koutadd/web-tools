@@ -35,10 +35,11 @@ export default async function HomePage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
       {/* ヘッダー（safe area 対応）*/}
-      <header className="pwa-safe-top" style={{
+      <header style={{
         background: 'var(--color-surface)',
         borderBottom: '1px solid var(--color-border)',
         padding: '14px 20px',
+        paddingTop: 'max(14px, calc(env(safe-area-inset-top, 0px) + 14px))',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <div>

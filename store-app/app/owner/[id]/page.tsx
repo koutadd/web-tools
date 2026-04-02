@@ -154,122 +154,133 @@ export default async function OwnerPage({
         }} />
 
         {/* コンテンツ（safe area 対応）*/}
-        <div className="pwa-safe-top" style={{ padding: '28px 20px 24px', position: 'relative' }}>
-          {/* 上段: 挨拶 + 管理リンク */}
+        <div style={{ padding: '14px 16px 20px', paddingTop: 'max(14px, calc(env(safe-area-inset-top, 0px) + 14px))', position: 'relative' }}>
+
+          {/* ── 1段目: アクションボタン（最上部・全幅）── */}
           <div style={{
-            display: 'flex', alignItems: 'flex-start',
-            justifyContent: 'space-between', marginBottom: 14, gap: 12,
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+            gap: 6, marginBottom: 16,
           }}>
-            <div>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 500, marginBottom: 4 }}>
-                おかえりなさい！
-              </p>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: 'white', letterSpacing: '-0.3px', lineHeight: 1.2 }}>
-                {raw.name} 様
-              </h1>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <button
-                data-pwa-install
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  padding: '6px 11px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.22)',
-                  color: 'rgba(255,255,255,0.95)',
-                  fontSize: 11, fontWeight: 600,
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  whiteSpace: 'nowrap', cursor: 'pointer',
-                }}
-              >
-                📱 アプリ化
-              </button>
-              <button
-                id="tutorial-btn"
-                onClick={undefined}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  padding: '6px 11px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.95)',
-                  color: '#2563eb',
-                  fontSize: 11, fontWeight: 700,
-                  border: '1px solid rgba(255,255,255,0.5)',
-                  whiteSpace: 'nowrap', cursor: 'pointer',
-                }}
-                data-tutorial-start
-              >
-                ❓ 使い方
-              </button>
-              <a
-                href={`/stores/${id}`}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  padding: '6px 13px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.18)',
-                  color: 'rgba(255,255,255,0.95)',
-                  fontSize: 11, fontWeight: 600, textDecoration: 'none',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                管理側を見る →
-              </a>
-            </div>
+            <button
+              data-pwa-install
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 3,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.2)',
+                color: 'rgba(255,255,255,0.95)',
+                fontSize: 11, fontWeight: 600,
+                border: '1px solid rgba(255,255,255,0.3)',
+                whiteSpace: 'nowrap', cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              📱 アプリ化
+            </button>
+            <button
+              id="tutorial-btn"
+              data-tutorial-start
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 3,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.95)',
+                color: '#2563eb',
+                fontSize: 11, fontWeight: 700,
+                border: '1px solid rgba(255,255,255,0.4)',
+                whiteSpace: 'nowrap', cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              ❓ 使い方
+            </button>
+            <a
+              href={`/stores/${id}`}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 3,
+                padding: '6px 10px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.15)',
+                color: 'rgba(255,255,255,0.9)',
+                fontSize: 11, fontWeight: 600, textDecoration: 'none',
+                border: '1px solid rgba(255,255,255,0.25)',
+                whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+            >
+              管理画面 →
+            </a>
           </div>
 
-          {/* 中段: フェーズ + 誰待ちバッジ + 期限 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+          {/* ── 2段目: 挨拶 + 店舗名（全幅・縦崩れ防止）── */}
+          <div style={{ marginBottom: 14 }}>
+            <p style={{
+              fontSize: 12, color: 'rgba(255,255,255,0.75)', fontWeight: 500,
+              marginBottom: 4, whiteSpace: 'nowrap',
+            }}>
+              おかえりなさい！
+            </p>
+            <h1 style={{
+              fontSize: 22, fontWeight: 800, color: 'white',
+              letterSpacing: '-0.3px', lineHeight: 1.25,
+              wordBreak: 'keep-all', overflowWrap: 'break-word',
+            }}>
+              {raw.name} 様
+            </h1>
+          </div>
+
+          {/* ── 3段目: フェーズ + 対応待ちバッジ ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
             <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '5px 14px', borderRadius: 99,
-              background: 'rgba(255,255,255,0.22)',
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 12px', borderRadius: 99,
+              background: 'rgba(255,255,255,0.2)',
               color: 'white', fontSize: 12, fontWeight: 700,
+              whiteSpace: 'nowrap',
             }}>
               {PHASE_ICONS[currentPhase]} {currentPhase}フェーズ
             </span>
 
             {whoWaiting === 'owner' ? (
               <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 14px', borderRadius: 99,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '4px 12px', borderRadius: 99,
                 background: 'rgba(255,255,255,0.95)',
-                color: '#b91c1c', fontSize: 12, fontWeight: 700,
+                color: '#b91c1c', fontSize: 11, fontWeight: 700,
+                whiteSpace: 'nowrap',
               }}>
                 <span className="pulse-dot" style={{ display: 'inline-block' }}>👤</span>
-                あなたの対応をお待ちしています
+                対応をお待ちしています
               </span>
             ) : whoWaiting === 'admin' ? (
               <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '5px 14px', borderRadius: 99,
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '4px 12px', borderRadius: 99,
                 background: 'rgba(255,255,255,0.18)',
-                color: 'white', fontSize: 12, fontWeight: 600,
+                color: 'white', fontSize: 11, fontWeight: 600,
+                whiteSpace: 'nowrap',
               }}>
                 🔧 担当者が作業中
               </span>
             ) : null}
           </div>
 
-          {/* 下段: 納期 + 期限バッジ */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>
+          {/* ── 4段目: 納期 + 期限バッジ ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap' }}>
               納期：{raw.deadline}
             </p>
             <span style={{
               display: 'inline-block',
               fontSize: 11, fontWeight: 800, padding: '2px 10px', borderRadius: 99,
+              whiteSpace: 'nowrap',
               background: deadlineMeta.label === '余裕あり'
                 ? 'rgba(255,255,255,0.2)'
                 : 'rgba(255,255,255,0.95)',
               color: deadlineMeta.label === '余裕あり'
-                ? 'rgba(255,255,255,0.9)'
+                ? 'rgba(255,255,255,0.85)'
                 : deadlineMeta.color,
             }}>
               {deadlineMeta.label}
             </span>
           </div>
 
-          {/* 進捗バー */}
-          <div style={{ marginTop: 16 }}>
+          {/* ── 5段目: 進捗バー ── */}
+          <div>
             <div style={{
               height: 4, background: 'rgba(255,255,255,0.22)',
               borderRadius: 99, overflow: 'hidden',
@@ -287,7 +298,7 @@ export default async function OwnerPage({
         </div>
       </header>
 
-      <main style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 100px' }}>
+      <main style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 100px', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
         <OwnerPageLogger storeId={id} phase={currentPhase} />
 
         {/* ─── チュートリアル（初回バナー + パネル）─── */}

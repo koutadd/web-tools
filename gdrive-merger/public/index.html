@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drive 重複統合</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+      font-size: 15px;
+    }
+
+    /* ステータスバー */
+    #statusBar {
+      background: #1a1a2e;
+      color: #ccc;
+      font-size: .78rem;
+      padding: 7px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    #statusBar .item { display: flex; align-items: center; gap: 5px; }
+    #statusBar .ok   { color: #4ade80; }
+    #statusBar .ng   { color: #f87171; }
+    #authCmd {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #authCmd code {
+      background: #2a2a3e;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: .76rem;
+      color: #a5b4fc;
+    }
+    .copy-btn {
+      background: #2a2a3e;
+      border: none;
+      color: #a5b4fc;
+      font-size: .72rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #3a3a5e; }
+    #authCmd.hidden { display: none; }
+
+    /* メイン */
+    main {
+      max-width: 800px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    /* カード */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+
+    /* 入力 */
+    label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    input[type=text] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #d0d5dd;
+      border-radius: 8px;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input[type=text]:focus { border-color: #1a73e8; }
+    input.ok  { border-color: #16a34a; }
+    input.err { border-color: #dc2626; }
+    #inputMsg {
+      font-size: .78rem;
+      margin-top: 5px;
+      min-height: 18px;
+      color: #888;
+    }
+    #inputMsg.ok  { color: #16a34a; }
+    #inputMsg.err { color: #dc2626; }
+
+    /* ボタン */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-wrap { flex: 1; min-width: 130px; display: flex; flex-direction: column; gap: 3px; }
+    button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter .12s, transform .1s;
+    }
+    button:active:not(:disabled) { transform: scale(.97); }
+    button:disabled { opacity: .38; cursor: not-allowed; }
+    .btn-scan   { background: #e8f0fe; color: #1a73e8; }
+    .btn-dryrun { background: #fef3cd; color: #7a5700; }
+    .btn-apply  { background: #d4edda; color: #166534; }
+    .btn-scan:hover:not(:disabled)   { filter: brightness(.93); }
+    .btn-dryrun:hover:not(:disabled) { filter: brightness(.93); }
+    .btn-apply:hover:not(:disabled)  { filter: brightness(.93); }
+    .btn-note { font-size: .72rem; color: #aaa; text-align: center; }
+
+    /* 実行ステータス */
+    #runStatus {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 7px;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-top: 14px;
+    }
+    #runStatus.running { display: flex; background: #e8f0fe; color: #1a73e8; }
+    #runStatus.success { display: flex; background: #d4edda; color: #166534; }
+    #runStatus.error   { display: flex; background: #fde8e8; color: #991b1b; }
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2.5px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 結果カード */
+    .result-card { display: none; }
+    .section-label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: #1a73e8;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 12px;
+    }
+
+    /* サマリー */
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: .8rem; font-weight: 700; }
+    .b-move { background: #d4edda; color: #166534; }
+    .b-skip { background: #e5e7eb; color: #374151; }
+    .b-quar { background: #fef3cd; color: #7a5700; }
+    .b-trash{ background: #fce7f3; color: #9d174d; }
+    .b-tot  { background: #dbeafe; color: #1e40af; }
+
+    /* テーブル */
+    .tbl-wrap { overflow-x: auto; border-radius: 7px; border: 1px solid #e4e7ec; }
+    table { width: 100%; border-collapse: collapse; font-size: .81rem; }
+    thead th {
+      background: #f8f9fa; padding: 8px 11px; text-align: left;
+      font-weight: 700; color: #444; border-bottom: 1px solid #e4e7ec;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) { background: #fafbfc; }
+    tbody td { padding: 7px 11px; border-bottom: 1px solid #eee; vertical-align: top; word-break: break-all; }
+    tbody tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+    .tag-MOVE       { background: #d4edda; color: #166534; }
+    .tag-SKIP_EXACT { background: #e5e7eb; color: #374151; }
+    .tag-QUARANTINE { background: #fef3cd; color: #7a5700; }
+    .tag-TRASH      { background: #fce7f3; color: #9d174d; }
+
+    .group-card { border: 1px solid #e4e7ec; border-radius: 7px; margin-bottom: 12px; overflow: hidden; }
+    .group-hd {
+      background: #f0f4ff; padding: 9px 13px; font-weight: 700;
+      font-size: .87rem; display: flex; align-items: center; gap: 7px;
+    }
+    .group-cnt { background: #1a73e8; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: .72rem; }
+
+    .paths {
+      background: #f8f9fa; border-radius: 7px; padding: 10px 13px;
+      margin-bottom: 12px; font-size: .79rem; color: #555;
+      word-break: break-all; line-height: 1.8;
+    }
+
+    /* 確認モーダル */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 100;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 12px; padding: 24px;
+      max-width: 420px; width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    }
+    .modal h2 { font-size: 1rem; margin-bottom: 8px; }
+    .modal-body { font-size: .86rem; color: #555; margin-bottom: 16px; line-height: 1.7; }
+    .modal-sm { font-size: .82rem; background: #f8f9fa; border-radius: 7px; padding: 10px 12px; margin-bottom: 16px; }
+    .modal-sm dt { font-weight: 700; color: #555; }
+    .modal-sm dd { color: #222; margin-bottom: 4px; }
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-btns button { flex: 1; padding: 11px; font-size: .9rem; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; }
+    .m-cancel  { background: #f0f2f5; color: #555; }
+    .m-confirm { background: #d4edda; color: #166534; }
+
+    @media (max-width: 560px) {
+      main { margin: 16px auto; }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ステータスバー -->
+<div id="statusBar">
+  <div class="item">
+    credentials: <span id="stCred" class="ng">確認中</span>
+  </div>
+  <div class="item">
+    token: <span id="stToken" class="ng">確認中</span>
+  </div>
+  <div id="authCmd" class="hidden">
+    <code>cd /Users/koutayamakawa/web-tools/gdrive-merger &amp;&amp; npm run auth</code>
+    <button class="copy-btn" onclick="copyAuth()">コピー</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- 操作カード -->
+  <div class="card">
+    <label for="folderInput">フォルダ URL または ID（空欄 = My Drive 直下）</label>
+    <input type="text" id="folderInput" placeholder="https://drive.google.com/drive/folders/…" oninput="onInput()">
+    <div id="inputMsg"></div>
+    <div class="btn-row">
+      <div class="btn-wrap">
+        <button class="btn-scan" id="btnScan" onclick="doScan()" disabled>🔍 スキャン</button>
+        <div class="btn-note" id="noteScan"></div>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn-dryrun" id="btnDryRun" onclick="doDryRun()" disabled>📋 dry-run</button>
+        <div class="btn-note" id="noteDryRun"></div>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn-apply" id="btnApply" onclick="openModal()" disabled>🚀 実行</button>
+        <div class="btn-note" id="noteApply">dry-run が先</div>
+      </div>
+    </div>
+    <div id="runStatus"></div>
+  </div>
+
+  <!-- スキャン結果 -->
+  <div class="card result-card" id="scanCard">
+    <div class="section-label">スキャン結果</div>
+    <div id="scanBody"></div>
+  </div>
+
+  <!-- dry-run / apply 結果 -->
+  <div class="card result-card" id="actionCard">
+    <div class="section-label" id="actionLabel"></div>
+    <div class="badges" id="badges"></div>
+    <div id="pathsArea"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>種別</th><th>ファイル名</th><th>移動元</th><th>移動先</th><th>理由</th></tr></thead>
+        <tbody id="actionBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- apply 確認モーダル -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <h2>⚠️ 実行確認</h2>
+    <div class="modal-body">ファイルを移動します。削除はしません。</div>
+    <dl class="modal-sm" id="modalSm"></dl>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="m-confirm" onclick="doApply()">実行する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let authReady = false, dryRunDone = false, dryRunSummary = null, folderId = null, running = false;
+
+// ===== 認証状態 =====
+async function checkStatus() {
+  try {
+    const d = await (await fetch('/status')).json();
+    $('stCred').textContent  = d.credentialsExists ? 'OK' : 'NG';
+    $('stCred').className    = d.credentialsExists ? 'ok' : 'ng';
+    $('stToken').textContent = d.tokenExists ? 'OK' : 'NG';
+    $('stToken').className   = d.tokenExists ? 'ok' : 'ng';
+    authReady = d.authReady;
+    $('authCmd').className = d.authReady ? 'hidden' : '';
+    sync();
+  } catch { /* サーバー未起動時は無視 */ }
+}
+
+// ===== ボタン同期 =====
+function sync() {
+  $('btnScan').disabled   = !authReady || running;
+  $('btnDryRun').disabled = !authReady || running;
+  $('btnApply').disabled  = !authReady || !dryRunDone || running;
+  $('noteScan').textContent   = !authReady ? '認証前' : '';
+  $('noteDryRun').textContent = !authReady ? '認証前' : '';
+  $('noteApply').textContent  = !authReady ? '認証前' : !dryRunDone ? 'dry-run が先' : '';
+}
+
+// ===== フォルダ入力 =====
+function extractId(s) {
+  const m = s.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  if (/^[a-zA-Z0-9_-]{20,}$/.test(s)) return s;
+  return null;
+}
+
+function onInput() {
+  const raw = $('folderInput').value.trim();
+  const msg = $('inputMsg');
+  $('folderInput').className = '';
+  msg.className = '';
+  msg.textContent = '';
+  if (!raw) { folderId = null; return; }
+  const id = extractId(raw);
+  if (!id) {
+    folderId = undefined;
+    $('folderInput').className = 'err';
+    msg.className = 'err';
+    msg.textContent = 'フォルダ URL または ID が不正です';
+  } else {
+    folderId = id;
+    $('folderInput').className = 'ok';
+    if (id !== raw) { msg.className = 'ok'; msg.textContent = `ID: ${id}`; }
+  }
+}
+
+// ===== API =====
+async function api(endpoint) {
+  if (folderId === undefined) throw new Error('フォルダ URL または ID を確認してください');
+  const r = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rootFolderId: folderId ?? '' }),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || r.statusText);
+  return d;
+}
+
+function setRun(s, msg) {
+  const el = $('runStatus');
+  el.className = s;
+  el.innerHTML = s === 'running'
+    ? `<div class="spinner"></div>${msg}`
+    : `${s === 'success' ? '✅' : '❌'} ${msg}`;
+}
+
+// ===== スキャン =====
+async function doScan() {
+  running = true; sync();
+  setRun('running', 'スキャン中...');
+  hide(['scanCard','actionCard']);
+  try {
+    const { groups } = await api('/scan');
+    renderScan(groups);
+    setRun('success', `重複グループ ${groups.length} 件`);
+  } catch(e) { setRun('error', e.message); }
+  finally { running = false; sync(); }
+}
+
+function renderScan(groups) {
+  if (!groups.length) {
+    $('scanBody').innerHTML = '<p style="color:#888;padding:6px 0">重複なし</p>';
+  } else {
+    $('scanBody').innerHTML = groups.map(g => `
+      <div class="group-card">
+        <div class="group-hd">${esc(g.key)} <span class="group-cnt">${g.folders.length}</span></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>フォルダ名</th><th>番号</th><th>更新日時</th><th>ID</th></tr></thead>
+          <tbody>${g.folders.sort((a,b)=>new Date(b.modifiedTime)-new Date(a.modifiedTime)).map((f,i)=>`
+            <tr>
+              <td>${esc(f.name)}${i===0?' <span class="tag tag-MOVE">正規</span>':''}</td>
+              <td>${esc(f.caseNumber)}</td>
+              <td>${fmtDate(f.modifiedTime)}</td>
+              <td style="font-size:.73rem;color:#888">${esc(f.id)}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>
+      </div>`).join('');
+  }
+  show('scanCard');
+}
+
+// ===== dry-run =====
+async function doDryRun() {
+  running = true; sync();
+  setRun('running', 'dry-run 実行中...');
+  hide(['actionCard']);
+  try {
+    const r = await api('/dry-run');
+    dryRunDone = true; dryRunSummary = r.summary;
+    renderAction(r, false);
+    setRun('success', `${r.summary.total} 件の操作を計画`);
+  } catch(e) { setRun('error', e.message); }
+  finally { running = false; sync(); }
+}
+
+// ===== apply =====
+function openModal() {
+  const s = dryRunSummary;
+  $('modalSm').innerHTML = `<dt>移動</dt><dd>${s.move} 件</dd><dt>スキップ</dt><dd>${s.skipExact} 件</dd><dt>要確認退避</dt><dd>${s.quarantine} 件</dd><dt>ゴミ箱（統合元フォルダ）</dt><dd>${s.trash} 件</dd>`;
+  $('modal').classList.add('open');
+}
+function closeModal() { $('modal').classList.remove('open'); }
+
+async function doApply() {
+  closeModal();
+  running = true; sync();
+  setRun('running', '実行中...');
+  hide(['actionCard']);
+  try {
+    const r = await api('/apply');
+    dryRunDone = false; dryRunSummary = null;
+    renderAction(r, true);
+    setRun('success', `完了 — 移動 ${r.summary.move} / 退避 ${r.summary.quarantine}`);
+  } catch(e) { setRun('error', e.message); }
+  finally { running = false; sync(); }
+}
+
+// ===== 結果レンダリング =====
+function renderAction(r, isApply) {
+  $('actionLabel').textContent = isApply ? '実行結果' : 'dry-run 計画';
+  const s = r.summary;
+  $('badges').innerHTML = `
+    <span class="badge b-move">移動${isApply?'':'予定'} ${s.move}</span>
+    <span class="badge b-skip">スキップ ${s.skipExact}</span>
+    <span class="badge b-quar">要確認 ${s.quarantine}</span>
+    <span class="badge b-trash">ゴミ箱 ${s.trash}</span>
+    <span class="badge b-tot">計 ${s.total}</span>`;
+  $('pathsArea').innerHTML = r.jsonPath
+    ? `<div class="paths">JSON: ${esc(r.jsonPath)}<br>CSV: ${esc(r.csvPath)}</div>` : '';
+  $('actionBody').innerHTML = r.actions.length
+    ? r.actions.map(a=>`<tr>
+        <td><span class="tag tag-${a.type}">${lbl(a.type)}</span></td>
+        <td>${esc(a.fileName)}</td>
+        <td style="color:#555">${esc(a.fromFolderPath)}</td>
+        <td style="color:#555">${esc(a.toFolderPath||'—')}</td>
+        <td style="color:#777;font-size:.75rem">${esc(a.reason)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:18px">操作なし</td></tr>';
+  show('actionCard');
+}
+
+// ===== utils =====
+function show(id) { $(id).style.display = 'block'; }
+function hide(ids) { ids.forEach(id => $(id).style.display = 'none'); }
+function lbl(t) { return {MOVE:'移動',SKIP_EXACT:'スキップ',QUARANTINE:'要確認'}[t]??t; }
+function fmtDate(iso) {
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function copyAuth() {
+  navigator.clipboard.writeText('cd /Users/koutayamakawa/web-tools/gdrive-merger && npm run auth');
+}
+
+$('modal').addEventListener('click', e => { if(e.target===$('modal')) closeModal(); });
+checkStatus();
+</script>
+</body>
+</html>

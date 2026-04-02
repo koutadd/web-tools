@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASE 02 眼精疲労・夕方の頭痛 | eye care lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+      color: #111;
+      background: #fff;
+      line-height: 1.75;
+    }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .btn-outline {
+      border: 1px solid #111;
+      color: #111;
+      transition: all 0.2s;
+      display: inline-block;
+      padding: 14px 32px;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+    .btn-outline:hover { background: #111; color: white; }
+    .timeline-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #2563EB;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<!-- Nav -->
+<nav style="position:sticky; top:0; z-index:100; background:white; border-bottom:1px solid #e5e7eb; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+  <a href="aicare-top-prototype.html" style="font-size:13px; color:#64748b; text-decoration:none; display:flex; align-items:center; gap:6px;">
+    ← eye care lab
+  </a>
+  <div style="font-size:11px; letter-spacing:0.2em; color:#94a3b8;">CASE STUDY</div>
+  <div style="display:flex; gap:16px; font-size:12px;">
+    <a href="aicare-case-01.html" style="color:#94a3b8; text-decoration:none;">CASE 01</a>
+    <a href="aicare-case-03.html" style="color:#94a3b8; text-decoration:none;">CASE 03</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section style="background:linear-gradient(135deg,#f0f4fa 0%,#e8eef7 100%); padding:80px 24px 72px;">
+  <div style="max-width:720px; margin:0 auto;">
+    <div style="font-size:11px; letter-spacing:0.25em; color:#2563EB; margin-bottom:16px;">CASE  02</div>
+    <h1 style="font-size:clamp(32px,5vw,52px); font-weight:700; color:#1e293b; letter-spacing:-0.03em; line-height:1.2; margin-bottom:20px;">眼精疲労・夕方の頭痛</h1>
+    <p style="font-size:16px; color:#475569; line-height:1.8; max-width:560px;">PC作業が続くと、夕方4時頃から目がかすみ、こめかみが痛くなる。目薬では一時しのぎにしかならない。その疲れ、目の根本からほぐせます。</p>
+  </div>
+</section>
+
+<!-- Profile -->
+<section style="padding:64px 24px; border-bottom:1px solid #f1f5f9;">
+  <div style="max-width:720px; margin:0 auto;">
+    <span class="section-label">CLIENT PROFILE</span>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:24px; margin-top:16px;">
+      <div style="border:1px solid #e5e7eb; padding:20px 24px;">
+        <div style="font-size:11px; color:#94a3b8; letter-spacing:0.1em; margin-bottom:6px;">年齢・性別</div>
+        <div style="font-size:18px; font-weight:700; color:#1e293b;">43歳・男性</div>
+      </div>
+      <div style="border:1px solid #e5e7eb; padding:20px 24px;">
+        <div style="font-size:11px; color:#94a3b8; letter-spacing:0.1em; margin-bottom:6px;">職業</div>
+        <div style="font-size:18px; font-weight:700; color:#1e293b;">IT系エンジニア</div>
+      </div>
+      <div style="border:1px solid #e5e7eb; padding:20px 24px;">
+        <div style="font-size:11px; color:#94a3b8; letter-spacing:0.1em; margin-bottom:6px;">PC使用時間</div>
+        <div style="font-size:18px; font-weight:700; color:#1e293b;">1日 10〜12時間</div>
+      </div>
+      <div style="border:1px solid #e5e7eb; padding:20px 24px;">
+        <div style="font-size:11px; color:#94a3b8; letter-spacing:0.1em; margin-bottom:6px;">主な症状</div>
+        <div style="font-size:18px; font-weight:700; color:#1e293b;">夕方の頭痛・目のかすみ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Problem -->
+<section style="padding:64px 24px; border-bottom:1px solid #f1f5f9;">
+  <div style="max-width:720px; margin:0 auto;">
+    <span class="section-label">PROBLEM</span>
+    <h2 style="font-size:clamp(20px,3vw,30px); font-weight:700; color:#1e293b; letter-spacing:-0.02em; margin-bottom:24px;">お悩みの詳細</h2>
+    <div style="background:#f8fafc; border-left:3px solid #2563EB; padding:24px 28px; margin-bottom:32px;">
+      <p style="font-size:15px; color:#334155; line-height:1.85; margin:0;">「毎日PC画面を10時間以上見てる。夕方4時を過ぎると、もう画面がつらい。眼科に行っても"異常なし"。目薬だけもらって帰ってくる。でも、明らかに昔と違う。夜になると頭まで痛くなって、仕事にならない。」</p>
+    </div>
+    <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;">
+      <li style="display:flex; gap:12px; align-items:flex-start; font-size:14px; color:#475569;">
+        <span style="color:#2563EB; font-weight:700; flex-shrink:0;">✓</span>夕方になると目がかすむ・ぼやける
+      </li>
+      <li style="display:flex; gap:12px; align-items:flex-start; font-size:14px; color:#475569;">
+        <span style="color:#2563EB; font-weight:700; flex-shrink:0;">✓</span>こめかみ〜後頭部にかけての頭痛
+      </li>
+      <li style="display:flex; gap:12px; align-items:flex-start; font-size:14px; color:#475569;">
+        <span style="color:#2563EB; font-weight:700; flex-shrink:0;">✓</span>目薬を1日4〜5回使っているが根本解決にならない
+      </li>
+      <li style="display:flex; gap:12px; align-items:flex-start; font-size:14px; color:#475569;">
+        <span style="color:#2563EB; font-weight:700; flex-shrink:0;">✓</span>眼科では「異常なし」と言われ続けている
+      </li>
+      <li style="display:flex; gap:12px; align-items:flex-start; font-size:14px; color:#475569;">
+        <span style="color:#2563EB; font-weight:700; flex-shrink:0;">✓</span>肩こり・首の張りも常に感じている
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Approach -->
+<section style="padding:64px 24px; border-bottom:1px solid #f1f5f9;">
+  <div style="max-width:720px; margin:0 auto;">
+    <span class="section-label">APPROACH</span>
+    <h2 style="font-size:clamp(20px,3vw,30px); font-weight:700; color:#1e293b; letter-spacing:-0.02em; margin-bottom:24px;">eye care lab のアプローチ</h2>
+    <p style="font-size:14px; color:#64748b; line-height:1.85; margin-bottom:32px;">眼精疲労は、眼球まわりの筋肉の過緊張・骨格バランスの乱れ・自律神経の乱れが複合的に絡み合って起こります。目薬は乾燥を和らげますが、筋肉の緊張は取り除けません。eye care labでは目の整体で根本原因にアプローチします。</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+      <div style="border:1px solid #e5e7eb; padding:24px;">
+        <div style="font-size:11px; color:#2563EB; letter-spacing:0.15em; margin-bottom:10px;">STEP 01</div>
+        <div style="font-size:15px; font-weight:700; color:#1e293b; margin-bottom:8px;">眼球筋の整体</div>
+        <p style="font-size:12px; color:#64748b; line-height:1.7; margin:0;">6本の外眼筋のアンバランスを解消。眼球の動きをスムーズにします。</p>
+      </div>
+      <div style="border:1px solid #e5e7eb; padding:24px;">
+        <div style="font-size:11px; color:#2563EB; letter-spacing:0.15em; margin-bottom:10px;">STEP 02</div>
+        <div style="font-size:15px; font-weight:700; color:#1e293b; margin-bottom:8px;">骨格バランス調整</div>
+        <p style="font-size:12px; color:#64748b; line-height:1.7; margin:0;">頸椎・肩甲骨・眼窩骨格のバランスを整え、目への負担を軽減。</p>
+      </div>
+      <div style="border:1px solid #e5e7eb; padding:24px;">
+        <div style="font-size:11px; color:#2563EB; letter-spacing:0.15em; margin-bottom:10px;">STEP 03</div>
+        <div style="font-size:15px; font-weight:700; color:#1e293b; margin-bottom:8px;">自律神経ケア</div>
+        <p style="font-size:12px; color:#64748b; line-height:1.7; margin:0;">目の疲れと連動した自律神経の乱れにもアプローチし、夜の回復力を高めます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section style="padding:64px 24px; border-bottom:1px solid #f1f5f9;">
+  <div style="max-width:720px; margin:0 auto;">
+    <span class="section-label">TIMELINE</span>
+    <h2 style="font-size:clamp(20px,3vw,30px); font-weight:700; color:#1e293b; letter-spacing:-0.02em; margin-bottom:32px;">改善までの流れ</h2>
+    <div style="display:flex; flex-direction:column; gap:0;">
+
+      <div style="display:flex; gap:20px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="timeline-dot"></div>
+          <div style="width:1px; background:#e2e8f0; flex:1; min-height:48px;"></div>
+        </div>
+        <div style="padding-bottom:36px;">
+          <div style="font-size:11px; color:#2563EB; letter-spacing:0.1em; margin-bottom:4px;">1回目</div>
+          <div style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">初回体験コース ¥8,980</div>
+          <p style="font-size:13px; color:#64748b; margin:0; line-height:1.75;">眼球筋・骨格バランスのアセスメント。施術後「目が軽くなった」と即日実感。</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="timeline-dot"></div>
+          <div style="width:1px; background:#e2e8f0; flex:1; min-height:48px;"></div>
+        </div>
+        <div style="padding-bottom:36px;">
+          <div style="font-size:11px; color:#2563EB; letter-spacing:0.1em; margin-bottom:4px;">1〜4週目</div>
+          <div style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">継続ケアプラン 週1〜2回</div>
+          <p style="font-size:13px; color:#64748b; margin:0; line-height:1.75;">外眼筋の緊張が徐々にほぐれ、夕方の頭痛が出始める時刻が後ろにずれ始める。</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="timeline-dot"></div>
+          <div style="width:1px; background:#e2e8f0; flex:1; min-height:48px;"></div>
+        </div>
+        <div style="padding-bottom:36px;">
+          <div style="font-size:11px; color:#2563EB; letter-spacing:0.1em; margin-bottom:4px;">1.5ヶ月目</div>
+          <div style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">夕方の疲れが大幅軽減</div>
+          <p style="font-size:13px; color:#64748b; margin:0; line-height:1.75;">夕方4時でも画面を見続けられるようになった。頭痛の頻度が週5日→週1〜2日に。</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="timeline-dot"></div>
+        </div>
+        <div style="padding-bottom:0;">
+          <div style="font-size:11px; color:#2563EB; letter-spacing:0.1em; margin-bottom:4px;">2ヶ月目〜</div>
+          <div style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">セルフケア習慣化・メンテナンスへ</div>
+          <p style="font-size:13px; color:#64748b; margin:0; line-height:1.75;">自宅でのアイトレーニングを習慣化。月1〜2回のメンテナンスで良い状態をキープ。</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Result -->
+<section style="padding:64px 24px; background:#f0f4fa; border-bottom:1px solid #e2e8f0;">
+  <div style="max-width:720px; margin:0 auto; text-align:center;">
+    <span class="section-label">RESULT</span>
+    <h2 style="font-size:clamp(20px,3vw,30px); font-weight:700; color:#1e293b; letter-spacing:-0.02em; margin-bottom:32px;">2ヶ月後の変化</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; text-align:left;">
+      <div style="background:white; padding:24px; border:1px solid #dbeafe;">
+        <div style="font-size:28px; font-weight:700; color:#2563EB; margin-bottom:6px;">週1〜2日</div>
+        <div style="font-size:12px; color:#64748b; line-height:1.6;">頭痛の頻度（来院前：ほぼ毎日）</div>
+      </div>
+      <div style="background:white; padding:24px; border:1px solid #dbeafe;">
+        <div style="font-size:28px; font-weight:700; color:#2563EB; margin-bottom:6px;">0本</div>
+        <div style="font-size:12px; color:#64748b; line-height:1.6;">目薬の使用本数（来院前：月3〜4本）</div>
+      </div>
+      <div style="background:white; padding:24px; border:1px solid #dbeafe;">
+        <div style="font-size:28px; font-weight:700; color:#2563EB; margin-bottom:6px;">+2h</div>
+        <div style="font-size:12px; color:#64748b; line-height:1.6;">夜まで集中できる時間の延長</div>
+      </div>
+    </div>
+    <blockquote style="margin:40px 0 0; padding:28px 32px; background:white; border-left:3px solid #2563EB; text-align:left;">
+      <p style="font-size:14px; color:#334155; line-height:1.85; margin:0 0 12px;">"夕方になると頭が痛くて、もう仕事にならない日が続いていた。ここに通って2ヶ月で、夕方でも普通に仕事できるようになった。目薬も使わなくなりました。"</p>
+      <cite style="font-size:12px; color:#94a3b8;">— K.M. さん（43歳・男性）</cite>
+    </blockquote>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:72px 24px; text-align:center;">
+  <div style="max-width:560px; margin:0 auto;">
+    <span class="section-label">FIRST STEP</span>
+    <h2 style="font-size:clamp(20px,3vw,30px); font-weight:700; color:#1e293b; letter-spacing:-0.02em; margin-bottom:12px;">まず、初回体験から。</h2>
+    <p style="font-size:14px; color:#64748b; margin-bottom:32px;">カウンセリング・アイチェック・施術体験をすべて含んだ初回体験コースで、目の状態を確認してみてください。</p>
+    <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+      <a href="aicare-top-prototype.html#reserve" class="btn-outline">初回体験を予約する（¥8,980）</a>
+      <a href="aicare-top-prototype.html" style="font-size:13px; color:#94a3b8; text-decoration:none; display:inline-flex; align-items:center; padding:14px 20px;">← トップに戻る</a>
+    </div>
+  </div>
+</section>
+
+<!-- Other Cases -->
+<section style="padding:48px 24px 72px; background:#f8fafc; border-top:1px solid #e5e7eb;">
+  <div style="max-width:720px; margin:0 auto;">
+    <div style="font-size:11px; letter-spacing:0.2em; color:#94a3b8; margin-bottom:20px; text-align:center;">OTHER CASES</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <a href="aicare-case-01.html" style="border:1px solid #e5e7eb; padding:24px; background:white; text-decoration:none; display:flex; flex-direction:column; gap:8px;">
+        <div style="font-size:10px; letter-spacing:0.2em; color:#94a3b8;">CASE  01</div>
+        <div style="font-size:16px; font-weight:700; color:#1e293b;">老眼・手元のぼやけ</div>
+        <div style="font-size:11px; color:#2563EB;">詳しく見る →</div>
+      </a>
+      <a href="aicare-case-03.html" style="border:1px solid #e5e7eb; padding:24px; background:white; text-decoration:none; display:flex; flex-direction:column; gap:8px;">
+        <div style="font-size:10px; letter-spacing:0.2em; color:#94a3b8;">CASE  03</div>
+        <div style="font-size:16px; font-weight:700; color:#1e293b;">近視の進行・視力低下</div>
+        <div style="font-size:11px; color:#2563EB;">詳しく見る →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

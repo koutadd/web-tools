@@ -1,0 +1,16 @@
+[      15ms] Uncaught ReferenceError: socket is not defined
+    at Xt.window.onbeforeunload (https://tag.kuzen.io/?tag_tracking_code=KT_h5bmAgO2Ko1lgQ==832&isLineChatApplication=1:1:41382)
+[    1319ms] [WARNING] Allow attribute will take precedence over 'allowfullscreen'. @ https://www.the-melon.com/online-program/:657
+[    2153ms] [WARNING] Unable to locate Google Analytics gtag function. @ https://extend.vimeocdn.com/ga4/103668344.js:1
+[    2213ms] [ERROR] Attestation check for Attribution Reporting on https://www.google-analytics.com failed. @ https://www.the-melon.com/online-program/:0
+[    2387ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.the-melon.com/online-program/:0
+[    9195ms] [WARNING] jQuery.Deferred exception: Cannot read properties of undefined (reading 'includes') TypeError: Cannot read properties of undefined (reading 'includes')
+    at urlParametersKeep (https://www.the-melon.com/wp-content/themes/melon-theme/_assets/js/init.js:437:12)
+    at HTMLDocument.<anonymous> (https://www.the-melon.com/wp-content/themes/melon-theme/_assets/js/init.js:81:2)
+    at j (https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js:2:29568)
+    at k (https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js:2:29882) undefined @ https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js:1
+[    9205ms] Uncaught TypeError: Cannot read properties of undefined (reading 'includes')
+    at urlParametersKeep (https://www.the-melon.com/wp-content/themes/melon-theme/_assets/js/init.js:436:11)
+    at <anonymous> (https://www.the-melon.com/wp-content/themes/melon-theme/_assets/js/init.js:80:1)
+    at j (https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js:1:29567)
+    at k (https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js:1:29881)

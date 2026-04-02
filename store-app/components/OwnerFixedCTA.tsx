@@ -50,6 +50,7 @@ export default function OwnerFixedCTA() {
           bottom: 0; left: 0; right: 0;
           z-index: 40;
           padding: 10px 16px 16px;
+          padding-bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 10px));
           background: white;
           border-top: 1px solid #e5e7eb;
           box-shadow: 0 -4px 16px rgba(0,0,0,0.08);

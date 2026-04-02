@@ -283,6 +283,7 @@ function PlayContent() {
         background: 'white',
         borderBottom: '1px solid #e5e7eb',
         padding: '10px 16px',
+        paddingTop: 'max(10px, calc(env(safe-area-inset-top, 0px) + 10px))',
         display: 'flex',
         alignItems: 'center',
         gap: 12,
@@ -319,7 +320,7 @@ function PlayContent() {
       </div>
 
       {/* ─── モック オーナーページ ─── */}
-      <div style={{ paddingTop: 54, paddingBottom: 230 }}>
+      <div style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 54px)', paddingBottom: 230 }}>
 
         {/* 店舗ヘッダー */}
         <div style={{

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bose Fellows – 研究を再定義する</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== BASE RESET ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-family: sans-serif; -webkit-text-size-adjust: 100%; }
+body { margin: 0; overflow-x: hidden; }
+article, aside, footer, header, main, nav, section { display: block; }
+img { border: 0; max-width: 100%; display: block; }
+ul { list-style: none; margin: 0; padding: 0; }
+a { text-decoration: none; }
+h1,h2,h3,h4,h5,h6 { margin: 0; }
+
+/* ===== TYPOGRAPHY ===== */
+body, button, input, select, textarea {
+  font-family: 'Noto Sans JP', 'Raleway', sans-serif;
+  font-weight: 400;
+  color: #2b2c75;
+  line-height: 1.75;
+  font-size: 16px;
+}
+p { margin: 0 0 1.5em; }
+b, strong { font-weight: 700; }
+h1,h2,h3,h4,h5,h6 {
+  font-family: 'Noto Sans JP', 'Raleway', sans-serif;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 .5em;
+  color: #2b2c75;
+}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h5 { font-size: 1.125rem; }
+a { color: #2b2c75; }
+a:hover { color: #1439ff; }
+
+/* ===== LAYOUT ===== */
+.inner-wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  padding: 0 50px;
+}
+.clearfix::after { content: ''; display: table; clear: both; }
+
+/* ===== HEADER ===== */
+.site-header {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  z-index: 100;
+  transition: background 0.3s, border 0.3s;
+}
+.site-header .inner-wrap {
+  padding: 0 52px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+.site-header.scrolled {
+  background: #fff;
+  border-bottom: 2px solid #1439ff;
+}
+
+/* Logo */
+.site-branding {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 12px;
+  z-index: 2;
+}
+.site-branding a {
+  display: inline-block;
+}
+.site-branding img {
+  height: 58px;
+  width: auto;
+  transition: filter 0.3s;
+}
+.site-header.scrolled .site-branding img {
+  /* switch to dark logo */
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(200deg) brightness(0.3);
+}
+.site-branding .logo-dark { display: none; }
+.site-branding .logo-light { display: block; }
+.site-header.scrolled .site-branding .logo-dark { display: block; }
+.site-header.scrolled .site-branding .logo-light { display: none; }
+
+/* Navigation */
+.header-left, .header-right {
+  display: flex;
+  align-items: flex-end;
+}
+.header-left { float: left; }
+.header-right { float: right; padding-right: 50px; position: relative; }
+
+.nav-menu { display: flex; gap: 0; }
+.nav-menu a {
+  color: #fff;
+  display: inline-block;
+  padding: 2.3rem 0.75rem 1.25rem;
+  border-bottom: 5px solid transparent;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: border-color 0.2s;
+}
+.nav-menu a:hover { border-bottom-color: #1439ff; color: #fff; }
+.site-header.scrolled .nav-menu a { color: #2b2c75; }
+.site-header.scrolled .nav-menu a:hover { border-bottom-color: #1439ff; color: #2b2c75; }
+.header-right .nav-menu a {
+  padding-top: 2.875rem;
+  font-size: 0.8125rem;
+}
+
+/* Search icon */
+.search-icon-wrap {
+  position: absolute;
+  top: 20px; right: 0;
+  color: #fff;
+  cursor: pointer;
+  border: solid 2px currentColor;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+}
+.site-header.scrolled .search-icon-wrap { color: #2b2c75; }
+
+/* ===== HERO PANELS ===== */
+.h-panels { width: 100%; position: relative; height: 100vh; overflow: hidden; }
+.h-panel-l, .h-panel-r {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #2b2c75;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+.h-panel-l { left: 0; background-image: url('https://bosefellows.mit.edu/wp-content/themes/bosefellows/images/ha-left.jpg'); }
+.h-panel-r { right: 0; background-image: url('https://bosefellows.mit.edu/wp-content/themes/bosefellows/images/ha-right.jpg'); }
+
+.h-panel-content {
+  font-family: 'Noto Sans JP', 'Raleway', sans-serif;
+  font-weight: 700;
+  left: 0;
+  line-height: 1.25;
+  margin: 0;
+  padding: 20px;
+  position: absolute;
+  text-align: center;
+  top: 160px;
+  width: 100%;
+  z-index: 5;
+  font-size: 9rem;
+  pointer-events: none;
+}
+.h-panel-content h2 {
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 60px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.h-panel-content a {
+  color: #fff;
+  border-bottom: 8px solid transparent;
+  display: block;
+  pointer-events: all;
+  transition: border-color 0.2s;
+}
+.h-panel-content a:hover { border-color: #1439ff; color: #fff; }
+
+/* ===== FEATURED IMAGE ===== */
+.featured-image {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #2b2c75;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  z-index: -1;
+}
+.featured-image::after {
+  content: '';
+  width: 100%;
+  height: 35%;
+  position: absolute;
+  bottom: 0; left: 0;
+  background: linear-gradient(to top, #19192a 0%, rgba(25,25,42,0) 100%);
+  z-index: 1;
+}
+.fi-grad {
+  position: absolute;
+  height: 150px;
+  top: 0; left: 0;
+  width: 100%;
+  background: linear-gradient(to bottom, #19192a 0%, rgba(25,25,42,0) 100%);
+}
+
+/* ===== PAGE TITLE ===== */
+.page-header {
+  height: 100vh;
+  padding-top: 62vh;
+  padding-left: 62px;
+  position: relative;
+  z-index: 2;
+}
+.page-title {
+  margin: 0;
+  font-family: 'Noto Sans JP', 'Raleway', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  font-size: 4.5rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+/* ===== MAIN CONTENT ===== */
+.entry-content {
+  background: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+/* Intro */
+.home-intro {
+  clear: both;
+  line-height: 1.731;
+  padding: 100px 11% 150px;
+  text-align: center;
+  font-size: 1.625rem;
+}
+.more {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.more a {
+  color: #1439ff;
+  border-bottom: 2px solid #2b2c75;
+  padding: 4px;
+  white-space: nowrap;
+}
+.more a:hover { color: #2b2c75; border-bottom-color: #1439ff; }
+
+/* Section head */
+.section-head {
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 2.5rem;
+}
+
+/* ===== COMPLETED PROJECTS ===== */
+.home-completed-projects {
+  position: relative;
+  background: linear-gradient(to left, #fff 50%, #e9edf4 50%);
+  padding: 25px 7.5%;
+}
+.home-completed-projects .inner-wrap { max-width: 1024px; }
+
+.home-completed-projects .top {
+  height: 550px;
+  overflow: hidden;
+  position: relative;
+}
+.home-completed-projects .right {
+  float: right;
+  width: 56%;
+}
+.home-completed-projects .right img {
+  width: 100%;
+  border-top: 4px solid #1439ff;
+}
+.home-completed-projects .post-info {
+  margin: 25px 0 0 20%;
+}
+.home-completed-projects .researcher-name {
+  font-weight: 700;
+}
+.home-completed-projects .project-title {
+  margin-top: 100px;
+  margin-bottom: 20px;
+  font-size: 1.313rem;
+}
+.home-completed-projects .project-description {
+  font-weight: 600;
+  width: 40%;
+  font-size: 2rem;
+}
+.home-completed-projects .the-excerpt {
+  margin: 25px 0 0 5%;
+  width: 28%;
+  font-size: 1rem;
+}
+.hangquote-left::before {
+  content: '\201C';
+  font-size: 1.5em;
+  line-height: 0;
+  vertical-align: -0.3em;
+  margin-right: 0.1em;
+}
+
+/* ===== PROJECT THUMBNAIL CARDS ===== */
+.cards-wrap { background-color: #e9edf4; }
+.cards {
+  padding: 80px 0;
+  overflow: hidden;
+  position: relative;
+}
+.cards-inner {
+  display: flex;
+  padding-left: 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 0;
+}
+.cards-inner::-webkit-scrollbar { display: none; }
+
+.card {
+  background-color: #fff;
+  border-bottom: 3px solid #2b2c75;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0 0 50px 40px;
+  padding: 0 6px;
+  position: relative;
+  width: 155px;
+  min-height: 180px;
+  text-align: center;
+  display: block;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover, .card.card-active {
+  box-shadow: 1px 1px 8px rgba(0,0,0,0.3);
+  border-color: #1439ff;
+}
+.card .feat-image {
+  border-radius: 50%;
+  width: 86px;
+  height: 86px;
+  overflow: hidden;
+  margin: -36px auto 0;
+  background-size: cover;
+  background-position: center;
+}
+.card .project-title {
+  border: 0;
+  color: #1439ff;
+  display: block;
+  text-align: center;
+  margin: 0;
+  padding: 20px 10px 0;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.card .project-title span { border-bottom: 1px solid #2b2c75; }
+.card .researcher-name {
+  color: #2b2c75;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  padding: 12px 0 0;
+  font-size: 0.875rem;
+}
+
+.cards-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px 40px;
+}
+.cards-nav button {
+  background: transparent;
+  border: none;
+  color: #2b2c75;
+  cursor: pointer;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 0;
+}
+.cards-nav button:hover { color: #1439ff; }
+
+/* ===== NEWS SECTION ===== */
+.home-news { position: relative; clear: both; }
+.home-news .news-head {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to bottom, #19192a 0%, rgba(25,25,42,0) 100%);
+}
+.home-news .news-head h3 {
+  position: absolute;
+  top: 25px; left: 40px;
+  color: #fff;
+  font-size: 1.25rem;
+}
+.home-news .news-head .more {
+  position: absolute;
+  top: 30px; right: 40px;
+}
+.home-news .news-head .more a { color: #fff; border-color: #1439ff; }
+
+.home-news .news-articles { display: flex; }
+.home-news article {
+  flex: 0 0 50%;
+  height: 550px;
+  padding: 350px 5% 0;
+  position: relative;
+  background-color: #2b2c75;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.home-news article::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(25,25,42,0.9) 0%, rgba(25,25,42,0.1) 60%, transparent 100%);
+  z-index: 1;
+}
+.home-news article .entry-meta,
+.home-news article .entry-title,
+.home-news article .more {
+  position: relative;
+  z-index: 2;
+}
+.home-news article .entry-meta,
+.home-news article .entry-meta a { color: #fff; font-size: 0.875rem; }
+.home-news article .entry-title {
+  margin-bottom: 25px;
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+.home-news article .entry-title a { color: #fff; }
+.home-news article .entry-title a:hover { color: #d1d1d1; }
+.home-news .more.view-article a { color: #fff; border-color: #1439ff; }
+
+/* ===== AWARDED PROJECTS ===== */
+.home-new-projects {
+  position: relative;
+  background: linear-gradient(to right, #fff 50%, #e9edf4 50%);
+  padding: 150px 7.5% 25px;
+}
+.home-new-projects .inner-wrap { max-width: 1024px; }
+.home-new-projects .top {
+  height: 550px;
+  overflow: hidden;
+  position: relative;
+}
+.home-new-projects .left {
+  float: left;
+  width: 56%;
+}
+.home-new-projects .left img {
+  width: 100%;
+  border-top: 4px solid #1439ff;
+}
+.home-new-projects .right {
+  float: right;
+  width: 44%;
+  position: relative;
+}
+.home-new-projects .project-title {
+  margin: 20px 0 20px 20%;
+  font-size: 1.313rem;
+}
+.home-new-projects .post-info {
+  margin: 25px 0 0 20%;
+}
+.home-new-projects .researcher-name { font-weight: 700; }
+.home-new-projects .project-description {
+  margin: 0 20%;
+  font-size: 1rem;
+}
+.home-new-projects .the-excerpt {
+  font-weight: 600;
+  margin: 25px 0 0 7%;
+  font-size: 1.5rem;
+}
+.home-new-projects .section-head { margin-bottom: 60px; }
+
+/* ===== DR. BOSE SECTION ===== */
+.home-bottom {
+  clear: both;
+  background: linear-gradient(to right, #fff 50%, #e9edf4 50%);
+  position: relative;
+  padding-bottom: 250px;
+}
+.home-bottom .image {
+  position: relative;
+  float: right;
+  width: 65%;
+}
+.home-bottom .image img {
+  display: block;
+  width: 100%;
+}
+.home-bottom .title {
+  position: absolute;
+  top: 42%; left: 30%;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  font-size: 3.5rem;
+  z-index: 3;
+}
+.home-bottom .title p { display: block; }
+.home-bottom .text {
+  background: #fff;
+  padding: 30px 20px;
+  width: 35%;
+  position: absolute;
+  bottom: 15%; left: 15%;
+  font-size: 1.625rem;
+  z-index: 3;
+}
+.home-bottom .text .more { font-size: 1rem; }
+
+/* Arrow right icon */
+.arrow-right {
+  position: relative;
+  top: -2px;
+  display: inline-block;
+  color: currentColor;
+  margin-right: 5px;
+  width: 22px;
+  height: 1px;
+  vertical-align: middle;
+  background-color: currentColor;
+}
+.arrow-right::before {
+  content: '';
+  position: absolute;
+  right: 0; top: -3px;
+  width: 7px; height: 7px;
+  border-top: solid 1px currentColor;
+  border-right: solid 1px currentColor;
+  transform: rotate(45deg);
+}
+.arrow-right::after {
+  content: '';
+  color: currentColor;
+  position: absolute;
+  top: -9px; right: -7px;
+  width: 19px; height: 19px;
+  border: solid 1px currentColor;
+  border-radius: 50%;
+  transform: rotate(-45deg);
+}
+
+/* Borderbox decoration */
+.borderbox-tl {
+  position: absolute;
+  top: 0; left: 0;
+  width: 30px; height: 30px;
+  border-top: 3px solid #1439ff;
+  border-left: 3px solid #1439ff;
+}
+
+/* ===== FOOTER WIDGETS ===== */
+.footer-widgets {
+  background-color: #2b2b75;
+  clear: both;
+  color: #fff;
+  width: 100%;
+  padding: 2em 0 0;
+}
+.footer-widgets a {
+  display: inline-block;
+  color: #fff;
+}
+.footer-widgets a:hover { color: #d1d1d1; }
+
+.footer-widgets .inner-wrap {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+  padding: 40px 50px;
+}
+
+.widget-area-1 { flex: 0 0 auto; width: 50%; }
+.widget-area-1 img { width: 248px; height: auto; margin-bottom: 30px; }
+.widget-area-1 ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 60px;
+}
+.widget-area-1 ul li {
+  float: left;
+  padding: 1.125em 0 0;
+  width: 50%;
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+  font-size: 0.875rem;
+}
+.widget-area-1 ul li:nth-last-child(-n+2) { border-bottom: 0; }
+.widget-area-1 ul li a {
+  border-bottom: 4px solid transparent;
+  font-weight: 600;
+  padding-left: 5px;
+  width: 100%;
+}
+.widget-area-1 ul li a:hover { border-color: #1439ff; color: #fff; }
+
+.widget-area-2 { flex: 1; padding-top: 56px; }
+.widget-area-2 .widget-title {
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+.widget-area-2 a {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #1439ff;
+}
+.widget-area-2 a:hover { color: #fff; }
+
+/* ===== SITE FOOTER ===== */
+.site-footer {
+  background-color: #2b2b75;
+  border-bottom: 4px solid #1439ff;
+  color: #fff;
+  padding: 1.5em 0 1em;
+}
+.site-footer .inner-wrap {
+  display: flex;
+  justify-content: flex-end;
+  gap: 40px;
+  align-items: center;
+}
+.site-footer a { color: #fff; font-size: 0.875rem; }
+.site-footer a:hover { color: #d1d1d1; }
+.site-footer p { margin: 0; font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+
+/* ===== FADE-IN ANIMATION ===== */
+.aos-init {
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.aos-will-fade {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.aos-init.aos-animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 720px) {
+  .h-panel-content { top: 80px; font-size: 4rem; }
+  .h-panel-content h2 { margin-bottom: 20px; }
+  .h-panel-content a { border-bottom-width: 4px; }
+  .page-header { padding-left: 20px; padding-top: 60vh; }
+  .page-title { font-size: 2.5rem; }
+  .home-intro { padding: 40px 5%; font-size: 0.938rem; }
+  .home-news article { padding-top: 200px; height: 400px; }
+  .home-completed-projects, .home-new-projects { padding: 25px 0; }
+  .home-completed-projects .top, .home-new-projects .top { height: 550px; }
+  .home-completed-projects .right, .home-new-projects .left { float: none; width: 100%; }
+  .home-completed-projects .project-description { width: 90%; margin-left: 5%; font-size: 1.5rem; }
+  .home-completed-projects .the-excerpt { width: 80%; }
+  .home-bottom .title { font-size: 2.5rem; left: 10%; top: 20%; }
+  .home-bottom .text { width: 90%; left: 5%; }
+  .home-bottom .image { width: 100%; float: none; }
+  .footer-widgets .inner-wrap { flex-direction: column; }
+  .widget-area-1 { width: 100%; }
+  .inner-wrap { padding: 0 16px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOP ANNOUNCEMENT BAR -->
+<div style="background:#2b2c75; color:#fff; text-align:center; padding:8px 20px; font-size:13px; position:relative; z-index:200;">
+  <a href="https://bosefellows.mit.edu/news/" style="color:#fff; text-decoration:underline;">ニュース</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="https://bosefellows.mit.edu/support/" style="color:#fff; text-decoration:underline;">サポート</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="https://bosefellows.mit.edu/plato/" style="color:#fff; text-decoration:underline;">プロジェクト・プラトー</a>
+</div>
+
+<!-- HERO PANELS -->
+<div class="h-panels">
+  <div class="h-panel-l"></div>
+  <div class="h-panel-r"></div>
+</div>
+
+<!-- HERO OVERLAY TEXT -->
+<div class="h-panel-content">
+  <h2>研究を再定義する</h2>
+  <a href="https://bosefellows.mit.edu/projects/">プロジェクト</a>
+  <a href="https://bosefellows.mit.edu/program/">プログラム</a>
+  <a href="https://bosefellows.mit.edu/drbose/">ボース博士</a>
+</div>
+
+<!-- HEADER / NAVIGATION -->
+<header id="masthead" class="site-header" role="banner">
+  <div class="inner-wrap">
+    <!-- Left Nav -->
+    <div class="header-left">
+      <nav role="navigation">
+        <ul class="nav-menu">
+          <li><a href="https://bosefellows.mit.edu/projects/">プロジェクト</a></li>
+          <li><a href="https://bosefellows.mit.edu/program/">プログラム</a></li>
+          <li><a href="https://bosefellows.mit.edu/drbose/">ボース博士</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Center Logo -->
+    <div class="site-branding">
+      <a href="https://bosefellows.mit.edu/" rel="home">
+        <!-- White logo (transparent header) -->
+        <img class="logo-light" src="https://bosefellows.mit.edu/wp-content/uploads/2024/04/BF_sub-brand_lockup_two-line_rgb_white.png" alt="Bose Fellows">
+        <!-- Dark logo (scrolled header) -->
+        <img class="logo-dark" src="https://bosefellows.mit.edu/wp-content/uploads/2024/04/BF_sub-brand_lockup_two-line_rgb_white.png" alt="Bose Fellows" style="filter:invert(1) sepia(1) saturate(3) hue-rotate(190deg) brightness(0.35);">
+      </a>
+    </div>
+
+    <!-- Right Nav -->
+    <div class="header-right">
+      <nav role="navigation">
+        <ul class="nav-menu">
+          <li><a href="https://bosefellows.mit.edu/news/">ニュース</a></li>
+          <li><a href="https://bosefellows.mit.edu/support/">サポート</a></li>
+          <li><a href="https://bosefellows.mit.edu/plato/">プロジェクト・プラトー</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- FEATURED IMAGE (fixed bg) -->
+<div class="featured-image" style="background-image: url('https://bosefellows.mit.edu/wp-content/uploads/2011/05/fi-home-1280-1.jpg');">
+  <div class="fi-grad"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="content" class="site-content">
+  <div id="primary" class="content-area">
+    <main id="main" class="site-main" role="main">
+
+      <!-- Page Title -->
+      <header class="page-header">
+        <h1 class="page-title">
+          不可能な<br>
+          研究に、<br>
+          資金を。
+        </h1>
+      </header>
+
+      <!-- Entry Content -->
+      <div class="entry-content">
+        <div class="borderbox-tl"></div>
+
+        <!-- INTRO TEXT -->
+        <div class="home-intro inner-wrap">
+          <p>アマル・G・ボース教授記念研究助成プログラムは、「不可能だ」という言葉を挑戦への招待と受け取るMITの教員たちが夢見る、大胆な研究プロジェクトを支援します。イノベーションを駆動する飽くなき知的好奇心を、私たちは後押しします。</p>
+          <div class="more"><a href="https://bosefellows.mit.edu/program/">詳しくはこちら </a></div>
+        </div>
+
+        <!-- COMPLETED PROJECTS -->
+        <div class="section-head">
+          <h2>最近完了したプロジェクト</h2>
+        </div>
+
+        <div class="home-completed-projects">
+          <div class="inner-wrap">
+            <!-- Featured project top -->
+            <div class="top clearfix">
+              <div class="right">
+                <a href="https://bosefellows.mit.edu/projects/seeds-of-survival/">
+                  <img src="https://bosefellows.mit.edu/wp-content/uploads/2022/04/mary-gehring-fi-640x360.jpg" alt="Seeds of Survival" onerror="this.src='https://bosefellows.mit.edu/wp-content/uploads/2020/02/kristala-prather-fi-640x360.jpg'">
+                </a>
+                <div class="post-info">
+                  <div class="researcher-name">メアリー・ゲーリング</div>
+                  <div class="more"><a href="https://bosefellows.mit.edu/projects/seeds-of-survival/">プロジェクトを見る <span class="arrow-right">&nbsp;</span></a></div>
+                </div>
+              </div>
+              <h2 class="project-title"><a href="https://bosefellows.mit.edu/projects/seeds-of-survival/">生存の種</a></h2>
+              <div class="project-description">気候変動への適応——孤児作物の活用</div>
+              <div class="the-excerpt">
+                <p><span class="hangquote-left"></span>1970年にノーベル賞を受賞したノーマン・ボーローグ博士の研究に感銘を受け、大学院進学を決意しました。今こそ、次の食料危機回避のため自分のスキルを活かすべき時です。」</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project thumbnail cards -->
+          <div class="cards-wrap">
+            <div class="cards">
+              <div class="cards-inner" id="completed-cards">
+
+                <div class="card card-active" onclick="window.location='https://bosefellows.mit.edu/projects/algorithmic-democracy/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2020/02/justin-solomon-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>アルゴリズム民主主義</span></div>
+                  <div class="researcher-name">Justin Solomon</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/light-emitting-plants/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2017/12/strano-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>発光する植物</span></div>
+                  <div class="researcher-name">Michael S. Strano, Sheila Kennedy</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/future-of-flight/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2017/12/barrett-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>飛行の未来</span></div>
+                  <div class="researcher-name">Steven Barrett</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/the-time-is-ripe/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2019/10/fi-time-is-ripe-107x60.jpg')"></div>
+                  <div class="project-title"><span>今こそ、その時</span></div>
+                  <div class="researcher-name">John Hart, Dina Katabi, Tim Swager</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/bringing-the-heat/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2017/12/wang-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>熱を制する</span></div>
+                  <div class="researcher-name">Evelyn Wang</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/biology-the-chemist/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2020/02/kristala-prather-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>化学者としての生物学</span></div>
+                  <div class="researcher-name">Kristala L. J. Prather</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/seeds-of-survival/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2022/04/mary-gehring-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>生存の種</span></div>
+                  <div class="researcher-name">Mary Gehring</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/a-heavy-metal-trojan-horse/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2021/08/nolan-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>重金属のトロイの木馬</span></div>
+                  <div class="researcher-name">Elizabeth N. Nolan</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/quantum-leap/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2021/09/quantum-leap-107x60.jpg')"></div>
+                  <div class="project-title"><span>量子的跳躍</span></div>
+                  <div class="researcher-name">Dirk Englund, Nuno Loureiro, Leonid Levitov</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/controlling-infections/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2021/09/controlling-infections-fi-107x60.jpg')"></div>
+                  <div class="project-title"><span>感染症を制御する</span></div>
+                  <div class="researcher-name">Laura Kiessling, Katharina Ribbeck</div>
+                </div>
+
+              </div>
+              <div class="cards-nav">
+                <button onclick="scrollCards('completed-cards', -220)">←前へ</button>
+                <button onclick="scrollCards('completed-cards', 220)">次へ→</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEWS SECTION -->
+        <div class="home-news">
+          <div class="news-head">
+            <h3>最新ニュース</h3>
+            <div class="more"><a href="https://bosefellows.mit.edu/news/">ニュース一覧</a></div>
+          </div>
+          <div class="news-articles">
+            <article style="background-image: url('https://bosefellows.mit.edu/wp-content/uploads/2025/11/2025-Bose-Fellows-1920x1080-1-1024x576.jpg');">
+              <div class="entry-meta">2025年11月13日 // <a href="https://bosefellows.mit.edu/mit-announces-2025-bose-grants/">MIT、2025年度 Bose グラントを発表</a></div>
+              <h2 class="entry-title"><a href="https://bosefellows.mit.edu/mit-announces-2025-bose-grants/">MIT、2025年度 Bose グラントを発表</a></h2>
+              <div class="more view-article"><a href="https://bosefellows.mit.edu/mit-announces-2025-bose-grants/">記事を読む</a></div>
+            </article>
+            <article style="background-image: url('https://bosefellows.mit.edu/wp-content/uploads/2024/04/BF_sub-brand_lockup_two-line_rgb_white.png'); background-color: #2b2c75; background-size: contain; background-repeat: no-repeat;">
+              <div class="entry-meta">2025年10月13日 //</div>
+              <h2 class="entry-title"><a href="https://bosefellows.mit.edu/wp-content/uploads/2025/10/Bose-research-grants-RFP-2025-26.pdf">提案募集：2025〜26年度 Amar G. Bose 教授 研究助成金</a></h2>
+              <div class="more view-article"><a href="https://bosefellows.mit.edu/wp-content/uploads/2025/10/Bose-research-grants-RFP-2025-26.pdf">記事を読む</a></div>
+            </article>
+          </div>
+        </div>
+
+        <!-- AWARDED PROJECTS -->
+        <div class="section-head" style="margin-top: 80px;">
+          <h2>最近採択されたプロジェクト</h2>
+        </div>
+
+        <div class="home-new-projects">
+          <div class="inner-wrap">
+            <div class="top clearfix">
+              <div class="left">
+                <a href="https://bosefellows.mit.edu/projects/dark-detectives/">
+                  <img src="https://bosefellows.mit.edu/wp-content/uploads/2024/09/dark-detectives-fi-640x360.jpg" alt="Dark Detectives" onerror="this.src='https://bosefellows.mit.edu/wp-content/uploads/2021/09/quantum-leap-640x360.jpg'">
+                </a>
+              </div>
+              <div class="right">
+                <h2 class="project-title"><a href="https://bosefellows.mit.edu/projects/dark-detectives/">ダーク・ディテクティブズ</a></h2>
+                <div class="post-info">
+                  <div class="researcher-name">David I. Kaiser, Peter Fisher</div>
+                  <div class="more"><a href="https://bosefellows.mit.edu/projects/dark-detectives/">プロジェクトを見る <span class="arrow-right">&nbsp;</span></a></div>
+                </div>
+                <div class="the-excerpt">原始ブラックホールとしての暗黒物質を探索する研究</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Awarded project thumbnail cards -->
+          <div class="cards-wrap">
+            <div class="cards">
+              <div class="cards-inner" id="awarded-cards">
+
+                <div class="card card-active" onclick="window.location='https://bosefellows.mit.edu/projects/beneath-the-surface/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/10/beneath-the-surface-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>表面の奥へ</span></div>
+                  <div class="researcher-name">Iwnetim I. Abate</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/material-fitness/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/10/material-fitness-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>素材の適応力</span></div>
+                  <div class="researcher-name">Skylar Tibbits</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/breathless/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/10/breathless-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>息のない海</span></div>
+                  <div class="researcher-name">Andrew Babbin</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/scanning-stethoscope/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/09/scanning-stethoscope-fi-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>走査型「聴診器」</span></div>
+                  <div class="researcher-name">Jacob White, Elfar Adalsteinsson</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/dark-detectives/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/09/dark-detectives-fi-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>ダーク・ディテクティブズ</span></div>
+                  <div class="researcher-name">David I. Kaiser, Peter Fisher</div>
+                </div>
+
+                <div class="card" onclick="window.location='https://bosefellows.mit.edu/projects/capturing-climate-warming-bubbles/'">
+                  <div class="feat-image" style="background-image:url('https://bosefellows.mit.edu/wp-content/uploads/2024/09/capturing-bubbles-fi-107x60.jpg'); background-color:#e9edf4;"></div>
+                  <div class="project-title"><span>温暖化を招く気泡を捕捉する</span></div>
+                  <div class="researcher-name">Kripa Varanasi, Desirée Plata</div>
+                </div>
+
+              </div>
+              <div class="cards-nav">
+                <button onclick="scrollCards('awarded-cards', -220)">←前へ</button>
+                <button onclick="scrollCards('awarded-cards', 220)">次へ→</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DR. BOSE SECTION -->
+        <div class="home-bottom">
+          <div class="image">
+            <img src="https://bosefellows.mit.edu/wp-content/uploads/2017/12/bose-amar-home-bottom-1.jpg" alt="A Lifelong Passion" onerror="this.src='https://bosefellows.mit.edu/wp-content/uploads/2011/05/fi-home-1280-1.jpg'">
+            <div class="title">生涯を<br><span>かけた</span><br>情熱</div>
+          </div>
+          <div class="text">
+            <p>ボース博士にとって、既成概念を打ち破る研究に挑むことは趣味ではなく、生き方そのものだった。</p>
+            <div class="more"><a href="https://bosefellows.mit.edu/drbose/">ストーリーを読む</a></div>
+          </div>
+        </div>
+
+      </div><!-- .entry-content -->
+    </main>
+  </div>
+</div><!-- #content -->
+
+<!-- FOOTER WIDGETS -->
+<div class="footer-widgets">
+  <div class="inner-wrap">
+    <div class="widget-area-1">
+      <a href="https://bosefellows.mit.edu/" rel="home">
+        <img src="https://bosefellows.mit.edu/wp-content/uploads/2024/04/BF_sub-brand_lockup_two-line_rgb_white.png" alt="Bose Fellows">
+      </a>
+      <ul>
+        <li><a href="https://bosefellows.mit.edu/projects/">プロジェクト</a></li>
+        <li><a href="https://bosefellows.mit.edu/news/">ニュース</a></li>
+        <li><a href="https://bosefellows.mit.edu/program/">プログラム</a></li>
+        <li><a href="https://bosefellows.mit.edu/support/">サポート</a></li>
+        <li><a href="https://bosefellows.mit.edu/drbose/">ボース博士</a></li>
+        <li><a href="https://bosefellows.mit.edu/plato/">プロジェクト・プラトー</a></li>
+      </ul>
+    </div>
+    <div class="widget-area-2">
+      <h5 class="widget-title">知性と驚異が交わる場所へ、<br>ともに。</h5>
+      <p><a href="https://bosefellows.mit.edu/program/">詳しくはこちら <span class="arrow-right">&nbsp;</span></a></p>
+    </div>
+  </div>
+</div>
+
+<!-- SITE FOOTER -->
+<footer id="colophon" class="site-footer" role="contentinfo">
+  <div class="inner-wrap">
+    <a href="https://accessibility.mit.edu" target="_blank">アクセシビリティ</a>
+    <p>© Bose Fellows 2020</p>
+  </div>
+</footer>
+
+<script>
+// ===== Headroom (scroll header effect) =====
+window.addEventListener('scroll', function() {
+  const header = document.getElementById('masthead');
+  if (window.scrollY > 80) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
+  }
+});
+
+// ===== Card scroll =====
+function scrollCards(id, amount) {
+  const el = document.getElementById(id);
+  el.scrollBy({ left: amount, behavior: 'smooth' });
+}
+
+// ===== Hero panel parallax =====
+(function() {
+  const panelL = document.querySelector('.h-panel-l');
+  const panelR = document.querySelector('.h-panel-r');
+  let ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        const y = window.scrollY * 0.3;
+        if (panelL) panelL.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+        if (panelR) panelR.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+// ===== Simple fade-in on scroll =====
+(function() {
+  const targets = document.querySelectorAll('.home-intro, .section-head, .home-completed-projects, .home-news, .home-new-projects, .home-bottom');
+
+  // Check if already scrolled (don't hide elements that are already visible)
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('aos-will-fade');
+        entry.target.classList.add('aos-animate');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  targets.forEach(function(t) {
+    t.classList.add('aos-init', 'aos-will-fade');
+    observer.observe(t);
+  });
+
+  // Trigger immediately for any elements already in viewport
+  setTimeout(function() {
+    targets.forEach(function(t) {
+      const rect = t.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        t.classList.remove('aos-will-fade');
+        t.classList.add('aos-animate');
+      }
+    });
+  }, 100);
+})();
+</script>
+
+</body>
+</html>

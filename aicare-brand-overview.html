@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アイケアラボ — ブランド宇宙マップ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --mono:'DM Mono',monospace; --body:'Noto Sans JP',sans-serif; }
+    html, body { height: 100%; overflow: hidden; background: #020c1a; }
+    body { font-family: var(--body); color: #dde6f0; -webkit-font-smoothing: antialiased; }
+    body.dragging { cursor: grabbing !important; }
+    body.dragging * { cursor: grabbing !important; pointer-events: none; }
+    body.dragging #panel, body.dragging .ph-close { pointer-events: auto; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 48px;
+      background: rgba(2,12,26,0.94); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(139,92,246,0.16);
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      padding: 0 24px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+    }
+    .nav a { color: #5a7a9a; text-decoration: none; padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.1); transition: color .15s; white-space: nowrap; }
+    .nav a:hover { color: #dde6f0; }
+    .nav a.active { color: #a78bfa; border-color: rgba(139,92,246,0.35); background: rgba(139,92,246,0.08); }
+    .nav-sep { color: #1e3048; }
+
+    /* ── UNIVERSE ── */
+    #universe { position: fixed; top: 48px; left: 0; right: 0; bottom: 0; }
+    #starfield { position: absolute; inset: 0; }
+    #nebula {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 30% 36%, rgba(139,92,246,0.05) 0%, transparent 100%),
+        radial-gradient(ellipse 50% 45% at 74% 58%, rgba(59,130,246,0.04) 0%, transparent 100%),
+        radial-gradient(ellipse 40% 38% at 50% 88%, rgba(16,185,129,0.03) 0%, transparent 100%);
+    }
+    #overlay { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+    #nodes   { position: absolute; inset: 0; }
+
+    /* ── NODE ── */
+    .node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      user-select: none;
+      z-index: 10;
+      will-change: left, top;
+    }
+    .node:active { cursor: grabbing; }
+    .node-orb {
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+    }
+    .node:hover  .node-orb { transform: scale(1.08); }
+    .node.active .node-orb { transform: scale(1.13); }
+
+    /* core rotating rings */
+    .node.core-node .node-orb::before {
+      content: ''; position: absolute; inset: -8px;
+      border-radius: 50%; border: 1px dashed rgba(139,92,246,0.3);
+      animation: spin 24s linear infinite;
+    }
+    .node.core-node .node-orb::after {
+      content: ''; position: absolute; inset: -20px;
+      border-radius: 50%; border: 1px dashed rgba(139,92,246,0.14);
+      animation: spin 44s linear infinite reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes corePulse { 0%,100%{box-shadow:var(--gs1)} 50%{box-shadow:var(--gs2)} }
+    @keyframes orbPulse  { 0%,100%{box-shadow:var(--gs1)} 50%{box-shadow:var(--gs2)} }
+
+    .node-halo {
+      position: absolute; border-radius: 50%;
+      border: 1px solid currentColor; opacity: 0;
+      transform: translate(-50%,-50%) scale(.82);
+      top: 50%; left: 50%;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .node:hover .node-halo, .node.active .node-halo {
+      opacity: .2; transform: translate(-50%,-50%) scale(1);
+    }
+
+    .node-status {
+      position: absolute; bottom: 4px; right: 4px;
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 2px solid #020c1a;
+    }
+    .s-live    { background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .s-wip     { background: #f59e0b; }
+    .s-concept { background: #3a5470; }
+
+    .node-label {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      text-align: center; white-space: nowrap; pointer-events: none;
+    }
+    .nl-name { display: block; font-size: 12px; font-weight: 700; color: #c8d8e8; text-shadow: 0 0 18px rgba(0,0,0,.95), 0 1px 4px rgba(0,0,0,.9); }
+    .nl-en   { display: block; font-family: var(--mono); font-size: 8px; color: #3a5470; letter-spacing: .1em; margin-top: 1px; }
+    .node:hover .nl-name, .node.active .nl-name { color: #fff; }
+
+    /* ── SVG ── */
+    @keyframes flowLine { to { stroke-dashoffset: -44; } }
+    #overlay line { animation: flowLine 16s linear infinite; }
+    #overlay line.hi { stroke-width: 2.2 !important; filter: drop-shadow(0 0 5px var(--lc)); }
+
+    /* ── PANEL ── */
+    #panel {
+      position: fixed; left: 0; top: 48px; bottom: 0; width: 480px;
+      background: rgba(5,14,28,.97); backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(255,255,255,.06);
+      transform: translateX(-100%);
+      transition: transform .32s cubic-bezier(.4,0,.2,1);
+      z-index: 150; display: flex; flex-direction: column;
+    }
+    #panel.open { transform: translateX(0); }
+    #panel-stripe { height: 3px; flex-shrink: 0; }
+    .ph { padding: 18px 18px 14px; border-bottom: 1px solid rgba(255,255,255,.05); display: flex; gap: 12px; align-items: flex-start; }
+    .ph-icon { width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .ph-title { font-size: 16px; font-weight: 700; color: #e8f0f8; margin-bottom: 2px; }
+    .ph-en    { font-family: var(--mono); font-size: 8.5px; letter-spacing: .12em; color: #3a5470; }
+    .ph-badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; letter-spacing: .07em; padding: 2px 8px; border-radius: 4px; margin-top: 6px; }
+    .ph-badge.live    { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.28); color:#34d399; }
+    .ph-badge.wip     { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.28); color:#f59e0b; }
+    .ph-badge.concept { background:rgba(58,84,112,.18); border:1px solid rgba(58,84,112,.4);   color:#5a7a9a; }
+    .ph-close { margin-left: auto; flex-shrink: 0; width: 26px; height: 26px; border-radius: 5px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); cursor: pointer; color: #3a5470; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .ph-close:hover { background: rgba(255,255,255,.09); color: #dde6f0; }
+    #panel-body { flex: 1; overflow-y: auto; padding: 16px 18px 24px; }
+    #panel-body::-webkit-scrollbar { width: 3px; }
+    #panel-body::-webkit-scrollbar-thumb { background: rgba(139,92,246,.2); border-radius: 2px; }
+    .pd-desc { font-size: 12.5px; color: #7a9ab8; line-height: 1.85; margin-bottom: 14px; }
+    .pd-kv   { font-style: italic; font-size: 13px; color: #c8d8e8; border-left: 2px solid rgba(255,255,255,.1); padding-left: 11px; margin-bottom: 14px; line-height: 1.65; }
+    .pd-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; }
+    .pd-tag  { font-size: 10.5px; padding: 2px 8px; border-radius: 3px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.07); color: #3a5470; }
+    .pd-sec  { font-family: var(--mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #1e3048; margin-bottom: 8px; }
+    .pd-item { display: flex; gap: 9px; align-items: flex-start; padding: 8px 10px; border-radius: 5px; margin-bottom: 4px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.04); }
+    .pd-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .pd-iname { font-size: 12px; font-weight: 600; color: #c8d8e8; margin-bottom: 2px; }
+    .pd-idesc { font-size: 11.5px; color: #5a7a9a; line-height: 1.55; }
+    .pd-link { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 16px; padding: 9px; border-radius: 5px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); color: #7a9ab8; text-decoration: none; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; transition: all .15s; }
+    .pd-link:hover { background: rgba(255,255,255,.07); color: #dde6f0; }
+    /* KGI/KPI bigger */
+    .kgi-label { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #a78bfa; }
+    .kpi-label { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #60a5fa; }
+    .pd-kgi-name { font-size: 14px; font-weight: 700; color: #c4b5fd; margin-bottom: 3px; outline: none; }
+    .pd-kpi-name { font-size: 14px; font-weight: 700; color: #93c5fd; margin-bottom: 3px; outline: none; }
+    .pd-k-desc   { font-size: 12px; color: #5a7a9a; line-height: 1.5; outline: none; min-height: 14px; }
+
+    /* ── LEGEND / HUD ── */
+    #legend { position: fixed; bottom: 20px; left: 20px; font-family: var(--mono); font-size: 9px; letter-spacing: .06em; z-index: 20; display: flex; flex-direction: column; gap: 5px; }
+    .leg { display: flex; align-items: center; gap: 6px; color: #2a3f58; }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+    #hint { position: fixed; bottom: 20px; right: 20px; font-family: var(--mono); font-size: 8.5px; color: #1e3048; z-index: 20; letter-spacing: .04em; }
+
+    /* ── EDIT POSITION BUTTON ── */
+    #edit-pos-btn {
+      position: fixed; top: 58px; right: 16px; z-index: 180;
+      background: rgba(2,12,26,0.85); border: 1px solid rgba(148,163,184,0.2);
+      color: #5a7a9a; font-family: var(--mono); font-size: 10px; letter-spacing: .07em;
+      padding: 5px 12px; border-radius: 5px; cursor: pointer;
+      transition: all .15s; backdrop-filter: blur(8px);
+    }
+    #edit-pos-btn:hover { color: #dde6f0; border-color: rgba(148,163,184,0.4); }
+    #edit-pos-btn.active {
+      color: #fbbf24; border-color: rgba(245,158,11,0.5);
+      background: rgba(245,158,11,0.1);
+    }
+    body.edit-mode .node { cursor: grab; }
+    body.edit-mode .node:active { cursor: grabbing; }
+
+    /* ── AUTHORITY BUTTON ── */
+    #auth-btn {
+      background: none; border: 1px solid rgba(245,158,11,0.35);
+      color: #f59e0b; font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+      padding: 3px 10px; border-radius: 4px; cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    #auth-btn:hover { color: #fbbf24; background: rgba(245,158,11,0.1); }
+
+    /* ── AUTHORITY OVERLAY ── */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(2,12,26,0.96); backdrop-filter: blur(20px);
+      display: none; flex-direction: column;
+      overflow: hidden;
+    }
+    #auth-overlay.open { display: flex; }
+    #auth-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(245,158,11,0.15);
+      flex-shrink: 0;
+    }
+    #auth-header h2 { font-size: 15px; font-weight: 700; color: #e8f0f8; letter-spacing: .04em; }
+    #auth-header p  { font-size: 11px; color: #3a5470; font-family: var(--mono); margin-top: 2px; }
+    #auth-close {
+      width: 30px; height: 30px; border-radius: 6px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      color: #5a7a9a; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; flex-shrink: 0;
+    }
+    #auth-close:hover { background: rgba(255,255,255,.1); color: #dde6f0; }
+    #auth-body {
+      flex: 1; overflow-y: auto; padding: 24px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
+      align-content: start;
+    }
+    #auth-body::-webkit-scrollbar { width: 4px; }
+    #auth-body::-webkit-scrollbar-thumb { background: rgba(245,158,11,.2); border-radius: 2px; }
+
+    /* ── AUTH CARD ── */
+    .auth-card {
+      background: rgba(10,22,40,.8); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px; overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .auth-card:hover { border-color: rgba(245,158,11,.35); transform: translateY(-2px); }
+    .auth-card-img {
+      width: 100%; aspect-ratio: 1/1; object-fit: cover;
+      background: linear-gradient(135deg, #0d1e36, #1a2f50);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px; color: rgba(255,255,255,.15);
+    }
+    .auth-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .auth-card-body { padding: 14px; }
+    .auth-card-cat {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+      color: #f59e0b; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .auth-card-name { font-size: 14px; font-weight: 700; color: #e8f0f8; margin-bottom: 2px; }
+    .auth-card-role { font-size: 11px; color: #5a7a9a; margin-bottom: 8px; line-height: 1.4; }
+    .auth-card-desc { font-size: 11.5px; color: #7a9ab8; line-height: 1.6; }
+    .auth-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+    .auth-card-tag {
+      font-size: 9.5px; padding: 2px 7px; border-radius: 3px;
+      background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.07); color: #3a5470;
+    }
+    .auth-card-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--mono); font-size: 9px; padding: 2px 8px; border-radius: 4px;
+      margin-top: 10px;
+    }
+    .auth-card-status.confirmed { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3); color:#34d399; }
+    .auth-card-status.negotiating { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); color:#f59e0b; }
+    .auth-card-status.planned { background:rgba(58,84,112,.15); border:1px solid rgba(58,84,112,.35); color:#5a7a9a; }
+    .auth-section-title {
+      grid-column: 1 / -1;
+      font-family: var(--mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+      color: #1e3048; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.04);
+      margin-top: 8px;
+    }
+
+    /* ── KGI/KPI BUTTON ── */
+    #kpi-btn {
+      background: none; border: 1px solid rgba(139,92,246,0.35);
+      color: #a78bfa; font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+      padding: 3px 10px; border-radius: 4px; cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    #kpi-btn:hover { color: #c4b5fd; background: rgba(139,92,246,0.1); }
+
+    /* ── KGI/KPI OVERLAY ── */
+    #kpi-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(2,12,26,0.97); backdrop-filter: blur(20px);
+      display: none; flex-direction: column;
+      overflow: hidden;
+    }
+    #kpi-overlay.open { display: flex; }
+    #kpi-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(139,92,246,0.18);
+      flex-shrink: 0;
+    }
+    #kpi-header .kpi-htitle { font-size: 15px; font-weight: 700; color: #e8f0f8; letter-spacing: .04em; }
+    #kpi-header .kpi-hsub   { font-size: 11px; color: #3a5470; font-family: var(--mono); margin-top: 2px; }
+    #kpi-close {
+      width: 30px; height: 30px; border-radius: 6px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      color: #5a7a9a; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; flex-shrink: 0;
+    }
+    #kpi-close:hover { background: rgba(255,255,255,.1); color: #dde6f0; }
+    #kpi-body {
+      flex: 1; overflow-y: auto; padding: 28px 32px 40px;
+    }
+    #kpi-body::-webkit-scrollbar { width: 4px; }
+    #kpi-body::-webkit-scrollbar-thumb { background: rgba(139,92,246,.2); border-radius: 2px; }
+
+    .kpi-section-title {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+      margin-bottom: 12px; margin-top: 32px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .kpi-section-title:first-child { margin-top: 0; }
+    .kpi-section-title.kgi { color: #a78bfa; border-color: rgba(139,92,246,.2); }
+    .kpi-section-title.kpi { color: #60a5fa; border-color: rgba(59,130,246,.2); }
+
+    .kpi-table { width: 100%; border-collapse: collapse; }
+    .kpi-table th {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+      color: #1e3048; padding: 6px 12px; text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .kpi-table td {
+      padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: 12.5px; color: #c8d8e8; vertical-align: middle;
+    }
+    .kpi-table tr:hover td { background: rgba(255,255,255,.02); }
+    .kpi-table td[contenteditable="true"] {
+      outline: none; cursor: text;
+      border-radius: 3px; transition: background .15s;
+    }
+    .kpi-table td[contenteditable="true"]:focus {
+      background: rgba(255,255,255,.06);
+      box-shadow: inset 0 0 0 1px rgba(139,92,246,.35);
+    }
+    .kpi-table td[contenteditable="true"]:empty::before {
+      content: '—'; color: #2a3f58;
+    }
+    .kpi-table .td-name { font-weight: 600; color: #e8f0f8; min-width: 160px; }
+    .kpi-table .td-cat {
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em;
+      padding: 2px 7px; border-radius: 3px;
+      background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.08);
+      color: #5a7a9a; white-space: nowrap; display: inline-block;
+    }
+
+    /* Status badges */
+    .kpi-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: .05em;
+      padding: 3px 9px; border-radius: 4px; white-space: nowrap;
+      cursor: pointer; user-select: none; transition: opacity .15s;
+    }
+    .kpi-status:hover { opacity: .8; }
+    .kpi-status.s-active  { background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.35); color:#60a5fa; }
+    .kpi-status.s-done    { background:rgba(16,185,129,.10); border:1px solid rgba(16,185,129,.30); color:#34d399; }
+    .kpi-status.s-none    { background:rgba(30,48,72,.4);    border:1px solid rgba(30,48,72,.7);    color:#3a5470; }
+    .kpi-status.s-unset   { background:transparent;           border:1px dashed rgba(245,158,11,.35); color:#92400e; }
+
+    .kpi-hint {
+      font-family: var(--mono); font-size: 9px; color: #1e3048; letter-spacing: .06em;
+      margin-top: 20px; text-align: right;
+    }
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-tasks.html">タスク管理</a>
+  <button id="auth-btn" onclick="openAuth()">⭐ 権威性一覧</button>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<nav class="nav">
+  <span style="color:#1e3048">eye care lab</span>
+  <span class="nav-sep">/</span>
+  <a href="aicare-top-prototype.html">サイト</a>
+  <a href="persona-dashboard.html">ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス ブランディング</a>
+  <a href="reference-sites.html">参考サイト集</a>
+  <a href="aicare-brand-overview.html" class="active">ブランド全体マップ</a>
+  <a href="store-persona-map.html" style="color:#10b981;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.07);">店舗ペルソナ分布</a>
+</nav>
+
+<main id="universe">
+  <canvas id="starfield"></canvas>
+  <div id="nebula"></div>
+  <svg id="overlay" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="nodes"></div>
+</main>
+
+<!-- KGI / KPI オーバーレイ -->
+<div id="kpi-overlay">
+  <div id="kpi-header">
+    <div>
+      <div class="kpi-htitle">ブランド全体 KGI / KPI</div>
+      <div class="kpi-hsub">アイケアラボ グループ 数値目標 — クリックで編集可能</div>
+    </div>
+    <button id="kpi-close" onclick="closeKPI()">✕</button>
+  </div>
+  <div id="kpi-body">
+
+    <!-- KGI -->
+    <div class="kpi-section-title kgi">▍ KGI — Key Goal Indicators</div>
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th style="width:200px">指標</th>
+          <th style="width:140px">目標値</th>
+          <th style="width:120px">期限</th>
+          <th style="width:130px">現在値</th>
+          <th style="width:110px">ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-name">全国店舗数</td>
+          <td contenteditable="true">100店舗</td>
+          <td contenteditable="true">2026年度末</td>
+          <td contenteditable="true">40後半〜</td>
+          <td><span class="kpi-status s-active" onclick="cycleStatus(this)">● 進行中</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">FC加盟店数（新規）</td>
+          <td contenteditable="true">50店舗</td>
+          <td contenteditable="true">2026年度末</td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">ブランド認知率（主要TA）</td>
+          <td contenteditable="true">20%</td>
+          <td contenteditable="true">2027年</td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">月間来店者数（全店合計）</td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">年間売上（グループ計）</td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- KPI -->
+    <div class="kpi-section-title kpi">▍ KPI — Key Performance Indicators</div>
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th style="width:200px">指標</th>
+          <th style="width:90px">カテゴリ</th>
+          <th style="width:130px">目標値</th>
+          <th style="width:110px">期限</th>
+          <th style="width:120px">現在値</th>
+          <th style="width:110px">ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-name">B2B法人契約数</td>
+          <td><span class="td-cat">B2B</span></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true">2026.Q2</td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">治験データ公開</td>
+          <td><span class="td-cat">エビデンス</span></td>
+          <td contenteditable="true">完了</td>
+          <td contenteditable="true">2026.05</td>
+          <td contenteditable="true">進行中</td>
+          <td><span class="kpi-status s-active" onclick="cycleStatus(this)">● 進行中</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">サイトリニューアル公開</td>
+          <td><span class="td-cat">Web</span></td>
+          <td contenteditable="true">完了</td>
+          <td contenteditable="true">2026.05</td>
+          <td contenteditable="true">未着手</td>
+          <td><span class="kpi-status s-none" onclick="cycleStatus(this)">○ 未着手</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">YouTube月間再生数</td>
+          <td><span class="td-cat">メディア</span></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true">2026.Q3</td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">顧客継続率（LTV）</td>
+          <td><span class="td-cat">顧客</span></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">プレスリリース数</td>
+          <td><span class="td-cat">PR</span></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true">2026年内</td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">ソラシドエアPR発表</td>
+          <td><span class="td-cat">パートナー</span></td>
+          <td contenteditable="true">完了</td>
+          <td contenteditable="true">2026.Q2</td>
+          <td contenteditable="true">調整中</td>
+          <td><span class="kpi-status s-active" onclick="cycleStatus(this)">● 進行中</span></td>
+        </tr>
+        <tr>
+          <td class="td-name">NPS（顧客推奨度）</td>
+          <td><span class="td-cat">顧客</span></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+          <td><span class="kpi-status s-unset" onclick="cycleStatus(this)">未設定</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="kpi-hint">● セルをクリックして直接編集できます　　ステータスをクリックで切り替え</div>
+  </div>
+</div>
+
+<!-- 権威性一覧 オーバーレイ -->
+<div id="auth-overlay">
+  <div id="auth-header">
+    <div>
+      <h2>権威性一覧</h2>
+      <p>アイケアラボ × 著名人・専門家 連携予定リスト</p>
+    </div>
+    <button id="auth-close" onclick="closeAuth()">✕</button>
+  </div>
+  <div id="auth-body">
+    <div class="auth-section-title">プロ野球選手</div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">⚾</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">プロ野球</div>
+        <div class="auth-card-name">選手名 A</div>
+        <div class="auth-card-role">球団名 / ポジション</div>
+        <div class="auth-card-desc">眼精疲労・集中力向上のためアイケアラボを継続利用。試合前後のケアに取り組む。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">現役</span><span class="auth-card-tag">グラス利用</span></div>
+        <div class="auth-card-status planned">● 交渉検討中</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">⚾</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">プロ野球 OB</div>
+        <div class="auth-card-name">選手名 B</div>
+        <div class="auth-card-role">元 球団名 / 解説者</div>
+        <div class="auth-card-desc">引退後も眼ケアの重要性を啓発。メディア出演多数。影響力が高いアンバサダー候補。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">OB</span><span class="auth-card-tag">メディア出演</span></div>
+        <div class="auth-card-status planned">● 交渉検討中</div>
+      </div>
+    </div>
+
+    <div class="auth-section-title">スポーツ選手（他競技）</div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">🏃</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">アスリート</div>
+        <div class="auth-card-name">選手名 C</div>
+        <div class="auth-card-role">競技名 / 所属</div>
+        <div class="auth-card-desc">動体視力・集中力のプロとしてアイケアグラス SPORTS ラインとの連携を構想。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">動体視力</span><span class="auth-card-tag">SPORTSライン</span></div>
+        <div class="auth-card-status planned">● 構想中</div>
+      </div>
+    </div>
+
+    <div class="auth-section-title">医療・専門家</div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">🩺</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">眼科医</div>
+        <div class="auth-card-name">医師名 A</div>
+        <div class="auth-card-role">眼科専門医 / 病院名</div>
+        <div class="auth-card-desc">隠れ斜位の医学的見地からアイケアラボの施術エビデンスを監修・推薦。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">監修</span><span class="auth-card-tag">エビデンス</span></div>
+        <div class="auth-card-status negotiating">● 交渉中</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">💪</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">スポーツトレーナー</div>
+        <div class="auth-card-name">トレーナー名 A</div>
+        <div class="auth-card-role">プロチーム専属トレーナー</div>
+        <div class="auth-card-desc">選手のパフォーマンス最適化の一環として眼ケアを取り入れ、アイケアラボを推薦。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">プロ帯同</span><span class="auth-card-tag">パフォーマンス</span></div>
+        <div class="auth-card-status planned">● 構想中</div>
+      </div>
+    </div>
+
+    <div class="auth-section-title">インフルエンサー・メディア</div>
+
+    <div class="auth-card">
+      <div class="auth-card-img">📹</div>
+      <div class="auth-card-body">
+        <div class="auth-card-cat">YouTuber / インフルエンサー</div>
+        <div class="auth-card-name">名前 A</div>
+        <div class="auth-card-role">健康・ライフスタイル系 / フォロワー XX万</div>
+        <div class="auth-card-desc">健康・ウェルネス領域で影響力あり。アイケアラボ体験レポートコンテンツを構想。</div>
+        <div class="auth-card-tags"><span class="auth-card-tag">SNS</span><span class="auth-card-tag">認知拡大</span></div>
+        <div class="auth-card-status planned">● 構想中</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<aside id="panel">
+  <div id="panel-stripe"></div>
+  <div class="ph" id="panel-head"></div>
+  <div id="panel-body"></div>
+</aside>
+
+<button id="edit-pos-btn" onclick="toggleEditMode()">⊹ 位置編集</button>
+
+<div id="legend">
+  <div class="leg"><div class="leg-dot" style="background:#10b981;box-shadow:0 0 5px #10b981;"></div>稼働中</div>
+  <div class="leg"><div class="leg-dot" style="background:#f59e0b;"></div>開発中 / 刷新中</div>
+  <div class="leg"><div class="leg-dot" style="background:#3a5470;"></div>構想中</div>
+</div>
+<div id="hint">クリックで詳細 · ESC で閉じる</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+const NODES = [
+  { id:'core',  name:'アイケアラボ（院）', nameEn:'EYE CARE LABO',     icon:'🏥', color:'#8b5cf6', g1:'rgba(139,92,246,.58)',  g2:'rgba(139,92,246,.2)',  status:'live',    px:50, py:46, size:90, isCore:true,
+    desc:'アイケアラボの中核事業。眼の整体院として全国展開。専門施術・来院体験・スタッフ育成のすべてを担う旗艦事業。', kv:'「目」から始まる、脳と全身の再設計。', tags:['施術','隠れ斜位','眼精疲労','全国展開'],
+    items:[{name:'本院（旗艦店）',status:'live',desc:'代々木。眼整体士による完全個別対応。'},{name:'多店舗展開',status:'wip',desc:'全国展開中。店舗詳細ページ整備中。'},{name:'予約システム',status:'wip',desc:'オンライン予約フォームとCRM強化。'}],
+    kgis:[{name:'今年中に100店舗達成',desc:'現在87店舗・検討中5件。残り8店舗。'}],
+    kpis:[{name:'月次新規出店数',desc:'月2〜3店舗ペースが目標'},{name:'施術稼働率',desc:'各院70%以上を維持'},{name:'顧客継続率',desc:'3回以上来院率 60%以上'}],
+    link:{label:'サイトプロトタイプ →',href:'aicare-top-prototype.html'} },
+
+  { id:'glass', name:'アイケアグラス',     nameEn:'EYE CARE GLASS',    icon:'👓', color:'#3b82f6', g1:'rgba(59,130,246,.55)',  g2:'rgba(59,130,246,.15)', status:'live',    px:76, py:19, size:66,
+    desc:'プリズムレンズで視線のズレを精密補正。ブランドサイト刷新中。FOCUS / KIDS / SPORTS のライン展開を構想。', kv:'「目が、ちゃんと、休める。」', tags:['プリズムメガネ','隠れ斜位','¥30,000〜'],
+    items:[{name:'Core Line',status:'live',desc:'スタンダード。GUCCI / TOM FORD 等。'},{name:'FOCUS',status:'concept',desc:'ビジネス・エンジニア向け。集中サポート。'},{name:'KIDS',status:'concept',desc:'子ども向け。学習・授業対応。'},{name:'SPORTS',status:'concept',desc:'アスリート向け。動体視力サポート。'}],
+    kgis:[{name:'年間販売1,000本',desc:'EC・院内クロスセルの合計'}],
+    kpis:[{name:'月間成約数',desc:'院内クロスセル + EC合計'},{name:'客単価',desc:'¥30,000以上を維持'},{name:'リピート率（2本目）',desc:'30%以上が目標'}],
+    link:{label:'グラス ブランディング →',href:'eyecare-glass-branding.html'} },
+
+  { id:'site',  name:'アイケアサイト',     nameEn:'OFFICIAL WEBSITE',  icon:'🌐', color:'#14b8a6', g1:'rgba(20,184,166,.5)',   g2:'rgba(20,184,166,.14)', status:'wip',     px:24, py:21, size:64,
+    desc:'公式Webサイト。来院前の主要タッチポイント。セルフ視界チェックをサイト内に格納。リブランディング進行中。', tags:['来院予約','認知獲得','地域SEO'],
+    items:[{name:'トップ / コーポレート',status:'wip',desc:'リブランディング中。プロトタイプ確認中。'},{name:'セルフ視界チェック',status:'live',desc:'サイト内格納。来院前の主要入口。'},{name:'事例・ケーススタディ',status:'wip',desc:'症状改善事例コンテンツ整備中。'},{name:'店舗詳細ページ',status:'wip',desc:'各店舗ページを統一フォーマットで整備。'}],
+    kgis:[{name:'月間 10,000 UU',desc:'公開6ヶ月以内に達成'}],
+    kpis:[{name:'オーガニック流入数',desc:'検索経由の自然流入'},{name:'予約CTA転換率',desc:'2%以上が目標'},{name:'直帰率',desc:'60%以下を目標'}],
+    link:{label:'サイトプロトタイプ →',href:'aicare-top-prototype.html'} },
+
+  { id:'app',   name:'アイケアアプリ',     nameEn:'MOBILE APP',        icon:'📱', color:'#10b981', g1:'rgba(16,185,129,.5)',   g2:'rgba(16,185,129,.13)', status:'concept', px:79, py:71, size:60,
+    desc:'眼の状態を毎日記録・可視化するネイティブアプリ（構想中）。院との連携でLTV向上。習慣的な眼ケアを促進。', tags:['構想中','ネイティブApp','LTV向上'],
+    items:[{name:'コンディション記録',status:'wip',desc:'日々の眼の状態・疲労度ログ。'},{name:'眼ケアガイド',status:'concept',desc:'自宅ケア動画・ストレッチコンテンツ。'}],
+    kgis:[{name:'リリース後6ヶ月でDAU 1,000',desc:'まずは院来院者へのオファーから'}],
+    kpis:[{name:'ダウンロード数',desc:'初月500DL目標'},{name:'アクティブ率',desc:'DAU / MAU = 30%以上'},{name:'院連携率',desc:'来院者のアプリ登録50%以上'}] },
+
+  { id:'y365',  name:'アイケア365',        nameEn:'ONLINE COMMUNITY',  icon:'♾️', color:'#f59e0b', g1:'rgba(245,158,11,.5)',   g2:'rgba(245,158,11,.13)', status:'wip',     px:21, py:71, size:60,
+    desc:'月額制オンラインサロン（DMM）。毎日の眼のセルフケア方法をプロが解説。DMMオンラインサロン再申請中、4/15オープン想定。', kv:'「目のケアを、毎日の習慣に。」', tags:['月額制','DMM','4/15想定','セルフケア'],
+    items:[{name:'DMMオンラインサロン',status:'wip',desc:'再申請中。4/15 or 7/15オープン想定（確認中）。'},{name:'眼整体士 資格プログラム',status:'concept',desc:'育成・資格認定。FC展開の礎。'}],
+    kgis:[{name:'会員数 500名',desc:'開始1年以内に達成'}],
+    kpis:[{name:'月次入会数',desc:'50名/月が目標'},{name:'解約率',desc:'月次5%以下'},{name:'LTV',desc:'12ヶ月以上継続が目標'}] },
+
+  { id:'media', name:'公式メディア',       nameEn:'MEDIA & SNS',       icon:'📡', color:'#fb923c', g1:'rgba(251,146,60,.5)',   g2:'rgba(251,146,60,.13)', status:'live',    px:50, py:87, size:58,
+    desc:'各SNSチャンネルで認知・教育・ライフスタイル訴求。眼の専門家としての権威性を構築するコンテンツ戦略。', tags:['X','Instagram','YouTube','TikTok（構想）'],
+    items:[{name:'X（旧Twitter）',status:'live',desc:'眼の豆知識・啓発コンテンツ。権威構築。'},{name:'Instagram',status:'live',desc:'ライフスタイル・施術ビフォーアフター。'},{name:'YouTube',status:'wip',desc:'ケア動画・隠れ斜位解説。SEO流入。'},{name:'TikTok',status:'concept',desc:'若年層リーチ。KIDSライン連動。'}],
+    kgis:[{name:'SNS総フォロワー 100,000',desc:'全チャンネル合計 1年以内'}],
+    kpis:[{name:'フォロワー増加率',desc:'月次 +5%以上'},{name:'エンゲージメント率',desc:'Instagram 3%以上'},{name:'流入CVR',desc:'SNS → 予約転換 0.5%以上'}] },
+];
+
+const SC = { live:'稼働中', wip:'開発中 / 刷新中', concept:'構想中' };
+const DC = { live:'#10b981', wip:'#f59e0b', concept:'#3a5470' };
+
+// ══════════════════════════════════════════════════
+//  STARS
+// ══════════════════════════════════════════════════
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [], raf;
+
+function initStars() {
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  stars = [];
+  const n = Math.floor(canvas.width * canvas.height / 3600);
+  for (let i = 0; i < n; i++)
+    stars.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+      r:Math.random()*1.4+.18, a:Math.random()*.65+.12,
+      tw:Math.random()<.13, ph:Math.random()*Math.PI*2, sp:Math.random()*.007+.002 });
+}
+function renderStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    const a = s.tw ? s.a*(0.45+0.55*Math.sin(t*.001*s.sp*700+s.ph)) : s.a;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28);
+    ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.fill();
+    if (s.r > 1.1) { ctx.beginPath(); ctx.arc(s.x, s.y, s.r*3, 0, 6.28); ctx.fillStyle = `rgba(200,220,255,${a*.06})`; ctx.fill(); }
+  });
+  raf = requestAnimationFrame(renderStars);
+}
+
+// ══════════════════════════════════════════════════
+//  NODE DOM
+// ══════════════════════════════════════════════════
+function hexL(hex, a) { return [1,3,5].map(i=>Math.min(255,parseInt(hex.slice(i,i+2),16)+a)).reduce((s,v,i)=>s+(i?',':'')+v,'rgb(')+')';}
+function hexD(hex, a) { return [1,3,5].map(i=>Math.max(0,parseInt(hex.slice(i,i+2),16)-a)).reduce((s,v,i)=>s+(i?',':'')+v,'rgb(')+')';}
+
+function mkNode(n) {
+  const el = document.createElement('div');
+  el.className = 'node' + (n.isCore ? ' core-node' : '');
+  el.id = 'nd-' + n.id;
+  el.style.left = n.px + '%'; el.style.top = n.py + '%';
+
+  const halo = document.createElement('div');
+  halo.className = 'node-halo';
+  halo.style.cssText = `width:${n.size+30}px;height:${n.size+30}px;color:${n.color};`;
+  el.appendChild(halo);
+
+  const orb = document.createElement('div');
+  orb.className = 'node-orb';
+  const gs1 = n.isCore
+    ? `0 0 24px 6px ${n.g1},0 0 60px 12px ${n.g2},inset 0 1px 0 rgba(255,255,255,.18)`
+    : `0 0 12px 2px ${n.g1},0 0 30px 5px ${n.g2},inset 0 1px 0 rgba(255,255,255,.12)`;
+  const gs2 = n.isCore
+    ? `0 0 36px 10px ${n.g1},0 0 80px 18px ${n.g2},inset 0 1px 0 rgba(255,255,255,.22)`
+    : `0 0 20px 5px ${n.g1},0 0 44px 8px ${n.g2},inset 0 1px 0 rgba(255,255,255,.16)`;
+  const dl = (Math.random()*2).toFixed(1);
+  orb.style.cssText = `width:${n.size}px;height:${n.size}px;background:radial-gradient(circle at 36% 34%,${hexL(n.color,50)},${n.color} 65%,${hexD(n.color,22)} 100%);--gs1:${gs1};--gs2:${gs2};box-shadow:${gs1};animation:${n.isCore?'corePulse 3.2':'orbPulse 4.6'}s ease-in-out ${dl}s infinite;`;
+
+  const ic = document.createElement('span');
+  ic.textContent = n.icon;
+  ic.style.cssText = `font-size:${n.isCore?34:24}px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.5));`;
+  orb.appendChild(ic);
+
+  const dot = document.createElement('div');
+  dot.className = `node-status s-${n.status}`;
+  orb.appendChild(dot);
+  el.appendChild(orb);
+
+  const lbl = document.createElement('div');
+  lbl.className = 'node-label';
+  lbl.style.top = (n.size + 11) + 'px';
+  lbl.innerHTML = `<span class="nl-name">${n.name}</span><span class="nl-en">${n.nameEn}</span>`;
+  el.appendChild(lbl);
+
+  // ── DRAG / CLICK ──
+  let ds = null;
+  const onDown = e => {
+    const pt = e.touches ? e.touches[0] : e;
+    ds = { sx: pt.clientX, sy: pt.clientY, ox: n.px, oy: n.py, moved: false };
+    if (editMode) { document.body.classList.add('dragging'); e.preventDefault(); }
+  };
+  const onMove = e => {
+    if (!ds || !editMode) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - ds.sx, dy = pt.clientY - ds.sy;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) ds.moved = true;
+    if (!ds.moved) return;
+    const uni = document.getElementById('universe');
+    const W = uni.clientWidth, H = uni.clientHeight;
+    n.px = Math.max(4, Math.min(96, ds.ox + dx / W * 100));
+    n.py = Math.max(4, Math.min(96, ds.oy + dy / H * 100));
+    el.style.left = n.px + '%'; el.style.top = n.py + '%';
+    n.isCore ? refreshAllSVG() : refreshLineSVG(n.id);
+  };
+  const onUp = () => {
+    document.body.classList.remove('dragging');
+    const wasMoved = ds && ds.moved;
+    const wasDown  = !!ds;
+    ds = null;
+    if (wasDown && wasMoved) savePositions();
+    if (wasDown && !wasMoved) openPanel(n.id);
+  };
+
+  el.addEventListener('mousedown', onDown, { passive: false });
+  el.addEventListener('touchstart', onDown, { passive: false });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', e => { if (ds && editMode) { e.preventDefault(); onMove(e); } }, { passive: false });
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+
+  return el;
+}
+
+// ══════════════════════════════════════════════════
+//  SVG  — aura + orbit rings + connection lines
+// ══════════════════════════════════════════════════
+const svg = document.getElementById('overlay');
+
+function buildSVG() {
+  svg.innerHTML = '';
+  const W = svg.clientWidth  || window.innerWidth;
+  const H = svg.clientHeight || (window.innerHeight - 48);
+  const core = NODES.find(n => n.id === 'core');
+  const cx = core.px / 100 * W;
+  const cy = core.py / 100 * H;
+  const aR = Math.min(W, H) * 0.52;          // aura radius — big enough to enclose all nodes
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  svg.appendChild(defs);
+
+  // ── Aura radial gradient ──
+  const aGrad = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+  aGrad.setAttribute('id', 'aura-g'); aGrad.setAttribute('gradientUnits', 'userSpaceOnUse');
+  aGrad.setAttribute('cx', cx); aGrad.setAttribute('cy', cy); aGrad.setAttribute('r', aR);
+  [['0%','rgba(139,92,246,0.10)'],['40%','rgba(139,92,246,0.05)'],['75%','rgba(139,92,246,0.015)'],['100%','rgba(139,92,246,0)']].forEach(([o,c]) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset',o); s.setAttribute('stop-color',c); aGrad.appendChild(s);
+  });
+  defs.appendChild(aGrad);
+
+  // ── Aura circle (fill) ──
+  const aFill = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  aFill.setAttribute('id','aura-fill');
+  Object.entries({cx,cy,r:aR,fill:'url(#aura-g)'}).forEach(([k,v])=>aFill.setAttribute(k,v));
+  svg.appendChild(aFill);
+
+  // ── Aura border ring ──
+  const aBorder = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  aBorder.setAttribute('id','aura-border');
+  Object.entries({cx,cy,r:aR,fill:'none',stroke:'rgba(139,92,246,0.14)','stroke-width':'1','stroke-dasharray':'5 14'}).forEach(([k,v])=>aBorder.setAttribute(k,v));
+  svg.appendChild(aBorder);
+
+  // ── Aura outer ghost ──
+  const aOuter = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  aOuter.setAttribute('id','aura-outer');
+  Object.entries({cx,cy,r:aR*1.18,fill:'none',stroke:'rgba(139,92,246,0.05)','stroke-width':'1','stroke-dasharray':'2 20'}).forEach(([k,v])=>aOuter.setAttribute(k,v));
+  svg.appendChild(aOuter);
+
+  // ── Aura label (text on arc) ──
+  const pathId = 'aura-arc';
+  const arcPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+  arcPath.setAttribute('id', pathId);
+  arcPath.setAttribute('d', `M ${cx - aR},${cy} A ${aR},${aR} 0 0,1 ${cx + aR},${cy}`);
+  arcPath.setAttribute('fill', 'none');
+  defs.appendChild(arcPath);
+
+  const aText = document.createElementNS('http://www.w3.org/2000/svg','text');
+  aText.setAttribute('id','aura-text');
+  aText.setAttribute('fill','rgba(139,92,246,0.28)');
+  aText.setAttribute('font-family','"DM Mono", monospace');
+  aText.setAttribute('font-size','10');
+  aText.setAttribute('letter-spacing','6');
+  const tp = document.createElementNS('http://www.w3.org/2000/svg','textPath');
+  tp.setAttribute('href','#'+pathId);
+  tp.setAttribute('startOffset','50%');
+  tp.setAttribute('text-anchor','middle');
+  tp.textContent = 'A I K E A R E   L A B O';
+  aText.appendChild(tp);
+  svg.appendChild(aText);
+
+  // ── Inner orbit rings ──
+  [aR*0.48, aR*0.75].forEach((r, i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('class','orbit');
+    Object.entries({cx,cy,r,fill:'none',stroke:'rgba(139,92,246,0.06)','stroke-width':'1','stroke-dasharray':'3 12'}).forEach(([k,v])=>c.setAttribute(k,v));
+    svg.appendChild(c);
+  });
+
+  // ── Connection lines ──
+  NODES.filter(n => n.id !== 'core').forEach(n => {
+    const x2 = n.px/100*W, y2 = n.py/100*H;
+    const gid = 'g-'+n.id;
+    const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+    grad.setAttribute('id',gid); grad.setAttribute('gradientUnits','userSpaceOnUse');
+    ['x1','y1','x2','y2'].forEach((a,i)=>grad.setAttribute(a,[cx,cy,x2,y2][i]));
+    [['0%','rgba(139,92,246,0.45)'],['100%',n.color+'99']].forEach(([o,c])=>{ const s=document.createElementNS('http://www.w3.org/2000/svg','stop'); s.setAttribute('offset',o); s.setAttribute('stop-color',c); grad.appendChild(s); });
+    defs.appendChild(grad);
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('id','ln-'+n.id);
+    line.style.setProperty('--lc', n.color);
+    Object.entries({x1:cx,y1:cy,x2,y2,stroke:`url(#${gid})`,'stroke-width':'1.2','stroke-dasharray':'5 6'}).forEach(([k,v])=>line.setAttribute(k,v));
+    svg.appendChild(line);
+  });
+}
+
+// ── Incremental SVG updates (during drag) ──
+function refreshLineSVG(id) {
+  const cont = document.getElementById('universe');
+  const W = cont.clientWidth, H = cont.clientHeight;
+  const n    = NODES.find(x => x.id === id);
+  const core = NODES.find(x => x.id === 'core');
+  const cx = core.px/100*W, cy = core.py/100*H;
+  const x2 = n.px/100*W,    y2 = n.py/100*H;
+  const ln = document.getElementById('ln-'+id);
+  const gr = document.getElementById('g-'+id);
+  if (ln) { ln.setAttribute('x2',x2); ln.setAttribute('y2',y2); }
+  if (gr) { gr.setAttribute('x2',x2); gr.setAttribute('y2',y2); }
+}
+
+function refreshAllSVG() {
+  const cont = document.getElementById('universe');
+  const W = cont.clientWidth, H = cont.clientHeight;
+  const core = NODES.find(x => x.id === 'core');
+  const cx = core.px/100*W, cy = core.py/100*H;
+  const aR = Math.min(W, H) * 0.52;
+
+  // Aura elements
+  ['aura-fill','aura-border','aura-outer'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    el.setAttribute('cx', cx); el.setAttribute('cy', cy);
+    if (id === 'aura-outer') el.setAttribute('r', aR * 1.18);
+    else el.setAttribute('r', aR);
+  });
+  const ag = document.getElementById('aura-g');
+  if (ag) { ag.setAttribute('cx',cx); ag.setAttribute('cy',cy); ag.setAttribute('r',aR); }
+
+  // Aura arc text path
+  const arcPath = document.getElementById('aura-arc');
+  if (arcPath) arcPath.setAttribute('d', `M ${cx-aR},${cy} A ${aR},${aR} 0 0,1 ${cx+aR},${cy}`);
+
+  // Orbit rings
+  document.querySelectorAll('#overlay circle.orbit').forEach((c, i) => {
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy);
+    c.setAttribute('r', [aR*0.48, aR*0.75][i]);
+  });
+
+  // All lines + gradients
+  NODES.filter(n => n.id !== 'core').forEach(n => {
+    const x2 = n.px/100*W, y2 = n.py/100*H;
+    const ln = document.getElementById('ln-'+n.id);
+    const gr = document.getElementById('g-'+n.id);
+    if (ln) { ln.setAttribute('x1',cx); ln.setAttribute('y1',cy); }
+    if (gr) { gr.setAttribute('x1',cx); gr.setAttribute('y1',cy); gr.setAttribute('x2',x2); gr.setAttribute('y2',y2); }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  PANEL
+// ══════════════════════════════════════════════════
+let activeId = null;
+
+const ADD_BTN = `background:none;border:1px solid currentColor;border-radius:3px;font-family:var(--mono);font-size:9px;letter-spacing:.07em;padding:1px 7px;cursor:pointer;opacity:.55;transition:opacity .15s;`;
+
+const POS_KEY = 'aicare-node-positions';
+function savePositions() {
+  const pos = {};
+  NODES.forEach(n => { pos[n.id] = { px: n.px, py: n.py }; });
+  localStorage.setItem(POS_KEY, JSON.stringify(pos));
+}
+function loadPositions() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(POS_KEY) || '{}');
+    NODES.forEach(n => {
+      if (saved[n.id]) { n.px = saved[n.id].px; n.py = saved[n.id].py; }
+    });
+  } catch(e) {}
+}
+
+let editMode = false;
+function toggleEditMode() {
+  editMode = !editMode;
+  const btn = document.getElementById('edit-pos-btn');
+  if (editMode) {
+    btn.classList.add('active');
+    btn.textContent = '⊹ 位置編集中';
+    document.getElementById('hint').textContent = 'ドラッグで移動 · クリックで詳細 · ESC で閉じる';
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '⊹ 位置編集';
+    document.getElementById('hint').textContent = 'クリックで詳細 · ESC で閉じる';
+  }
+}
+
+function kgiRows(n) {
+  if (!n.kgis) n.kgis = [];
+  let h = '';
+  n.kgis.forEach((k, i) => {
+    h += `<div class="pd-item" style="border-color:rgba(139,92,246,0.22);background:rgba(139,92,246,0.08);align-items:flex-start;padding:10px 12px">
+      <div class="pd-dot" style="background:#a78bfa;box-shadow:0 0 4px #a78bfa44;margin-top:7px;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div class="pd-kgi-name" contenteditable="true"
+          data-node="${n.id}" data-ktype="kgis" data-idx="${i}" data-field="name"
+          onblur="saveField(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          >${k.name}</div>
+        <div class="pd-k-desc" contenteditable="true"
+          data-node="${n.id}" data-ktype="kgis" data-idx="${i}" data-field="desc"
+          onblur="saveField(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          >${k.desc||''}</div>
+      </div>
+      <span onclick="removeKItem('${n.id}','kgis',${i})" style="cursor:pointer;color:#3a5470;font-size:14px;padding:0 3px;flex-shrink:0;transition:color .15s" onmouseover="this.style.color='#e87070'" onmouseout="this.style.color='#3a5470'">✕</span>
+    </div>`;
+  });
+  return h;
+}
+
+function kpiRows(n) {
+  if (!n.kpis) n.kpis = [];
+  let h = '';
+  n.kpis.forEach((k, i) => {
+    h += `<div class="pd-item" style="border-color:rgba(59,130,246,0.22);background:rgba(59,130,246,0.08);align-items:flex-start;padding:10px 12px">
+      <div class="pd-dot" style="background:#60a5fa;margin-top:7px;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div class="pd-kpi-name" contenteditable="true"
+          data-node="${n.id}" data-ktype="kpis" data-idx="${i}" data-field="name"
+          onblur="saveField(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          >${k.name}</div>
+        <div class="pd-k-desc" contenteditable="true"
+          data-node="${n.id}" data-ktype="kpis" data-idx="${i}" data-field="desc"
+          onblur="saveField(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          >${k.desc||''}</div>
+      </div>
+      <span onclick="removeKItem('${n.id}','kpis',${i})" style="cursor:pointer;color:#3a5470;font-size:14px;padding:0 3px;flex-shrink:0;transition:color .15s" onmouseover="this.style.color='#e87070'" onmouseout="this.style.color='#3a5470'">✕</span>
+    </div>`;
+  });
+  return h;
+}
+
+function renderPanelBody(n) {
+  let b = `<p class="pd-desc">${n.desc}</p>`;
+  if (n.kv)   b += `<div class="pd-kv">${n.kv}</div>`;
+  if (n.tags?.length) b += `<div class="pd-tags">${n.tags.map(t=>`<span class="pd-tag">${t}</span>`).join('')}</div>`;
+  if (n.items?.length) {
+    b += `<div class="pd-sec">構成要素</div>`;
+    n.items.forEach(it => b += `<div class="pd-item"><div class="pd-dot" style="background:${DC[it.status]};${it.status==='live'?`box-shadow:0 0 4px ${DC[it.status]};`:''}"></div><div><div class="pd-iname">${it.name}</div><div class="pd-idesc">${it.desc}</div></div></div>`);
+  }
+
+  // KGI
+  b += `<div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <span class="kgi-label">▍ KGI</span>
+    <button style="${ADD_BTN}color:#a78bfa" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.55'" onclick="addKItem('${n.id}','kgis')">+ 追加</button>
+  </div>`;
+  b += `<div id="kgi-rows-${n.id}">` + kgiRows(n) + `</div>`;
+  if (!n.kgis.length) b += `<div style="font-family:var(--mono);font-size:10px;color:#1e3048;padding:6px 10px;">— まだ設定されていません —</div>`;
+
+  // KPI
+  b += `<div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <span class="kpi-label">▍ KPI</span>
+    <button style="${ADD_BTN}color:#60a5fa" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.55'" onclick="addKItem('${n.id}','kpis')">+ 追加</button>
+  </div>`;
+  b += `<div id="kpi-rows-${n.id}">` + kpiRows(n) + `</div>`;
+  if (!n.kpis.length) b += `<div style="font-family:var(--mono);font-size:10px;color:#1e3048;padding:6px 10px;">— まだ設定されていません —</div>`;
+
+  if (n.link) b += `<a class="pd-link" href="${n.link.href}" style="margin-top:20px;border-color:${n.color}30;color:${n.color}">${n.link.label}</a>`;
+  return b;
+}
+
+function saveField(el) {
+  const { node: id, ktype, idx, field } = el.dataset;
+  const n = NODES.find(x => x.id === id);
+  if (!n || !n[ktype]) return;
+  n[ktype][+idx][field] = el.textContent.trim();
+}
+
+function addKItem(id, ktype) {
+  const n = NODES.find(x => x.id === id);
+  if (!n) return;
+  if (!n[ktype]) n[ktype] = [];
+  n[ktype].push({ name: '新しい' + (ktype === 'kgis' ? 'KGI' : 'KPI'), desc: '' });
+  // re-render only the rows section
+  const rowsEl = document.getElementById((ktype === 'kgis' ? 'kgi' : 'kpi') + '-rows-' + id);
+  if (rowsEl) {
+    rowsEl.innerHTML = (ktype === 'kgis' ? kgiRows : kpiRows)(n);
+    // focus last added name
+    const last = rowsEl.querySelectorAll('[data-field="name"]');
+    if (last.length) { const el = last[last.length-1]; el.focus(); document.execCommand('selectAll',false,null); }
+  }
+}
+
+function removeKItem(id, ktype, idx) {
+  const n = NODES.find(x => x.id === id);
+  if (!n || !n[ktype]) return;
+  n[ktype].splice(idx, 1);
+  const rowsEl = document.getElementById((ktype === 'kgis' ? 'kgi' : 'kpi') + '-rows-' + id);
+  if (rowsEl) rowsEl.innerHTML = (ktype === 'kgis' ? kgiRows : kpiRows)(n);
+}
+
+function openPanel(id) {
+  if (activeId === id) { closePanel(); return; }
+  activeId = id;
+  const n = NODES.find(x => x.id === id);
+  document.querySelectorAll('.node').forEach(el => el.classList.remove('active'));
+  document.getElementById('nd-'+id)?.classList.add('active');
+  document.querySelectorAll('#overlay line').forEach(l => l.classList.remove('hi'));
+  document.getElementById('ln-'+id)?.classList.add('hi');
+  document.getElementById('panel-stripe').style.background = n.color;
+  document.getElementById('panel-head').innerHTML = `
+    <div class="ph-icon" style="background:${n.color}20;border:1px solid ${n.color}40">${n.icon}</div>
+    <div style="flex:1;min-width:0"><div class="ph-title">${n.name}</div><div class="ph-en">${n.nameEn}</div><span class="ph-badge ${n.status}">${SC[n.status]}</span></div>
+    <button class="ph-close" onclick="closePanel()">✕</button>`;
+  document.getElementById('panel-body').innerHTML = renderPanelBody(n);
+  document.getElementById('panel').classList.add('open');
+}
+
+function closePanel() {
+  activeId = null;
+  document.getElementById('panel').classList.remove('open');
+  document.querySelectorAll('.node').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('#overlay line').forEach(l => l.classList.remove('hi'));
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+function init() {
+  loadPositions();
+  initStars();
+  raf = requestAnimationFrame(renderStars);
+  const cont = document.getElementById('nodes');
+  NODES.forEach(n => cont.appendChild(mkNode(n)));
+  requestAnimationFrame(buildSVG);
+}
+
+let resT;
+window.addEventListener('resize', () => {
+  clearTimeout(resT);
+  resT = setTimeout(() => {
+    cancelAnimationFrame(raf);
+    initStars(); raf = requestAnimationFrame(renderStars);
+    buildSVG();
+  }, 120);
+});
+
+document.getElementById('universe').addEventListener('mouseup', e => {
+  if (e.target === document.getElementById('universe') ||
+      e.target === document.getElementById('starfield') ||
+      e.target === document.getElementById('nebula')) {
+    closePanel();
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePanel(); closeAuth(); closeKPI(); } });
+
+function openAuth()  { document.getElementById('auth-overlay').classList.add('open'); }
+function closeAuth() { document.getElementById('auth-overlay').classList.remove('open'); }
+
+function openKPI()  { document.getElementById('kpi-overlay').classList.add('open'); }
+function closeKPI() { document.getElementById('kpi-overlay').classList.remove('open'); }
+
+const STATUS_CYCLE = [
+  { cls: 's-active', label: '● 進行中' },
+  { cls: 's-done',   label: '✓ 完了' },
+  { cls: 's-none',   label: '○ 未着手' },
+  { cls: 's-unset',  label: '未設定' },
+];
+function cycleStatus(el) {
+  const cur = STATUS_CYCLE.findIndex(s => el.classList.contains(s.cls));
+  const next = STATUS_CYCLE[(cur + 1) % STATUS_CYCLE.length];
+  STATUS_CYCLE.forEach(s => el.classList.remove(s.cls));
+  el.classList.add(next.cls);
+  el.textContent = next.label;
+}
+
+init();
+
+// ── リアルタイム自動保存 ──────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { try { savePositions(); } catch(e) {} }
+});
+window.addEventListener('beforeunload', () => { try { savePositions(); } catch(e) {} });
+</script>
+</body>
+</html>

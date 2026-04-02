@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アイケアLaBo — ブランディング戦略 &amp; ペルソナ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #07101f;
+      --panel:    #0c1b2e;
+      --card:     #0f2035;
+      --border:   rgba(59,130,246,0.14);
+      --border2:  rgba(59,130,246,0.24);
+      --blue:     #3b82f6;
+      --blue-lt:  #60a5fa;
+      --blue-dim: rgba(59,130,246,0.10);
+      --amber:    #f59e0b;
+      --amber-dim:rgba(245,158,11,0.10);
+      --green:    #10b981;
+      --green-dim:rgba(16,185,129,0.10);
+      --red:      #ef4444;
+      --red-dim:  rgba(239,68,68,0.10);
+      --orange:   #fb923c;
+      --text:     #dde6f0;
+      --text2:    #8fa8c4;
+      --text3:    #4e6a88;
+      --mono:     'DM Mono', monospace;
+      --body:     'Noto Sans JP', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.15);
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+      flex-wrap: nowrap;
+      overflow-x: auto; overflow-y: hidden;
+      white-space: nowrap;
+      height: 42px; min-height: 42px; max-height: 42px;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav > * { flex-shrink: 0; }
+    .nav a {
+      color: var(--text2); text-decoration: none;
+      padding: 4px 12px; border-radius: 4px;
+      border: 1px solid rgba(148,163,184,0.15); transition: color 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--blue); border-color: rgba(59,130,246,0.35); background: var(--blue-dim); }
+    .nav-sep { color: var(--text3); margin: 0 2px; flex-shrink: 0; }
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 56px 32px 80px; }
+
+    .section { margin-bottom: 72px; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 10px; display: block;
+    }
+    .sec-title {
+      font-size: clamp(22px, 3vw, 30px); font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em; line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .sec-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; line-height: 1.7; }
+    .divider { border: none; border-top: 1px solid var(--border); margin-bottom: 32px; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 36px 40px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .hero-top { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+    .hero-ava {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #1d3a5e, #2952a3);
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(59,130,246,0.3);
+    }
+    .hero-ava svg { width: 30px; height: 30px; fill: rgba(96,165,250,0.85); }
+    .hero-name { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .hero-role { font-size: 14px; color: var(--text2); margin-top: 3px; }
+    .hero-badge {
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em;
+      color: var(--blue); border: 1px solid rgba(59,130,246,0.3);
+      background: var(--blue-dim); border-radius: 4px;
+      padding: 3px 10px; display: inline-block; margin-top: 8px;
+    }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      border: 1px solid var(--border2); border-radius: 8px;
+      padding: 10px 18px; background: rgba(0,0,0,0.25);
+    }
+    .chip-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); display: block; margin-bottom: 2px; }
+    .chip-value { font-size: 16px; font-weight: 700; color: var(--text); }
+    .hero-quote {
+      border-left: 3px solid var(--amber);
+      background: var(--amber-dim);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 22px;
+      font-size: 15px; font-style: italic;
+      color: var(--text); line-height: 1.85;
+    }
+
+    /* ── POSITIONING BOX ── */
+    .positioning {
+      background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.06));
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .pos-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text3); margin-bottom: 10px; }
+    .pos-main { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1.3; margin-bottom: 12px; }
+    .pos-main span { color: var(--blue-lt); }
+    .pos-sub { font-size: 14px; color: var(--text2); line-height: 1.75; max-width: 640px; margin: 0 auto; }
+
+    /* ── 2-COL ── */
+    .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 640px) { .col2 { grid-template-columns: 1fr; } }
+
+    /* ── INFO CARD ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 26px;
+      margin-bottom: 14px;
+    }
+    .card:last-child { margin-bottom: 0; }
+    .card-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 14px; display: block;
+    }
+    .card-title.red { color: var(--red); }
+    .card-title.amber { color: var(--amber); }
+    .card-title.green { color: var(--green); }
+
+    /* info rows */
+    .info-row {
+      display: flex; gap: 12px; padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .ir-lbl { font-size: 12px; color: var(--text3); min-width: 60px; flex-shrink: 0; line-height: 1.6; }
+    .ir-val { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.6; }
+    .ir-val.warn { color: var(--orange); }
+    .ir-val.danger { color: var(--red); }
+
+    /* stat chips in card */
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .stat-box {
+      background: rgba(0,0,0,0.25); border: 1px solid var(--border2);
+      border-radius: 6px; padding: 12px 14px;
+    }
+    .stat-num { font-size: 22px; font-weight: 700; line-height: 1.1; margin-bottom: 3px; }
+    .stat-num.blue { color: var(--blue-lt); }
+    .stat-num.red  { color: var(--red); }
+    .stat-num.amber { color: var(--amber); }
+    .stat-num.green { color: var(--green); }
+    .stat-desc { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
+
+    /* psych */
+    .psych-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:560px) { .psych-cols { grid-template-columns: 1fr; } }
+    .psych-box { border-radius: 7px; padding: 14px 16px; }
+    .psych-box.surface { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2); }
+    .psych-box.deep    { background: var(--red-dim);  border: 1px solid rgba(239,68,68,0.2); }
+    .psych-head { font-size: 11.5px; font-weight: 700; margin-bottom: 10px; }
+    .psych-head.blue { color: var(--blue-lt); }
+    .psych-head.red  { color: var(--red); }
+    .psych-item { font-size: 13px; color: var(--text2); padding: 3px 0 3px 12px; position: relative; line-height: 1.6; }
+    .psych-item::before { content: '—'; position: absolute; left: 0; color: var(--text3); }
+
+    /* timeline horizontal */
+    .tl-h { display: flex; flex-wrap: wrap; gap: 0; }
+    .tl-col { display: flex; flex-direction: column; align-items: center; padding: 0 10px; min-width: 80px; position: relative; }
+    .tl-col:not(:last-child)::after {
+      content: '→'; position: absolute; right: -8px; top: 18px;
+      color: var(--text3); font-size: 14px;
+    }
+    .tl-time { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 5px; }
+    .tl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text3); margin-bottom: 6px; }
+    .tl-dot.s { background: var(--orange); }
+    .tl-dot.d { background: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
+    .tl-lbl { font-size: 11.5px; color: var(--text2); text-align: center; line-height: 1.5; }
+
+    /* trigger list */
+    .trig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+    .trig-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 11px 14px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .trig-n {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+      background: var(--blue-dim); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: var(--blue); margin-top: 2px;
+    }
+    .trig-t { font-size: 12.5px; color: var(--text2); line-height: 1.55; }
+
+    /* ── EYE-BODY EVIDENCE ── */
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width: 640px) { .evidence-grid { grid-template-columns: 1fr; } }
+    .ev-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px 22px;
+    }
+    .ev-card.highlight { border-left: 3px solid var(--blue); }
+    .ev-icon { font-size: 20px; margin-bottom: 8px; }
+    .ev-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .ev-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+    .ev-body strong { color: var(--text); }
+    .ev-source {
+      font-family: var(--mono); font-size: 9px; color: var(--text3);
+      margin-top: 10px; display: block; line-height: 1.5;
+    }
+
+    /* chain flow */
+    .chain {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 20px 24px; margin-top: 14px;
+    }
+    .chain-title { font-size: 13px; font-weight: 700; color: var(--blue-lt); margin-bottom: 14px; }
+    .chain-flow {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    }
+    .chain-node {
+      background: var(--blue-dim); border: 1px solid var(--border2);
+      border-radius: 5px; padding: 6px 12px;
+      font-size: 12.5px; color: var(--text); font-weight: 500;
+    }
+    .chain-node.red { background: var(--red-dim); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+    .chain-node.amber { background: var(--amber-dim); border-color: rgba(245,158,11,0.25); color: #fcd34d; }
+    .chain-arr { color: var(--text3); font-size: 16px; flex-shrink: 0; }
+
+    /* ── STATE BAR ── */
+    .state-bar {
+      display: flex; align-items: center; border-radius: 8px;
+      overflow: hidden; height: 44px; margin-bottom: 16px;
+    }
+    .sb-l {
+      flex: 3; background: rgba(99,102,241,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.28); height: 100%;
+    }
+    .sb-c {
+      flex: 1.2; background: var(--amber);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #000; white-space: nowrap; height: 100%;
+    }
+    .sb-r {
+      flex: 2; background: rgba(16,185,129,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: #34d399;
+      border: 1px solid rgba(16,185,129,0.25); height: 100%;
+    }
+    .state-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:560px) { .state-cols { grid-template-columns: 1fr; } }
+    .state-box { border-radius: 6px; padding: 14px 16px; font-size: 13px; color: var(--text2); line-height: 1.65; }
+    .state-box.lat { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); }
+    .state-box.man { background: var(--green-dim); border: 1px solid rgba(16,185,129,0.2); }
+    .state-box-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block; }
+    .state-box.lat .state-box-title { color: #a5b4fc; }
+    .state-box.man .state-box-title { color: #34d399; }
+
+    /* ── FUNNEL STAGES ── */
+    .stage {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 6px; overflow: hidden;
+    }
+    .stage.s1 { border-left: 4px solid #6366f1; }
+    .stage.s2 { border-left: 4px solid var(--blue); }
+    .stage.s3 { border-left: 4px solid #818cf8; }
+    .stage.s4 { border-left: 4px solid var(--amber); }
+    .stage.s5 { border-left: 4px solid var(--green); }
+
+    .stage-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 24px;
+    }
+    .stage-num {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+      color: var(--text3); background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 3px 8px; white-space: nowrap; flex-shrink: 0;
+    }
+    .stage-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+    .stage-tag {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+      border-radius: 4px; padding: 3px 9px; white-space: nowrap; flex-shrink: 0;
+    }
+    .s1 .stage-tag { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+    .s2 .stage-tag { background: var(--blue-dim); color: var(--blue-lt); }
+    .s3 .stage-tag { background: rgba(129,140,248,0.10); color: #818cf8; }
+    .s4 .stage-tag { background: var(--amber-dim); color: var(--amber); }
+    .s5 .stage-tag { background: var(--green-dim); color: var(--green); }
+
+    .stage-body {
+      padding: 0 24px 24px;
+      display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; gap: 12px;
+    }
+    @media(max-width:760px) { .stage-body { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:480px) { .stage-body { grid-template-columns: 1fr; } }
+
+    .ab {
+      border-radius: 6px; padding: 14px 16px;
+    }
+    .ab.state    { background: rgba(0,0,0,0.2); border: 1px solid var(--border); }
+    .ab.attack   { background: var(--red-dim); border: 1px solid rgba(239,68,68,0.2); }
+    .ab.creative { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2); }
+    .ab.media    { background: var(--green-dim); border: 1px solid rgba(16,185,129,0.2); }
+
+    .ab-lbl {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+    }
+    .ab.state .ab-lbl    { color: var(--text3); }
+    .ab.attack .ab-lbl   { color: var(--red); }
+    .ab.creative .ab-lbl { color: var(--blue-lt); }
+    .ab.media .ab-lbl    { color: var(--green); }
+
+    .ab-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+    .ab-body strong { color: var(--text); }
+    .copy-pill {
+      display: block; margin-top: 6px;
+      background: rgba(0,0,0,0.35); border: 1px solid var(--border2);
+      border-radius: 4px; padding: 6px 10px;
+      font-size: 13px; font-style: italic; color: var(--text); line-height: 1.6;
+    }
+    .media-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .media-chip {
+      font-size: 11px; padding: 2px 9px; border-radius: 4px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399;
+    }
+    .funnel-arr { text-align: center; color: var(--text3); font-size: 20px; padding: 6px 0; }
+
+    /* golden rules */
+    .golden {
+      background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px; padding: 22px 28px; margin-top: 20px;
+    }
+    .golden-head { font-size: 14px; font-weight: 700; color: var(--amber); margin-bottom: 14px; }
+    .golden-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+    .golden-rule { display: flex; gap: 10px; align-items: flex-start; }
+    .golden-n {
+      width: 22px; height: 22px; border-radius: 50%; background: var(--amber);
+      color: #000; font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .golden-t { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+    /* ── CREATIVE ── */
+    .creative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width: 640px) { .creative-grid { grid-template-columns: 1fr; } }
+    .c-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px 24px;
+    }
+    .c-card.rec { border-top: 3px solid var(--amber); }
+    .c-card.full { grid-column: 1 / -1; }
+    .c-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .c-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+    .c-badge {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+      color: var(--amber); background: var(--amber-dim);
+      border: 1px solid rgba(245,158,11,0.25); border-radius: 4px; padding: 2px 7px;
+    }
+    .c-lbl { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; color: var(--text3); margin-bottom: 4px; display: block; }
+    .c-val { font-size: 13px; color: var(--text2); line-height: 1.65; margin-bottom: 10px; }
+    .c-copy {
+      font-size: 13px; font-style: italic; color: var(--text);
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border2);
+      border-radius: 4px; padding: 8px 12px; margin: 4px 0 10px; line-height: 1.6;
+    }
+    .c-warn {
+      display: flex; gap: 8px; align-items: flex-start;
+      background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15);
+      border-radius: 4px; padding: 8px 12px;
+    }
+    .c-warn-x { color: var(--red); font-weight: 700; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+    .c-warn-t { font-size: 12px; color: #f87171; line-height: 1.6; }
+
+    /* ── SOURCES ── */
+    .sources {
+      background: rgba(9,18,35,0.8); border: 1px solid var(--border);
+      border-radius: 8px; padding: 24px 28px; margin-top: 56px;
+    }
+    .src-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 7px 28px; margin-top: 12px; }
+    .src-row { display: flex; gap: 8px; align-items: baseline; }
+    .src-n { font-family: var(--mono); font-size: 9px; color: var(--blue); flex-shrink: 0; }
+    .src-t { font-size: 11.5px; color: var(--text3); line-height: 1.6; }
+    .src-t strong { color: var(--text2); }
+
+    /* ══ BRANDING SECTION — Fixed CSS variables for branding content ══ */
+    /* branding.html用の追加CSS変数（persona側にないもの） */
+    :root {
+      --br-muted:   #8b949e;
+      --br-accent:  #4493f8;
+      --br-accent2: #3fb950;
+      --br-accent3: #f78166;
+      --br-accent4: #d2a8ff;
+      --br-yellow:  #e3b341;
+    }
+
+    /* ── br-hero ── */
+    .br-hero {
+      background: linear-gradient(135deg, #0d1f3c 0%, #1a1f2e 100%);
+      border: 1px solid #1f3a5f;
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .br-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(68,147,248,.12) 0%, transparent 70%);
+    }
+    .br-hero-tag {
+      font-size: 11px;
+      color: var(--br-accent);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 10px;
+    }
+    .br-hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+    .br-hero h1 em {
+      font-style: normal;
+      color: var(--br-accent);
+    }
+    .br-hero p { color: var(--br-muted); font-size: 14px; max-width: 680px; line-height: 1.7; }
+
+    /* ── br-cards / br-card ── */
+    .br-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+    @media(max-width:640px) { .br-cards { grid-template-columns: 1fr; } }
+    .br-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .br-card-label { font-size: 11px; color: var(--br-muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    .br-card-value { font-size: 22px; font-weight: 700; }
+    .br-card-sub { font-size: 12px; color: var(--br-muted); margin-top: 4px; }
+    .br-card-value.blue  { color: var(--br-accent); }
+    .br-card-value.green { color: var(--br-accent2); }
+    .br-card-value.purple{ color: var(--br-accent4); }
+
+    /* ── Competitor table ── */
+    .comp-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 13px; }
+    .comp-table th {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--br-muted);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .comp-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(59,130,246,0.08);
+      vertical-align: top;
+      color: var(--text2);
+    }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table tr:hover td { background: rgba(59,130,246,0.04); }
+    .cat-pill {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .pill-a { background: rgba(212,167,255,.15); color: var(--br-accent4); }
+    .pill-b { background: rgba(79,192,255,.15);  color: #79c0ff; }
+    .pill-c { background: rgba(247,129,102,.15); color: var(--br-accent3); }
+    .pill-d { background: rgba(227,179,65,.15);  color: var(--br-yellow); }
+    .pill-e { background: rgba(63,185,80,.15);   color: var(--br-accent2); }
+    .pill-f { background: rgba(139,148,158,.15); color: var(--br-muted); }
+
+    /* ── Positioning map ── */
+    .map-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .map-title { font-size: 13px; font-weight: 600; margin-bottom: 20px; color: var(--br-muted); text-transform: uppercase; letter-spacing: .08em; }
+    .map-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .axis-h, .axis-v {
+      position: absolute;
+      background: var(--border);
+    }
+    .axis-h { top: 50%; left: 5%; right: 5%; height: 1px; }
+    .axis-v { left: 50%; top: 5%; bottom: 5%; width: 1px; }
+    .axis-label {
+      position: absolute;
+      font-size: 10px;
+      color: var(--br-muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .label-top    { top: 7px;  left: 50%; transform: translateX(-50%); color: var(--br-accent2); font-weight: 600; }
+    .label-bottom { bottom: 7px; left: 50%; transform: translateX(-50%); }
+    .label-left   { top: 50%; left: 8px; transform: translateY(-50%); }
+    .label-right  { top: 50%; right: 8px; transform: translateY(-50%); color: var(--br-accent); font-weight: 600; }
+    .dot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: default;
+    }
+    .dot-inner {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--br-muted);
+      opacity: .6;
+    }
+    .dot-label {
+      position: absolute;
+      top: 12px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--br-muted);
+      white-space: nowrap;
+      text-align: center;
+    }
+    .dot.highlight .dot-inner {
+      width: 14px; height: 14px;
+      background: var(--br-accent);
+      opacity: 1;
+      box-shadow: 0 0 16px rgba(68,147,248,.5);
+    }
+    .dot.highlight .dot-label { color: var(--br-accent); font-weight: 700; font-size: 11px; }
+    .dot.med .dot-inner { background: #58a6ff; opacity: .5; }
+    .dot.cat-a .dot-inner { background: var(--br-accent4); }
+    .dot.cat-b .dot-inner { background: #79c0ff; }
+    .dot.cat-c .dot-inner { background: var(--br-accent3); }
+    .dot.cat-d .dot-inner { background: var(--br-yellow); }
+    .whitespace-zone {
+      position: absolute;
+      border: 2px dashed rgba(68,147,248,.35);
+      border-radius: 8px;
+      background: rgba(68,147,248,.04);
+    }
+    .whitespace-tag {
+      position: absolute;
+      font-size: 9px;
+      color: rgba(68,147,248,.7);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      top: -16px; left: 4px;
+    }
+
+    /* ── Insight box ── */
+    .insight {
+      background: linear-gradient(135deg, rgba(68,147,248,.08) 0%, rgba(68,147,248,.03) 100%);
+      border: 1px solid rgba(68,147,248,.3);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+    }
+    .insight-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .insight-icon {
+      width: 22px; height: 22px;
+      background: rgba(68,147,248,.2);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .insight-title { font-weight: 600; font-size: 14px; color: var(--text); }
+    .insight p { color: var(--br-muted); font-size: 13px; line-height: 1.7; }
+    .insight strong { color: var(--text); }
+
+    /* ── Position statement ── */
+    .position-statement {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--br-accent);
+      border-radius: 0 10px 10px 0;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .position-statement p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text);
+    }
+    .position-statement em {
+      font-style: normal;
+      color: var(--br-accent);
+      font-weight: 600;
+    }
+
+    /* ── Next steps ── */
+    .next-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 28px; }
+    @media(max-width:640px) { .next-steps { grid-template-columns: 1fr; } }
+    .next-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: default;
+      text-align: left;
+      text-decoration: none;
+      color: inherit;
+    }
+    .next-btn-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .next-btn-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; color: var(--text); }
+    .next-btn-desc { font-size: 12px; color: var(--br-muted); line-height: 1.5; }
+    .next-btn.done .next-btn-title::after {
+      content: ' ✓';
+      color: var(--br-accent2);
+    }
+
+    /* ── Legend ── */
+    .br-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+    .br-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--br-muted); }
+    .br-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── Branding section headers ── */
+    .br-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--br-muted);
+      margin-bottom: 12px;
+      margin-top: 36px;
+    }
+    .br-section-label:first-child { margin-top: 0; }
+
+    /* ── wip-tag ── */
+    .wip-tag {
+      font-size: 10px;
+      background: rgba(227,179,65,.15);
+      color: var(--br-yellow);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+
+    /* ── New sections responsive ── */
+    @media(max-width:760px) {
+      .new-3col { grid-template-columns: 1fr !important; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── DRAWER ── */
+    #drawer-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+    #drawer {
+      position: fixed; top: 0; right: 0;
+      width: 420px; height: 100vh;
+      background: #0c1b2e;
+      border-left: 1px solid rgba(59,130,246,0.24);
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    #drawer.open { transform: translateX(0); }
+    @media(max-width:480px) { #drawer { width: 100vw; } }
+
+    #drawer-header {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid rgba(59,130,246,0.14);
+      display: flex; flex-direction: column; gap: 6px;
+      position: relative; flex-shrink: 0;
+    }
+    #drawer-tag {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--blue); display: block;
+    }
+    #drawer-title {
+      font-size: 17px; font-weight: 700;
+      color: var(--text); line-height: 1.3;
+      padding-right: 32px;
+    }
+    #drawer-close {
+      position: absolute; top: 16px; right: 18px;
+      background: none; border: 1px solid rgba(59,130,246,0.2);
+      color: var(--text2); cursor: pointer;
+      width: 28px; height: 28px; border-radius: 6px;
+      font-size: 16px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, background 0.15s;
+    }
+    #drawer-close:hover { color: var(--text); background: rgba(59,130,246,0.1); }
+    #drawer-body {
+      flex: 1; overflow-y: auto; padding: 20px 22px 32px;
+      scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
+    }
+    #drawer-body::-webkit-scrollbar { width: 5px; }
+    #drawer-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* drawer inner styles */
+    .d-section { margin-bottom: 20px; }
+    .d-label {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text3); display: block; margin-bottom: 8px;
+    }
+    .d-text { font-size: 13px; color: var(--text2); line-height: 1.75; }
+    .d-text strong { color: var(--text); }
+    .d-quote {
+      border-left: 3px solid var(--blue); background: var(--blue-dim);
+      border-radius: 0 6px 6px 0; padding: 12px 16px;
+      font-size: 13px; font-style: italic; color: var(--text); line-height: 1.7;
+    }
+    .d-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .d-chip {
+      font-size: 11px; padding: 3px 9px; border-radius: 4px;
+      background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2); color: var(--blue-lt);
+    }
+    .d-chip.green { background: var(--green-dim); border-color: rgba(16,185,129,0.2); color: var(--green); }
+    .d-chip.amber { background: var(--amber-dim); border-color: rgba(245,158,11,0.2); color: var(--amber); }
+    .d-row {
+      display: flex; gap: 10px; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .d-row:last-child { border-bottom: none; }
+    .d-row-lbl { font-size: 11px; color: var(--text3); min-width: 80px; flex-shrink: 0; }
+    .d-row-val { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+    .d-copy {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border2);
+      border-radius: 5px; padding: 10px 14px;
+      font-size: 13px; font-style: italic; color: var(--text); line-height: 1.6; margin-top: 6px;
+    }
+    .d-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .d-journey { display: flex; flex-direction: column; gap: 4px; }
+    .d-journey-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 12px;
+    }
+    .d-journey-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--blue-dim); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9.5px; font-weight: 700; color: var(--blue); flex-shrink: 0; margin-top: 1px;
+    }
+    .d-journey-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+    /* ── BRAND MAP SECTION ── */
+    #brand-map { padding-top: 16px; }
+    .bm-tree {
+      background: var(--panel); border: 1px solid var(--border2);
+      border-radius: 12px; padding: 32px 28px; margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .bm-root {
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+    .bm-node {
+      background: var(--card); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 14px 24px;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      min-width: 280px;
+    }
+    .bm-node:hover { border-color: var(--blue); background: rgba(59,130,246,0.08); }
+    .bm-node.mission { border-color: rgba(59,130,246,0.4); border-top: 3px solid var(--blue); }
+    .bm-node.vision  { border-color: rgba(16,185,129,0.4); border-top: 3px solid var(--green); }
+    .bm-node.concept { border-color: rgba(245,158,11,0.4); border-top: 3px solid var(--amber); }
+    .bm-node.b2c     { border-color: rgba(59,130,246,0.3); }
+    .bm-node.b2b     { border-color: rgba(16,185,129,0.3); }
+    .bm-node.fc      { border-color: rgba(245,158,11,0.3); }
+    .bm-node-tag {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 5px; display: block;
+    }
+    .bm-node.mission .bm-node-tag { color: var(--blue); }
+    .bm-node.vision  .bm-node-tag { color: var(--green); }
+    .bm-node.concept .bm-node-tag { color: var(--amber); }
+    .bm-node.b2c .bm-node-tag { color: var(--blue-lt); }
+    .bm-node.b2b .bm-node-tag { color: var(--green); }
+    .bm-node.fc  .bm-node-tag { color: var(--amber); }
+    .bm-node-text {
+      font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.5;
+    }
+    .bm-arrow {
+      text-align: center; color: var(--text3); font-size: 18px;
+      padding: 4px 0; line-height: 1;
+    }
+    .bm-branch {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px; width: 100%;
+    }
+    .bm-branch-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .bm-sub {
+      background: rgba(0,0,0,0.25); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 14px; width: 100%;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .bm-sub:hover { border-color: var(--blue); }
+    .bm-sub-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; display: block; }
+    .bm-sub-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+    /* KGI / KPI tables */
+    .kgi-table, .kpi-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px; margin-bottom: 28px;
+    }
+    .kgi-table th, .kpi-table th {
+      text-align: left; padding: 9px 12px;
+      border-bottom: 1px solid var(--border2);
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text3); font-weight: 500;
+    }
+    .kgi-table td, .kpi-table td {
+      padding: 10px 12px; border-bottom: 1px solid rgba(59,130,246,0.07);
+      color: var(--text2); vertical-align: middle;
+    }
+    .kgi-table tr:last-child td, .kpi-table tr:last-child td { border-bottom: none; }
+    .kgi-table tbody tr, .kpi-table tbody tr {
+      cursor: pointer; transition: background 0.12s;
+    }
+    .kgi-table tbody tr:hover td, .kpi-table tbody tr:hover td {
+      background: rgba(59,130,246,0.06);
+    }
+    .kgi-table td strong, .kpi-table td strong { color: var(--text); }
+    /* editable cells */
+    .cell-edit {
+      outline: none; min-width: 40px;
+      border-radius: 3px; padding: 1px 4px;
+    }
+    .cell-edit:focus {
+      background: rgba(59,130,246,0.1);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.4);
+    }
+    /* status badges */
+    .badge {
+      display: inline-block; font-family: var(--mono);
+      font-size: 9.5px; letter-spacing: 0.06em;
+      border-radius: 4px; padding: 2px 9px; white-space: nowrap;
+    }
+    .badge-blue   { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.3); color: var(--blue-lt); }
+    .badge-green  { background: var(--green-dim); border: 1px solid rgba(16,185,129,0.3); color: var(--green); }
+    .badge-gray   { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.25); color: var(--text3); }
+    .badge-amber-dashed { background: transparent; border: 1px dashed rgba(245,158,11,0.5); color: var(--amber); }
+    .badge-amber  { background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.3); color: var(--amber); }
+
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<nav class="nav">
+  <span style="color:var(--text3);white-space:nowrap;">eye care lab</span>
+  <span class="nav-sep">/</span>
+  <a href="aicare-top-prototype.html">サイト</a>
+  <a href="persona-dashboard.html" class="active">ペルソナ</a>
+  <a href="reference-sites.html">参考サイト集</a>
+  <a href="aicare-brand-overview.html" style="color:#a78bfa;border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.07);">ブランド全体マップ</a>
+  <a href="store-persona-map.html" style="color:#10b981;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.07);">店舗ペルソナ分布</a>
+  <a href="project-board.html" style="color:#10b981;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.07);">PJボード</a>
+  <span class="nav-sep">|</span>
+  <a href="#branding-overview">概要</a>
+  <a href="#competitors">競合調査</a>
+  <a href="#positioning">ポジショニング</a>
+  <a href="#persona">ペルソナ詳細</a>
+  <span class="nav-sep">|</span>
+  <a href="#persona-detail">ペルソナ3体</a>
+  <a href="#brand-positioning">ポジショニング定義</a>
+  <a href="#brand-mission">ミッション</a>
+  <a href="#brand-map" style="color:#a78bfa;border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.07);">ブランドマップ</a>
+  <span class="nav-sep">|</span>
+  <a href="eyecare-glass-branding.html" style="color:var(--amber);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.07);">グラス ブランディング</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     BRANDING SECTIONS (統合: branding.html より)
+     ══════════════════════════════════════════════ -->
+
+<!-- ══ BRANDING OVERVIEW ══ -->
+<div id="branding-overview" class="wrap" style="padding-top:48px;">
+
+  <div class="section">
+    <span class="eyebrow">Branding Strategy — 2026</span>
+    <h2 class="sec-title">ブランド戦略概要</h2>
+    <hr class="divider">
+
+    <div class="br-hero">
+      <div class="br-hero-tag">Rebranding 2026</div>
+      <h1>「目」から始まる、<br><em>脳と全身の再設計</em>。</h1>
+      <p>アイケアラボが目指すポジション — 治験エビデンスに裏付けられた「脳の使い方のマネジメント」を軸に、目→脳→全身・生産性への波及を科学的に訴求する、全国唯一のアイケアチェーン。</p>
+    </div>
+
+    <div class="br-cards">
+      <div class="br-card">
+        <div class="br-card-label">現在の店舗数</div>
+        <div class="br-card-value blue">87店舗<span style="font-size:0.5em;color:var(--text2);margin-left:8px;">検討中 5件</span></div>
+        <div class="br-card-sub">今年中に100店舗は必達</div>
+      </div>
+      <div class="br-card">
+        <div class="br-card-label">競合調査対象</div>
+        <div class="br-card-value green">22社</div>
+        <div class="br-card-sub">国内16社 + 海外6社</div>
+      </div>
+      <div class="br-card">
+        <div class="br-card-label">治験データ公開</div>
+        <div class="br-card-value purple">2026.05</div>
+        <div class="br-card-sub">リブランディング・サイト刷新の起点</div>
+      </div>
+    </div>
+
+    <div class="br-section-label">アイケアラボの本質的提供価値</div>
+
+    <div class="insight">
+      <div class="insight-head">
+        <div class="insight-icon">🧠</div>
+        <div class="insight-title">「目を治す」ではなく「脳の使い方を変える」</div>
+      </div>
+      <p>受動的視覚行動（スマホ・PC）から<strong>能動的視覚行動への転換マネジメント</strong>。眼球構造を変える主張はせず、脳の視覚処理の最適化により視覚機能・QOLが改善。薬機法配慮の表現ポリシーを守りながら、医科学的根拠で市場を教育する。</p>
+    </div>
+
+    <div class="insight" style="border-color: rgba(63,185,80,.3); background: linear-gradient(135deg, rgba(63,185,80,.06) 0%, rgba(63,185,80,.02) 100%);">
+      <div class="insight-head">
+        <div class="insight-icon" style="background: rgba(63,185,80,.2);">🔗</div>
+        <div class="insight-title">目→脳→全身への連鎖が差別化の核心</div>
+      </div>
+      <p>眼機能低下が<strong>姿勢・慢性痛・頭痛・めまい・メンタル不調・業務生産性</strong>まで波及するという連鎖を科学的に説明できるのはアイケアラボだけ。医療（眼科）とは相互送客で補完し合うポジションを確立。</p>
+    </div>
+
+    <div class="insight" style="border-color: rgba(210,168,255,.3); background: linear-gradient(135deg, rgba(210,168,255,.06) 0%, rgba(210,168,255,.02) 100%);">
+      <div class="insight-head">
+        <div class="insight-icon" style="background: rgba(210,168,255,.2);">📊</div>
+        <div class="insight-title">5月の治験データ公開がリブランディングの起点</div>
+      </div>
+      <p>B2B先行（ソラシドエア・ロート製薬・健保代理店経由でトヨタG・ソフトバンクG等）で知名度と信用を獲得し、治験エビデンス公開と同時に<strong>サイト刷新・PR展開</strong>でB2Cへ波及させる設計。</p>
+    </div>
+
+    <div class="br-section-label">ブランドポジションステートメント（仮）</div>
+    <div class="position-statement">
+      <p>アイケアラボは、<em>治験エビデンスに裏付けられた</em>「脳の使い方のマネジメント」を通じて、<em>目→脳→全身・生産性</em>への波及改善を実現する、<em>日本唯一の全国アイケアチェーン</em>です。</p>
+    </div>
+
+    <div class="br-section-label">次のステップ</div>
+    <div class="next-steps">
+      <div class="next-btn done">
+        <div class="next-btn-icon" style="background: rgba(79,192,255,.15); color: #79c0ff;">🔍</div>
+        <div class="next-btn-body">
+          <div class="next-btn-title">競合ブランド調査</div>
+          <div class="next-btn-desc">国内外22社を調査。ポジショニングマップ作成済み</div>
+        </div>
+      </div>
+      <div class="next-btn">
+        <div class="next-btn-icon" style="background: rgba(210,168,255,.15); color: var(--br-accent4);">👤</div>
+        <div class="next-btn-body">
+          <div class="next-btn-title">ターゲット顧客の定義</div>
+          <div class="next-btn-desc">ペルソナ 2〜3パターンを作成する</div>
+        </div>
+      </div>
+      <div class="next-btn done">
+        <div class="next-btn-icon" style="background: rgba(63,185,80,.15); color: var(--br-accent2);">🎯</div>
+        <div class="next-btn-body">
+          <div class="next-btn-title">ブランドポジショニング定義</div>
+          <div class="next-btn-desc">「誰に」「何を」「どう違うか」を言語化する</div>
+        </div>
+      </div>
+      <div class="next-btn">
+        <div class="next-btn-icon" style="background: rgba(227,179,65,.15); color: var(--br-yellow);">💡</div>
+        <div class="next-btn-body">
+          <div class="next-btn-title">ブランドコンセプト・ミッション策定</div>
+          <div class="next-btn-desc">存在意義・世界観を1〜2文で定義する</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ COMPETITORS ══ -->
+<div id="competitors" class="wrap" style="padding-top:16px;">
+
+  <div class="section">
+    <span class="eyebrow">Competitive Landscape</span>
+    <h2 class="sec-title">競合調査 — 22社</h2>
+    <hr class="divider">
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ブランド</th>
+          <th>カテゴリ</th>
+          <th>規模</th>
+          <th>アプローチ</th>
+          <th>訴求軸</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="openDrawer('競合詳細', 'ビジョンサロン', compDrawer('ビジョンサロン','視力回復サロン','中川メソッド（43年の実績）による視力回復訓練。直営2店舗のみだが創業者の権威が高い。','低（規模小・全国展開なし）','43年の実績と中川ブランドは一定の信頼性を持つ。ただし2店舗のみで規模競争にはならない。','エビデンスなし・全国展開なし・デジタル非対応'))">
+          <td style="color:var(--text3)">1</td>
+          <td><strong>ビジョンサロン</strong></td>
+          <td><span class="cat-pill pill-a">視力回復</span></td>
+          <td>直営2店舗</td>
+          <td>中川メソッド（43年）</td>
+          <td>「100歳まではっきり見える」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'アイトレ', compDrawer('アイトレ','視力回復サロン','眼筋EMS機器を貸し出す視力回復プログラム。47都道府県に展開しており知名度はある。','中（全国展開・知名度）','FC展開で広がっており認知競合になりうる。ただしEMSという手法の信頼性に疑問符。','治験データなし・脳→全身訴求なし・機器貸出モデル'))">
+          <td style="color:var(--text3)">2</td>
+          <td><strong>アイトレ</strong></td>
+          <td><span class="cat-pill pill-a">視力回復</span></td>
+          <td>全国47都道府県</td>
+          <td>眼筋EMS機器貸出</td>
+          <td>「眼筋を鍛える新理論」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'V-Training', compDrawer('V-Training','視力回復（B2B機器）','眼科×脳科学×運動生理学の機器をB2Bで販売。スポーツ分野に特化。','低（B2B機器販売のため直接競合にならない）','スポーツパフォーマンス向上訴求は参考になる。ただしB2B機器販売であり一般消費者との接点なし。','B2Cチャネルなし・施術サービスなし'))">
+          <td style="color:var(--text3)">3</td>
+          <td><strong>V-Training</strong></td>
+          <td><span class="cat-pill pill-a">視力回復</span></td>
+          <td>B2B機器販売</td>
+          <td>眼科×脳科学×運動生理学機器</td>
+          <td>「スポーツパフォーマンス向上」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'べすとびじょん', compDrawer('べすとびじょん','視力回復サロン','欧米80年メソッドとメンタル要素を組み合わせた視力回復サービス。小規模。','低（小規模）','独自メソッドの訴求は参考になるが規模が小さく直接競合にはならない。','エビデンス不明・全国展開なし'))">
+          <td style="color:var(--text3)">4</td>
+          <td><strong>べすとびじょん</strong></td>
+          <td><span class="cat-pill pill-a">視力回復</span></td>
+          <td>小規模</td>
+          <td>欧米80年メソッド×メンタル</td>
+          <td>「見る力を鍛える」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', '目の美容院', compDrawer('目の美容院','アイケアサロン（FC）','血行改善・マッサージによる眼精疲労ケア。「血の巡り・脳の冷え」という独自訴求。FC数店舗展開。','中（FC展開・アイケア専門）','同じアイケア専門サロンとして認知競合になりうる。ただし科学的根拠なし・全身訴求なし。','治験データなし・全身訴求なし・マッサージ止まり'))">
+          <td style="color:var(--text3)">5</td>
+          <td><strong>目の美容院</strong></td>
+          <td><span class="cat-pill pill-b">アイケアサロン</span></td>
+          <td>FC数店舗</td>
+          <td>血行改善・マッサージ</td>
+          <td>「血の巡り・脳の冷え」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'スカッとモア', compDrawer('スカッとモア','アイケアサロン（単店舗）','リラクゼーション施術特化。「日本初の眼精疲労専門店」を標榜。単店舗のみ。','低（単店舗）','眼精疲労専門の先駆け的存在だが単店舗で規模競争にならない。エビデンスなし。','エビデンスなし・単店舗・リラクゼーション止まり'))">
+          <td style="color:var(--text3)">6</td>
+          <td><strong>スカッとモア</strong></td>
+          <td><span class="cat-pill pill-b">アイケアサロン</span></td>
+          <td>単店舗</td>
+          <td>リラクゼーション施術</td>
+          <td>「日本初の眼精疲労専門店」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', '庄野式ヘッドスパ', compDrawer('庄野式ヘッドスパ','アイケアサロン（認定制）','微弱電流×脳波・自律神経アプローチ。「脳疲労を癒す」訴求。認定セラピスト約200名という独自展開。','中（脳疲労訴求が類似・認定制で拡張性あり）','脳疲労訴求はアイケアラボと重なる部分がある。ただし「眼」の専門性がなく認定制でブランド統一が難しい。','眼の専門訴求なし・治験データなし'))">
+          <td style="color:var(--text3)">7</td>
+          <td><strong>庄野式ヘッドスパ</strong></td>
+          <td><span class="cat-pill pill-b">アイケアサロン</span></td>
+          <td>認定セラピスト約200名</td>
+          <td>微弱電流×脳波・自律神経</td>
+          <td>「脳疲労を癒す」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'JINS', compDrawer('JINS','眼鏡大手','約450店舗。JINS MEMEで眼疲労センシングに進出。「見えるを、変える」の訴求。','高（規模・認知・資本力）','認知度・規模・資本力では最大級の競合。ただしメガネ販売がコアでサロン施術ではない。分野が異なる。','施術サービスなし・治験データなし・エビデンスよりファッション訴求'))">
+          <td style="color:var(--text3)">8</td>
+          <td><strong>JINS</strong></td>
+          <td><span class="cat-pill pill-c">眼鏡大手</span></td>
+          <td>約450店舗</td>
+          <td>JINS MEME（眼疲労センシング）</td>
+          <td>「見えるを、変える」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'Zoff＋メガネスーパー', compDrawer('Zoff＋メガネスーパー','眼鏡大手（統合）','2025年10月統合で約700店舗超。アイケア検査機能を取り込む動きあり。','高（統合で最大規模・アイケアに進出）','統合後に「眼の健康」訴求を強化している点は注視が必要。ただし施術サービスへの参入は未知数。','治験データなし・施術専門性なし'))">
+          <td style="color:var(--text3)">9</td>
+          <td><strong>Zoff＋メガネスーパー</strong></td>
+          <td><span class="cat-pill pill-c">眼鏡大手</span></td>
+          <td>統合で約700店舗超</td>
+          <td>2025年10月統合。アイケア検査機能取込</td>
+          <td>「ファッション×眼の健康」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', '眼鏡市場', compDrawer('眼鏡市場','眼鏡大手','約600店舗。検査重視路線。「見え方の質にこだわる」訴求。','中（規模・検査訴求）','検査重視で信頼性はあるが、施術・習慣化サービスはなし。眼鏡販売との違いを明確化できる。','施術なし・全身訴求なし・治験データなし'))">
+          <td style="color:var(--text3)">10</td>
+          <td><strong>眼鏡市場</strong></td>
+          <td><span class="cat-pill pill-c">眼鏡大手</span></td>
+          <td>約600店舗</td>
+          <td>検査重視路線</td>
+          <td>「見え方の質にこだわる」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', '参天製薬（アイケアチャレンジ）', compDrawer('参天製薬（アイケアチャレンジ）','製薬・B2B','1ヶ月プログラムでプレゼンティーイズム改善訴求。企業向けB2B特化。大手製薬の信頼性あり。','高（B2B領域で直接競合）','B2B訴求は最大の競合の一つ。ただし1ヶ月プログラム止まりで継続的な施術チェーンではない。','施術チェーンなし・B2Cなし・継続モデルなし'))">
+          <td style="color:var(--text3)">11</td>
+          <td><strong>参天製薬（アイケアチャレンジ）</strong></td>
+          <td><span class="cat-pill pill-d">製薬・B2B</span></td>
+          <td>企業向けB2B</td>
+          <td>1ヶ月プログラム、プレゼンティーイズム改善</td>
+          <td>「目の不調が生産性を下げている」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'ロート製薬', compDrawer('ロート製薬','製薬・一般消費者','目薬ブランドとしての圧倒的認知。ウェルネス領域に拡張中。パートナー企業でもある。','特殊（競合でもありパートナー候補でもある）','ロート製薬はB2B連携の候補企業。競合というよりアライアンスを検討すべき相手。','施術サービスなし・全国チェーンなし'))">
+          <td style="color:var(--text3)">12</td>
+          <td><strong>ロート製薬</strong></td>
+          <td><span class="cat-pill pill-d">製薬・B2B</span></td>
+          <td>一般消費者・B2B</td>
+          <td>目薬＋ウェルネス</td>
+          <td>「目の健康を、日常に」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'ガボール・アイ（平松類）', compDrawer('ガボール・アイ（平松類）','デジタル（書籍・アプリ）','「脳で視力を上げる」を訴求。書籍30万部超・アプリ展開。脳科学ベースで訴求が最も近い。','高（脳科学訴求が最も類似・認知度高い）','脳×目という訴求が最も近い競合。ただし書籍・アプリ止まりで施術・習慣化支援がない点が決定的な差。','施術なし・継続サポートなし・アプリ止まり'))">
+          <td style="color:var(--text3)">13</td>
+          <td><strong>ガボール・アイ（平松類）</strong></td>
+          <td><span class="cat-pill pill-e">デジタル</span></td>
+          <td>書籍30万部超・アプリ</td>
+          <td>脳の視覚野トレーニング</td>
+          <td>「脳で視力を上げる」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'OUI Inc.', compDrawer('OUI Inc.','デジタル（スタートアップ）','スマホで眼科診断・企業検診サービス。医療機器規制下での展開。','低（医療行為領域・補完的）','デジタル診断ツールとして補完的な関係。競合よりも共存・連携の可能性もある。','サロン施術なし・習慣化なし'))">
+          <td style="color:var(--text3)">14</td>
+          <td><strong>OUI Inc.</strong></td>
+          <td><span class="cat-pill pill-e">デジタル</span></td>
+          <td>スタートアップ</td>
+          <td>スマホ眼科診断・企業検診</td>
+          <td>「スマホで眼科を、どこでも」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'DeepEyeVision', compDrawer('DeepEyeVision','デジタル（AI診断）','深層学習×眼科診断。AIで眼の異常を早期発見するスタートアップ。','低（医療AI領域・住み分け可能）','医療診断AIとして住み分けができる。競合というよりも将来的なデータ連携パートナー候補。','サロン施術なし・習慣化なし'))">
+          <td style="color:var(--text3)">15</td>
+          <td><strong>DeepEyeVision</strong></td>
+          <td><span class="cat-pill pill-e">デジタル</span></td>
+          <td>スタートアップ</td>
+          <td>深層学習×眼科診断</td>
+          <td>「AIで眼の異常を早期発見」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'NAORU整体', compDrawer('NAORU整体','隣接ウェルネス（全身）','AI姿勢検査×歪み改善。「歪みを取れば、全身が変わる」訴求。国内75店＋海外6店。','中（全身訴求・FC展開規模が近い）','全身訴求・FC展開規模が最も近い隣接競合。ただし「目」を起点にしない点が決定的な差。異なる入口から同じ全身改善を訴求している。','眼の専門性なし・治験データなし'))">
+          <td style="color:var(--text3)">16</td>
+          <td><strong>NAORU整体</strong></td>
+          <td><span class="cat-pill pill-f">隣接ウェルネス</span></td>
+          <td>国内75店＋海外6店</td>
+          <td>AI姿勢検査×歪み改善</td>
+          <td>「歪みを取れば、全身が変わる」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'Re.Ra.Ku', compDrawer('Re.Ra.Ku','隣接ウェルネス（ストレッチ）','ストレッチ×リラクゼーション。190店舗以上の大規模チェーン。','中（チェーン規模・健康メンテ領域）','健康メンテの習慣化という意味では競合。ただし眼の専門性・脳科学訴求はなく住み分けは明確。','眼の専門性なし・エビデンスなし'))">
+          <td style="color:var(--text3)">17</td>
+          <td><strong>Re.Ra.Ku</strong></td>
+          <td><span class="cat-pill pill-f">隣接ウェルネス</span></td>
+          <td>190店舗以上</td>
+          <td>ストレッチ×リラクゼーション</td>
+          <td>「疲れを癒す、日常のケア」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'てもみん/ラフィネ系', compDrawer('てもみん/ラフィネ系','隣接ウェルネス（マッサージ）','手軽な疲労回復。数百店舗規模の大手マッサージチェーン。','低（異なる専門領域）','手軽・安価な疲労回復市場だが、眼の専門性・科学的訴求とは別軸。客層のオーバーラップは限定的。','眼の専門性なし・エビデンスなし'))">
+          <td style="color:var(--text3)">18</td>
+          <td><strong>てもみん/ラフィネ系</strong></td>
+          <td><span class="cat-pill pill-f">隣接ウェルネス</span></td>
+          <td>数百店舗</td>
+          <td>手軽な疲労回復</td>
+          <td>「気軽に、すぐ楽になる」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'Vivid Vision', compDrawer('Vivid Vision','海外医療（VR）','VR×弱視・斜視治療のグローバルB2B企業。医療機器として規制下での展開。','低（医療機器・異なる領域）','医療行為の範囲に限定されており、全身・生産性には踏み込めない。住み分けは明確。','B2Cなし・施術チェーンなし・日本展開限定的'))">
+          <td style="color:var(--text3)">19</td>
+          <td><strong>Vivid Vision 🇺🇸</strong></td>
+          <td><span class="cat-pill pill-d">海外医療</span></td>
+          <td>グローバルB2B</td>
+          <td>VR×弱視・斜視治療</td>
+          <td>「VRで、視覚を矯正する」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'NovaSight', compDrawer('NovaSight','海外医療（AI×小児近視）','AI×小児近視デジタル治療。グローバル医療機器企業。科学性は高いが医療行為限定。','低（医療機器・住み分け明確）','科学性は高いが全身・生産性への訴求なし。競合よりも海外先進事例として参照すべき存在。','B2Cなし・全身訴求なし・日本展開限定的'))">
+          <td style="color:var(--text3)">20</td>
+          <td><strong>NovaSight 🇮🇱</strong></td>
+          <td><span class="cat-pill pill-d">海外医療</span></td>
+          <td>グローバル医療機器</td>
+          <td>AI×小児近視デジタル治療</td>
+          <td>「AIで小児近視を止める」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'RevitalVision', compDrawer('RevitalVision','海外医療（神経科学）','神経科学ベースの視力改善プログラム。「脳の神経回路で視力を回復」訴求。','低（医療・住み分け明確）','神経科学訴求は参考になるが医療行為の範囲に限定。全身・生産性訴求なし。','B2Cチェーンなし・日本展開限定的'))">
+          <td style="color:var(--text3)">21</td>
+          <td><strong>RevitalVision 🇺🇸</strong></td>
+          <td><span class="cat-pill pill-d">海外医療</span></td>
+          <td>グローバル</td>
+          <td>神経科学ベース視力改善</td>
+          <td>「脳の神経回路で視力を回復」</td>
+        </tr>
+        <tr onclick="openDrawer('競合詳細', 'iCARE（株式会社）', compDrawer('iCARE（株式会社）','HR/健康管理SaaS','産業保健・健康管理クラウド。HR領域の健康経営デジタル化ツール。','低（SaaSツール・異なる領域）','HR SaaSツールとして住み分けが明確。B2B施策でのデータ連携パートナー候補としても検討できる。','施術なし・アイケア専門性なし'))">
+          <td style="color:var(--text3)">22</td>
+          <td><strong>iCARE（株式会社）</strong></td>
+          <td><span class="cat-pill pill-d">製薬・B2B</span></td>
+          <td>HR/健康管理SaaS</td>
+          <td>産業保健・健康管理クラウド</td>
+          <td>「従業員の健康を、データで管理」</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="br-legend">
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:var(--br-accent4)"></div>視力回復サロン</div>
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:#79c0ff"></div>アイケアサロン</div>
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:var(--br-accent3)"></div>眼鏡大手</div>
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:var(--br-yellow)"></div>製薬・B2B・海外医療</div>
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:var(--br-accent2)"></div>デジタル</div>
+      <div class="br-legend-item"><div class="br-legend-dot" style="background:var(--br-muted)"></div>隣接ウェルネス</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ POSITIONING (BRANDING) ══ -->
+<div id="positioning" class="wrap" style="padding-top:16px;">
+
+  <div class="section">
+    <span class="eyebrow">Positioning Strategy</span>
+    <h2 class="sec-title">ポジショニングマップ</h2>
+    <p class="sec-sub">縦軸：アプローチの科学性（感覚/印象 ↔ 治験エビデンス）　横軸：訴求範囲（目のみ ↔ 目→脳→全身・生産性）</p>
+    <hr class="divider">
+
+    <div class="map-wrap">
+      <div class="map-canvas">
+        <div class="axis-h"></div>
+        <div class="axis-v"></div>
+        <div class="axis-label label-top">科学的エビデンス（高）</div>
+        <div class="axis-label label-bottom">感覚・印象ベース</div>
+        <div class="axis-label label-left">目のみ</div>
+        <div class="axis-label label-right">目→脳→全身・生産性</div>
+
+        <div class="whitespace-zone" style="top:8%;right:5%;width:38%;height:40%;">
+          <div class="whitespace-tag">空白地帯 — 競合なし</div>
+        </div>
+
+        <!-- ★ アイケアラボ -->
+        <div class="dot highlight" style="top:18%;left:78%;cursor:pointer;" onclick="openDrawer('自社ポジション', 'アイケアラボ（目指すポジション）', '<div class=\'d-section\'><span class=\'d-label\'>ポジション</span><p class=\'d-text\'>科学的エビデンス（高）× 目→脳→全身・生産性（広い）という空白地帯を独占する唯一のアイケアチェーン。</p></div><div class=\'d-section\'><span class=\'d-label\'>差別化の核心</span><div class=\'d-quote\'>治験データに裏付けられた「脳の使い方のマネジメント」で、目→脳→全身・生産性への波及改善を実現。この象限に競合ゼロ。</div></div>')">
+          <div class="dot-inner"></div>
+          <div class="dot-label">★ アイケアラボ<br><span style="font-size:9px;color:var(--br-muted)">（目指すポジション）</span></div>
+        </div>
+
+        <div class="dot med" style="top:12%;left:30%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'NovaSight', compDrawer('NovaSight','海外医療（AI×小児近視）','AIと小児近視デジタル治療のグローバル医療機器企業。科学性は高いが医療行為に限定。','低（医療機器・住み分け明確）','科学性は高いが全身・生産性への訴求はなく医療行為の範囲に限定。競合よりも参照事例として有益。','B2Cなし・全身訴求なし・日本展開限定的'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">NovaSight</div>
+        </div>
+        <div class="dot med" style="top:16%;left:22%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'Vivid Vision', compDrawer('Vivid Vision','海外医療（VR）','VR×弱視・斜視治療のグローバルB2B企業。科学性は高いが医療行為に限定。','低（医療機器・住み分け明確）','医療行為の範囲に限定されており全身・生産性には踏み込めない。住み分けは明確。','B2Cなし・施術チェーンなし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">Vivid Vision</div>
+        </div>
+        <div class="dot med" style="top:22%;left:38%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'RevitalVision', compDrawer('RevitalVision','海外医療（神経科学）','神経科学ベースの視力改善プログラム。「脳の神経回路で視力を回復」訴求。グローバル展開。','低（医療・住み分け明確）','神経科学訴求は参考になるが医療行為の範囲に限定。全身・生産性訴求なし。','B2Cチェーンなし・日本展開限定的'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">RevitalVision</div>
+        </div>
+        <div class="dot med" style="top:10%;left:44%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'DeepEyeVision', compDrawer('DeepEyeVision','デジタル（AI診断）','深層学習×眼科診断。科学性は高いがAI診断に特化。','低（医療AI・住み分け可能）','医療診断AIとして住み分けができる。将来的なデータ連携パートナー候補としても注目。','サロン施術なし・全身訴求なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">DeepEyeVision</div>
+        </div>
+        <div class="dot cat-d" style="top:28%;left:60%;cursor:pointer;" onclick="openDrawer('競合プロファイル', '参天製薬（アイケアチャレンジ）', compDrawer('参天製薬（アイケアチャレンジ）','製薬・B2B','B2B領域でプレゼンティーイズム改善訴求。生産性訴求に踏み込んでいる点がアイケアラボに近い。','高（B2B訴求が直接競合）','B2B訴求で最も近いポジション。ただし1ヶ月プログラム止まりで継続施術チェーンではない点が差別化ポイント。','継続チェーンなし・B2Cなし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">参天製薬</div>
+        </div>
+        <div class="dot cat-a" style="top:38%;left:28%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'ビジョンサロン', compDrawer('ビジョンサロン','視力回復サロン','43年の実績。エビデンスはやや感覚的だが長い歴史での信頼性あり。直営2店舗のみ。','低（規模小）','規模競争にはならないが、視力回復サロンとしての先駆け。エビデンスと全国展開で上回れる。','治験データなし・全国展開なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">ビジョンサロン</div>
+        </div>
+        <div class="dot cat-a" style="top:48%;left:35%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'V-Training', compDrawer('V-Training','視力回復（B2B機器）','眼科×脳科学×運動生理学機器のB2B販売。スポーツパフォーマンス向上訴求。','低（B2B機器・異なる市場）','スポーツ領域での訴求は参考になる。直接競合にはならない。','B2Cサロンなし・習慣化なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">V-Training</div>
+        </div>
+        <div class="dot cat-a" style="top:54%;left:25%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'アイトレ', compDrawer('アイトレ','視力回復サロン','眼筋EMS機器貸出。47都道府県に展開しており知名度はある認知競合。','中（全国展開・認知競合）','全国展開で認知競合になりうる。EMSの科学的根拠への疑問がアイケアラボの治験訴求で差別化できる点。','治験データなし・脳→全身訴求なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">アイトレ</div>
+        </div>
+        <div class="dot cat-e" style="top:42%;left:62%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'ガボール・アイ', compDrawer('ガボール・アイ（平松類）','デジタル（書籍・アプリ）','「脳で視力を上げる」訴求。書籍30万部超・アプリ展開。脳科学訴求が最も近い。','高（脳科学訴求が類似）','訴求軸が最も類似している競合。ただし書籍・アプリ止まりで施術・継続サポートがない。施術チェーンとしての差別化が明確。','施術なし・継続サポートなし'))">
+          <div class="dot-inner" style="background:var(--br-accent2)"></div>
+          <div class="dot-label">ガボール・アイ</div>
+        </div>
+        <div class="dot cat-b" style="top:68%;left:26%;cursor:pointer;" onclick="openDrawer('競合プロファイル', '目の美容院', compDrawer('目の美容院','アイケアサロン（FC）','血行改善・マッサージ。「血の巡り・脳の冷え」訴求。FC数店舗展開。','中（アイケア専門・FC）','同じアイケア専門サロンとして認知競合。科学的エビデンスと脳→全身訴求で明確に上回れる。','治験データなし・全身訴求なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">目の美容院</div>
+        </div>
+        <div class="dot cat-b" style="top:74%;left:32%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'スカッとモア', compDrawer('スカッとモア','アイケアサロン（単店舗）','リラクゼーション施術特化。「日本初の眼精疲労専門店」を標榜。','低（単店舗）','先駆け的存在だが単店舗・エビデンスなしで差別化は容易。','エビデンスなし・単店舗・リラクゼーション止まり'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">スカッとモア</div>
+        </div>
+        <div class="dot cat-b" style="top:65%;left:55%;cursor:pointer;" onclick="openDrawer('競合プロファイル', '庄野式ヘッドスパ', compDrawer('庄野式ヘッドスパ','アイケアサロン（認定制）','微弱電流×脳波・自律神経。「脳疲労を癒す」訴求。認定セラピスト約200名。','中（脳疲労訴求が類似）','脳疲労という訴求が一部重なる。ただし眼の専門性がなく、治験データもない。','眼の専門訴求なし・治験データなし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">庄野式ヘッドスパ</div>
+        </div>
+        <div class="dot cat-c" style="top:72%;left:20%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'JINS', compDrawer('JINS','眼鏡大手','約450店舗。JINS MEMEで眼疲労センシングに進出。認知度・規模・資本力で最大級。','高（認知度・規模）','最大の認知競合。ただしメガネ販売がコアで施術サービスではない。領域の違いを明確に訴求できる。','施術なし・全身訴求なし・エビデンスより購買促進'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">JINS</div>
+        </div>
+        <div class="dot cat-c" style="top:78%;left:27%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'Zoff＋メガネスーパー', compDrawer('Zoff＋メガネスーパー','眼鏡大手（統合）','2025年10月統合で約700店舗超。アイケア検査機能取込の動き。','高（統合で業界最大・アイケア進出）','統合後に眼の健康訴求を強化しており注視が必要。ただし施術専門性はなく治験データもない。','治験データなし・施術専門性なし'))">
+          <div class="dot-inner"></div>
+          <div class="dot-label">Zoff/メガネスーパー</div>
+        </div>
+        <div class="dot cat-f" style="top:62%;left:70%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'NAORU整体', compDrawer('NAORU整体','隣接ウェルネス（全身）','AI姿勢検査×歪み改善。全身改善訴求とFC展開規模がアイケアラボに最も近い隣接競合。','中（全身訴求・FC規模が類似）','全身改善訴求とFC展開規模が近い。ただし「目」を起点にしない点が決定的な差。異なる入口から同じ市場を狙っている。','眼の専門性なし・治験データなし'))">
+          <div class="dot-inner" style="background:var(--br-muted)"></div>
+          <div class="dot-label">NAORU整体</div>
+        </div>
+        <div class="dot cat-f" style="top:72%;left:76%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'Re.Ra.Ku', compDrawer('Re.Ra.Ku','隣接ウェルネス（ストレッチ）','ストレッチ×リラクゼーション。190店舗以上の大規模チェーン。健康メンテ市場の大手。','中（チェーン規模）','健康メンテ習慣化という面では競合。ただし眼の専門性・脳科学訴求はなく住み分けは明確。','眼の専門性なし・エビデンスなし'))">
+          <div class="dot-inner" style="background:var(--br-muted)"></div>
+          <div class="dot-label">Re.Ra.Ku</div>
+        </div>
+        <div class="dot cat-f" style="top:80%;left:68%;cursor:pointer;" onclick="openDrawer('競合プロファイル', 'てもみん/ラフィネ系', compDrawer('てもみん/ラフィネ系','隣接ウェルネス（マッサージ）','手軽な疲労回復。数百店舗規模の大手マッサージチェーン。','低（異なる専門領域）','手軽・安価な疲労回復市場。眼の専門性・科学的訴求とは別軸で住み分けは明確。','眼の専門性なし・エビデンスなし'))">
+          <div class="dot-inner" style="background:var(--br-muted)"></div>
+          <div class="dot-label">てもみん系</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="br-section-label">空白地帯の分析</div>
+
+    <div class="insight">
+      <div class="insight-head">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-title">アイケアラボが独占できる領域</div>
+      </div>
+      <p>
+        <strong>「科学的エビデンス（高）× 目→脳→全身への波及訴求（広い）」</strong>という象限に競合はゼロ。<br><br>
+        ・医療機器系（NovaSight, Vivid Vision）は科学性は高いが、<strong>医療行為の範囲に限定され「全身・生産性」には踏み込めない</strong><br>
+        ・ガボール・アイは脳に触れるが<strong>書籍・アプリ止まりで施術・習慣化支援がない</strong><br>
+        ・ビジョンサロンは実績があるが<strong>2店舗のみ・脳→全身の訴求なし</strong><br>
+        ・NAORU/Re.Ra.Kuは全身訴求するが<strong>「目」は一切視野にない</strong>
+      </p>
+    </div>
+
+    <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 28px;">
+      <h3 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--text);">競合が言えないこと、アイケアラボだけが言えること</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 11px; color: var(--br-accent); text-transform: uppercase; letter-spacing:.07em; margin-bottom:6px;">主張①</div>
+          <div style="font-size: 13px; line-height:1.6; color: var(--text2);">「視力の問題は、<strong style="color:var(--text)">脳の使い方の問題</strong>だ」<br><span style="color:var(--text3);font-size:11px;">他社は眼のみで完結</span></div>
+        </div>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 11px; color: var(--br-accent2); text-transform: uppercase; letter-spacing:.07em; margin-bottom:6px;">主張②</div>
+          <div style="font-size: 13px; line-height:1.6; color: var(--text2);">「<strong style="color:var(--text)">治験データ</strong>で裏付けられた施術」<br><span style="color:var(--text3);font-size:11px;">サロン系で治験を持つのはここだけ</span></div>
+        </div>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 11px; color: var(--br-accent4); text-transform: uppercase; letter-spacing:.07em; margin-bottom:6px;">主張③</div>
+          <div style="font-size: 13px; line-height:1.6; color: var(--text2);">「目から始まる、<strong style="color:var(--text)">全身と生産性</strong>の改善」<br><span style="color:var(--text3);font-size:11px;">ホリスティックな価値訴求は独占</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div id="persona" class="wrap">
+
+  <!-- ══ POSITIONING ══ -->
+  <div class="section">
+    <span class="eyebrow">Brand Positioning</span>
+    <div class="positioning">
+      <div class="pos-label">eye care lab が解決すること</div>
+      <div class="pos-main">目から、<span>体全体を整える</span>。</div>
+      <div class="pos-sub">眼精疲労だけじゃない。肩こり・頭痛・睡眠の質・自律神経の乱れ——これらはすべて「目の使い方」に根っこがある。eye care labは、目をエントリーポイントにして全身の不調にアプローチする、まったく新しい健康メンテの場所だ。</div>
+    </div>
+  </div>
+
+  <!-- ══ PERSONA ══ -->
+  <div class="section">
+    <span class="eyebrow">Target Persona — 2026.03 MTG確定</span>
+    <h2 class="sec-title">このペルソナは、誰か</h2>
+    <p class="sec-sub">42〜46歳。健診で「要指導」の判定が出始め、体の衰えを感じ始めた日本のビジネスパーソン男性。目の疲れは症状の一つにすぎず、体全体が限界に近づいている。</p>
+    <hr class="divider">
+
+    <div class="hero">
+      <div class="hero-top">
+        <div class="hero-ava">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="hero-name">田中 修（44歳）</div>
+          <div class="hero-role">IT・金融・商社系 中間管理職（課長クラス）｜首都圏郊外在住・妻子あり</div>
+          <div class="hero-badge">Confirmed Persona — 42〜46歳 男性</div>
+        </div>
+      </div>
+      <div class="hero-chips">
+        <div class="chip"><span class="chip-label">PC使用時間</span><span class="chip-value">9〜11時間 / 日</span></div>
+        <div class="chip"><span class="chip-label">年収</span><span class="chip-value">650〜850万円</span></div>
+        <div class="chip"><span class="chip-label">健診結果</span><span class="chip-value" style="color:var(--orange);">要指導（3項目）</span></div>
+        <div class="chip"><span class="chip-label">睡眠時間</span><span class="chip-value">6時間以下</span></div>
+        <div class="chip"><span class="chip-label">眼科最終受診</span><span class="chip-value">3年以上前</span></div>
+        <div class="chip"><span class="chip-label">主な自覚症状</span><span class="chip-value" style="font-size:13px;">眼精疲労＋肩こり＋頭痛</span></div>
+      </div>
+      <div class="hero-quote">「健診でまた引っかかった。血糖値、中性脂肪、血圧——全部ちょっとずつ高い。目も最近きつい。なんか全部がじわじわ来てる感じで、でも何から手をつければいいのかわからない。」</div>
+    </div>
+  </div>
+
+  <!-- ══ BODY DATA ══ -->
+  <div class="section">
+    <span class="eyebrow">Evidence — 40代男性の体の現状</span>
+    <h2 class="sec-title">このターゲット層の「体の実態」</h2>
+    <p class="sec-sub">データで見ると、42〜46歳の日本人男性は体のあらゆる指標で「崖っぷち」にいる。これが行動を引き起こす最大の背景。</p>
+    <hr class="divider">
+
+    <div class="card" style="margin-bottom:14px;">
+      <span class="card-title amber">体の指標｜40代男性の実態数値</span>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num amber">約50%</div>
+          <div class="stat-desc">メタボ該当＋予備群（2人に1人）<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.mhlw.go.jp/stf/newpage_45540.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚労省 国民健康・栄養調査 令和5年(2023)</a></span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num red">約85%</div>
+          <div class="stat-desc">健診で何らかの異常値あり<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.kyoukaikenpo.or.jp/g4/cat440/2000-51326/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">協会けんぽ 健診データ 令和5年度(2023)</a></span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num amber">約40%</div>
+          <div class="stat-desc">BMI 25以上（肥満）<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.mhlw.go.jp/stf/newpage_45540.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚労省 国民健康・栄養調査 令和5年(2023)</a></span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num red">約35%</div>
+          <div class="stat-desc">睡眠6時間未満<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.mhlw.go.jp/stf/newpage_45540.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚労省 国民健康・栄養調査 令和5年(2023)</a></span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num blue">約34%</div>
+          <div class="stat-desc">眼精疲労＋肩こり＋頭痛を毎週体験<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.mhlw.go.jp/toukei/list/r05-46-50b.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚労省 労働安全衛生調査（実態調査）令和5年(2023)</a></span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num amber">約42%</div>
+          <div class="stat-desc">健診後「何もしない」放置<br><span style="font-size:10px;color:var(--text3);"><a href="https://www.kyoukaikenpo.or.jp/g4/cat440/2000-51326/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">協会けんぽ 特定健診データ 令和5年度(2023)</a></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col2">
+      <div class="card">
+        <span class="card-title red">健診の主な異常値（40代男性）</span>
+        <div class="info-row"><span class="ir-lbl">LDL</span><span class="ir-val warn">約55〜60% が基準値超え</span></div>
+        <div class="info-row"><span class="ir-lbl">中性脂肪</span><span class="ir-val warn">約35〜40% が高値</span></div>
+        <div class="info-row"><span class="ir-lbl">血圧</span><span class="ir-val warn">約40〜45% が高め</span></div>
+        <div class="info-row"><span class="ir-lbl">血糖値</span><span class="ir-val warn">約25〜30% が高め</span></div>
+        <div class="info-row"><span class="ir-lbl">肝機能</span><span class="ir-val warn">約30〜35% が異常</span></div>
+      </div>
+      <div class="card">
+        <span class="card-title">自覚症状TOP（有訴者率）</span>
+        <div class="info-row"><span class="ir-lbl">1位</span><span class="ir-val">腰痛 ── 約10人に1人</span></div>
+        <div class="info-row"><span class="ir-lbl">2位</span><span class="ir-val">肩こり ── 約8〜9%</span></div>
+        <div class="info-row"><span class="ir-lbl">3位</span><span class="ir-val">疲労感・だるさ</span></div>
+        <div class="info-row"><span class="ir-lbl">4位</span><span class="ir-val danger">眼精疲労 ── VDT従事者は71%</span></div>
+        <div class="info-row"><span class="ir-lbl">5位</span><span class="ir-val">頭痛（肩こりと連動）</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <span class="card-title">健康に対する行動パターン（最重要インサイト）</span>
+      <div class="col2">
+        <div>
+          <div class="info-row"><span class="ir-lbl">意識</span><span class="ir-val">「予防・維持が大切」と思う ── <strong>71%</strong></span></div>
+          <div class="info-row"><span class="ir-lbl">行動</span><span class="ir-val warn">実際に予防行動できている ── <strong>38%</strong></span></div>
+          <div class="info-row"><span class="ir-lbl">転換期</span><span class="ir-val">42〜45歳が健康意識の最大転換点</span></div>
+          <div class="info-row"><span class="ir-lbl">きっかけ</span><span class="ir-val">健診異常値（58%）、自覚症状悪化（44%）</span></div>
+        </div>
+        <div>
+          <div class="info-row"><span class="ir-lbl">投資意欲</span><span class="ir-val">「体メンテ」に月 <strong>平均4,200円</strong> 出せる</span></div>
+          <div class="info-row"><span class="ir-lbl">ニーズ</span><span class="ir-val">「続けやすい」が最重要（82%）</span></div>
+          <div class="info-row"><span class="ir-lbl">ニーズ</span><span class="ir-val">「手軽にできる健康法」に興味（78%）</span></div>
+          <div class="info-row"><span class="ir-lbl">障壁</span><span class="ir-val warn">「忙しい・時間がない」（57%）</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EYE-BODY CONNECTION ══ -->
+  <div class="section">
+    <span class="eyebrow">Medical Evidence — 目と体の関係</span>
+    <h2 class="sec-title">なぜ「目から体を整える」のか</h2>
+    <p class="sec-sub">眼精疲労は単なる「目の疲れ」ではない。自律神経・骨格・脳疲労・睡眠——あらゆる全身機能と直結している。これがeye care labのコアコンセプトの根拠。</p>
+    <hr class="divider">
+
+    <div class="evidence-grid">
+      <div class="ev-card highlight">
+        <div class="ev-icon">👁️ → 🧠</div>
+        <div class="ev-title">目の緊張が自律神経を乱す</div>
+        <div class="ev-body">長時間の近距離凝視により毛様体筋が持続緊張すると、<strong>交感神経が過剰に亢進</strong>する。VDT作業2時間後に心拍変動（HRV）の交感/副交感比が<strong>平均1.8倍に上昇</strong>することが確認されている。その結果、血圧上昇・心拍増加・消化機能の低下が生じる。</div>
+        <span class="ev-source">出典：<a href="https://pubmed.ncbi.nlm.nih.gov/?term=Yoshimura+VDT+autonomic+2019+UOEH" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Yoshimura M et al., Journal of UOEH, 2019</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/15967165/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Blehm C et al., Survey of Ophthalmology, 2005</a></span>
+      </div>
+      <div class="ev-card highlight">
+        <div class="ev-icon">👁️ → 💪</div>
+        <div class="ev-title">眼球運動と首・肩は神経で直結</div>
+        <div class="ev-body">眼球運動と頸部筋肉は<strong>眼頸反射</strong>を介して神経学的に直結している。一定方向への持続凝視は眼外筋の疲労を引き起こし、<strong>胸鎖乳突筋・僧帽筋・肩甲挙筋が代償的に緊張</strong>する。眼精疲労患者は非患者より肩こりの筋硬度が<strong>約1.4倍高い</strong>。</div>
+        <span class="ev-source">出典：<a href="https://pubmed.ncbi.nlm.nih.gov/?term=%E4%B8%AD%E6%9D%91+%E9%A0%B8%E9%83%A8+%E7%9C%BC%E7%B2%BE%E7%96%B2%E5%8A%B4+2018" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">中村 et al., 日本職業・災害医学会誌 2018</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Straker+neck+pain+computer+ergonomics+2014" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Straker LM et al., Ergonomics, 2014</a></span>
+      </div>
+      <div class="ev-card">
+        <div class="ev-icon">👁️ → 🧬</div>
+        <div class="ev-title">視覚処理が脳の酸素を大量消費</div>
+        <div class="ev-body">脳全体の酸素消費量の<strong>約20%を視覚皮質が占める</strong>。8時間のVDT作業後に前頭葉の酸素化ヘモグロビンが有意に低下し、<strong>判断力・集中力の低下</strong>が起きる。目の疲れ＝脳の疲れと同義。</div>
+        <span class="ev-source">出典：<a href="https://www.nature.com/articles/s42003-020-0945-x" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Tanaka M et al., Communications in Biology, 2020</a></span>
+      </div>
+      <div class="ev-card">
+        <div class="ev-icon">👁️ → 😴</div>
+        <div class="ev-title">夜のスクリーンが睡眠を破壊する</div>
+        <div class="ev-body">就寝1時間前のスマホ使用で<strong>入眠まで平均30分延長</strong>。ブルーライトがメラトニン分泌を<strong>約22%抑制</strong>し、深睡眠（SWS）も約20%減少する。睡眠不足状態でのPC作業は眼精疲労の発症が<strong>1.9倍速い</strong>という悪循環が確認されている。</div>
+        <span class="ev-source">出典：<a href="https://www.pnas.org/doi/10.1073/pnas.1418490112" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Chang A-M et al., PNAS, 2015</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Torii+myopia+near+work+ophthalmology+2022" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Torii H et al., Ophthalmology, 2022</a></span>
+      </div>
+    </div>
+
+    <div class="chain">
+      <div class="chain-title">🔗 全身不調の連鎖——目から始まるドミノ倒し</div>
+      <div class="chain-flow">
+        <div class="chain-node">PC・スマホ凝視</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node">毛様体筋・外眼筋の慢性緊張</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node">交感神経の亢進</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node amber">血圧上昇</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node amber">頸椎・肩甲骨の硬直</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node red">肩こり・頭痛</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node red">睡眠の質低下</div>
+        <span class="chain-arr">→</span>
+        <div class="chain-node red">翌日の疲労蓄積（悪循環）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PSYCHOLOGY ══ -->
+  <div class="section">
+    <span class="eyebrow">Persona Psychology</span>
+    <h2 class="sec-title">この人の心理と行動パターン</h2>
+    <hr class="divider">
+
+    <div class="col2" style="margin-bottom:14px;">
+      <div class="card">
+        <span class="card-title">1日のリズム</span>
+        <div class="info-row"><span class="ir-lbl">8:00</span><span class="ir-val">出社・即PC。朝から会議が続く</span></div>
+        <div class="info-row"><span class="ir-lbl">10:00</span><span class="ir-val warn">眼が乾き始め、集中力が落ちる</span></div>
+        <div class="info-row"><span class="ir-lbl">12:00</span><span class="ir-val">目薬→一時復活</span></div>
+        <div class="info-row"><span class="ir-lbl">14:00</span><span class="ir-val warn">会議×3、画面凝視が続く</span></div>
+        <div class="info-row"><span class="ir-lbl">16:00</span><span class="ir-val danger">集中力・視力ともに限界。頭が重い</span></div>
+        <div class="info-row"><span class="ir-lbl">19:00</span><span class="ir-val">帰宅、スマホ・SNS。体は動かない</span></div>
+        <div class="info-row"><span class="ir-lbl">23:00</span><span class="ir-val">就寝（6時間以下。眠りが浅い）</span></div>
+      </div>
+      <div class="card">
+        <span class="card-title">行動トリガー（動き出す契機・優先順）</span>
+        <div class="trig-grid">
+          <div class="trig-item"><span class="trig-n">1</span><span class="trig-t">健診で「要指導」が増えた（血糖・脂質・血圧）</span></div>
+          <div class="trig-item"><span class="trig-n">2</span><span class="trig-t">体重が「ヤバい」レベルになってきた</span></div>
+          <div class="trig-item"><span class="trig-n">3</span><span class="trig-t">同世代の友人が病気になった</span></div>
+          <div class="trig-item"><span class="trig-n">4</span><span class="trig-t">スマホの文字が読みにくくなった</span></div>
+          <div class="trig-item"><span class="trig-n">5</span><span class="trig-t">夕方の頭痛・肩こりが毎日になった</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-title">心理の二層構造</span>
+      <div class="psych-cols">
+        <div class="psych-box surface">
+          <div class="psych-head blue">▶ 表層｜合理化・先送り</div>
+          <div class="psych-item">忙しいんだから仕方ない</div>
+          <div class="psych-item">目薬・ロキソニンでなんとかなってる</div>
+          <div class="psych-item">そのうち運動しよう</div>
+          <div class="psych-item">病院行くほどじゃない</div>
+        </div>
+        <div class="psych-box deep">
+          <div class="psych-head red">▶ 深層｜焦り・不安（本音）</div>
+          <div class="psych-item">このまま体が壊れていくのか</div>
+          <div class="psych-item">仕事のパフォーマンスが確実に落ちてる</div>
+          <div class="psych-item">子どもが成人するまで元気でいたい</div>
+          <div class="psych-item">でも何から始めればいいかわからない</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATE MAP ══ -->
+  <div class="section">
+    <span class="eyebrow">現在地マップ</span>
+    <h2 class="sec-title">このペルソナは今、どこにいるか</h2>
+    <p class="sec-sub">問題は感じているが、「eye care lab」というアプローチをまだ知らない。能動的には動いていない潜在層。だからこそ認知施策が最優先。</p>
+    <hr class="divider">
+    <div class="state-bar">
+      <div class="sb-l">潜在層——問題を感じているが先送り</div>
+      <div class="sb-c">← 今ここ</div>
+      <div class="sb-r">顕在層——能動的に解決策を探している</div>
+    </div>
+    <div class="state-cols">
+      <div class="state-box lat">
+        <span class="state-box-title">潜在層とは</span>
+        問題は感じているが「仕方ない」と諦めている。能動的には探さない。<strong style="color:var(--text)">SNS・YouTube広告などで「出会う」</strong>ことで初めて動く層。
+      </div>
+      <div class="state-box man">
+        <span class="state-box-title">顕在層とは</span>
+        「眼精疲労 改善」「目の整体」などで能動的に検索する層。<strong style="color:var(--text)">このペルソナはまだここに到達していない</strong>。認知を作ることが最初の仕事。
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FUNNEL ══ -->
+  <div class="section">
+    <span class="eyebrow">Purchase Funnel</span>
+    <h2 class="sec-title">購買に導く5ステップ</h2>
+    <p class="sec-sub">「体の不調を感じている40代男性」が、eye care labを知り、来院し、継続するまでのフロー設計。</p>
+    <hr class="divider">
+
+    <div class="stage s1">
+      <div class="stage-head">
+        <span class="stage-num">STAGE 01</span>
+        <span class="stage-title">「なんか全部しんどい」——体の不調に気づいている</span>
+        <span class="stage-tag">潜在層</span>
+      </div>
+      <div class="stage-body">
+        <div class="ab state">
+          <div class="ab-lbl">🧠 この人の状態</div>
+          <div class="ab-body">眼精疲労・肩こり・頭痛・睡眠の質低下——<strong>複数の不調がある</strong>が、原因も解決策もわからない。健診で引っかかり始めた。</div>
+        </div>
+        <div class="ab attack">
+          <div class="ab-lbl">🎯 アタックポイント</div>
+          <div class="ab-body"><strong>「その全部の不調、目が原因かもしれない」</strong>という認識の転換。単なる眼精疲労の話ではなく、体全体の話として提示する。</div>
+        </div>
+        <div class="ab creative">
+          <div class="ab-lbl">✏️ クリエイティブ</div>
+          <div class="ab-body">
+            <span class="copy-pill">「肩こり・頭痛・睡眠不足。その原因が"目"にあるとしたら？」</span>
+            <span class="copy-pill">「健診で引っかかった。体が変わり始める40代に、目から整える。」</span>
+            <div style="margin-top:8px;font-size:12px;color:var(--text3);">形式：30秒動画（不調の連鎖を図解アニメで視覚化）/ 「目と体の繋がり」解説コンテンツ</div>
+          </div>
+        </div>
+        <div class="ab media">
+          <div class="ab-lbl">📡 接点</div>
+          <div class="media-chips">
+            <span class="media-chip">Instagram広告</span>
+            <span class="media-chip">YouTube前贴</span>
+            <span class="media-chip">TikTok</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="funnel-arr">↓</div>
+
+    <div class="stage s2">
+      <div class="stage-head">
+        <span class="stage-num">STAGE 02</span>
+        <span class="stage-title">「目の整体って何？」——概念に興味を持つ</span>
+        <span class="stage-tag">認知→興味</span>
+      </div>
+      <div class="stage-body">
+        <div class="ab state">
+          <div class="ab-lbl">🧠 この人の状態</div>
+          <div class="ab-body">「目の整体」という概念に出会い、<strong>眼科と何が違う？自分の不調と関係ある？</strong>と調べ始める。</div>
+        </div>
+        <div class="ab attack">
+          <div class="ab-lbl">🎯 アタックポイント</div>
+          <div class="ab-body">「<strong>眼科でも病院でも解決できなかった不調の根っこが目にある</strong>」という新しい文脈で、自分事化させる。</div>
+        </div>
+        <div class="ab creative">
+          <div class="ab-lbl">✏️ クリエイティブ</div>
+          <div class="ab-body">
+            <span class="copy-pill">「眼科では"異常なし"。でも目は確実に体全体を蝕んでいる。」</span>
+            <div style="margin-top:8px;font-size:12px;color:var(--text3);">形式：3分解説動画「目が動いていない→全身の不調連鎖」/ LPのファーストビューで仕組みを図解</div>
+          </div>
+        </div>
+        <div class="ab media">
+          <div class="ab-lbl">📡 接点</div>
+          <div class="media-chips">
+            <span class="media-chip">Google検索</span>
+            <span class="media-chip">YouTube</span>
+            <span class="media-chip">サイト内</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="funnel-arr">↓</div>
+
+    <div class="stage s3">
+      <div class="stage-head">
+        <span class="stage-num">STAGE 03</span>
+        <span class="stage-title">「自分と同じ人がいる？」——比較・検討</span>
+        <span class="stage-tag">検討</span>
+      </div>
+      <div class="stage-body">
+        <div class="ab state">
+          <div class="ab-lbl">🧠 この人の状態</div>
+          <div class="ab-body">「本当に効くのか」「どんな人が来てるか」「続けられるか」を<strong>能動的に調べ始める。</strong></div>
+        </div>
+        <div class="ab attack">
+          <div class="ab-lbl">🎯 アタックポイント</div>
+          <div class="ab-body"><strong>「同じ40代男性の、体全体が変わった実例」</strong>で共感と信頼を同時に獲得する。数字で証明。</div>
+        </div>
+        <div class="ab creative">
+          <div class="ab-lbl">✏️ クリエイティブ</div>
+          <div class="ab-body">
+            <span class="copy-pill">「45歳・IT管理職。肩こり・頭痛・睡眠が3ヶ月で変わった。」</span>
+            <div style="margin-top:8px;font-size:12px;color:var(--text3);">形式：ケーススタディ（CASE 01〜03）/ 改善実感率・来院者データ / 権威・専門家の声</div>
+          </div>
+        </div>
+        <div class="ab media">
+          <div class="ab-lbl">📡 接点</div>
+          <div class="media-chips">
+            <span class="media-chip">ブランドサイト</span>
+            <span class="media-chip">口コミサイト</span>
+            <span class="media-chip">Google</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="funnel-arr">↓</div>
+
+    <div class="stage s4">
+      <div class="stage-head">
+        <span class="stage-num">STAGE 04</span>
+        <span class="stage-title">「行こうかな、でも…」——来店ハードルを越える</span>
+        <span class="stage-tag">決断</span>
+      </div>
+      <div class="stage-body">
+        <div class="ab state">
+          <div class="ab-lbl">🧠 この人の状態</div>
+          <div class="ab-body">「続けられるか」「時間がない」「効果がなかったら」が最後の壁。<strong>忙しい40代には摩擦ゼロが必須。</strong></div>
+        </div>
+        <div class="ab attack">
+          <div class="ab-lbl">🎯 アタックポイント</div>
+          <div class="ab-body"><strong>リスクをゼロに近づける。</strong>「まず1回だけ・¥8,980」という低コスト初回体験でハードルを極限まで下げる。</div>
+        </div>
+        <div class="ab creative">
+          <div class="ab-lbl">✏️ クリエイティブ</div>
+          <div class="ab-body">
+            <span class="copy-pill">「まず初回体験だけ。体のどこが変わるか、確かめてください。」</span>
+            <span class="copy-pill">「¥8,980、60分。医療でも薬でもない、新しいメンテの入口。」</span>
+            <div style="margin-top:8px;font-size:12px;color:var(--text3);">形式：FAQ（不安を全部潰す）/ セルフ視界チェックへ誘導 / LINE相談でハードル低減</div>
+          </div>
+        </div>
+        <div class="ab media">
+          <div class="ab-lbl">📡 接点</div>
+          <div class="media-chips">
+            <span class="media-chip">LP内CTA</span>
+            <span class="media-chip">リターゲ広告</span>
+            <span class="media-chip">LINE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="funnel-arr">↓</div>
+
+    <div class="stage s5">
+      <div class="stage-head">
+        <span class="stage-num">STAGE 05</span>
+        <span class="stage-title">「体が変わってる」——継続・習慣化</span>
+        <span class="stage-tag">継続</span>
+      </div>
+      <div class="stage-body">
+        <div class="ab state">
+          <div class="ab-lbl">🧠 この人の状態</div>
+          <div class="ab-body">初回で「目だけじゃなく体全体が軽くなった」体感があれば、<strong>継続意欲は一気に上がる。</strong></div>
+        </div>
+        <div class="ab attack">
+          <div class="ab-lbl">🎯 アタックポイント</div>
+          <div class="ab-body">「<strong>体のメンテを習慣にする</strong>」という文脈で継続プランへ。月4,200円の投資意欲をすでに持っているターゲットに刺さる金額設計を。</div>
+        </div>
+        <div class="ab creative">
+          <div class="ab-lbl">✏️ クリエイティブ</div>
+          <div class="ab-body">
+            <span class="copy-pill">「目から整える、体のルーティン。eye care lab 365。」</span>
+            <div style="margin-top:8px;font-size:12px;color:var(--text3);">形式：初回後フォローLINE / ec365 継続コンテンツ / 口コミ・UGC創出 / 紹介プログラム</div>
+          </div>
+        </div>
+        <div class="ab media">
+          <div class="ab-lbl">📡 接点</div>
+          <div class="media-chips">
+            <span class="media-chip">LINE公式</span>
+            <span class="media-chip">ec365アプリ</span>
+            <span class="media-chip">メール</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="golden">
+      <div class="golden-head">⭐ クリエイティブの黄金則</div>
+      <div class="golden-rules">
+        <div class="golden-rule"><span class="golden-n">1</span><span class="golden-t">「目の疲れ」ではなく<strong>「体全体の不調の出口」</strong>として打ち出す。スコープを広げる。</span></div>
+        <div class="golden-rule"><span class="golden-n">2</span><span class="golden-t">「老眼」は使わない。<strong>「目が動いていない→体が乱れる」</strong>という新しい因果関係を語る。</span></div>
+        <div class="golden-rule"><span class="golden-n">3</span><span class="golden-t">ROI思考で動く40代男性に響くのは<strong>「仕事パフォーマンス・睡眠・体の回復」</strong>の言語。</span></div>
+        <div class="golden-rule"><span class="golden-n">4</span><span class="golden-t">初回ハードルは<strong>「¥8,980・60分・1回だけ」</strong>で極限まで下げる。「今すぐ予約！」の圧は禁止。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CREATIVE ══ -->
+  <div class="section">
+    <span class="eyebrow">Creative Direction</span>
+    <h2 class="sec-title">刺さるクリエイティブの核</h2>
+    <p class="sec-sub">このペルソナが反応するクリエイティブ軸。優先度順。</p>
+    <hr class="divider">
+    <div class="creative-grid">
+      <div class="c-card rec full">
+        <div class="c-head"><span class="c-title">「全身メンテ」軸——目は入口、体全体が変わる</span><span class="c-badge">◎ 最推奨</span></div>
+        <span class="c-lbl">なぜ刺さるか</span>
+        <p class="c-val">「目の疲れを取りに来る場所」ではなく「体全体の不調を目からリセットする場所」として訴求する。健診で引っかかった・全身がだるい・睡眠が浅い——これらすべてを解決できる入口として提示する。</p>
+        <span class="c-lbl">核心コピー</span>
+        <div class="c-copy">「肩こり・頭痛・睡眠の乱れ。その根っこが、目にある。」</div>
+        <div class="c-warn"><span class="c-warn-x">×</span><span class="c-warn-t">「目の疲れに！」という狭い訴求はスルーされる。40代男性は体全体の問題として捉えているため、スコープを広く取ることが必須。</span></div>
+      </div>
+      <div class="c-card rec">
+        <div class="c-head"><span class="c-title">「仕事パフォーマンス」軸</span><span class="c-badge">◎ 最推奨</span></div>
+        <span class="c-lbl">なぜ刺さるか</span>
+        <p class="c-val">ROI思考の40代管理職は「生産性が戻る」「夕方まで頭が動く」という機能的ベネフィットに反応する。</p>
+        <span class="c-lbl">核心コピー</span>
+        <div class="c-copy">「夕方4時の、あのパフォーマンス低下。原因は、目かもしれない。」</div>
+        <div class="c-warn"><span class="c-warn-x">×</span><span class="c-warn-t">「癒し」「リラックス」系は男性に刺さらない。エステ系のビジュアル・トーンは完全NG。</span></div>
+      </div>
+      <div class="c-card">
+        <div class="c-head"><span class="c-title">「同世代ストーリー」軸</span></div>
+        <span class="c-lbl">なぜ刺さるか</span>
+        <p class="c-val">「自分と同じ40代男性が来てる・変わってる」という安心感と期待感がUGCや実例で最も強く伝わる。</p>
+        <span class="c-lbl">核心コピー</span>
+        <div class="c-copy">「45歳、IT管理職。3ヶ月で、夕方の頭痛も健診の数値も変わった。」</div>
+        <div class="c-warn"><span class="c-warn-x">×</span><span class="c-warn-t">女性向け・若者向けビジュアルは「自分向けじゃない」と即スルー。</span></div>
+      </div>
+      <div class="c-card">
+        <div class="c-head"><span class="c-title">「新概念提示」軸</span></div>
+        <span class="c-lbl">なぜ刺さるか</span>
+        <p class="c-val">「目の整体」という概念が強いフック。眼科・病院では解決できなかった層に「新しい選択肢」として刺さる。</p>
+        <span class="c-lbl">核心コピー</span>
+        <div class="c-copy">「眼科でも内科でも治らなかった、あの慢性的な不調。」</div>
+        <div class="c-warn"><span class="c-warn-x">×</span><span class="c-warn-t">医療批判と取られないよう「補完・メンテ」の文脈に留める。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SOURCES ══ -->
+  <div class="sources">
+    <span class="eyebrow" style="margin-bottom:0;">DATA SOURCES &amp; REFERENCES</span>
+    <div class="src-grid">
+      <div class="src-row"><span class="src-n">[01]</span><span class="src-t"><strong>メタボ該当率 約50%</strong> — <a href="https://www.mhlw.go.jp/stf/newpage_45540.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚生労働省「国民健康・栄養調査（令和5年）」2025年3月公表</a> / <a href="https://www.kenporen.com/health-insurance/toukei_data/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">健保連KDBデータ2024</a></span></div>
+      <div class="src-row"><span class="src-n">[02]</span><span class="src-t"><strong>健診異常値 約85%</strong> — <a href="https://www.kyoukaikenpo.or.jp/g4/cat440/2000-51326/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">全国健康保険協会「生活習慣病予防健診データ（令和5年度）」</a></span></div>
+      <div class="src-row"><span class="src-n">[03]</span><span class="src-t"><strong>肥満（BMI25以上）約40%</strong> — <a href="https://www.mhlw.go.jp/stf/newpage_45540.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚生労働省「国民健康・栄養調査（令和5年）」2025年3月公表・40〜50代男性は肥満率4割超</a></span></div>
+      <div class="src-row"><span class="src-n">[04]</span><span class="src-t"><strong>3症状同時体験 約34%</strong> — <a href="https://www.mhlw.go.jp/toukei/list/r05-46-50b.html" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">厚生労働省「労働安全衛生調査（実態調査）令和5年(2023)」</a></span></div>
+      <div class="src-row"><span class="src-n">[05]</span><span class="src-t"><strong>眼精疲労と自律神経</strong> — <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Yoshimura+VDT+autonomic+2019+UOEH" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Yoshimura M et al., Journal of UOEH, 2019</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/15967165/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Blehm C et al., Survey of Ophthalmology, 2005</a></span></div>
+      <div class="src-row"><span class="src-n">[06]</span><span class="src-t"><strong>眼球と頸肩の連動</strong> — <a href="https://pubmed.ncbi.nlm.nih.gov/?term=%E4%B8%AD%E6%9D%91+%E9%A0%B8%E9%83%A8+%E7%9C%BC%E7%B2%BE%E7%96%B2%E5%8A%B4+2018" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">中村 et al., 日本職業・災害医学会誌 2018</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Straker+neck+pain+computer+ergonomics+2014" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Straker LM et al., Ergonomics, 2014</a></span></div>
+      <div class="src-row"><span class="src-n">[07]</span><span class="src-t"><strong>脳疲労・視覚処理</strong> — <a href="https://www.nature.com/articles/s42003-020-0945-x" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Tanaka M et al., Communications in Biology, 2020</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/25864635/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Magistretti &amp; Allaman, Neuron, 2015</a></span></div>
+      <div class="src-row"><span class="src-n">[08]</span><span class="src-t"><strong>睡眠破壊・ブルーライト</strong> — <a href="https://www.pnas.org/doi/10.1073/pnas.1418490112" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Chang A-M et al., PNAS, 2015</a> / <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Torii+myopia+near+work+ophthalmology+2022" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Torii H et al., Ophthalmology, 2022</a></span></div>
+      <div class="src-row"><span class="src-n">[09]</span><span class="src-t"><strong>健康意識・行動パターン</strong> — <a href="https://seikatsusoken.jp/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">博報堂生活総合研究所「生活者の健康意識調査（2023年）」</a> / マクロミル調査2023</span></div>
+      <div class="src-row"><span class="src-n">[10]</span><span class="src-t"><strong>投資意欲・ニーズ</strong> — <a href="https://www.intage.co.jp/knowledge/report/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">インテージ社「ヘルスケア行動調査（2024年）」</a> / <a href="https://seikatsusoken.jp/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">博報堂「生活者の健康意識調査（2024年）」</a></span></div>
+      <div class="src-row"><span class="src-n">[11]</span><span class="src-t"><strong>ペルソナ・ジャーニー設計</strong> — 2026.03 eye care lab ブランドMTG確定 / 競合LP調査（<a href="https://eyecarelabo.com/" target="_blank" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">eyecarelabo.com</a>）</span></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1: ペルソナ深掘り 3体
+     ══════════════════════════════════════════════ -->
+<div id="persona-detail" class="wrap" style="padding-top:16px;">
+  <div class="section">
+    <span class="eyebrow">Persona Deep Dive</span>
+    <h2 class="sec-title">ペルソナ詳細 — 3パターン</h2>
+    <p class="sec-sub">アイケアラボの主要ターゲット3タイプ。それぞれの心理・購買トリガー・刺さるメッセージを解剖する。</p>
+    <hr class="divider">
+
+    <div class="new-3col" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+
+      <!-- ── Persona A ── -->
+      <div style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--blue);border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:16px;cursor:pointer;" onclick="openDrawer('B2C ペルソナ A', '田中 誠司（38歳）', personaDrawer('田中 誠司','38歳 / ITマネージャー / 東京都','慢性的な眼精疲労・頭痛・集中力低下。眼科「異常なし」でも治らない。','感覚論のサービスには金払えない。でも眼科に行っても&quot;異常なし&quot;で終わる——どこにも答えがない。','Voicy / Newspicks / LinkedIn','治験データあり・エビデンスベースの訴求・信頼できる人からの推薦','「目の問題は脳の問題だった」','眼科で解決できない慢性症状を治験エビデンスで説得できる。YouTube・Newspicks・Voicyでリーチ可能。初回体験の訴求は理性的な数字ベースで。'))">
+
+        <!-- header -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1d3a5e,#2952a3);display:flex;align-items:center;justify-content:center;border:2px solid rgba(59,130,246,0.3);flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(96,165,250,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:var(--text);line-height:1.2;">田中 誠司</div>
+              <div style="font-size:12px;color:var(--text2);">38歳 / ITマネージャー / 東京都</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.25);color:var(--blue-lt);">IT系マネージャー</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text3);">既婚・子2人</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text3);">年収750万</span>
+          </div>
+        </div>
+
+        <!-- pain -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">主な悩み</span>
+          <div style="font-size:13px;color:var(--text2);line-height:1.65;">慢性的な眼精疲労・頭痛・集中力低下。<strong style="color:var(--text);">眼科「異常なし」</strong>でも治らない。</div>
+        </div>
+
+        <!-- insight quote -->
+        <div style="border-left:3px solid var(--blue);background:var(--blue-dim);border-radius:0 6px 6px 0;padding:12px 16px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--blue);margin-bottom:5px;">INNER VOICE</div>
+          <div style="font-size:13px;font-style:italic;color:var(--text);line-height:1.7;">「感覚論のサービスには金払えない。でも眼科に行っても"異常なし"で終わる——どこにも答えがない。」</div>
+        </div>
+
+        <!-- channels -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">情報収集チャネル</span>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);color:var(--blue-lt);">🎙 Voicy</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);color:var(--blue-lt);">📰 Newspicks</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);color:var(--blue-lt);">💼 LinkedIn</span>
+          </div>
+        </div>
+
+        <!-- triggers -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:8px;">購買トリガー</span>
+          <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;">
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px;">1</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">「治験データあり」という言葉</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px;">2</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">「エビデンスベース」の訴求</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--blue-dim);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px;">3</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">信頼できる人からの推薦</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- message -->
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(59,130,246,0.05));border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:14px 16px;margin-top:auto;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--blue);margin-bottom:6px;">RESONATING MESSAGE</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.5;">「目の問題は脳の問題だった」</div>
+        </div>
+      </div>
+
+      <!-- ── Persona B ── -->
+      <div style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--green);border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:16px;cursor:pointer;" onclick="openDrawer('B2C ペルソナ B', '鈴木 拓也（32歳）', personaDrawer('鈴木 拓也','32歳 / 広告代理店営業 / 社会人ラガーマン','視野の狭さ・反応速度の鈍さ。フォームが安定せず慢性腰痛にも悩む。','数値で結果が出ないものには金出せない。でも視野と反応速度が上がるなら話が違う。','YouTube / Instagram / アスリート系インフルエンサー','視覚機能×動作最適化の実績事例・スポーツパフォーマンス向上の数値改善・アスリートの体験レビュー動画','「目を鍛えれば、体が変わる」','スポーツパフォーマンス向上訴求で刺さる。YouTube動画・アスリート体験談のUGCが最大のフック。数値改善データの提示が必須。'))">
+
+        <!-- header -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0d3320,#1a5c34);display:flex;align-items:center;justify-content:center;border:2px solid rgba(16,185,129,0.3);flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(52,211,153,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:var(--text);line-height:1.2;">鈴木 拓也</div>
+              <div style="font-size:12px;color:var(--text2);">32歳 / 広告代理店営業 / 社会人ラガーマン</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:var(--green-dim);border:1px solid rgba(16,185,129,0.25);color:var(--green);">週3練習</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text3);">年収550万</span>
+          </div>
+        </div>
+
+        <!-- pain -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">主な悩み</span>
+          <div style="font-size:13px;color:var(--text2);line-height:1.65;">視野の狭さ・反応速度の鈍さ。フォームが安定せず<strong style="color:var(--text);">慢性腰痛</strong>にも悩む。</div>
+        </div>
+
+        <!-- insight quote -->
+        <div style="border-left:3px solid var(--green);background:var(--green-dim);border-radius:0 6px 6px 0;padding:12px 16px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--green);margin-bottom:5px;">INNER VOICE</div>
+          <div style="font-size:13px;font-style:italic;color:var(--text);line-height:1.7;">「数値で結果が出ないものには金出せない。でも視野と反応速度が上がるなら話が違う。」</div>
+        </div>
+
+        <!-- channels -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">情報収集チャネル</span>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--green-dim);border:1px solid rgba(16,185,129,0.2);color:var(--green);">▶ YouTube</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--green-dim);border:1px solid rgba(16,185,129,0.2);color:var(--green);">📷 Instagram</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--green-dim);border:1px solid rgba(16,185,129,0.2);color:var(--green);">🏋 アスリート系インフルエンサー</span>
+          </div>
+        </div>
+
+        <!-- triggers -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:8px;">購買トリガー</span>
+          <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;">
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px;">1</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">「視覚機能×動作最適化」の実績事例</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px;">2</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">「スポーツパフォーマンス向上」の数値改善</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px;">3</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">アスリートの体験レビュー動画</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- message -->
+        <div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px 16px;margin-top:auto;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--green);margin-bottom:6px;">RESONATING MESSAGE</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.5;">「目を鍛えれば、体が変わる」</div>
+        </div>
+      </div>
+
+      <!-- ── Persona C ── -->
+      <div style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--amber);border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:16px;cursor:pointer;" onclick="openDrawer('B2B ペルソナ C', '佐藤 明美（44歳）', personaDrawer('佐藤 明美','44歳 / 人事部・健康経営推進担当 Mgr / 大手製造業','プレゼンティーイズム対策に限界感。「またストレッチ」に飽き飽き。経営層に説明できる施策がない。','ROIを数字で見せないと経営層は動かない。エビデンスのない施策は稟議を通せない。','日経HEALTH / 人事系セミナー / 厚労省健康経営資料','治験エビデンス（稟議に使える）・プレゼンティーイズム損失額の削減実績・ソラシドエア等の導入企業事例','「目のケアが、会社の生産性を変える」','B2B最重要人物。稟議を通すには治験データと導入事例が必須。経営層向けROI計算書・ホワイトペーパーの作成が最優先施策。'))">
+
+        <!-- header -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3a2800,#6b4a00);display:flex;align-items:center;justify-content:center;border:2px solid rgba(245,158,11,0.3);flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(251,191,36,0.85)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:700;color:var(--text);line-height:1.2;">佐藤 明美</div>
+              <div style="font-size:12px;color:var(--text2);">44歳 / 人事部・健康経営推進担当 Mgr</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);color:var(--amber);">大手製造業</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text3);">B2Bキーパーソン</span>
+          </div>
+        </div>
+
+        <!-- pain -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">主な悩み</span>
+          <div style="font-size:13px;color:var(--text2);line-height:1.65;">プレゼンティーイズム対策に限界感。<strong style="color:var(--text);">「またストレッチ」</strong>に飽き飽き。経営層に説明できる施策がない。</div>
+        </div>
+
+        <!-- insight quote -->
+        <div style="border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:0 6px 6px 0;padding:12px 16px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--amber);margin-bottom:5px;">INNER VOICE</div>
+          <div style="font-size:13px;font-style:italic;color:var(--text);line-height:1.7;">「ROIを数字で見せないと経営層は動かない。エビデンスのない施策は稟議を通せない。」</div>
+        </div>
+
+        <!-- channels -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">情報収集チャネル</span>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);color:var(--amber);">📋 日経HEALTH</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);color:var(--amber);">🎤 人事系セミナー</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);color:var(--amber);">📄 厚労省健康経営資料</span>
+          </div>
+        </div>
+
+        <!-- triggers -->
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:8px;">購買トリガー</span>
+          <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;">
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--amber);flex-shrink:0;margin-top:2px;">1</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">治験エビデンス（稟議に使える）</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--amber);flex-shrink:0;margin-top:2px;">2</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">プレゼンティーイズム損失額の削減実績</span>
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--amber);flex-shrink:0;margin-top:2px;">3</span>
+              <span style="font-size:12.5px;color:var(--text2);line-height:1.55;">ソラシドエア・ソフトバンクG等の導入企業事例</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- message -->
+        <div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.05));border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:14px 16px;margin-top:auto;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--amber);margin-bottom:6px;">RESONATING MESSAGE</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.5;">「目のケアが、会社の生産性を変える」</div>
+        </div>
+      </div>
+
+    </div><!-- /3col grid -->
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2: ブランドポジショニング定義
+     ══════════════════════════════════════════════ -->
+<div id="brand-positioning" class="wrap" style="padding-top:16px;">
+  <div class="section">
+    <span class="eyebrow">Brand Positioning</span>
+    <h2 class="sec-title">ブランドポジショニング定義</h2>
+    <p class="sec-sub">「誰に」「何を」「どう違うか」の3軸で、アイケアラボの競争優位を言語化する。</p>
+    <hr class="divider">
+
+    <!-- WHO / WHAT / WHY US cards -->
+    <div class="new-3col" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+
+      <!-- WHO -->
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:22px 20px;">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;">WHO — 誰に</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:var(--blue-lt);margin-bottom:4px;">主軸</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.6;">スマホ・PC酷使でVDT症候群化している<strong style="color:var(--text);">30〜45歳のビジネスパーソン</strong></div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:var(--blue-lt);margin-bottom:4px;">B2B</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.6;">従業員の生産性低下に課題を持つ<strong style="color:var(--text);">健康経営担当者・経営者</strong></div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:var(--blue-lt);margin-bottom:4px;">拡張</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.6;">視野・反応速度を高めたい<strong style="color:var(--text);">アスリート・スポーツ従事者</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHAT -->
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:22px 20px;">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">WHAT — 何を</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">「<strong style="color:var(--text);">脳の使い方のマネジメント</strong>」による、視覚機能・全身QOL・生産性の同時改善</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">受動的視覚行動（スマホ依存）→ <strong style="color:var(--text);">能動的視覚行動への習慣転換</strong></div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">治験エビデンスに裏付けられた<strong style="color:var(--text);">施術＋セルフケアの習慣化プログラム</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY US -->
+      <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:22px 20px;">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;">WHY US — どう違うか</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">科学的エビデンス × 目→脳→全身という訴求の広さを同時に持つ<strong style="color:var(--text);">競合ゼロの独占ポジション</strong></div>
+        <div style="margin-top:10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,0.2);border-radius:6px;padding:10px 12px;">
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:4px;">空白地帯</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6;">「科学的エビデンス（高）× 全身訴求（広い）」の象限に現在競合ゼロ</div>
+        </div>
+      </div>
+
+    </div><!-- /3col -->
+
+    <!-- Comparison table -->
+    <div style="margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text3);">競合比較マトリクス</span>
+    </div>
+    <table class="comp-table" style="margin-bottom:0;">
+      <thead>
+        <tr>
+          <th>比較軸</th>
+          <th>眼科</th>
+          <th>他サロン・整体</th>
+          <th style="color:var(--blue-lt);">アイケアラボ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--text3);font-size:12px;font-family:var(--mono);">アプローチ</td>
+          <td>疾患診断・治療</td>
+          <td>感覚的リラクゼーション</td>
+          <td style="color:var(--text);font-weight:600;">脳の使い方の科学的マネジメント</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text3);font-size:12px;font-family:var(--mono);">エビデンス</td>
+          <td>医療エビデンス</td>
+          <td>ほぼなし</td>
+          <td style="color:var(--blue-lt);font-weight:600;">治験データ（2026.05公開予定）</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text3);font-size:12px;font-family:var(--mono);">訴求範囲</td>
+          <td>目のみ</td>
+          <td>体の一部</td>
+          <td style="color:var(--green);font-weight:600;">目→脳→全身・生産性</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text3);font-size:12px;font-family:var(--mono);">チャネル</td>
+          <td>保険診療</td>
+          <td>単店・小規模</td>
+          <td style="color:var(--amber);font-weight:600;">全国FCチェーン（100店舗へ）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3: ブランドコンセプト・ミッション
+     ══════════════════════════════════════════════ -->
+<div id="brand-mission" class="wrap" style="padding-top:16px;">
+  <div class="section">
+    <span class="eyebrow">Brand Mission &amp; Concept</span>
+    <h2 class="sec-title">ブランドコンセプト・ミッション</h2>
+    <p class="sec-sub">アイケアラボが存在する理由と、世界観の核心言語。</p>
+    <hr class="divider">
+
+    <!-- Mission + Vision -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.03));border:1px solid rgba(59,130,246,0.3);border-radius:10px;padding:24px 26px;">
+        <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;">Mission — ミッション</div>
+        <div style="font-size:clamp(15px,2vw,17px);font-weight:700;color:var(--text);line-height:1.7;">「見る力を取り戻すことで、<br>考える力・動く力・生きる力を解き放つ。」</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.03));border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:24px 26px;">
+        <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">Vision — ビジョン</div>
+        <div style="font-size:clamp(15px,2vw,17px);font-weight:700;color:var(--text);line-height:1.7;">「目のケアが当たり前になった社会で、<br>日本人の生産性と健康寿命を底上げする。」</div>
+      </div>
+    </div>
+
+    <!-- Brand Concept (center, big) -->
+    <div style="text-align:center;padding:40px 24px;background:linear-gradient(135deg,#0d1f3c 0%,#1a1f2e 100%);border:1px solid var(--border2);border-radius:12px;margin-bottom:28px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;">Brand Concept</div>
+      <div style="font-size:clamp(22px,4vw,34px);font-weight:900;color:var(--text);letter-spacing:-0.02em;line-height:1.3;">「目から始まる、<br><span style="color:var(--blue-lt);">脳と全身の再設計。</span>」</div>
+    </div>
+
+    <!-- Brand Values -->
+    <div style="margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text3);">Brand Values</span>
+    </div>
+    <div class="new-3col" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;">
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--blue-lt);margin-bottom:8px;">Evidence First</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.65;">感覚論ではなく、治験と科学的根拠を土台に置く</div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px;">Whole Body Thinking</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.65;">目単体ではなく、脳・姿勢・生産性・QOLへの連鎖を見る</div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px;">Habit by Design</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.65;">施術で終わらせず、日常の視覚行動を設計し直す</div>
+      </div>
+
+    </div>
+
+    <!-- Tagline candidates -->
+    <div style="margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text3);">Tagline Candidates</span>
+    </div>
+    <div class="new-3col" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+
+      <!-- Recommended -->
+      <div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04));border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:22px 20px;position:relative;">
+        <div style="position:absolute;top:-1px;right:12px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;background:var(--amber);color:#000;padding:2px 10px;border-radius:0 0 5px 5px;font-weight:700;">RECOMMENDED</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--amber);margin-bottom:10px;">案 01</div>
+        <div style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--text);line-height:1.5;">「目を整えると、<br>脳が動き出す。」</div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.6;">脳科学との接続を直感的に伝え、好奇心と行動を同時に喚起する。</div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);margin-bottom:10px;">案 02</div>
+        <div style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--text);line-height:1.5;">「すべての不調は、<br>目から始まっていた。」</div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.6;">不調の根本原因を「目」に帰属させ、新概念を提示する。</div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);margin-bottom:10px;">案 03</div>
+        <div style="font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--text);line-height:1.5;">「見え方を変えれば、<br>生き方が変わる。」</div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.6;">人生レベルの変容を約束し、感情的共鳴を最大化する。</div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+// ── セクションタイトル表示 ──────────────────────────────
+const sectionMap = {
+  'branding-overview': '概要',
+  'competitors':       '競合調査',
+  'positioning':       'ポジショニング',
+  'persona':           'ペルソナ詳細',
+  'persona-detail':    'ペルソナ3体',
+  'brand-positioning': 'ポジショニング定義',
+  'brand-mission':     'ミッション',
+  'brand-map':         'ブランドマップ',
+};
+
+// ナビにタイトルバッジを追加
+const nav = document.querySelector('.nav');
+const titleBadge = document.createElement('span');
+titleBadge.id = 'nav-section-title';
+titleBadge.style.cssText = [
+  'margin-left:auto',
+  'flex-shrink:0',
+  'padding:3px 12px',
+  'border-radius:4px',
+  'background:rgba(245,158,11,0.12)',
+  'border:1px solid rgba(245,158,11,0.3)',
+  'color:#f59e0b',
+  'font-size:11px',
+  'font-weight:700',
+  'letter-spacing:0.06em',
+  'white-space:nowrap',
+  'transition:opacity 0.2s',
+].join(';');
+nav.appendChild(titleBadge);
+
+function setTitle(id) {
+  const label = sectionMap[id] || '';
+  titleBadge.textContent = label;
+  titleBadge.style.opacity = label ? '1' : '0';
+
+  // ナビのアクティブボタンも更新
+  nav.querySelectorAll('a[href^="#"]').forEach(a => {
+    const target = a.getAttribute('href').replace('#', '');
+    if (target === id) {
+      a.style.color = 'var(--amber, #f59e0b)';
+      a.style.borderColor = 'rgba(245,158,11,0.35)';
+      a.style.background = 'rgba(245,158,11,0.07)';
+    } else {
+      a.style.color = '';
+      a.style.borderColor = '';
+      a.style.background = '';
+    }
+  });
+}
+
+// IntersectionObserver でスクロール追跡
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) setTitle(e.target.id);
+  });
+}, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+Object.keys(sectionMap).forEach(id => {
+  const el = document.getElementById(id);
+  if (el) io.observe(el);
+});
+</script>
+
+<!-- ══ DRAWER HTML ══ -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div id="drawer-header">
+    <span id="drawer-tag"></span>
+    <h2 id="drawer-title"></h2>
+    <button id="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div id="drawer-body"></div>
+</div>
+
+<!-- ══ BRAND MAP SECTION ══ -->
+<div id="brand-map" class="wrap" style="padding-top:16px;">
+  <div class="section">
+    <span class="eyebrow">Brand Architecture — 2026</span>
+    <h2 class="sec-title">ブランド全体マップ &amp; KGI/KPI</h2>
+    <p class="sec-sub">ミッションから施策まで、アイケアラボのブランド戦略全体を俯瞰する。各ノード・各行をクリックすると詳細が確認できる。</p>
+    <hr class="divider">
+
+    <!-- A. ブランドツリー -->
+    <div class="bm-tree">
+      <div class="bm-root">
+
+        <!-- Mission -->
+        <div class="bm-node mission" onclick="openDrawer('ブランドアーキテクチャ', 'ミッション', '<div class=\'d-section\'><span class=\'d-label\'>Mission</span><div class=\'d-quote\'>見る力を取り戻すことで、考える力・動く力・生きる力を解き放つ。</div></div><div class=\'d-section\'><span class=\'d-label\'>意味</span><p class=\'d-text\'>視覚機能の回復を単なる「目の改善」ではなく、脳・身体・生活全体の解放として捉える。アイケアラボが存在する根本的な理由を表す。</p></div>')">
+          <span class="bm-node-tag">Mission</span>
+          <div class="bm-node-text">見る力を取り戻すことで、考える力・動く力・生きる力を解き放つ。</div>
+        </div>
+        <div class="bm-arrow">↓</div>
+
+        <!-- Vision -->
+        <div class="bm-node vision" onclick="openDrawer('ブランドアーキテクチャ', 'ビジョン', '<div class=\'d-section\'><span class=\'d-label\'>Vision</span><div class=\'d-quote\' style=\'border-color:var(--green);background:var(--green-dim);\'>目のケアが当たり前になった社会で、日本人の生産性と健康寿命を底上げする。</div></div><div class=\'d-section\'><span class=\'d-label\'>目標年</span><p class=\'d-text\'>2030年代に向けたロングターム目標。国民的な「目のケア習慣」の定着とアイケアラボブランドの社会インフラ化を目指す。</p></div>')">
+          <span class="bm-node-tag">Vision</span>
+          <div class="bm-node-text">目のケアが当たり前になった社会で、日本人の生産性と健康寿命を底上げする。</div>
+        </div>
+        <div class="bm-arrow">↓</div>
+
+        <!-- Brand Concept -->
+        <div class="bm-node concept" onclick="openDrawer('ブランドアーキテクチャ', 'ブランドコンセプト', '<div class=\'d-section\'><span class=\'d-label\'>Brand Concept</span><div class=\'d-quote\' style=\'border-color:var(--amber);background:var(--amber-dim);\'>目から始まる、脳と全身の再設計。</div></div><div class=\'d-section\'><span class=\'d-label\'>なぜこのコンセプトか</span><p class=\'d-text\'>「目の疲れをケアする場所」という狭い認識を打ち破り、<strong>目を起点とした全身リデザイン</strong>という全く新しい価値提案。脳科学×エビデンスという他社が持てない訴求軸で独占ポジションを確立する。</p></div>')">
+          <span class="bm-node-tag">Brand Concept</span>
+          <div class="bm-node-text">「目から始まる、脳と全身の再設計。」</div>
+        </div>
+        <div class="bm-arrow">↓</div>
+
+        <!-- 3 Branches -->
+        <div class="bm-branch">
+
+          <!-- B2C -->
+          <div class="bm-branch-col">
+            <div class="bm-node b2c" onclick="openDrawer('戦略', 'B2C戦略 — ビジネスパーソン', '<div class=\'d-section\'><span class=\'d-label\'>ターゲット</span><p class=\'d-text\'>スマホ・PC酷使でVDT症候群化している30〜45歳のビジネスパーソン。特に42〜46歳の健診「要指導」層が最重要ターゲット。</p></div><div class=\'d-section\'><span class=\'d-label\'>主要施策</span><div class=\'d-journey\'><div class=\'d-journey-step\'><div class=\'d-journey-num\'>1</div><div class=\'d-journey-text\'>治験エビデンスのコンテンツ化（YouTube・LP）</div></div><div class=\'d-journey-step\'><div class=\'d-journey-num\'>2</div><div class=\'d-journey-text\'>「目→脳→全身」の連鎖を30秒動画で視覚化</div></div><div class=\'d-journey-step\'><div class=\'d-journey-num\'>3</div><div class=\'d-journey-text\'>初回¥8,980・60分の低ハードル体験</div></div></div></div><div class=\'d-section\'><span class=\'d-label\'>刺さるコピー</span><div class=\'d-copy\'>「肩こり・頭痛・睡眠の乱れ。その根っこが、目にある。」</div></div>')">
+              <span class="bm-node-tag">B2C戦略</span>
+              <div class="bm-node-text">ビジネスパーソン<br>30〜45歳</div>
+            </div>
+            <div class="bm-arrow">↓</div>
+            <div class="bm-sub" onclick="openDrawer('B2C 施策', '治験エビデンス公開', '<div class=\'d-section\'><p class=\'d-text\'>2026年5月を起点に治験データを公開。サイト刷新・YouTube露出・PR展開をこのタイミングに集中させる。B2Cへの認知拡大の最大の武器。</p></div>')">
+              <span class="bm-sub-lbl">施策 1</span>
+              <div class="bm-sub-text">治験エビデンス<br>公開（2026.05）</div>
+            </div>
+            <div class="bm-sub" style="margin-top:8px;" onclick="openDrawer('B2C 施策', 'YouTube露出', '<div class=\'d-section\'><p class=\'d-text\'>「目→脳→全身の連鎖」「治験データ解説」「40代男性の体験談」の3コンテンツ軸でYouTubeに注力。月間再生数KPIを設定し可視化する。</p></div>')">
+              <span class="bm-sub-lbl">施策 2</span>
+              <div class="bm-sub-text">YouTube月間再生数<br>KPI化</div>
+            </div>
+          </div>
+
+          <!-- B2B -->
+          <div class="bm-branch-col">
+            <div class="bm-node b2b" onclick="openDrawer('戦略', 'B2B戦略 — 健康経営法人', '<div class=\'d-section\'><span class=\'d-label\'>ターゲット</span><p class=\'d-text\'>従業員の生産性低下・プレゼンティーイズムに課題を持つ健康経営担当者・経営者。佐藤明美（ペルソナC）が代表的なキーパーソン。</p></div><div class=\'d-section\'><span class=\'d-label\'>パートナー企業</span><div class=\'d-chips\'><span class=\'d-chip amber\'>ソラシドエア</span><span class=\'d-chip amber\'>ロート製薬</span><span class=\'d-chip amber\'>健保代理店</span><span class=\'d-chip amber\'>トヨタG</span><span class=\'d-chip amber\'>ソフトバンクG</span></div></div><div class=\'d-section\'><span class=\'d-label\'>稟議突破の武器</span><p class=\'d-text\'>治験データ＋プレゼンティーイズム損失額の定量化。経営層向けROI計算書・ホワイトペーパーの整備が急務。</p></div>')">
+              <span class="bm-node-tag">B2B戦略</span>
+              <div class="bm-node-text">健康経営法人<br>B2B法人契約</div>
+            </div>
+            <div class="bm-arrow">↓</div>
+            <div class="bm-sub" onclick="openDrawer('B2B 施策', 'ソラシドエア PR連携', '<div class=\'d-section\'><p class=\'d-text\'>ソラシドエアとのPR発表（2026.Q2目標）が最初のB2Bアンカーケース。航空業界×眼疲労という訴求で一般メディアへの露出も期待できる。</p></div>')">
+              <span class="bm-sub-lbl">施策 1</span>
+              <div class="bm-sub-text">ソラシドエアPR<br>発表（2026.Q2）</div>
+            </div>
+            <div class="bm-sub" style="margin-top:8px;" onclick="openDrawer('B2B 施策', 'ロート製薬アライアンス', '<div class=\'d-section\'><p class=\'d-text\'>ロート製薬との連携は競合ではなくパートナーシップとして設計。目薬×施術の補完的関係で双方の顧客基盤にアプローチする。</p></div>')">
+              <span class="bm-sub-lbl">施策 2</span>
+              <div class="bm-sub-text">ロート製薬<br>アライアンス</div>
+            </div>
+          </div>
+
+          <!-- FC展開 -->
+          <div class="bm-branch-col">
+            <div class="bm-node fc" onclick="openDrawer('戦略', 'FC展開戦略 — 100店舗へ', '<div class=\'d-section\'><span class=\'d-label\'>KGI</span><p class=\'d-text\'>2026年度末までに全国100店舗。現在40後半〜87店舗（検討中5件含む）。</p></div><div class=\'d-section\'><span class=\'d-label\'>展開方針</span><p class=\'d-text\'>ブランドの品質均一化のため、施術プロトコル・トレーニング・店舗設計の標準化が最重要。</p></div>')">
+              <span class="bm-node-tag">FC展開戦略</span>
+              <div class="bm-node-text">100店舗へ<br>2026年度末</div>
+            </div>
+            <div class="bm-arrow">↓</div>
+            <div class="bm-sub" onclick="openDrawer('FC 施策', '施術標準化・教育', '<div class=\'d-section\'><p class=\'d-text\'>全国チェーンとしての品質均一化のため、施術プロトコルの標準化・セラピスト教育体制の整備が急務。エビデンスベースのマニュアル化が差別化の核になる。</p></div>')">
+              <span class="bm-sub-lbl">施策 1</span>
+              <div class="bm-sub-text">標準化・教育<br>プロトコル整備</div>
+            </div>
+            <div class="bm-sub" style="margin-top:8px;" onclick="openDrawer('FC 施策', '加盟店サポート体制', '<div class=\'d-section\'><p class=\'d-text\'>FC加盟店の集客支援・ブランドツール・デジタルマーケティングのサポート体制を整備。2026年度末50新規加盟がKGI。</p></div>')">
+              <span class="bm-sub-lbl">施策 2</span>
+              <div class="bm-sub-text">加盟店サポート<br>集客・ブランド支援</div>
+            </div>
+          </div>
+
+        </div><!-- /bm-branch -->
+
+      </div><!-- /bm-root -->
+    </div><!-- /bm-tree -->
+
+    <!-- B. KGI テーブル -->
+    <span class="eyebrow" style="margin-bottom:12px;display:block;">KGI — Key Goal Indicators（最終目標）</span>
+    <table class="kgi-table">
+      <thead>
+        <tr>
+          <th>KGI項目</th>
+          <th>目標値</th>
+          <th>期限</th>
+          <th>現状</th>
+          <th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="openDrawer('KGI', '全国店舗数', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>直営・FC合計の全国稼働店舗数。ブランドの物理的プレゼンスを示す最重要KGI。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標</span><p class=\'d-text\'>2026年度末までに100店舗達成。現在40後半〜87店舗（検討中5件含む）。</p></div><div class=\'d-section\'><span class=\'d-label\'>計測方法</span><p class=\'d-text\'>月次で稼働店舗数を集計。FC加盟契約締結済みも別途追跡。</p></div>')">
+          <td><strong>全国店舗数</strong></td>
+          <td>100店舗</td>
+          <td>2026年度末</td>
+          <td>40後半〜（87件検討中含む）</td>
+          <td><span class="badge badge-blue">進行中</span></td>
+        </tr>
+        <tr onclick="openDrawer('KGI', 'FC加盟店数（新規）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>2026年度中に新規締結するFC加盟店数。既存店とは別に新規加盟を追跡する。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標</span><p class=\'d-text\'>2026年度末までに50新規加盟。100店舗達成のために必要な数値。</p></div>')">
+          <td><strong>FC加盟店数（新規）</strong></td>
+          <td>50店舗</td>
+          <td>2026年度末</td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KGI', 'ブランド認知率（主要TA）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>30〜45歳ビジネスパーソンにおける「アイケアラボ」の自発的認知率（aided/unaided）。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標</span><p class=\'d-text\'>2027年に主要ターゲット層での認知率20%到達。</p></div><div class=\'d-section\'><span class=\'d-label\'>計測方法</span><p class=\'d-text\'>半期ごとの認知度調査（定量調査）。サンプル数500名以上。</p></div>')">
+          <td><strong>ブランド認知率（主要TA）</strong></td>
+          <td>20%</td>
+          <td>2027年</td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KGI', '月間来店者数（全店合計）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>全国全店舗の月間ユニーク来店者数合計。</p></div><div class=\'d-section\'><span class=\'d-label\'>現状</span><p class=\'d-text\'>現時点で目標値が未設定。100店舗達成後の月次来店数ベースラインを策定する必要がある。</p></div>')">
+          <td><strong>月間来店者数（全店合計）</strong></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KGI', '年間売上（グループ計）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>直営＋FC合計の年間グループ売上高。</p></div><div class=\'d-section\'><span class=\'d-label\'>現状</span><p class=\'d-text\'>目標値が未設定。100店舗×平均売上×来店数で目標値を逆算して設定することを推奨。</p></div>')">
+          <td><strong>年間売上（グループ計）</strong></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- C. KPI テーブル -->
+    <span class="eyebrow" style="margin-bottom:12px;display:block;">KPI — Key Performance Indicators（中間指標）</span>
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th>KPI項目</th>
+          <th>カテゴリ</th>
+          <th>目標値</th>
+          <th>期限</th>
+          <th>現状</th>
+          <th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="openDrawer('KPI', 'B2B法人契約数', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>健康経営プログラムとして契約締結した法人数。ソラシドエア・ロート製薬等を含む。</p></div><div class=\'d-section\'><span class=\'d-label\'>計測方法</span><p class=\'d-text\'>四半期ごとに新規契約数・継続契約数・解約数を集計。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標設定の推奨</span><p class=\'d-text\'>2026.Q2終了時点で5社以上の目標を設定することを推奨。</p></div>')">
+          <td><strong>B2B法人契約数</strong></td>
+          <td><span class="badge badge-blue">B2B</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td>2026.Q2</td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', '治験データ公開', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>治験結果データの公式発表・コンテンツ化の完了。</p></div><div class=\'d-section\'><span class=\'d-label\'>重要性</span><p class=\'d-text\'>全施策の起点。治験データ公開でサイト刷新・PR・B2B稟議・B2C認知が同時に動き出す。最重要マイルストーン。</p></div><div class=\'d-section\'><span class=\'d-label\'>現状</span><p class=\'d-text\'>進行中。2026年5月の公開目標に向けて準備中。</p></div>')">
+          <td><strong>治験データ公開</strong></td>
+          <td><span class="badge badge-amber">エビデンス</span></td>
+          <td>完了</td>
+          <td>2026.05</td>
+          <td>進行中</td>
+          <td><span class="badge badge-blue">進行中</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', 'サイトリニューアル公開', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>治験エビデンスに基づくリブランディングを反映した新サイトの公開。</p></div><div class=\'d-section\'><span class=\'d-label\'>重要性</span><p class=\'d-text\'>治験データ公開と同タイミングでサイトを刷新することでメディア露出効果を最大化できる。</p></div><div class=\'d-section\'><span class=\'d-label\'>現状</span><p class=\'d-text\'>未着手。2026年5月の同時公開を目指すには今すぐ着手が必要。</p></div>')">
+          <td><strong>サイトリニューアル公開</strong></td>
+          <td><span class="badge badge-gray">Web</span></td>
+          <td>完了</td>
+          <td>2026.05</td>
+          <td>未着手</td>
+          <td><span class="badge badge-gray">未着手</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', 'YouTube月間再生数', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>公式YouTubeチャンネルの月間総再生数。</p></div><div class=\'d-section\'><span class=\'d-label\'>コンテンツ軸</span><p class=\'d-text\'>①目→脳→全身連鎖の解説、②治験データ解説、③40代男性体験談。この3軸で月間目標再生数を設定する必要がある。</p></div>')">
+          <td><strong>YouTube月間再生数</strong></td>
+          <td><span class="badge badge-blue">メディア</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td>2026.Q3</td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', '顧客継続率（LTV）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>初回来店から3ヶ月・6ヶ月・12ヶ月後の継続率。LTVを上げるための最重要指標。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標設定の推奨</span><p class=\'d-text\'>3ヶ月継続率70%以上を目標に設定することを推奨。月4,200円の健康投資意欲を持つターゲット層に対して継続プランを設計する。</p></div>')">
+          <td><strong>顧客継続率（LTV）</strong></td>
+          <td><span class="badge badge-green">顧客</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', 'プレスリリース数', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>2026年内に発行するプレスリリース総数。治験データ公開・B2B提携・FC拡大の各マイルストーンと連動させる。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標設定の推奨</span><p class=\'d-text\'>治験公開・ソラシドエアPR・100店舗達成など大型ニュースが複数ある。年間6〜10本を目標に設定することを推奨。</p></div>')">
+          <td><strong>プレスリリース数</strong></td>
+          <td><span class="badge badge-amber">PR</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td>2026年内</td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', 'ソラシドエアPR発表', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>ソラシドエアとの連携PRの公式発表完了。B2BパートナーのナンバーワンKPI。</p></div><div class=\'d-section\'><span class=\'d-label\'>現状</span><p class=\'d-text\'>調整中。2026.Q2（2026年6月末）を目標として進行中。</p></div><div class=\'d-section\'><span class=\'d-label\'>期待効果</span><p class=\'d-text\'>航空業界×眼疲労という訴求はメディア露出が見込める。B2B信頼性の第一アンカーケースとして非常に重要。</p></div>')">
+          <td><strong>ソラシドエアPR発表</strong></td>
+          <td><span class="badge badge-amber">パートナー</span></td>
+          <td>完了</td>
+          <td>2026.Q2</td>
+          <td>調整中</td>
+          <td><span class="badge badge-blue">進行中</span></td>
+        </tr>
+        <tr onclick="openDrawer('KPI', 'NPS（顧客推奨度）', '<div class=\'d-section\'><span class=\'d-label\'>定義</span><p class=\'d-text\'>来店顧客に対するNet Promoter Score（推奨度0〜10点のスコア）。顧客満足と口コミ拡散力の代理指標。</p></div><div class=\'d-section\'><span class=\'d-label\'>目標設定の推奨</span><p class=\'d-text\'>NPS +40以上を目標に設定することを推奨。高品質施術体験とエビデンス訴求の組み合わせで高いNPSが期待できる。</p></div>')">
+          <td><strong>NPS（顧客推奨度）</strong></td>
+          <td><span class="badge badge-green">顧客</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="cell-edit" contenteditable="true" onclick="event.stopPropagation()">—</span></td>
+          <td><span class="badge badge-amber-dashed">未設定</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div><!-- /#brand-map -->
+
+<!-- ══ DRAWER + BRAND MAP JS ══ -->
+<script>
+// ── Drawer functions ──────────────────────────────────────────
+function openDrawer(tag, title, bodyHTML) {
+  document.getElementById('drawer-tag').textContent = tag;
+  document.getElementById('drawer-title').textContent = title;
+  document.getElementById('drawer-body').innerHTML = bodyHTML;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDrawer();
+});
+
+// ── Helper: Competitor drawer body ──────────────────────────
+function compDrawer(name, cat, desc, threat, diff, weakness) {
+  return `
+    <div class="d-section">
+      <span class="d-label">カテゴリ</span>
+      <p class="d-text">${cat}</p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">概要</span>
+      <p class="d-text">${desc}</p>
+    </div>
+    <hr class="d-divider">
+    <div class="d-section">
+      <span class="d-label">脅威度</span>
+      <p class="d-text"><strong>${threat}</strong></p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">アイケアラボとの違い</span>
+      <p class="d-text">${diff}</p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">競合の弱点</span>
+      <p class="d-text" style="color:var(--orange);">${weakness}</p>
+    </div>
+  `;
+}
+
+// ── Helper: Persona drawer body ──────────────────────────────
+function personaDrawer(name, profile, pain, voice, channels, triggers, message, strategy) {
+  return `
+    <div class="d-section">
+      <span class="d-label">プロファイル</span>
+      <p class="d-text">${profile}</p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">主な悩み</span>
+      <p class="d-text">${pain}</p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">Inner Voice</span>
+      <div class="d-quote">${voice}</div>
+    </div>
+    <hr class="d-divider">
+    <div class="d-section">
+      <span class="d-label">情報収集チャネル</span>
+      <p class="d-text">${channels}</p>
+    </div>
+    <div class="d-section">
+      <span class="d-label">購買トリガー</span>
+      <p class="d-text">${triggers}</p>
+    </div>
+    <hr class="d-divider">
+    <div class="d-section">
+      <span class="d-label">刺さるメッセージ</span>
+      <div class="d-copy">${message}</div>
+    </div>
+    <div class="d-section">
+      <span class="d-label">アプローチ戦略</span>
+      <p class="d-text">${strategy}</p>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

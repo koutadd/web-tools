@@ -251,7 +251,7 @@ export default function AdminProposalPanel({
                 >
                   {/* ヘッダー行 */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
                       {/* カテゴリバッジ */}
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', gap: 4,

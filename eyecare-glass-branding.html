@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アイケアグラス — ブランディング戦略</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #07101f;
+      --panel:    #0c1b2e;
+      --card:     #0f2035;
+      --border:   rgba(59,130,246,0.14);
+      --border2:  rgba(59,130,246,0.24);
+      --blue:     #3b82f6;
+      --blue-lt:  #60a5fa;
+      --blue-dim: rgba(59,130,246,0.10);
+      --amber:    #f59e0b;
+      --amber-dim:rgba(245,158,11,0.10);
+      --green:    #10b981;
+      --green-dim:rgba(16,185,129,0.10);
+      --red:      #ef4444;
+      --red-dim:  rgba(239,68,68,0.10);
+      --orange:   #fb923c;
+      --text:     #dde6f0;
+      --text2:    #8fa8c4;
+      --text3:    #4e6a88;
+      --mono:     'DM Mono', monospace;
+      --body:     'Noto Sans JP', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.2);
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 32px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+    }
+    .nav a {
+      color: var(--text2); text-decoration: none;
+      padding: 5px 14px; border-radius: 4px;
+      border: 1px solid rgba(148,163,184,0.15); transition: color 0.15s;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--amber); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.08); }
+    .nav-sep { color: var(--text3); margin: 0 4px; }
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 56px 32px 80px; }
+
+    .section { margin-bottom: 72px; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 10px; display: block;
+    }
+    .sec-title {
+      font-size: clamp(22px, 3vw, 30px); font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em; line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .sec-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; line-height: 1.7; }
+    .divider { border: none; border-top: 1px solid rgba(245,158,11,0.15); margin-bottom: 32px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 26px;
+      margin-bottom: 14px;
+    }
+    .card:last-child { margin-bottom: 0; }
+    .card-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 14px; display: block;
+    }
+    .card-title.blue  { color: var(--blue); }
+    .card-title.amber { color: var(--amber); }
+    .card-title.green { color: var(--green); }
+
+    /* ── TAB BUTTONS ── */
+    .glass-tabs {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 28px;
+    }
+    .glass-tab {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      padding: 8px 20px; border-radius: 6px; cursor: pointer;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--text2); transition: all 0.18s;
+    }
+    .glass-tab:hover { color: var(--text); border-color: rgba(245,158,11,0.4); }
+    .glass-tab.active {
+      background: rgba(245,158,11,0.10); border-color: var(--amber);
+      color: var(--amber); font-weight: 600;
+    }
+    .glass-panel { display: none; }
+    .glass-panel.active { display: block; }
+
+    /* ── GLASS CONTENT COMPONENTS ── */
+    .gl-hero {
+      background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.05));
+      border: 1px solid var(--border2); border-radius: 10px;
+      padding: 28px 32px; margin-bottom: 20px; text-align: center;
+    }
+    .gl-hero-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text3); margin-bottom: 10px; }
+    .gl-hero-main { font-size: clamp(18px, 2.5vw, 24px); font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
+    .gl-hero-main em { color: var(--blue-lt); font-style: normal; }
+
+    .gl-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    @media(max-width:640px) { .gl-cols { grid-template-columns: 1fr; } }
+    .gl-cols.col3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media(max-width:640px) { .gl-cols.col3 { grid-template-columns: 1fr; } }
+
+    .gl-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px 24px;
+    }
+    .gl-card.blue  { border-left: 3px solid var(--blue); }
+    .gl-card.amber { border-left: 3px solid var(--amber); }
+    .gl-card.green { border-left: 3px solid var(--green); }
+    .gl-card.rec   { border-top: 3px solid var(--amber); }
+    .gl-card-label {
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 12px; display: block;
+    }
+    .gl-card-label.blue  { color: var(--blue); }
+    .gl-card-label.amber { color: var(--amber); }
+    .gl-card-label.green { color: var(--green); }
+    .gl-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
+    .gl-card-body  { font-size: 13px; color: var(--text2); line-height: 1.75; }
+    .gl-card-body strong { color: var(--text); }
+    .gl-card-body li { margin-left: 16px; margin-bottom: 4px; }
+
+    .gl-tag-num {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+      color: var(--text3); margin-bottom: 10px;
+    }
+    .gl-tag-badge {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+      padding: 3px 9px; border-radius: 4px; background: var(--amber-dim);
+      border: 1px solid rgba(245,158,11,0.25); color: var(--amber);
+    }
+    .gl-tagline { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--text); margin: 6px 0 12px; line-height: 1.3; }
+    .gl-en { font-size: 13px; font-style: italic; color: var(--text2); margin-bottom: 10px; }
+    .gl-strength { font-size: 12.5px; color: var(--text2); line-height: 1.65; }
+    .gl-strength span { color: var(--text3); font-size: 11px; font-family: var(--mono); letter-spacing: 0.08em; }
+
+    .gl-combo {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 20px 24px; margin-bottom: 16px;
+    }
+    .gl-combo-head { font-size: 13px; font-weight: 700; color: var(--blue-lt); margin-bottom: 14px; }
+    .gl-combo-block {
+      background: rgba(0,0,0,0.2); border-radius: 6px; padding: 16px 20px;
+      font-size: 14px; line-height: 2; color: var(--text);
+    }
+    .gl-combo-block .gl-combo-h1 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .gl-combo-block .gl-combo-sub { font-size: 13px; color: var(--text2); line-height: 1.9; }
+
+    .gl-slogan {
+      background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px; padding: 18px 24px; text-align: center;
+    }
+    .gl-slogan-main { font-size: 18px; font-weight: 700; color: var(--amber); font-style: italic; margin-bottom: 6px; }
+    .gl-slogan-sub  { font-size: 12px; color: var(--text2); }
+
+    .gl-color-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+    .gl-swatch {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 14px; flex: 1; min-width: 160px;
+    }
+    .gl-swatch-dot { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+    .gl-swatch-info { font-size: 12px; }
+    .gl-swatch-name { font-weight: 600; color: var(--text); display: block; }
+    .gl-swatch-hex  { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+    .gl-site-flow {
+      background: rgba(0,0,0,0.25); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 20px 24px;
+    }
+    .gl-site-flow-title { font-size: 13px; font-weight: 700; color: var(--blue-lt); margin-bottom: 14px; }
+    .gl-site-step {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .gl-site-step:last-child { border-bottom: none; }
+    .gl-step-n {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      background: var(--blue-dim); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--blue);
+    }
+    .gl-step-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+    .gl-step-body strong { color: var(--text); }
+
+    .gl-persona-hero {
+      background: var(--panel); border: 1px solid var(--border2);
+      border-radius: 10px; padding: 24px 28px; margin-bottom: 16px;
+    }
+    .gl-persona-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .gl-persona-role { font-size: 13px; color: var(--blue-lt); margin-bottom: 14px; font-family: var(--mono); letter-spacing: 0.06em; }
+    .gl-persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media(max-width:560px) { .gl-persona-grid { grid-template-columns: 1fr; } }
+    .gl-persona-row { display: flex; gap: 8px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .gl-persona-row:last-child { border-bottom: none; }
+    .gl-persona-lbl { color: var(--text3); min-width: 70px; flex-shrink: 0; }
+    .gl-persona-val { color: var(--text); }
+
+    .gl-moment {
+      background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 6px; padding: 14px 18px; margin-top: 12px;
+      font-size: 13px; color: var(--text2); line-height: 1.7;
+    }
+    .gl-moment strong { color: var(--blue-lt); }
+
+    .gl-pos-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+      margin-top: 4px;
+    }
+    .gl-pos-table th {
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text3); padding: 8px 12px; border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .gl-pos-table td {
+      padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text2); vertical-align: top;
+    }
+    .gl-pos-table tr:last-child td { border-bottom: none; }
+    .gl-pos-table td:first-child { color: var(--text); font-weight: 600; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-store-detail.html">店舗詳細</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<nav class="nav">
+  <span style="color:var(--text3)">eye care lab</span>
+  <span class="nav-sep">/</span>
+  <a href="aicare-top-prototype.html">サイト</a>
+  <a href="persona-dashboard.html">ペルソナ</a>
+  <a href="reference-sites.html">参考サイト集</a>
+  <a href="aicare-brand-overview.html" style="color:#a78bfa;border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.07);">ブランド全体マップ</a>
+  <a href="eyecare-glass-branding.html" class="active">グラス ブランディング</a>
+  <span class="nav-sep">|</span>
+  <a href="#concept">コンセプト</a>
+  <a href="#target">ターゲット</a>
+  <a href="#tagline">タグライン</a>
+  <a href="#visual">ビジュアル</a>
+</nav>
+
+<div class="wrap">
+  <div class="section">
+    <span class="eyebrow">Eyecare Glass — Brand Identity 2026</span>
+    <h2 class="sec-title">アイケアグラス ブランディング</h2>
+    <p class="sec-sub">プリズムメガネのブランドサイト刷新に向けた戦略成果物 — 4セクション</p>
+    <hr class="divider">
+
+    <!-- ── TAB BUTTONS ── -->
+    <div class="glass-tabs">
+      <button class="glass-tab active" onclick="showGlassTab(0)">01 コンセプトシート</button>
+      <button class="glass-tab" onclick="showGlassTab(1)">02 ターゲット定義</button>
+      <button class="glass-tab" onclick="showGlassTab(2)">03 タグライン</button>
+      <button class="glass-tab" onclick="showGlassTab(3)">04 ビジュアル方針</button>
+      <button class="glass-tab" onclick="showGlassTab(4)">05 製品ライン展開</button>
+    </div>
+
+    <!-- ══ PANEL 0: CONCEPT SHEET ══ -->
+    <div class="glass-panel active" id="concept">
+
+      <div class="gl-hero">
+        <div class="gl-hero-eyebrow">ONE LINE CONCEPT</div>
+        <div class="gl-hero-main">「視線のズレを整え、<em>眼の本来の力を引き出す</em>プリズムメガネ。」</div>
+      </div>
+
+      <div class="gl-cols">
+        <div class="gl-card blue">
+          <span class="gl-card-label blue">何を解決するか</span>
+          <div class="gl-card-body">
+            <strong>隠れ斜位（視線のズレ）</strong>による——<br>
+            <ul style="margin-top:8px;">
+              <li>眼精疲労・ドライアイ</li>
+              <li>慢性的な頭痛・肩こり</li>
+              <li>集中力の低下・ブレインフォグ</li>
+              <li>原因不明の倦怠感</li>
+            </ul>
+            <br>
+            「見えている」のに疲れる——その<strong>本当の原因</strong>に初めてアプローチする。
+          </div>
+        </div>
+        <div class="gl-card green">
+          <span class="gl-card-label green">誰のためか</span>
+          <div class="gl-card-body">
+            <strong>「眼科で異常なし」と言われ続けてきた現代人</strong><br><br>
+            <ul>
+              <li>PC・スマホを1日6h以上使用</li>
+              <li>視力は正常だが眼が疲れる</li>
+              <li>頭痛・肩こりの根本を知りたい</li>
+              <li>パフォーマンスに投資できる層</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <span class="card-title green">3層の価値</span>
+        <div class="gl-cols col3">
+          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:7px;padding:16px 18px;">
+            <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--blue);margin-bottom:8px;">FUNCTIONAL</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">機能価値</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;">プリズムレンズが視線のズレを精密補正し、眼の筋肉への負荷を軽減</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:7px;padding:16px 18px;">
+            <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--amber);margin-bottom:8px;">EXPERIENTIAL</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">体験価値</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;">「疲れない日常」「集中できる時間」「頭がクリアな感覚」</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:7px;padding:16px 18px;">
+            <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--green);margin-bottom:8px;">IDENTITY</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">意味価値</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;">自分の眼を正しく理解し、ケアしている。眼から始まる自分らしいパフォーマンス。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-cols">
+        <div class="gl-card">
+          <span class="gl-card-label">ブランドポジション</span>
+          <div style="text-align:center;padding:12px 0;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:4px;">医療的・専門的</div>
+            <div style="display:inline-block;background:var(--blue-dim);border:1px solid var(--border2);border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;color:var(--blue-lt);margin:10px 0;">★ アイケアグラス</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:8px;">「医療的専門性」×「日常に溶け込むデザイン」の交点</div>
+          </div>
+        </div>
+        <div class="gl-card">
+          <span class="gl-card-label">ブランドパーソナリティ</span>
+          <div class="gl-card-body">
+            <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--blue);font-size:12px;">▸</span>
+              <span><strong>専門的だが、難しくない</strong> — 科学的根拠があるが、白衣感は出さない</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--blue);font-size:12px;">▸</span>
+              <span><strong>静かな自信</strong> — 声高に主張せず、使った人が変化を実感する</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;">
+              <span style="color:var(--blue);font-size:12px;">▸</span>
+              <span><strong>現代的・ミニマル</strong> — 「眼鏡＝補正器具」のイメージを更新する</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-0 -->
+
+    <!-- ══ PANEL 1: TARGET ══ -->
+    <div class="glass-panel" id="target">
+
+      <div class="gl-persona-hero">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="background:var(--blue-dim);border:1px solid var(--border2);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👓</div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.15em;color:var(--blue);margin-bottom:3px;">PRIMARY PERSONA</div>
+            <div class="gl-persona-name">「疲れている理由がわからない」集中族</div>
+            <div class="gl-persona-role">32歳前後 / ナレッジワーカー / 都市圏在住</div>
+          </div>
+        </div>
+        <div class="gl-persona-grid">
+          <div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">デバイス</span><span class="gl-persona-val">PC 8h + スマホ 3h / 日</span></div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">視力</span><span class="gl-persona-val">1.0以上 / 眼科で「異常なし」経験あり</span></div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">症状</span><span class="gl-persona-val">午後の頭重感、肩こり、眼のショボショボ</span></div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">対処歴</span><span class="gl-persona-val">BLカット、目薬、マッサージ → どれも「まあまあ」止まり</span></div>
+          </div>
+          <div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">情報源</span><span class="gl-persona-val">X / YouTube / Voicy / ビジネス書</span></div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">購買</span><span class="gl-persona-val">価格より価値。「本当に効くもの」なら3〜5万出せる</span></div>
+            <div class="gl-persona-row"><span class="gl-persona-lbl">心理</span><span class="gl-persona-val">自己パフォーマンス最大化志向。不調の「正体」を知りたい</span></div>
+          </div>
+        </div>
+        <div class="gl-moment">
+          <strong>この人が動く瞬間 ——</strong> 「隠れ斜位」という概念を初めて知って「これかも」と思うとき / インフルエンサーの体験談を見て興味を持つとき
+        </div>
+      </div>
+
+      <div class="gl-cols">
+        <div class="gl-card amber">
+          <span class="gl-card-label amber">Secondary Persona</span>
+          <div class="gl-card-title">「集中力を上げたい」<br>パフォーマンス追求型</div>
+          <div class="gl-card-body">
+            18〜25歳、大学受験生・新卒〜若手・プログラマー学習中<br><br>
+            <strong>動機：</strong>勉強・仕事の効率化。疲れにくい眼で長時間集中したい<br>
+            <strong>接点：</strong>SNS広告、YouTube、TikTok、受験系コンテンツ
+          </div>
+        </div>
+        <div class="gl-card green">
+          <span class="gl-card-label green">Tertiary Persona</span>
+          <div class="gl-card-title">「原因不明の不調」を<br>根本から整えたい層</div>
+          <div class="gl-card-body">
+            35〜50歳・女性多め、フリーランス・主婦・スマホヘビーユーザー<br><br>
+            <strong>動機：</strong>体質改善・根本ケア志向。漢方・鍼灸にも関心あり<br>
+            <strong>接点：</strong>Instagram、健康系メディア、口コミ
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:4px;">
+        <span class="card-title">メッセージ軸の使い分け</span>
+        <table class="gl-pos-table">
+          <thead><tr><th>ペルソナ</th><th>刺さるメッセージ軸</th></tr></thead>
+          <tbody>
+            <tr><td>集中族（Primary）</td><td style="color:var(--text2)">「疲れの正体を知る」「眼から始まるパフォーマンス改善」</td></tr>
+            <tr><td>パフォーマンス追求型</td><td style="color:var(--text2)">「集中力が続く」「勉強・仕事の質が変わる」</td></tr>
+            <tr><td>健康意識高め層</td><td style="color:var(--text2)">「眼のケア」「原因不明の不調を整える」</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /panel-1 -->
+
+    <!-- ══ PANEL 2: TAGLINE ══ -->
+    <div class="glass-panel" id="tagline">
+
+      <div class="gl-card rec" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span class="gl-tag-badge">★ 推奨</span>
+          <span class="gl-tag-num">案01 — Hero大見出し</span>
+        </div>
+        <div class="gl-tagline">目が、ちゃんと、休める。</div>
+        <div class="gl-en">Finally, eyes that can truly rest.</div>
+        <div class="gl-strength">
+          <span>強み ▸ </span>やさしく・日常的・余白が美しい。誰でも共感できる。ランディングHeroに最適。
+        </div>
+      </div>
+
+      <div class="gl-cols" style="margin-bottom:16px;">
+        <div class="gl-card">
+          <div class="gl-tag-num"><span class="gl-tag-badge" style="background:var(--blue-dim);border-color:rgba(59,130,246,0.3);color:var(--blue-lt);">案02</span> 問題提起</div>
+          <div class="gl-tagline" style="font-size:clamp(16px,2.2vw,22px);">見えているのに、<br>なぜ疲れるのか。</div>
+          <div class="gl-en">Your vision is fine. Your eyes are not.</div>
+          <div class="gl-strength"><span>用途 ▸ </span>スクロール誘導・問題提起セクション冒頭</div>
+        </div>
+        <div class="gl-card">
+          <div class="gl-tag-num"><span class="gl-tag-badge" style="background:var(--blue-dim);border-color:rgba(59,130,246,0.3);color:var(--blue-lt);">案03</span> 啓示</div>
+          <div class="gl-tagline" style="font-size:clamp(16px,2.2vw,22px);">疲れ目の本質は、<br>視線のズレにある。</div>
+          <div class="gl-en">Realign your gaze. Reclaim your clarity.</div>
+          <div class="gl-strength"><span>用途 ▸ </span>説明セクション・SNS啓発コンテンツ</div>
+        </div>
+        <div class="gl-card">
+          <div class="gl-tag-num"><span class="gl-tag-badge" style="background:var(--blue-dim);border-color:rgba(59,130,246,0.3);color:var(--blue-lt);">案04</span> 広告直球</div>
+          <div class="gl-tagline" style="font-size:clamp(16px,2.2vw,22px);">眼鏡で、<br>集中が変わる。</div>
+          <div class="gl-en">Precision optics for peak performance.</div>
+          <div class="gl-strength"><span>用途 ▸ </span>広告バナー・SNS見出し</div>
+        </div>
+        <div class="gl-card">
+          <div class="gl-tag-num"><span class="gl-tag-badge" style="background:var(--blue-dim);border-color:rgba(59,130,246,0.3);color:var(--blue-lt);">案05</span> 感情訴求</div>
+          <div class="gl-tagline" style="font-size:clamp(16px,2.2vw,22px);">あなたの眼は、<br>ずっと働きすぎていた。</div>
+          <div class="gl-en">Your eyes have been working too hard. Until now.</div>
+          <div class="gl-strength"><span>用途 ▸ </span>ブランドストーリー・動画冒頭</div>
+        </div>
+      </div>
+
+      <div class="gl-combo">
+        <div class="gl-combo-head">推奨コピー構成（Heroセクション）</div>
+        <div class="gl-combo-block">
+          <div class="gl-combo-h1">目が、ちゃんと、休める。</div>
+          <div class="gl-combo-sub">見えているのに、なぜ疲れるのか——<br>その答えは、視線のズレにあります。<br>アイケアグラスのプリズムメガネが、眼の本来の力を引き出します。</div>
+        </div>
+      </div>
+
+      <div class="gl-slogan" style="margin-top:16px;">
+        <div class="gl-slogan-main">"Align your gaze. Unlock your focus."</div>
+        <div class="gl-slogan-sub">ブランドスローガン（常設・英語）— 視線を整え、集中を解き放つ。</div>
+      </div>
+
+    </div><!-- /panel-2 -->
+
+    <!-- ══ PANEL 3: VISUAL DIRECTION ══ -->
+    <div class="glass-panel" id="visual">
+
+      <div class="card" style="margin-bottom:16px;">
+        <span class="card-title">ブランドトーン定義</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">医療的 ↔ ライフスタイル</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">中央やや医療寄り。「クリニック感」ではなく<strong style="color:var(--text)">「専門家に支えられた日常」</strong></div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">ミニマル ↔ リッチ</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">ミニマル寄り。<strong style="color:var(--text)">余白を活かした上質感</strong></div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">静 ↔ 動</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;">静。<strong style="color:var(--text)">静謐さ・集中・クリアネス</strong>を表現</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">日本的 ↔ グローバル</div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.65;"><strong style="color:var(--text)">どちらにも読めるニュートラル</strong>。海外展開も意識</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <span class="card-title blue">カラーパレット</span>
+        <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--text3);margin-bottom:8px;">PRIMARY</div>
+        <div class="gl-color-row">
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#F8F7F4;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">オフホワイト</span><span class="gl-swatch-hex">#F8F7F4 — 背景・余白</span></div></div>
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#1C1C1C;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">チャコール</span><span class="gl-swatch-hex">#1C1C1C — 本文・見出し</span></div></div>
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#A8C8D8;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">アイスブルー</span><span class="gl-swatch-hex">#A8C8D8 — CTA・アクセント</span></div></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;color:var(--text3);margin:14px 0 8px;">SECONDARY</div>
+        <div class="gl-color-row">
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#E8E6E0;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">ライトグレー</span><span class="gl-swatch-hex">#E8E6E0 — カードBG</span></div></div>
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#C8E0D8;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">クリアミント</span><span class="gl-swatch-hex">#C8E0D8 — 強調・バッジ</span></div></div>
+          <div class="gl-swatch"><div class="gl-swatch-dot" style="background:#2C3E50;"></div><div class="gl-swatch-info"><span class="gl-swatch-name">ネイビーグレー</span><span class="gl-swatch-hex">#2C3E50 — フッター・ダーク</span></div></div>
+        </div>
+      </div>
+
+      <div class="gl-cols">
+        <div class="gl-card">
+          <span class="gl-card-label">タイポグラフィ</span>
+          <div class="gl-card-body">
+            <table class="gl-pos-table">
+              <thead><tr><th>役割</th><th>フォント</th></tr></thead>
+              <tbody>
+                <tr><td>H1（日本語）</td><td style="color:var(--text2);">游明朝 / Noto Serif JP — 権威・信頼</td></tr>
+                <tr><td>H2-3（日本語）</td><td style="color:var(--text2);">游ゴシック / Noto Sans JP Medium</td></tr>
+                <tr><td>本文</td><td style="color:var(--text2);">Noto Sans JP Regular</td></tr>
+                <tr><td>英語見出し</td><td style="color:var(--text2);font-style:italic;">Cormorant Garamond Italic</td></tr>
+                <tr><td>UI / ナビ</td><td style="color:var(--text2);">Inter / DM Sans</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="gl-card">
+          <span class="gl-card-label">フォトグラフィ方針</span>
+          <div class="gl-card-body">
+            <div style="margin-bottom:10px;">
+              <div style="font-size:11.5px;font-weight:700;color:var(--green);margin-bottom:6px;">OK — 目指すトーン</div>
+              <div>自然光・柔らかいディフューズ光 / 集中している人物 / 眼元のクローズアップ / 都市の日常（カフェ・オフィス）</div>
+            </div>
+            <div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;">
+              <div style="font-size:11.5px;font-weight:700;color:var(--red);margin-bottom:6px;">NG — 避けるトーン</div>
+              <div>白衣・クリニック感 / 過度なキラキラ感 / 大げさな笑顔 / EC的な価格バナー</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-site-flow" style="margin-top:16px;">
+        <div class="gl-site-flow-title">ブランドサイト構成（推奨）</div>
+        <div class="gl-site-step"><div class="gl-step-n">1</div><div class="gl-step-body"><strong>Hero</strong> — タグライン「目が、ちゃんと、休める。」+ CTA（無料相談 / 詳しく見る）</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">2</div><div class="gl-step-body"><strong>Problem</strong> — 「見えているのに疲れる」問題提起。隠れ斜位の説明</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">3</div><div class="gl-step-body"><strong>Science</strong> — プリズムメガネの仕組み（インフォグラフィック）</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">4</div><div class="gl-step-body"><strong>Product</strong> — フレームラインアップ。特徴説明メイン（ECへ誘導しない）</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">5</div><div class="gl-step-body"><strong>Story</strong> — アイケアLaboからの流れ・ブランドストーリー</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">6</div><div class="gl-step-body"><strong>Voice</strong> — 使用者の声（3〜5人）</div></div>
+        <div class="gl-site-step"><div class="gl-step-n">7</div><div class="gl-step-body"><strong>CTA</strong> — 来店予約 / お問い合わせ</div></div>
+      </div>
+
+    </div><!-- /panel-3 -->
+
+    <!-- ══ PANEL 4: PRODUCT LINES ══ -->
+    <div class="glass-panel" id="product-lines">
+
+      <!-- ライン展開の考え方 -->
+      <div class="gl-hero">
+        <div class="gl-hero-eyebrow">PRODUCT LINE EXPANSION</div>
+        <div class="gl-hero-main">「アイケアラボ × グラス」<em>シーン別ライン展開</em>へ</div>
+      </div>
+
+      <!-- コアライン -->
+      <div class="gl-card rec" style="margin-bottom:16px;">
+        <span class="gl-card-label amber">Core Line</span>
+        <div class="gl-card-title">EYE CARE GLASS（コアライン）</div>
+        <div class="gl-card-body">
+          プリズムメガネのスタンダードライン。日常のあらゆる場面に対応する基本モデル。<br>
+          ターゲット：25〜45歳ナレッジワーカー / 慢性的な眼精疲労を持つ全世代<br>
+          価格帯：¥30,000〜¥50,000 / ステータス：<strong style="color:var(--green);">稼働中</strong>
+        </div>
+      </div>
+
+      <!-- 3ライン -->
+      <div class="gl-cols col3" style="margin-bottom:16px;">
+
+        <!-- FOCUS -->
+        <div class="gl-card blue">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--blue-dim);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🎯</div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--blue);margin-bottom:2px;">LINE 01</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">EYE CARE GLASS<br><em style="font-style:normal;color:var(--blue-lt);">FOCUS</em></div>
+            </div>
+          </div>
+          <div class="gl-card-body">
+            <div style="margin-bottom:10px;"><strong>対象：</strong>ビジネスパーソン・エンジニア・クリエイター</div>
+            <div style="margin-bottom:10px;"><strong>シーン：</strong>長時間PC作業・集中が必要な業務</div>
+            <div style="margin-bottom:10px;"><strong>特徴：</strong>高精度プリズム + ブルーライトカット + 軽量フレーム</div>
+            <div style="margin-bottom:10px;"><strong>キャッチ：</strong>「集中が、続く。」</div>
+            <div style="display:inline-block;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--amber);">構想中</div>
+          </div>
+        </div>
+
+        <!-- KIDS -->
+        <div class="gl-card green">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--green-dim);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👦</div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--green);margin-bottom:2px;">LINE 02</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">EYE CARE GLASS<br><em style="font-style:normal;color:#34d399;">KIDS</em></div>
+            </div>
+          </div>
+          <div class="gl-card-body">
+            <div style="margin-bottom:10px;"><strong>対象：</strong>小学生〜高校生 / 保護者</div>
+            <div style="margin-bottom:10px;"><strong>シーン：</strong>授業・宿題・タブレット学習</div>
+            <div style="margin-bottom:10px;"><strong>特徴：</strong>軽量・耐久性・子どもの視力発達に配慮したプリズム設計</div>
+            <div style="margin-bottom:10px;"><strong>キャッチ：</strong>「勉強が、もっと楽になる。」</div>
+            <div style="display:inline-block;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--amber);">構想中</div>
+          </div>
+        </div>
+
+        <!-- SPORTS -->
+        <div class="gl-card" style="border-left:3px solid var(--orange);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚡</div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--orange);margin-bottom:2px;">LINE 03</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text);">EYE CARE GLASS<br><em style="font-style:normal;color:var(--orange);">SPORTS</em></div>
+            </div>
+          </div>
+          <div class="gl-card-body">
+            <div style="margin-bottom:10px;"><strong>対象：</strong>アスリート・スポーツ愛好家</div>
+            <div style="margin-bottom:10px;"><strong>シーン：</strong>トレーニング・競技・アウトドア</div>
+            <div style="margin-bottom:10px;"><strong>特徴：</strong>スポーツフレーム + 動体視力サポート + プリズム補正</div>
+            <div style="margin-bottom:10px;"><strong>キャッチ：</strong>「視界が、勝敗を変える。」</div>
+            <div style="display:inline-block;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--amber);">構想中</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ライン展開マップ -->
+      <div class="card" style="margin-bottom:16px;">
+        <span class="card-title">ライン展開ロードマップ</span>
+        <table class="gl-pos-table">
+          <thead><tr><th>ライン</th><th>ターゲット</th><th>価格帯（想定）</th><th>展開時期</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>EYE CARE GLASS（Core）</td>
+              <td style="color:var(--text2);">25〜45歳 ナレッジワーカー</td>
+              <td style="color:var(--text2);">¥30,000〜¥50,000</td>
+              <td style="color:var(--green);">稼働中</td>
+            </tr>
+            <tr>
+              <td>FOCUS</td>
+              <td style="color:var(--text2);">ビジネス・エンジニア・クリエイター</td>
+              <td style="color:var(--text2);">¥35,000〜¥60,000</td>
+              <td style="color:var(--amber);">2026 Q3〜</td>
+            </tr>
+            <tr>
+              <td>KIDS</td>
+              <td style="color:var(--text2);">小学生〜高校生 / 保護者</td>
+              <td style="color:var(--text2);">¥20,000〜¥35,000</td>
+              <td style="color:var(--amber);">2026 Q4〜</td>
+            </tr>
+            <tr>
+              <td>SPORTS</td>
+              <td style="color:var(--text2);">アスリート・スポーツ愛好家</td>
+              <td style="color:var(--text2);">¥40,000〜¥70,000</td>
+              <td style="color:var(--text3);">2027〜（検討）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ライン共通の価値軸 -->
+      <div class="gl-slogan">
+        <div class="gl-slogan-main">全ラインに共通する核：「プリズム補正による根本ケア」</div>
+        <div class="gl-slogan-sub">シーンは違っても、視線のズレを整えるという本質は変わらない。</div>
+      </div>
+
+    </div><!-- /panel-4 -->
+
+  </div>
+</div>
+
+<script>
+  function showGlassTab(idx) {
+    document.querySelectorAll('.glass-tab').forEach(function(b, i) {
+      b.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.glass-panel').forEach(function(p, i) {
+      p.classList.toggle('active', i === idx);
+    });
+  }
+</script>
+
+</body>
+</html>

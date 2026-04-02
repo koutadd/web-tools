@@ -1,0 +1,63 @@
+[  471934ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  476936ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  481944ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  486947ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  487286ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  488583ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489103ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489313ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489451ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489572ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489703ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489842ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  489962ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  490110ms] ReferenceError: openGenrePicker is not defined
+    at HTMLButtonElement.onclick (http://localhost:3000/aicare-portfolio.html:1:1)
+[  491954ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  496961ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  499882ms] [ERROR] Framing 'https://drive.google.com/' violates the following report-only Content Security Policy directive: "frame-ancestors 'self'". The violation has been logged, but no further action has been taken.
+ @ :0
+[  500135ms] [ERROR] Framing 'https://drive.google.com/' violates the following Content Security Policy directive: "frame-ancestors https://drive.google.com". The request has been blocked.
+ @ :0
+[  500408ms] [ERROR] Framing 'https://accounts.google.com/' violates the following Content Security Policy directive: "frame-ancestors https://drive.google.com". The request has been blocked.
+ @ :0
+[  501963ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  506978ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  511986ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  516990ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  521997ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  527003ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  532008ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  537015ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  542019ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  547023ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  552029ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  557037ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  562041ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  567046ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  572052ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  577056ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  582063ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  587071ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  592079ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  597087ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  602093ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  607101ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  612109ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  617114ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  622122ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  627129ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  632133ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  637138ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  642142ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  647149ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0
+[  652154ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/watch-images:0

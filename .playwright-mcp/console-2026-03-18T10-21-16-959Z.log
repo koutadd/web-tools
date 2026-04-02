@@ -1,0 +1,3 @@
+[    1939ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://store-app-psi-nine.vercel.app/favicon.ico:0
+[   13944ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://store-app-psi-nine.vercel.app/api/review-auth:0
+[   57854ms] An error occurred in the Server Components render. The specific message is omitted in production builds to avoid leaking sensitive details. A digest property is included on this error instance which may provide additional details about the nature of the error.

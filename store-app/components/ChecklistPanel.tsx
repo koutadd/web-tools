@@ -189,16 +189,31 @@ export default function ChecklistPanel({
   const [overSizeErrors, setOverSizeErrors] = useState<Record<string, { fileSizeMB: number; driveUrl: string }>>({});
   // 提出完了アニメーション: itemId → true（1500ms 後に解除）
   const [justSubmitted, setJustSubmitted] = useState<Record<string, boolean>>({});
-  // 入稿データフォルダ URL（/drive/info から取得）
-  const [driveUploadUrl, setDriveUploadUrl] = useState<string>(DRIVE_PARENT_FOLDER_URL);
+  // カテゴリ別フォルダ URL（/drive/info から取得）
+  const [driveFolderUrls, setDriveFolderUrls] = useState<{
+    photo: string; asset: string; document: string; submit: string; root: string;
+  }>({ photo: '', asset: '', document: '', submit: '', root: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 入稿データフォルダ URL を取得（oversize error 案内用）
+  // カテゴリ別フォルダ URL を取得
   useEffect(() => {
     fetch(`/api/stores/${storeId}/drive/info`)
       .then((r) => r.ok ? r.json() : null)
-      .then((d: { driveUploadUrl?: string } | null) => {
-        if (d?.driveUploadUrl) setDriveUploadUrl(d.driveUploadUrl);
+      .then((d: {
+        driveUploadUrl?: string;
+        photoFolderUrl?: string;
+        assetFolderUrl?: string;
+        documentFolderUrl?: string;
+        rootFolderUrl?: string;
+      } | null) => {
+        if (!d) return;
+        setDriveFolderUrls({
+          photo:    d.photoFolderUrl    ?? '',
+          asset:    d.assetFolderUrl    ?? '',
+          document: d.documentFolderUrl ?? '',
+          submit:   d.driveUploadUrl    ?? '',
+          root:     d.rootFolderUrl     ?? '',
+        });
       })
       .catch(() => {/* fallback to DRIVE_PARENT_FOLDER_URL */});
   }, [storeId]);
@@ -276,6 +291,18 @@ export default function ChecklistPanel({
     }
   };
 
+  // カテゴリ → 対応フォルダ URL（未取得の場合は親フォルダにフォールバック）
+  const getCategoryFolderUrl = (category: string): string => {
+    switch (category) {
+      case 'photo':    return driveFolderUrls.photo    || driveFolderUrls.root || DRIVE_PARENT_FOLDER_URL;
+      case 'logo':     return driveFolderUrls.asset    || driveFolderUrls.root || DRIVE_PARENT_FOLDER_URL;
+      case 'document':
+      case 'access':
+      case 'sns':      return driveFolderUrls.document || driveFolderUrls.root || DRIVE_PARENT_FOLDER_URL;
+      default:         return driveFolderUrls.root     || DRIVE_PARENT_FOLDER_URL;
+    }
+  };
+
   // ─── ファイルアップロード ─────────────────────────────────────────────────
   const triggerUpload = (itemId: string) => {
     setUploadTargetId(itemId);
@@ -303,7 +330,7 @@ export default function ChecklistPanel({
     if (file.size > UPLOAD_MAX_BYTES) {
       setOverSizeErrors((prev) => ({
         ...prev,
-        [itemId]: { fileSizeMB: Math.ceil(file.size / 1024 / 1024), driveUrl: driveUploadUrl },
+        [itemId]: { fileSizeMB: Math.ceil(file.size / 1024 / 1024), driveUrl: getCategoryFolderUrl(category) },
       }));
       setUploadingItemId(null);
       return;
@@ -360,8 +387,8 @@ export default function ChecklistPanel({
         submission?: { id: string };
       };
 
-      // アップロード成功後に driveUploadUrl をステートへ反映（oversize エラー案内を最新 URL に更新）
-      if (data.driveUploadUrl) setDriveUploadUrl(data.driveUploadUrl);
+      // アップロード成功後に submit フォルダ URL を反映（oversize エラー案内を最新 URL に更新）
+      if (data.driveUploadUrl) setDriveFolderUrls((prev) => ({ ...prev, submit: data.driveUploadUrl }));
 
       // 完了アニメーション
       setJustSubmitted((prev) => ({ ...prev, [itemId]: true }));
@@ -558,10 +585,10 @@ export default function ChecklistPanel({
                 </div>
               )}
               <div style={{ padding: '12px 14px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  {/* ステータスバッジ */}
+                {/* 上段: ステータスバッジ + 撮影ガイドボタン */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span style={{
-                    display: 'inline-block', flexShrink: 0, marginTop: 1,
+                    display: 'inline-block', flexShrink: 0,
                     padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
                     background: statusMeta.bg, color: statusMeta.text,
                     border: `1px solid ${statusMeta.border}`,
@@ -569,52 +596,6 @@ export default function ChecklistPanel({
                   }}>
                     {statusMeta.label}
                   </span>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {/* タイトル + 期限ラベル */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' as const, marginBottom: 3 }}>
-                      <span style={{
-                        fontSize: 14, fontWeight: 600,
-                        color: item.status === 'approved' ? '#9ca3af' : 'var(--color-text)',
-                      }}>
-                        {item.label}
-                      </span>
-                      {item.dueLabel && item.status === 'pending' && (
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 99,
-                          background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a',
-                          whiteSpace: 'nowrap' as const,
-                        }}>
-                          {item.dueLabel}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* 理由 */}
-                    {item.reason && item.status !== 'approved' && (
-                      <p style={{ fontSize: 12, color: 'var(--color-text-sub)', lineHeight: 1.6, marginBottom: 5 }}>
-                        {item.reason}
-                      </p>
-                    )}
-
-                    {/* アップロード済みの場合: 入稿データフォルダへの1本リンクのみ表示 */}
-                    {item.latestSubmission ? (
-                      <DriveUploadResult
-                        submission={item.latestSubmission}
-                        submitFolderUrl={item.latestSubmission.submitFolderUrl || driveUploadUrl}
-                        onReUpload={() => triggerUpload(item.id)}
-                      />
-                    ) : null}
-
-                    {/* 担当 */}
-                    <div style={{ marginTop: item.latestSubmission ? 6 : 2 }}>
-                      <span style={{ fontSize: 11, color: '#9ca3af' }}>
-                        担当：{item.assigneeType === 'owner' ? 'オーナー' : '管理側'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 撮影ガイドボタン */}
                   {item.isPhotoRequired && item.status === 'pending' && (
                     <button
                       onClick={() => setGuideModal(item)}
@@ -628,6 +609,48 @@ export default function ChecklistPanel({
                       📸 撮影ガイド
                     </button>
                   )}
+                </div>
+
+                {/* タイトル + 期限ラベル（全幅） */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' as const, marginBottom: 3 }}>
+                  <span style={{
+                    fontSize: 14, fontWeight: 600,
+                    color: item.status === 'approved' ? '#9ca3af' : 'var(--color-text)',
+                  }}>
+                    {item.label}
+                  </span>
+                  {item.dueLabel && item.status === 'pending' && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 99,
+                      background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a',
+                      whiteSpace: 'nowrap' as const,
+                    }}>
+                      {item.dueLabel}
+                    </span>
+                  )}
+                </div>
+
+                {/* 理由 */}
+                {item.reason && item.status !== 'approved' && (
+                  <p style={{ fontSize: 12, color: 'var(--color-text-sub)', lineHeight: 1.6, marginBottom: 5 }}>
+                    {item.reason}
+                  </p>
+                )}
+
+                {/* アップロード済みの場合: 入稿データフォルダへの1本リンクのみ表示 */}
+                {item.latestSubmission ? (
+                  <DriveUploadResult
+                    submission={item.latestSubmission}
+                    submitFolderUrl={item.latestSubmission.submitFolderUrl || getCategoryFolderUrl(item.category)}
+                    onReUpload={() => triggerUpload(item.id)}
+                  />
+                ) : null}
+
+                {/* 担当 */}
+                <div style={{ marginTop: item.latestSubmission ? 6 : 2 }}>
+                  <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                    担当：{item.assigneeType === 'owner' ? 'オーナー' : '管理側'}
+                  </span>
                 </div>
               </div>
 
@@ -677,24 +700,71 @@ export default function ChecklistPanel({
                     </div>
                   )}
 
-                  {/* 通常エラーメッセージ */}
-                  {uploadError && (
-                    <div style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 6,
-                      padding: '8px 10px', borderRadius: 6,
-                      background: '#fef2f2', border: '1px solid #fecaca',
-                      marginBottom: 8,
-                    }}>
-                      <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
-                      <div>
-                        <p style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', marginBottom: 1 }}>
-                          アップロードに失敗しました
+                  {/* ─── フォルダ導線（通常: 小さく / エラー時: 強調）─── */}
+                  {!overSizeErr && (
+                    uploadError ? (
+                      /* エラー時: 強調表示 + フォルダボタン */
+                      <div style={{
+                        padding: '12px 14px', borderRadius: 8, marginBottom: 10,
+                        background: '#fef2f2', border: '2px solid #fca5a5',
+                      }}>
+                        <p style={{ fontSize: 12, fontWeight: 800, color: '#dc2626', marginBottom: 3 }}>
+                          ⚠️ アップロードできませんでした
                         </p>
-                        <p style={{ fontSize: 11, color: '#991b1b', lineHeight: 1.5 }}>
-                          {uploadError}
+                        <p style={{ fontSize: 11, color: '#991b1b', lineHeight: 1.6, marginBottom: 10 }}>
+                          通信環境やファイルサイズの影響で失敗した可能性があります。<br />
+                          下のボタンから対象フォルダを開き、直接ファイルを入れてください。
                         </p>
+                        {/* 優先①: フォルダを開く */}
+                        <a
+                          href={getCategoryFolderUrl(item.category)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '10px 14px', borderRadius: 7, marginBottom: 8,
+                            background: '#1967D2', color: 'white',
+                            fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                          }}
+                        >
+                          <svg width="12" height="11" viewBox="0 0 87.3 78" fill="none">
+                            <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L27.5 51H0c0 1.55.4 3.1 1.2 4.5z" fill="rgba(255,255,255,0.8)"/>
+                            <path d="M43.65 25L29.9 0c-1.35.8-2.5 1.9-3.3 3.3L1.2 46.5A9.06 9.06 0 000 51h27.5z" fill="white"/>
+                            <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8z" fill="rgba(255,255,255,0.7)"/>
+                          </svg>
+                          📁 {CATEGORY_TO_FOLDER[item.category] ?? '対象フォルダ'}を開く
+                        </a>
+                        {/* 優先②: もう一度試す */}
+                        <button
+                          onClick={() => {
+                            setUploadErrors((prev) => { const next = { ...prev }; delete next[item.id]; return next; });
+                            triggerUpload(item.id);
+                          }}
+                          style={{
+                            width: '100%', padding: '8px', borderRadius: 7,
+                            border: '1px solid #fecaca', background: 'transparent',
+                            color: '#b91c1c', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                          }}
+                        >
+                          もう一度試す
+                        </button>
                       </div>
-                    </div>
+                    ) : (
+                      /* 通常時: 小さくフォルダリンクを表示（⑦） */
+                      <div style={{ textAlign: 'right' as const, marginBottom: 6 }}>
+                        <a
+                          href={getCategoryFolderUrl(item.category)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: 10, color: '#9ca3af',
+                            textDecoration: 'underline', fontWeight: 500,
+                          }}
+                        >
+                          📁 直接フォルダを開く
+                        </a>
+                      </div>
+                    )
                   )}
 
                   {/* ボタン行 */}
