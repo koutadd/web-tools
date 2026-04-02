@@ -1475,12 +1475,22 @@ function renderMembers() {
     const doing = projs.filter(p => p.status === '進行中').length;
     const todo  = projs.filter(p => p.status === '未着手').length;
 
-    // タスク一覧（担当者 assignee が一致するもの）
+    // タスク一覧：タスクのassigneeが一致、または子タスクも再帰検索
     const tasks = [];
-    projects.forEach(p => {
-      (p.tasks||[]).forEach(t => {
-        if (t.assignee === person) tasks.push({ task: t, project: p });
+    function collectTasks(taskList, proj) {
+      (taskList || []).forEach(t => {
+        const ta = (t.assignee || '').split(/[、,，\s]+/).map(s => s.trim());
+        if (ta.includes(person)) tasks.push({ task: t, project: proj });
+        if (t.children && t.children.length) collectTasks(t.children, proj);
       });
+    }
+    // プロジェクト担当者の場合、タスクにassigneeがなければプロジェクト全タスクを含める
+    projects.forEach(p => {
+      const pa = (p.assignee || '').split(/[、,，\s]+/).map(s => s.trim());
+      const pm = (p.members || '').split(/[、,，\s]+/).map(s => s.trim());
+      if (pa.includes(person) || pm.includes(person)) {
+        collectTasks(p.tasks, p);
+      }
     });
 
     const rows = projs.map(p => {
