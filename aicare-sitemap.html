@@ -676,6 +676,26 @@
       background: #f1f5f9; border-radius: 8px; padding: 12px 16px;
     }
     .share-section-value.empty { color: #94a3b8; font-style: italic; }
+
+    /* Readonly mode */
+    body.readonly #btn-add-root,
+    body.readonly #btn-add-child,
+    body.readonly #btn-delete,
+    body.readonly #btn-save,
+    body.readonly #btn-export,
+    body.readonly #btn-share-page,
+    body.readonly #save-indicator,
+    body.readonly #detail-panel { display: none !important; }
+    body.readonly #tree-panel { flex: 1; }
+    body.readonly .tree-row { cursor: default; }
+    body.readonly .drag-handle { display: none; }
+    #readonly-banner {
+      display: none;
+      background: #1e3a5f; color: #93c5fd;
+      padding: 6px 20px; font-size: 12px; font-weight: 600;
+      text-align: center; letter-spacing: .05em;
+    }
+    body.readonly #readonly-banner { display: block; }
 </style>
 <nav id="aicare-common-nav">
   <span class="cn-label">eye care lab</span>
@@ -709,6 +729,7 @@
 <!-- ── AICARE COMMON NAV END ── -->
 
 <!-- ========== TOOLBAR ========== -->
+<div id="readonly-banner">👁 閲覧専用モード — このページは編集できません</div>
 <div id="toolbar">
   <a href="http://localhost:8766/persona-dashboard.html#positioning" class="tb-btn accent" style="text-decoration:none;">← Hub</a>
   <div class="sep"></div>
@@ -733,6 +754,13 @@
   <div class="sep"></div>
   <button class="tb-btn primary" id="btn-flowmap" title="導線マップを表示">
     &#128202; 導線マップ
+  </button>
+  <a href="aicare-wireframe.html" class="tb-btn" style="text-decoration:none;background:rgba(99,102,241,.22);color:#a5b4fc;" title="ワイヤーフレームビルダー">
+    &#9634; ワイヤーフレーム
+  </a>
+  <div class="sep"></div>
+  <button class="tb-btn" id="btn-share-all" title="サイトマップ全体を共有（閲覧専用URL）" style="background:rgba(59,130,246,.15);color:#60a5fa;border-color:rgba(59,130,246,.3);">
+    🔗 共有
   </button>
   <div class="spacer"></div>
   <span id="save-indicator">未保存の変更あり</span>
@@ -2254,8 +2282,26 @@ document.getElementById('btn-share-page').addEventListener('click', () => {
 // Check for ?share= on load
 const _shareParam = new URLSearchParams(location.search).get('share');
 if (_shareParam) {
-  // Wait for data to be ready, then show share view
   setTimeout(() => renderShareView(_shareParam), 100);
+}
+
+// Whole-sitemap share button
+document.getElementById('btn-share-all').addEventListener('click', () => {
+  const url = location.origin + location.pathname + '?readonly=1';
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('🔗 閲覧専用URLをコピーしました');
+  }).catch(() => {
+    prompt('共有URL（閲覧専用）:', url);
+  });
+});
+
+// Readonly mode
+if (new URLSearchParams(location.search).get('readonly') === '1') {
+  document.body.classList.add('readonly');
+  // Disable all editing event handlers by making tree rows non-draggable
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[draggable]').forEach(el => el.draggable = false);
+  });
 }
 
 /* ===== RIGHT TAB SWITCHING ===== */
