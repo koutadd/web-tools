@@ -1240,6 +1240,7 @@ const DEFAULT_PROJECTS = [
   { id:25, categoryId:'management', name:'タスク・スケジュール可視化',            purpose:'全プロジェクトのタスク・スケジュールを一覧で管理できる状態にする',    status:'未着手', priority:'高',     deadline:'', leadRole:'director', assignee:'こうた',          members:'開発、全員',                                deliverables:'プロジェクト一覧、スケジュール表、KPI表',                            overview:'', background:'', completionCriteria:'', notes:'' },
   { id:26, categoryId:'management', name:'制作体制・キャパシティ整理',            purpose:'各メンバーの役割と工数を整理し、無理のない体制を作る',               status:'未着手', priority:'中',     deadline:'', leadRole:'director', assignee:'こうた',          members:'がく、ささじま、ちなり、鷲巣、開発',        deliverables:'体制図、担当表、工数見立て',                                         overview:'', background:'', completionCriteria:'', notes:'' },
   { id:27, categoryId:'management', name:'プロジェクト別アサイン整理',            purpose:'プロジェクトごとの担当・連絡体制・会議体を整理する',                status:'未着手', priority:'中',     deadline:'', leadRole:'director', assignee:'こうた',          members:'全員',                                      deliverables:'アサイン表、連絡体制、会議体整理',                                   overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:28, categoryId:'brand',      name:'本部ロゴ制作',                          purpose:'アイケアラボ本部のロゴを制作し、ブランドの統一イメージを確立する',    status:'進行中', priority:'最優先', deadline:'2026-04-15', leadRole:'design', assignee:'こうた', members:'がく、ささじま',                            deliverables:'ロゴデータ（AI/PNG/SVG）、ガイドライン',                            overview:'明日（4/3）ロゴ提出、4/15完成', background:'', completionCriteria:'ロゴデータ入稿完了', notes:'ロゴ提出期限: 2026-04-03' },
 ];
 
 // ===================== STORAGE =====================
@@ -1309,6 +1310,12 @@ let APP = null;
 function initializeApp() {
   // Render immediately from localStorage (no waiting)
   APP = loadLocal() || initData();
+  // Merge any new DEFAULT_PROJECTS not yet in saved data
+  DEFAULT_PROJECTS.forEach(def => {
+    if (!APP.projects.find(p => p.id === def.id)) {
+      APP.projects.push({ ...def, tasks: makeDefaultTasks(def.id) });
+    }
+  });
   if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
   render();
   // Background cloud sync (doesn't block rendering)
