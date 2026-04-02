@@ -1880,7 +1880,7 @@ function renderDashboard() {
     (taskList || []).forEach(t => {
       if (t.status !== '完了') {
         const d = daysUntil(t.deadline);
-        if (d !== null && d <= 0) todayTasks.push({ t, proj });
+        if (d !== null && d <= 3) todayTasks.push({ t, proj });
       }
       if (t.children) collectTodayTasks(t.children, proj);
     });
@@ -1899,16 +1899,17 @@ function renderDashboard() {
   let taskTodayHtml = '';
   if (todayTasks.length) {
     taskTodayHtml = `<div class="today-panel" style="background:rgba(167,139,250,0.07);border-color:rgba(109,40,217,0.25);border-left:3px solid #7c3aed;margin-bottom:8px;">
-      <div class="today-panel-title" style="color:#6d28d9;">📌 今日期限のタスク <span style="opacity:0.65;font-weight:500;font-size:12px;">${todayTasks.length}件</span></div>
+      <div class="today-panel-title" style="color:#6d28d9;">📌 3日以内のタスク <span style="opacity:0.65;font-weight:500;font-size:12px;">${todayTasks.length}件</span></div>
       ${todayTasks.map(({ t, proj }) => {
         const d = daysUntil(t.deadline);
-        const dlColor = d < 0 ? '#f87171' : '#fb923c';
+        const dlColor = d < 0 ? '#f87171' : d === 0 ? '#fb923c' : d <= 1 ? '#f59e0b' : '#6d28d9';
+        const dlLabel = d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '今日期限' : `あと${d}日`;
         return `<div class="priority-item" style="border-left-color:rgba(167,139,250,0.6);" onclick="navigate('#/project/${proj.id}')">
           <span class="pi-name">📌 ${t.name}</span>
           <div class="pi-meta">
             <span style="font-size:11px;color:var(--muted);">${proj.name}</span>
             ${t.assignee ? `<span style="font-size:11px;color:#6d28d9;">👤 ${t.assignee}</span>` : ''}
-            <span style="color:${dlColor};font-weight:700;font-size:11px;">${d < 0 ? `${Math.abs(d)}日超過` : '今日期限'}</span>
+            <span style="color:${dlColor};font-weight:700;font-size:11px;">${dlLabel}</span>
             <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();navigate('#/project/${proj.id}')">今見る →</button>
           </div>
         </div>`;
