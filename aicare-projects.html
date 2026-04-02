@@ -1307,14 +1307,29 @@ function saveData(data) {
 
 let APP = null;
 
+function deduplicateProjects(projects) {
+  const seen = new Set();
+  return projects.filter(p => {
+    const key = String(p.id);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function initializeApp() {
   // Render immediately from localStorage (no waiting)
   APP = loadLocal() || initData();
-  // Migration: add 本部ロゴ (id:28) if not yet in saved data
+  // Deduplicate (fixes any duplicates from previous bad migration)
+  const before = APP.projects.length;
+  APP.projects = deduplicateProjects(APP.projects);
+  // Add 本部ロゴ (id:28) if missing
   if (!APP.projects.find(p => String(p.id) === '28')) {
     const def = DEFAULT_PROJECTS.find(p => p.id === 28);
-    if (def) { APP.projects.push({ ...def, tasks: makeDefaultTasks(28) }); saveData(APP); }
+    if (def) APP.projects.push({ ...def, tasks: makeDefaultTasks(28) });
   }
+  // Save if we changed anything
+  if (APP.projects.length !== before) saveData(APP);
   if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
   render();
   // Background cloud sync (doesn't block rendering)
@@ -1345,6 +1360,7 @@ async function syncFromCloud() {
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT')) return;
     data.projects.forEach(p => ensureChildren(p.tasks));
+    data.projects = deduplicateProjects(data.projects);
     // ローカルで追加した担当者をクラウドデータが上書きしないようにマージ
     if (APP.people && APP.people.length) {
       if (!data.people || !data.people.length) data.people = APP.people;
