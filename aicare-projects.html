@@ -1310,12 +1310,11 @@ let APP = null;
 function initializeApp() {
   // Render immediately from localStorage (no waiting)
   APP = loadLocal() || initData();
-  // Merge any new DEFAULT_PROJECTS not yet in saved data
-  DEFAULT_PROJECTS.forEach(def => {
-    if (!APP.projects.find(p => p.id === def.id)) {
-      APP.projects.push({ ...def, tasks: makeDefaultTasks(def.id) });
-    }
-  });
+  // Migration: add 本部ロゴ (id:28) if not yet in saved data
+  if (!APP.projects.find(p => String(p.id) === '28')) {
+    const def = DEFAULT_PROJECTS.find(p => p.id === 28);
+    if (def) { APP.projects.push({ ...def, tasks: makeDefaultTasks(28) }); saveData(APP); }
+  }
   if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
   render();
   // Background cloud sync (doesn't block rendering)
