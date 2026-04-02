@@ -23,11 +23,11 @@
 }
 #aicare-common-nav::-webkit-scrollbar { display: none; }
 #aicare-common-nav > * { flex-shrink: 0; }
-#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
-#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
-#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
-#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
-#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+#aicare-common-nav .cn-label { color: rgba(0,0,0,0.3); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(0,0,0,0.2); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: #4b6080; text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #1a2535; background: rgba(0,0,0,0.05); }
+#aicare-common-nav a.cn-active { color: #2563eb !important; border-color: rgba(37,99,235,0.35) !important; background: rgba(37,99,235,0.08) !important; }
 
 /* ===================== DESIGN SYSTEM ===================== */
 :root {
@@ -81,7 +81,7 @@ body {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #cbd5e1;
+  color: var(--muted);
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
@@ -124,16 +124,16 @@ body {
   white-space: nowrap;
 }
 
-.status-未着手 { background: rgba(107,114,128,0.15); color: #a1adc0; border: 1px solid rgba(107,114,128,0.35); }
-.status-進行中 { background: rgba(59,130,246,0.2);  color: #7db8ff; border: 1px solid rgba(59,130,246,0.4); }
-.status-完了   { background: rgba(16,185,129,0.15); color: #4ade80; border: 1px solid rgba(16,185,129,0.35); }
-.status-要確認 { background: rgba(245,158,11,0.22); color: #fcd34d; border: 1px solid rgba(245,158,11,0.5); }
-.status-保留   { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.35); }
+.status-未着手 { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.3); }
+.status-進行中 { background: rgba(37,99,235,0.1);   color: #1d4ed8; border: 1px solid rgba(37,99,235,0.3); }
+.status-完了   { background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3); }
+.status-要確認 { background: rgba(217,119,6,0.12);  color: #b45309; border: 1px solid rgba(217,119,6,0.3); }
+.status-保留   { background: rgba(109,40,217,0.1);  color: #6d28d9; border: 1px solid rgba(109,40,217,0.3); }
 
-.priority-最優先 { background: rgba(239,68,68,0.22);  color: #fc8181; border: 1px solid rgba(239,68,68,0.5); }
-.priority-高     { background: rgba(249,115,22,0.22); color: #fdba74; border: 1px solid rgba(249,115,22,0.5); }
-.priority-中     { background: rgba(245,158,11,0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); }
-.priority-低     { background: rgba(107,114,128,0.15); color: #a1adc0; border: 1px solid rgba(107,114,128,0.3); }
+.priority-最優先 { background: rgba(220,38,38,0.1);  color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
+.priority-高     { background: rgba(234,88,12,0.1);  color: #ea580c; border: 1px solid rgba(234,88,12,0.3); }
+.priority-中     { background: rgba(202,138,4,0.1);  color: #a16207; border: 1px solid rgba(202,138,4,0.3); }
+.priority-低     { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.25); }
 
 /* ===================== BUTTONS ===================== */
 .btn {
@@ -153,9 +153,9 @@ body {
 
 .btn-primary {
   background: var(--accent);
-  color: #0f1117;
+  color: #ffffff;
 }
-.btn-primary:hover { background: #d97706; }
+.btn-primary:hover { background: #1d4ed8; }
 
 .btn-secondary {
   background: transparent;
@@ -786,12 +786,12 @@ body {
 /* ===================== PRIORITY ITEMS (today panel) ===================== */
 .priority-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; background: rgba(255,255,255,0.03);
+  padding: 10px 14px; background: rgba(0,0,0,0.02);
   border-radius: 8px; margin-bottom: 4px;
   border-left: 3px solid; cursor: pointer;
   transition: background 0.12s;
 }
-.priority-item:hover { background: rgba(255,255,255,0.07); }
+.priority-item:hover { background: rgba(0,0,0,0.04); }
 .priority-item .pi-name { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e8f0ff; }
 .priority-item .pi-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11px; }
 
@@ -1546,7 +1546,7 @@ function renderMembers() {
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div style="font-size:16px;font-weight:700;">${person}</div>
-            ${personRoles.map(r => `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#3b4f8422;color:#93c5fd;border:1px solid #3b4f8444;">${r.label}</span>`).join('')}
+            ${personRoles.map(r => `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(37,99,235,0.1);color:#1d4ed8;border:1px solid rgba(37,99,235,0.25);">${r.label}</span>`).join('')}
           </div>
           <div style="font-size:12px;color:var(--muted);margin-top:4px;">プロジェクト ${projs.length}件 &nbsp;·&nbsp; 進行中 ${doing} &nbsp;·&nbsp; 完了 ${done} &nbsp;·&nbsp; 未着手 ${todo}</div>
         </div>
@@ -1878,7 +1878,7 @@ function renderDashboard() {
   });
   const revHtml = todayGroup('要確認', '#f59e0b', 0.07, '🟡', review, null);
   const meHtml = todayGroup('こうた待ち', '#fb923c', 0.06, '👤', waitMe, p => `<span style="color:#fdba74;">${p.waitingFor}</span>`);
-  const otherHtml = todayGroup('他メンバー待ち', '#3b82f6', 0.07, '👥', waitOther, p => `<span style="color:#93c5fd;">${p.waitingFor}</span>`);
+  const otherHtml = todayGroup('他メンバー待ち', '#3b82f6', 0.07, '👥', waitOther, p => `<span style="color:#1d4ed8;">${p.waitingFor}</span>`);
 
   // 今日のタスクパネル
   let taskTodayHtml = '';
@@ -1892,7 +1892,7 @@ function renderDashboard() {
           <span class="pi-name">📌 ${t.name}</span>
           <div class="pi-meta">
             <span style="font-size:11px;color:var(--muted);">${proj.name}</span>
-            ${t.assignee ? `<span style="font-size:11px;color:#c4b5fd;">👤 ${t.assignee}</span>` : ''}
+            ${t.assignee ? `<span style="font-size:11px;color:#6d28d9;">👤 ${t.assignee}</span>` : ''}
             <span style="color:${dlColor};font-weight:700;font-size:11px;">${d < 0 ? `${Math.abs(d)}日超過` : '今日期限'}</span>
             <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();navigate('#/project/${proj.id}')">今見る →</button>
           </div>
@@ -1940,7 +1940,7 @@ function renderDashboard() {
     <div>
       <div style="display:flex;align-items:center;gap:10px;">
         <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">プロジェクト管理</h1>
-        <span id="saveIndicator" style="font-size:11px;color:#4ade80;opacity:0;transition:opacity 0.5s;padding:2px 8px;border-radius:4px;background:rgba(74,222,128,0.1);"></span>
+        <span id="saveIndicator" style="font-size:11px;color:#059669;opacity:0;transition:opacity 0.5s;padding:2px 8px;border-radius:4px;background:rgba(5,150,105,0.1);"></span>
       </div>
       <div style="font-size:12px;color:var(--muted);margin-top:3px;">アイケアラボ — ${total}プロジェクト</div>
     </div>
@@ -1949,7 +1949,7 @@ function renderDashboard() {
       <button class="btn btn-secondary btn-sm" onclick="openRolesModal()">👥 役割編集</button>
       <button class="btn btn-secondary btn-sm" onclick="openCategoriesModal()">🏷 カテゴリ</button>
       <button class="btn btn-primary btn-sm" onclick="openProjectModal(null)">＋ 追加</button>
-      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="color:#4ade80;border-color:#16a34a44;">📊 CSV</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="color:#059669;border-color:rgba(5,150,105,0.3);">📊 CSV</button>
     </div>
   </div>
 
@@ -2066,9 +2066,9 @@ function renderDashboard() {
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
             ${doing  ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);">進行中 ${doing}</span>` : ''}
-            ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);">要確認 ${review}</span>` : ''}
+            ${review ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,0.15);color:#b45309;border:1px solid rgba(180,83,9,0.3);">要確認 ${review}</span>` : ''}
             ${todo   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(107,114,128,0.12);color:#94a3b8;border:1px solid rgba(107,114,128,0.25);">未着手 ${todo}</span>` : ''}
-            ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);color:#4ade80;border:1px solid rgba(16,185,129,0.25);">完了 ${done}</span>` : ''}
+            ${done   ? `<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);color:#059669;border:1px solid rgba(5,150,105,0.3);">完了 ${done}</span>` : ''}
           </div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">${cat.desc || ''}</div>
           <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;pointer-events:none;font-size:12px;">今見る →</button>
@@ -3368,22 +3368,22 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
 #tour-card.tour-fade-out { opacity: 0; transform: translateY(4px); }
 
 .tc-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.tc-title  { font-size: 15px; font-weight: 700; color: #f0f4ff; line-height: 1.35; }
+.tc-title  { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.35; }
 .tc-close  { background: none; border: none; color: #4a5568; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; flex-shrink: 0; transition: color 0.15s; }
-.tc-close:hover { color: #f0f4ff; }
+.tc-close:hover { color: var(--text); }
 .tc-body   { font-size: 13px; color: #8a9cc0; line-height: 1.75; margin-bottom: 10px; }
 .tc-tip    { font-size: 11px; color: #4a6080; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12); border-radius: 8px; padding: 8px 11px; margin-bottom: 12px; }
 .tc-tip::before { content: '💡 '; }
 
 .tc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid #1e2a40; }
 .tc-dots   { display: flex; gap: 5px; align-items: center; }
-.tc-dot    { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.12); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.tc-dot    { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.12); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
 .tc-dot.on { background: #f59e0b; width: 20px; border-radius: 3px; }
 .tc-dot:hover:not(.on) { background: rgba(245,158,11,0.4); }
 .tc-nav    { display: flex; align-items: center; gap: 8px; }
 .tc-count  { font-size: 11px; color: #3d5070; min-width: 34px; text-align: center; }
 .tc-prev   { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 12px; font-size: 12px; color: #6b7fa0; cursor: pointer; transition: all 0.15s; }
-.tc-prev:hover { color: #f0f4ff; border-color: #3a4a6a; }
+.tc-prev:hover { color: var(--text); border-color: #3a4a6a; }
 .tc-next   { background: #f59e0b; border: none; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; transition: background 0.15s; }
 .tc-next:hover { background: #fbbf24; }
 </style>
