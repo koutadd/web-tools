@@ -1659,7 +1659,7 @@ function renderDashboard() {
   </div>
 
   <!-- Stats bar: 3 big + 3 small -->
-  <div style="display:flex;gap:10px;margin-bottom:28px;align-items:stretch;flex-wrap:wrap;">
+  <div id="tour-stats" style="display:flex;gap:10px;margin-bottom:28px;align-items:stretch;flex-wrap:wrap;">
     <!-- Big 3 -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;min-width:300px;">
       ${[
@@ -1687,13 +1687,13 @@ function renderDashboard() {
   </div>
 
   <!-- ① 今日の優先対応 -->
-  <div class="section-block">
+  <div class="section-block" id="section-today">
     ${sectionHead('🔥','今日の優先対応','画面を開いたら最初に確認')}
     ${todayContent}
   </div>
 
   <!-- ② 詰まり一覧 -->
-  <div class="section-block">
+  <div class="section-block" id="section-blockers">
     ${sectionHead('⛔','詰まり一覧','誰待ち / 何待ちで絞り込み')}
     <div class="blocker-filter">
       ${blockerKeys.map(k => `<button class="blocker-btn${blockerFilter===k?' active':''}" data-bf="${k}" onclick="setBlockerFilter('${k}')">${k}</button>`).join('')}
@@ -1702,7 +1702,7 @@ function renderDashboard() {
   </div>
 
   <!-- ③ プロジェクト一覧 -->
-  <div class="section-block">
+  <div class="section-block" id="section-projlist">
     ${sectionHead('📋','全プロジェクト一覧',`${total}件 — 各項目をクリックで直接編集`)}
     <!-- 列ヘッダー -->
     <div style="display:flex;align-items:center;gap:10px;padding:4px 21px 8px;font-size:10px;color:#3d5070;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;">
@@ -1737,7 +1737,7 @@ function renderDashboard() {
   </div>
 
   <!-- ⑤ カテゴリ一覧 -->
-  <div class="section-block">
+  <div class="section-block" id="section-categories">
     ${sectionHead('🏷','カテゴリ一覧','カテゴリ別の一覧ページへ')}
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
       ${getCategories().map(cat => {
@@ -2807,5 +2807,302 @@ window.addEventListener('beforeunload', () => { try { save(); } catch(e) {} });
   <option value="確認待ち">
   <option value="素材待ち">
 </datalist>
+
+<!-- ═══════════════════════════════ TOUR ═══════════════════════════════ -->
+<style>
+/* ── Tour button ── */
+#tour-btn {
+  position: fixed; top: 52px; right: 20px; z-index: 9990;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 14px; cursor: pointer;
+  color: var(--muted); font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+#tour-btn:hover { color: var(--accent); border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.07); }
+
+/* ── Tour overlay ── */
+#tour-overlay { display: none; }
+#tour-overlay.active { display: block; }
+
+#tour-backdrop {
+  position: fixed; inset: 0; z-index: 99998;
+  background: rgba(0,0,0,0.76); display: none;
+}
+#tour-spotlight {
+  position: fixed; z-index: 99999;
+  background: transparent; border-radius: 12px;
+  border: 2px solid rgba(245,158,11,0.85);
+  box-shadow: 0 0 0 4000px rgba(0,0,0,0.76), 0 0 0 6px rgba(245,158,11,0.15), 0 0 32px rgba(245,158,11,0.2);
+  transition: top 0.38s cubic-bezier(0.4,0,0.2,1),
+              left 0.38s cubic-bezier(0.4,0,0.2,1),
+              width 0.38s cubic-bezier(0.4,0,0.2,1),
+              height 0.38s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.25s;
+  pointer-events: none; opacity: 0;
+}
+
+/* ── Tour card ── */
+#tour-card {
+  position: fixed; z-index: 100000;
+  background: #0f1623; border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 16px; padding: 22px 24px;
+  width: 360px; max-width: calc(100vw - 32px);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.95), 0 0 0 1px rgba(245,158,11,0.1);
+  transition: opacity 0.2s, transform 0.2s;
+}
+#tour-card.tour-fade-out { opacity: 0; transform: translateY(4px); }
+
+.tc-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.tc-title  { font-size: 15px; font-weight: 700; color: #f0f4ff; line-height: 1.35; }
+.tc-close  { background: none; border: none; color: #4a5568; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; flex-shrink: 0; transition: color 0.15s; }
+.tc-close:hover { color: #f0f4ff; }
+.tc-body   { font-size: 13px; color: #8a9cc0; line-height: 1.75; margin-bottom: 10px; }
+.tc-tip    { font-size: 11px; color: #4a6080; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12); border-radius: 8px; padding: 8px 11px; margin-bottom: 12px; }
+.tc-tip::before { content: '💡 '; }
+
+.tc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid #1e2a40; }
+.tc-dots   { display: flex; gap: 5px; align-items: center; }
+.tc-dot    { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.12); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.tc-dot.on { background: #f59e0b; width: 20px; border-radius: 3px; }
+.tc-dot:hover:not(.on) { background: rgba(245,158,11,0.4); }
+.tc-nav    { display: flex; align-items: center; gap: 8px; }
+.tc-count  { font-size: 11px; color: #3d5070; min-width: 34px; text-align: center; }
+.tc-prev   { background: #1a2236; border: 1px solid #253047; border-radius: 7px; padding: 6px 12px; font-size: 12px; color: #6b7fa0; cursor: pointer; transition: all 0.15s; }
+.tc-prev:hover { color: #f0f4ff; border-color: #3a4a6a; }
+.tc-next   { background: #f59e0b; border: none; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; transition: background 0.15s; }
+.tc-next:hover { background: #fbbf24; }
+</style>
+
+<button id="tour-btn" onclick="startTour()">❓ 使い方ガイド</button>
+
+<div id="tour-overlay">
+  <div id="tour-backdrop"></div>
+  <div id="tour-spotlight"></div>
+  <div id="tour-card"></div>
+</div>
+
+<script>
+// ══════════════════════════════════ TOUR ══════════════════════════════════
+const TOUR_STEPS = [
+  {
+    id: null,
+    title: '👋 プロジェクト管理ツールの使い方',
+    body: 'アイケアラボの全プロジェクトをここで管理します。<br>各機能をステップごとに体験してみましょう。',
+    tip: null,
+    pos: 'center',
+  },
+  {
+    id: 'tour-stats',
+    title: '📊 ステータス概要',
+    body: 'プロジェクトの状態別件数が一目でわかります。<br><b style="color:#3b82f6">進行中</b> · <b style="color:#f59e0b">要確認</b> · <b style="color:#6b7280">未着手</b> が主要指標です。',
+    tip: null,
+    pos: 'bottom',
+  },
+  {
+    id: 'section-today',
+    title: '🔥 今日の優先対応',
+    body: '<b style="color:#ef4444">期限3日以内</b> · 要確認 · こうた待ち · 他メンバー待ちのプロジェクトが自動表示されます。<br>毎朝ここから確認しましょう。',
+    tip: 'データを保存するたびにリアルタイムで自動更新されます',
+    pos: 'bottom',
+  },
+  {
+    id: 'section-blockers',
+    title: '⛔ 詰まり一覧',
+    body: '誰待ち・何が詰まっているかを一覧できます。<br>上のボタンで担当者別にフィルタリングできます。',
+    tip: 'プロジェクト編集の「誰待ち」「今の詰まり」フィールドから入力します',
+    pos: 'bottom',
+  },
+  {
+    id: 'section-projlist',
+    title: '📋 全プロジェクト一覧（インライン編集）',
+    body: '各列は<b style="color:#f59e0b">クリックして直接編集</b>できます。<br>・ステータス・優先度 → ドロップダウン<br>・担当者・期限・次アクション → クリックして直接入力<br>変更は<b style="color:#10b981">自動保存</b>されます。',
+    tip: 'プロジェクト名をクリックすると詳細ページへ移動します',
+    pos: 'top',
+  },
+  {
+    id: 'section-shortcuts',
+    title: '👥 担当者ショートカット',
+    body: 'ボタンをクリックすると、<b style="color:#f59e0b">その担当者の最初のプロジェクト</b>までスクロールしてハイライト表示します。',
+    tip: null,
+    pos: 'top',
+  },
+  {
+    id: 'section-categories',
+    title: '🏷 カテゴリ一覧',
+    body: 'カテゴリ別の件数・状態の内訳が確認できます。<br>カードをクリックするとそのカテゴリの詳細ページへ移動します。',
+    tip: null,
+    pos: 'top',
+  },
+  {
+    id: null,
+    title: '📝 プロジェクト詳細ページ',
+    body: 'プロジェクト名をクリックすると詳細画面が開きます。<br>・タスクをタップ → 詳細展開<br>・<b style="color:#f59e0b">☑ 一括選択</b> → 複数タスクの担当者をまとめて変更<br>・ドラッグ&ドロップでタスクを並び替え',
+    tip: '全体スケジュールページではガントチャートでプロジェクト状況を確認できます',
+    pos: 'center',
+  },
+  {
+    id: null,
+    title: '✅ 準備完了！',
+    body: '右上の <b style="color:#f59e0b">❓ 使い方ガイド</b> ボタンからいつでもこのガイドを再表示できます。<br><br>さっそく使ってみましょう！',
+    tip: null,
+    pos: 'center',
+    isLast: true,
+  },
+];
+
+let _tourIdx = 0;
+
+function startTour() {
+  // Ensure we're on the dashboard
+  if (location.hash && location.hash !== '#/' && location.hash !== '#') {
+    navigate('#/');
+    setTimeout(startTour, 150);
+    return;
+  }
+  _tourIdx = 0;
+  document.getElementById('tour-overlay').classList.add('active');
+  _showTourStep(0, false);
+}
+
+function endTour() {
+  document.getElementById('tour-overlay').classList.remove('active');
+  document.getElementById('tour-backdrop').style.display = 'none';
+  document.getElementById('tour-spotlight').style.opacity = '0';
+}
+
+function nextTourStep() {
+  if (_tourIdx < TOUR_STEPS.length - 1) {
+    _advanceTour(_tourIdx + 1);
+  } else {
+    endTour();
+  }
+}
+
+function prevTourStep() {
+  if (_tourIdx > 0) _advanceTour(_tourIdx - 1);
+}
+
+function jumpTourStep(idx) { _advanceTour(idx); }
+
+function _advanceTour(idx) {
+  const card = document.getElementById('tour-card');
+  card.classList.add('tour-fade-out');
+  setTimeout(() => {
+    card.classList.remove('tour-fade-out');
+    _tourIdx = idx;
+    _showTourStep(idx, true);
+  }, 180);
+}
+
+function _showTourStep(idx, animate) {
+  const step = TOUR_STEPS[idx];
+  const spotlight = document.getElementById('tour-spotlight');
+  const backdrop  = document.getElementById('tour-backdrop');
+  const card      = document.getElementById('tour-card');
+
+  _renderTourCard(step, idx);
+
+  if (step.id) {
+    const el = document.getElementById(step.id);
+    if (el) {
+      backdrop.style.display = 'none';
+      // Scroll into view, then position spotlight
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const delay = animate ? 200 : 80;
+      setTimeout(() => _positionSpotlight(el, step, card, spotlight), delay);
+    } else {
+      // Target not in DOM — show as center step
+      backdrop.style.display = 'block';
+      spotlight.style.opacity = '0';
+      _positionCardCenter(card);
+    }
+  } else {
+    backdrop.style.display = 'block';
+    spotlight.style.opacity = '0';
+    _positionCardCenter(card);
+  }
+}
+
+function _positionSpotlight(el, step, card, spotlight) {
+  const pad = 10;
+  const r = el.getBoundingClientRect();
+  spotlight.style.top    = (r.top  - pad) + 'px';
+  spotlight.style.left   = (r.left - pad) + 'px';
+  spotlight.style.width  = (r.width  + pad * 2) + 'px';
+  spotlight.style.height = (r.height + pad * 2) + 'px';
+  spotlight.style.opacity = '1';
+  _positionCardNear(r, step.pos, card);
+}
+
+function _positionCardCenter(card) {
+  card.style.top = '50%';
+  card.style.left = '50%';
+  card.style.transform = 'translate(-50%, -50%)';
+}
+
+function _positionCardNear(r, pref, card) {
+  const cw = 360, ch = 230; // approx card size
+  const winW = window.innerWidth, winH = window.innerHeight;
+  const pad = 16, navH = 52;
+  let top, left;
+
+  // Determine vertical position
+  const spaceBelow = winH - r.bottom - 20;
+  const spaceAbove = r.top - navH - 20;
+
+  if (pref === 'bottom' && spaceBelow >= ch) {
+    top = r.bottom + 16;
+  } else if (pref === 'top' && spaceAbove >= ch) {
+    top = r.top - ch - 16;
+  } else if (spaceBelow >= ch) {
+    top = r.bottom + 16;
+  } else if (spaceAbove >= ch) {
+    top = r.top - ch - 16;
+  } else {
+    top = Math.max(navH + pad, Math.min(r.top, winH - ch - pad));
+  }
+
+  // Horizontal: align with spotlight, clamped to viewport
+  left = Math.max(pad, Math.min(r.left, winW - cw - pad));
+
+  card.style.top  = Math.max(navH + pad, top) + 'px';
+  card.style.left = left + 'px';
+  card.style.transform = 'none';
+}
+
+function _renderTourCard(step, idx) {
+  const total = TOUR_STEPS.length;
+  const card = document.getElementById('tour-card');
+
+  const dots = TOUR_STEPS.map((_, i) =>
+    `<div class="tc-dot${i === idx ? ' on' : ''}" onclick="jumpTourStep(${i})" title="${i+1}ステップ目"></div>`
+  ).join('');
+
+  card.innerHTML = `
+    <div class="tc-header">
+      <div class="tc-title">${step.title}</div>
+      <button class="tc-close" onclick="endTour()" title="閉じる">✕</button>
+    </div>
+    <div class="tc-body">${step.body}</div>
+    ${step.tip ? `<div class="tc-tip">${step.tip}</div>` : ''}
+    <div class="tc-footer">
+      <div class="tc-dots">${dots}</div>
+      <div class="tc-nav">
+        ${idx > 0 ? `<button class="tc-prev" onclick="prevTourStep()">← 前へ</button>` : ''}
+        <span class="tc-count">${idx + 1} / ${total}</span>
+        <button class="tc-next" onclick="${step.isLast ? 'endTour()' : 'nextTourStep()'}">${step.isLast ? '完了 ✓' : '次へ →'}</button>
+      </div>
+    </div>`;
+}
+
+// Close on backdrop click
+document.getElementById('tour-backdrop').addEventListener('click', endTour);
+// ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('tour-overlay').classList.contains('active')) endTour();
+});
+</script>
+
 </body>
 </html>
