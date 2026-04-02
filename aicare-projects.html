@@ -1560,7 +1560,7 @@ function renderMembers() {
     return `
     <div class="card" data-person="${person}" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4f7cff,#7c4fff);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">${person.slice(0,1)}</div>
+        <div style="width:40px;height:40px;border-radius:50%;background:${personColor(person)};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">${person.slice(0,2)}</div>
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div style="font-size:16px;font-weight:700;">${person}</div>
@@ -1754,10 +1754,7 @@ function renderPersonView(name) {
   const myTasks = [];
   projects.forEach(p => collectTasks(p.tasks, p.id, myTasks));
 
-  const colors = ['#818cf8','#34d399','#60a5fa','#a78bfa','#fb923c','#f472b6','#94a3b8'];
-  const people = getPeople();
-  const idx = people.indexOf(name);
-  const color = colors[idx >= 0 ? idx % colors.length : 0];
+  const color = personColor(name);
 
   // Group tasks by project
   const tasksByProject = {};
@@ -2038,8 +2035,7 @@ function renderDashboard() {
     ${sectionHead('👥','担当者ショートカット','クリックで担当者のプロジェクト・タスク一覧へ')}
     <div class="person-shortcuts">
       ${people.map((person, i) => {
-        const colors = ['#818cf8','#34d399','#60a5fa','#a78bfa','#fb923c','#f472b6','#94a3b8'];
-        const c = colors[i % colors.length];
+        const c = personColor(person);
         return `<button class="person-btn" onclick="goToPersonSection('${person}')" style="border-color:${c}33;">
           <span style="width:26px;height:26px;border-radius:50%;background:${c}22;color:${c};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${person.slice(0,2)}</span>
           <span>${person}</span>
@@ -2233,6 +2229,12 @@ let currentTab = 'tasks';
 
 // ══════════════════════════════ PROJECT DETAIL INLINE EDIT ══════════════════════════
 const DEFAULT_PEOPLE = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
+const PERSON_COLORS = ['#818cf8','#34d399','#60a5fa','#a78bfa','#fb923c','#f472b6','#94a3b8','#f87171','#34d399','#fbbf24'];
+function personColor(name) {
+  const all = getPeople();
+  const i = all.indexOf(name);
+  return PERSON_COLORS[(i >= 0 ? i : Math.abs(name.split('').reduce((a,c)=>a+c.charCodeAt(0),0))) % PERSON_COLORS.length];
+}
 
 // 全プロジェクト・タスクから担当者名を収集してAPP.peopleにマージ
 function getAllKnownPeople() {
