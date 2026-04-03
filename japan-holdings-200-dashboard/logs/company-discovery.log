@@ -1,0 +1,4 @@
+[2026-04-02T07:21:53.386Z] 候補企業探索開始
+[2026-04-02T07:21:53.387Z]   JPX上場銘柄一覧の取得を試みます...
+[2026-04-02T07:21:53.702Z]   JPXデータ取得成功（XLS）
+[2026-04-02T07:21:53.704Z] 候補保存完了: 319件 -> /Users/koutayamakawa/web-tools/japan-holdings-200-dashboard/data/companies_raw.json

@@ -1,0 +1,229 @@
+[2026-04-02T06:24:05.760Z] ロゴ収集開始: 50社
+[2026-04-02T06:24:05.761Z]   処理中 [1] ソフトバンクグループ
+[2026-04-02T06:24:06.162Z]   取得成功: logos/companies/softbank-group.png
+[2026-04-02T06:24:06.664Z]   処理中 [2] 野村ホールディングス
+[2026-04-02T06:24:07.035Z]   取得成功: logos/companies/nomura-holdings.png
+[2026-04-02T06:24:07.536Z]   処理中 [3] セブン＆アイ・HD
+[2026-04-02T06:24:07.750Z]   取得成功: logos/companies/seven-and-i-holdings.png
+[2026-04-02T06:24:08.250Z]   処理中 [4] 日本郵政グループ
+[2026-04-02T06:24:08.375Z]   取得成功: logos/companies/japan-post-group.webp
+[2026-04-02T06:24:08.877Z]   処理中 [5] 三菱HCキャピタル
+[2026-04-02T06:24:09.042Z]   取得成功: logos/companies/mitsubishi-hc-capital.png
+[2026-04-02T06:24:09.543Z]   処理中 [6] 日本マクドナルドHD
+[2026-04-02T06:24:09.657Z]   取得成功: logos/companies/mcdonalds-japan-holdings.jpg
+[2026-04-02T06:24:10.157Z]   処理中 [7] NIPPON EXPRESS HD
+[2026-04-02T06:24:10.403Z]   取得成功: logos/companies/nippon-express-holdings.png
+[2026-04-02T06:24:10.904Z]   処理中 [8] 日本酸素HD
+[2026-04-02T06:24:12.406Z]   取得成功: logos/companies/nippon-sanso-holdings.png
+[2026-04-02T06:24:12.907Z]   処理中 [9] SCREENホールディングス
+[2026-04-02T06:24:13.602Z]   取得成功: logos/companies/screen-holdings.png
+[2026-04-02T06:24:14.103Z]   処理中 [10] DOWAホールディングス
+[2026-04-02T06:24:14.470Z]   取得失敗（missing）: DOWAホールディングス
+[2026-04-02T06:24:14.973Z]   処理中 [11] ゼンショーHD
+[2026-04-02T06:24:24.991Z]   サイトアクセス失敗 https://www.zensho.com/jp/: timeout of 10000ms exceeded
+[2026-04-02T06:24:24.992Z]   取得失敗（missing）: ゼンショーHD
+[2026-04-02T06:24:25.494Z]   処理中 [12] JFEホールディングス
+[2026-04-02T06:24:25.591Z]   取得成功: logos/companies/jfe-holdings.png
+[2026-04-02T06:24:26.093Z]   処理中 [13] MS&AD HD
+[2026-04-02T06:24:26.316Z]   取得失敗（missing）: MS&AD HD
+[2026-04-02T06:24:26.818Z]   処理中 [14] SOMPOホールディングス
+[2026-04-02T06:24:27.176Z]   取得成功: logos/companies/sompo-holdings.png
+[2026-04-02T06:24:27.676Z]   処理中 [15] 電通グループ
+[2026-04-02T06:24:27.811Z]   取得成功: logos/companies/dentsu-group.png
+[2026-04-02T06:24:28.311Z]   処理中 [16] ソニーグループ
+[2026-04-02T06:24:28.441Z]   取得失敗（missing）: ソニーグループ
+[2026-04-02T06:24:28.941Z]   処理中 [17] 第一生命HD
+[2026-04-02T06:24:29.253Z]   取得成功: logos/companies/dai-ichi-life-holdings.webp
+[2026-04-02T06:24:29.755Z]   処理中 [18] 東京海上HD
+[2026-04-02T06:24:29.970Z]   取得成功: logos/companies/tokio-marine-holdings.png
+[2026-04-02T06:24:30.472Z]   処理中 [19] ゆうちょ銀行
+[2026-04-02T06:24:30.518Z]   取得失敗（missing）: ゆうちょ銀行
+[2026-04-02T06:24:31.019Z]   処理中 [20] りそなHD
+[2026-04-02T06:24:31.421Z]   取得成功: logos/companies/resona-holdings.svg
+[2026-04-02T06:24:31.922Z]   処理中 [21] 東急不動産HD
+[2026-04-02T06:24:32.079Z]   取得成功: logos/companies/tokyu-fudosan-holdings.png
+[2026-04-02T06:24:32.580Z]   処理中 [22] 飯田グループHD
+[2026-04-02T06:24:32.643Z]   サイトアクセス失敗 https://www.iida-group.co.jp/: Hostname/IP does not match certificate's altnames: Host: www.iida-group.co.jp. is not in the cert's altnames: DNS:*.sakura.ne.jp, DNS:*.180r.com, DNS:*.2-d.jp, DNS:*.achoo.jp, DNS:*.amaretto.jp, DNS:*.bona.jp, DNS:*.chew.jp, DNS:*.crap.jp, DNS:*.daynight.jp, DNS:*.deko8.jp, DNS:*.dojin.com, DNS:*.eek.jp, DNS:*.flop.jp, DNS:*.from.tv, DNS:*.fubuki.info, DNS:*.gokujou.biz, DNS:*.grats.jp, DNS:*.grrr.jp, DNS:*.halfmoon.jp, DNS:*.ivory.ne.jp, DNS:*.jeez.jp, DNS:*.jpn.org, DNS:*.kirara.st, DNS:*.kokage.cc, DNS:*.mail-box.ne.jp, DNS:*.matrix.jp, DNS:*.mimoza.jp, DNS:*.mints.ne.jp, DNS:*.mokuren.ne.jp, DNS:*.nazo.cc, DNS:*.netgamers.jp, DNS:*.noob.jp, DNS:*.nyanta.jp, DNS:*.o0o0.jp, DNS:*.opal.ne.jp, DNS:*.rash.jp, DNS:*.razor.jp, DNS:*.rdy.jp, DNS:*.rgr.jp, DNS:*.rojo.jp, DNS:*.rossa.cc, DNS:*.rulez.jp, DNS:*.rusk.to, DNS:*.saikyou.biz, DNS:*.sakura.tv, DNS:*.sakuratan.com, DNS:*.sakuraweb.com, DNS:*.saloon.jp, DNS:*.sblo.jp, DNS:*.silk.to, DNS:*.skr.jp, DNS:*.spawn.jp, DNS:*.squares.net, DNS:*.sumomo.ne.jp, DNS:*.tank.jp, DNS:*.thyme.jp, DNS:*.topaz.ne.jp, DNS:*.uh-oh.jp, DNS:*.undo.jp, DNS:*.websozai.jp, DNS:*.whoa.jp, DNS:*.x0.com, DNS:*.x0.to, DNS:*.xii.jp
+[2026-04-02T06:24:32.644Z]   取得失敗（missing）: 飯田グループHD
+[2026-04-02T06:24:33.145Z]   処理中 [23] 西日本FHD
+[2026-04-02T06:24:33.424Z]   取得失敗（missing）: 西日本FHD
+[2026-04-02T06:24:33.927Z]   処理中 [24] いよぎんHD
+[2026-04-02T06:24:34.275Z]   取得成功: logos/companies/iyogin-holdings.png
+[2026-04-02T06:24:34.776Z]   処理中 [25] しずおかFG
+[2026-04-02T06:24:35.149Z]   取得成功: logos/companies/shizuoka-financial-group.jpg
+[2026-04-02T06:24:35.650Z]   処理中 [26] コンコルディアFG
+[2026-04-02T06:24:36.008Z]   取得成功: logos/companies/concordia-financial-group.jpg
+[2026-04-02T06:24:36.510Z]   処理中 [27] めぶきFG
+[2026-04-02T06:24:36.892Z]   取得成功: logos/companies/mebuki-financial-group.png
+[2026-04-02T06:24:37.392Z]   処理中 [28] ひろぎんHD
+[2026-04-02T06:24:37.505Z]   取得成功: logos/companies/hirogin-holdings.png
+[2026-04-02T06:24:38.006Z]   処理中 [29] ちゅうぎんFG
+[2026-04-02T06:24:38.030Z]   サイトアクセス失敗 https://www.chugginfinancialgroup.co.jp/: getaddrinfo ENOTFOUND www.chugginfinancialgroup.co.jp
+[2026-04-02T06:24:38.031Z]   取得失敗（missing）: ちゅうぎんFG
+[2026-04-02T06:24:38.532Z]   処理中 [30] 九州FG
+[2026-04-02T06:24:38.737Z]   取得成功: logos/companies/kyushu-financial-group.jpg
+[2026-04-02T06:24:39.238Z]   処理中 [31] FPGホールディングス
+[2026-04-02T06:24:39.260Z]   サイトアクセス失敗 https://www.fpg-net.co.jp/: getaddrinfo ENOTFOUND www.fpg-net.co.jp
+[2026-04-02T06:24:39.260Z]   取得失敗（missing）: FPGホールディングス
+[2026-04-02T06:24:39.762Z]   処理中 [32] OBARA GROUP
+[2026-04-02T06:24:39.867Z]   サイトアクセス失敗 https://www.obara-group.co.jp/: getaddrinfo ENOTFOUND www.obara-group.co.jp
+[2026-04-02T06:24:39.867Z]   取得失敗（missing）: OBARA GROUP
+[2026-04-02T06:24:40.368Z]   処理中 [33] CARTA HOLDINGS
+[2026-04-02T06:24:40.483Z]   取得成功: logos/companies/carta-holdings.png
+[2026-04-02T06:24:40.985Z]   処理中 [34] ID&Eホールディングス
+[2026-04-02T06:24:41.003Z]   サイトアクセス失敗 https://www.id-e-holdings.co.jp/: getaddrinfo ENOTFOUND www.id-e-holdings.co.jp
+[2026-04-02T06:24:41.004Z]   取得失敗（missing）: ID&Eホールディングス
+[2026-04-02T06:24:41.505Z]   処理中 [35] UTグループ
+[2026-04-02T06:24:41.721Z]   取得成功: logos/companies/ut-group.png
+[2026-04-02T06:24:42.223Z]   処理中 [36] スターツコーポレーション
+[2026-04-02T06:24:42.745Z]   取得成功: logos/companies/starts-corporation.svg
+[2026-04-02T06:24:43.246Z]   処理中 [37] トピー工業グループ
+[2026-04-02T06:24:43.624Z]   取得成功: logos/companies/topy-industries-group.png
+[2026-04-02T06:24:44.124Z]   処理中 [38] 西鉄グループ
+[2026-04-02T06:24:44.353Z]   取得成功: logos/companies/nishitetsu-group.png
+[2026-04-02T06:24:44.854Z]   処理中 [39] 阪急阪神HD
+[2026-04-02T06:24:46.082Z]   取得成功: logos/companies/hankyu-hanshin-holdings.svg
+[2026-04-02T06:24:46.583Z]   処理中 [40] 名古屋鉄道グループ
+[2026-04-02T06:24:46.977Z]   取得成功: logos/companies/meitetsu-group.png
+[2026-04-02T06:24:47.478Z]   処理中 [41] 京成グループ
+[2026-04-02T06:24:47.528Z]   取得成功: logos/companies/keisei-group.png
+[2026-04-02T06:24:48.029Z]   処理中 [42] 東武グループ
+[2026-04-02T06:24:48.298Z]   取得成功: logos/companies/tobu-group.png
+[2026-04-02T06:24:48.798Z]   処理中 [43] 小田急グループ
+[2026-04-02T06:24:48.896Z]   取得成功: logos/companies/odakyu-group.svg
+[2026-04-02T06:24:49.397Z]   処理中 [44] 京王グループ
+[2026-04-02T06:24:49.587Z]   取得成功: logos/companies/keio-group.svg
+[2026-04-02T06:24:50.088Z]   処理中 [45] 東急グループ
+[2026-04-02T06:24:50.190Z]   取得成功: logos/companies/tokyu-group.jpg
+[2026-04-02T06:24:50.690Z]   処理中 [46] アパグループ
+[2026-04-02T06:24:50.821Z]   取得失敗（missing）: アパグループ
+[2026-04-02T06:24:51.322Z]   処理中 [47] WELCOME Group
+[2026-04-02T06:24:51.348Z]   サイトアクセス失敗 https://www.welcome-group.co.jp/: getaddrinfo ENOTFOUND www.welcome-group.co.jp
+[2026-04-02T06:24:51.348Z]   取得失敗（missing）: WELCOME Group
+[2026-04-02T06:24:51.849Z]   処理中 [48] OUGホールディングス
+[2026-04-02T06:24:52.187Z]   取得成功: logos/companies/oug-holdings.jpg
+[2026-04-02T06:24:52.688Z]   処理中 [49] NISSOホールディングス
+[2026-04-02T06:24:52.711Z]   サイトアクセス失敗 https://www.nisso-holdings.co.jp/: getaddrinfo ENOTFOUND www.nisso-holdings.co.jp
+[2026-04-02T06:24:52.711Z]   取得失敗（missing）: NISSOホールディングス
+[2026-04-02T06:24:53.213Z]   処理中 [50] 日本工営グループ
+[2026-04-02T06:24:53.234Z]   サイトアクセス失敗 https://www.nipponkoei.co.jp/: getaddrinfo ENOTFOUND www.nipponkoei.co.jp
+[2026-04-02T06:24:53.235Z]   取得失敗（missing）: 日本工営グループ
+[2026-04-02T06:24:53.739Z] 
+完了: 成功=35, missing=15
+[2026-04-02T06:25:04.339Z] TOP20ブランドロゴ収集開始
+[2026-04-02T06:25:04.340Z]   [1] ソフトバンクグループ株式会社
+[2026-04-02T06:25:04.746Z]     取得成功: SoftBank Group
+[2026-04-02T06:25:05.380Z]     取得失敗（missing）: SoftBank
+[2026-04-02T06:25:07.295Z]     取得成功: Arm
+[2026-04-02T06:25:08.178Z]     取得失敗（missing）: Vision Fund
+[2026-04-02T06:25:08.679Z]   [2] 野村ホールディングス株式会社
+[2026-04-02T06:25:09.100Z]     取得成功: Nomura
+[2026-04-02T06:25:09.974Z]     取得失敗（missing）: Nomura Asset Management
+[2026-04-02T06:25:10.742Z]     取得成功: Nomura Securities
+[2026-04-02T06:25:11.243Z]   [3] セブン＆アイ・ホールディングス
+[2026-04-02T06:25:11.346Z]     取得成功: 7&i
+[2026-04-02T06:25:11.950Z]     取得成功: 7-Eleven
+[2026-04-02T06:25:12.669Z]     取得成功: イトーヨーカドー
+[2026-04-02T06:25:14.127Z]     取得成功: ヨークベニマル
+[2026-04-02T06:25:14.701Z]     取得失敗（missing）: デニーズ
+[2026-04-02T06:25:15.202Z]   [4] 日本郵政グループ
+[2026-04-02T06:25:15.287Z]     取得成功: 日本郵政
+[2026-04-02T06:25:15.888Z]     取得成功: 日本郵便
+[2026-04-02T06:25:16.461Z]     取得失敗（missing）: ゆうちょ銀行
+[2026-04-02T06:25:17.058Z]     取得成功: かんぽ生命
+[2026-04-02T06:25:17.560Z]   [5] 三菱HCキャピタル株式会社
+[2026-04-02T06:25:17.726Z]     取得成功: 三菱HCキャピタル
+[2026-04-02T06:25:18.228Z]   [6] 日本マクドナルドホールディングス株式会社
+[2026-04-02T06:25:18.338Z]     取得成功: McDonald's
+[2026-04-02T06:25:18.894Z]     取得成功: 日本マクドナルド
+[2026-04-02T06:25:19.395Z]   [7] NIPPON EXPRESSホールディングス株式会社
+[2026-04-02T06:25:19.904Z]     取得成功: NIPPON EXPRESS
+[2026-04-02T06:25:20.625Z]     取得成功: NX
+[2026-04-02T06:25:21.281Z]     取得成功: NX Logistics
+[2026-04-02T06:25:21.783Z]   [8] 日本酸素ホールディングス株式会社
+[2026-04-02T06:25:25.631Z]     取得成功: 日本酸素ホールディングス
+[2026-04-02T06:25:26.226Z]     取得成功: Thermos
+[2026-04-02T06:25:28.335Z]     取得成功: Matheson
+[2026-04-02T06:25:31.010Z]     取得成功: Taiyo Nippon Sanso
+[2026-04-02T06:25:31.512Z]   [9] SCREENホールディングス
+[2026-04-02T06:25:31.820Z]     取得成功: SCREEN
+[2026-04-02T06:25:32.516Z]     取得成功: SCREEN Semiconductor Solutions
+[2026-04-02T06:25:33.254Z]     取得成功: SCREEN Graphic Solutions
+[2026-04-02T06:25:34.095Z]     取得成功: SCREEN PE Solutions
+[2026-04-02T06:25:34.596Z]   [10] DOWAホールディングス株式会社
+[2026-04-02T06:25:34.937Z]     取得失敗（missing）: DOWA
+[2026-04-02T06:25:35.890Z]     取得成功: DOWAエコシステム
+[2026-04-02T06:25:36.390Z]     キャッシュ済み: DOWAメタルマイン
+[2026-04-02T06:25:36.892Z]     キャッシュ済み: DOWAエレクトロニクス
+[2026-04-02T06:25:37.393Z]     キャッシュ済み: DOWAメタルテック
+[2026-04-02T06:25:37.895Z]     キャッシュ済み: DOWAサーモテック
+[2026-04-02T06:25:38.397Z]   [11] ゼンショーホールディングス株式会社
+[2026-04-02T06:25:48.404Z]     取得失敗（missing）: ゼンショー
+[2026-04-02T06:25:49.118Z]     取得成功: すき家
+[2026-04-02T06:25:49.890Z]     取得成功: はま寿司
+[2026-04-02T06:25:50.458Z]     取得失敗（missing）: なか卯
+[2026-04-02T06:25:51.294Z]     取得成功: ココス
+[2026-04-02T06:25:52.020Z]     取得成功: ジョリーパスタ
+[2026-04-02T06:25:52.734Z]     取得成功: ビッグボーイ
+[2026-04-02T06:25:53.235Z]   [12] JFEホールディングス株式会社
+[2026-04-02T06:25:53.338Z]     取得成功: JFE
+[2026-04-02T06:25:53.840Z]     キャッシュ済み: JFEスチール
+[2026-04-02T06:25:54.342Z]     キャッシュ済み: JFEエンジニアリング
+[2026-04-02T06:25:54.843Z]     キャッシュ済み: JFE商事
+[2026-04-02T06:25:55.345Z]   [13] MS&ADインシュアランスグループホールディングス株式会社
+[2026-04-02T06:25:55.650Z]     取得失敗（missing）: MS&AD
+[2026-04-02T06:25:56.366Z]     取得成功: 三井住友海上
+[2026-04-02T06:25:58.317Z]     取得成功: あいおいニッセイ同和損保
+[2026-04-02T06:25:59.021Z]     取得成功: 三井住友海上あいおい生命
+[2026-04-02T06:25:59.522Z]   [14] SOMPOホールディングス株式会社
+[2026-04-02T06:25:59.835Z]     取得成功: SOMPO
+[2026-04-02T06:26:00.547Z]     取得成功: 損保ジャパン
+[2026-04-02T06:26:01.048Z]     キャッシュ済み: SOMPOひまわり生命
+[2026-04-02T06:26:01.549Z]     キャッシュ済み: SOMPOケア
+[2026-04-02T06:26:02.051Z]   [15] 電通グループ株式会社
+[2026-04-02T06:26:03.279Z]     取得成功: dentsu
+[2026-04-02T06:26:03.827Z]     取得成功: 電通
+[2026-04-02T06:26:04.665Z]     取得成功: 電通総研
+[2026-04-02T06:26:05.166Z]   [16] ソニーグループ株式会社
+[2026-04-02T06:26:05.280Z]     取得失敗（missing）: Sony
+[2026-04-02T06:26:06.095Z]     取得成功: PlayStation
+[2026-04-02T06:26:07.069Z]     取得成功: Sony Music
+[2026-04-02T06:26:08.012Z]     取得成功: Sony Pictures
+[2026-04-02T06:26:09.090Z]     取得成功: Sony Semiconductor
+[2026-04-02T06:26:09.591Z]   [17] 第一生命ホールディングス株式会社
+[2026-04-02T06:26:09.702Z]     取得成功: 第一生命
+[2026-04-02T06:26:10.243Z]     取得成功: Dai-ichi Life
+[2026-04-02T06:26:11.096Z]     取得成功: ネオファースト生命
+[2026-04-02T06:26:11.598Z]   [18] 東京海上ホールディングス株式会社
+[2026-04-02T06:26:11.750Z]     取得成功: 東京海上
+[2026-04-02T06:26:12.491Z]     取得成功: 東京海上日動
+[2026-04-02T06:26:13.139Z]     取得成功: 東京海上日動あんしん生命
+[2026-04-02T06:26:13.640Z]   [19] ゆうちょ銀行
+[2026-04-02T06:26:13.714Z]     取得失敗（missing）: ゆうちょ銀行
+[2026-04-02T06:26:14.216Z]   [20] りそなホールディングス株式会社
+[2026-04-02T06:26:14.472Z]     取得成功: りそな
+[2026-04-02T06:26:15.335Z]     取得成功: りそな銀行
+[2026-04-02T06:26:16.086Z]     取得成功: 埼玉りそな銀行
+[2026-04-02T06:26:16.861Z]     取得成功: 関西みらい銀行
+[2026-04-02T06:26:17.789Z]     取得成功: みなと銀行
+[2026-04-02T06:26:18.291Z] TOP20ブランドロゴ収集完了
+[2026-04-02T06:26:25.989Z] アセット検証開始
+[2026-04-02T06:26:25.990Z]   missing: DOWAホールディングス
+[2026-04-02T06:26:25.990Z]   missing: ゼンショーHD
+[2026-04-02T06:26:25.990Z]   missing: MS&AD HD
+[2026-04-02T06:26:25.990Z]   missing: ソニーグループ
+[2026-04-02T06:26:25.991Z]   missing: ゆうちょ銀行
+[2026-04-02T06:26:25.991Z]   missing: 飯田グループHD
+[2026-04-02T06:26:25.991Z]   missing: 西日本FHD
+[2026-04-02T06:26:25.991Z]   missing: ちゅうぎんFG
+[2026-04-02T06:26:25.991Z]   missing: FPGホールディングス
+[2026-04-02T06:26:25.991Z]   missing: OBARA GROUP
+[2026-04-02T06:26:25.991Z]   missing: ID&Eホールディングス
+[2026-04-02T06:26:25.991Z]   missing: アパグループ
+[2026-04-02T06:26:25.991Z]   missing: WELCOME Group
+[2026-04-02T06:26:25.991Z]   missing: NISSOホールディングス
+[2026-04-02T06:26:25.991Z]   missing: 日本工営グループ
+[2026-04-02T06:26:25.991Z] 
+親会社ロゴ: 取得済み=35, missing=15
+[2026-04-02T06:26:25.992Z] ブランドロゴ: 取得済み=64, missing=0
+[2026-04-02T06:26:25.992Z] 検証完了・JSON更新済み

@@ -1,0 +1,30 @@
+{
+  "name": "japan-holdings-logos-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "collect": "npx ts-node --project tsconfig.scripts.json scripts/collect-companies.ts",
+    "collect:logos": "npx ts-node --project tsconfig.scripts.json scripts/collect-logos.ts",
+    "enrich:top20": "npx ts-node --project tsconfig.scripts.json scripts/enrich-top20-brands.ts",
+    "verify:assets": "npx ts-node --project tsconfig.scripts.json scripts/verify-assets.ts",
+    "setup:all": "npm run collect && npm run collect:logos && npm run enrich:top20 && npm run verify:assets"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/cheerio": "^0.22.35",
+    "typescript": "^5",
+    "ts-node": "^10.9.2",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
