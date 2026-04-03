@@ -2214,12 +2214,42 @@ function renderProjectCard(p) {
     ${p.members ? `<span>👥 ${p.members}</span>` : ''}
   </div>
   ${p.deliverables ? `<div class="proj-deliverables">📦 ${truncate(p.deliverables, 80)}</div>` : ''}
+  ${progressBarHtml(p, { height: '5px', fontSize: '12px' })}
   <div class="proj-actions" onclick="event.stopPropagation()">
     <button class="btn btn-secondary btn-sm" onclick="navigate('#/project/${p.id}/tasks')">タスクを見る</button>
     <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${p.id}')">編集</button>
     <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">削除</button>
   </div>
 </div>`;
+}
+
+// ===================== PROGRESS CALC =====================
+function calcProgress(p) {
+  let total = 0, done = 0;
+  function walk(tasks) {
+    (tasks || []).forEach(t => {
+      total++;
+      if (t.status === '完了') done++;
+      if (t.children && t.children.length) walk(t.children);
+    });
+  }
+  walk(p.tasks);
+  const pct = total === 0 ? 0 : Math.round(done / total * 100);
+  return { total, done, pct };
+}
+
+function progressBarHtml(p, opts) {
+  const { pct, done, total } = calcProgress(p);
+  const height   = (opts && opts.height)  || '4px';
+  const fontSize = (opts && opts.fontSize) || '11px';
+  const color = pct === 100 ? '#10b981' : pct >= 50 ? '#3b82f6' : '#94a3b8';
+  return `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+    <div style="flex:1;height:${height};background:#1e2d42;border-radius:99px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:99px;transition:width .3s;"></div>
+    </div>
+    <span style="font-size:${fontSize};color:${color};font-weight:700;white-space:nowrap;">${pct}%</span>
+    ${total > 0 ? `<span style="font-size:${fontSize};color:#3d5070;white-space:nowrap;">${done}/${total}</span>` : ''}
+  </div>`;
 }
 
 // ===================== PROJECT ROW (inline edit table row) =====================
@@ -2245,7 +2275,10 @@ function renderProjectRow(p) {
   const assigneeColor = assigneeVal ? personColor(assigneeVal.split(/[、,，\s]+/)[0].trim()) : '#94a3b8';
   return `
 <div class="proj-row${dim}" id="proj-row-${p.id}" style="border-left-color:${borderColor}">
-  <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">${p.name}</span>
+  <span class="proj-row-name" onclick="navigate('#/project/${p.id}')">
+    ${p.name}
+    ${progressBarHtml(p, { height: '3px', fontSize: '10px' })}
+  </span>
   <span style="width:68px;flex-shrink:0;display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--muted);" onclick="event.stopPropagation();startInlineEdit('${p.id}','assignee',this)" title="主担当をクリックで編集">
     ${assigneeVal
       ? `<span style="width:22px;height:22px;border-radius:50%;background:${assigneeColor};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${assigneeInitial}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${assigneeVal}</span>`
@@ -2491,6 +2524,7 @@ function renderProject(id, tab) {
         ⏳ ${p.waitingFor ? p.waitingFor+'待ち' : '誰待ちを設定'}
       </span>
     </div>
+    <div style="margin-top:10px;">${progressBarHtml(p, { height: '6px', fontSize: '12px' })}</div>
     <div class="pde-field" style="margin-top:8px;display:flex;" onclick="startProjDetailEdit('${p.id}','nextAction',this)" title="クリックで次アクションを編集">
       ${p.nextAction
         ? `<div class="next-action-bar" style="flex:1;margin:0;">▶ 次アクション: ${p.nextAction}</div>`
