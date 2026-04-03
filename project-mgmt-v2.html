@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロジェクト管理 v2 | eye care lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===================== COMMON NAV ===================== */
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #1a2235;
+  border-bottom: 1px solid rgba(61,90,254,0.25);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.2); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(255,255,255,0.55); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+#aicare-common-nav a.cn-active { color: #818cf8 !important; border-color: rgba(129,140,248,0.4) !important; background: rgba(129,140,248,0.12) !important; }
+
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --sidebar-bg: #1a1f36;
+  --sidebar-text: rgba(255,255,255,0.7);
+  --sidebar-active: #3d5afe;
+  --accent: #3d5afe;
+  --accent2: #00b8a9;
+  --main-bg: #f7f8fa;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar-width: 240px;
+  --nav-height: 42px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--main-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===================== APP SHELL ===================== */
+#app-shell {
+  display: flex;
+  height: calc(100vh - var(--nav-height));
+}
+
+/* ===================== SIDEBAR ===================== */
+#sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: width 0.25s ease, min-width 0.25s ease;
+  position: relative;
+  z-index: 100;
+}
+#sidebar.collapsed {
+  width: 0;
+  min-width: 0;
+}
+
+/* Brand area */
+.sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sb-brand-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.sb-brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Nav items */
+.sb-nav {
+  padding: 10px 8px;
+  flex-shrink: 0;
+}
+.sb-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--sidebar-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+  white-space: nowrap;
+}
+.sb-nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.sb-nav-item.active { background: rgba(61,90,254,0.2); color: #fff; }
+.sb-nav-item .sb-icon { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+
+/* Divider */
+.sb-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 6px 16px;
+  flex-shrink: 0;
+}
+
+/* Project section */
+.sb-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  padding: 8px 20px 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sb-projects {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sb-projects::-webkit-scrollbar { width: 4px; }
+.sb-projects::-webkit-scrollbar-track { background: transparent; }
+.sb-projects::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.sb-proj-item {
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.12s;
+  margin-bottom: 2px;
+}
+.sb-proj-item:hover { background: rgba(255,255,255,0.07); }
+.sb-proj-item.active { background: rgba(61,90,254,0.22); }
+.sb-proj-item .spi-name {
+  font-size: 12px;
+  color: var(--sidebar-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  transition: color 0.12s;
+}
+.sb-proj-item.active .spi-name { color: #fff; }
+.sb-proj-item:hover .spi-name { color: rgba(255,255,255,0.9); }
+.spi-progress-track {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.spi-progress-bar {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+/* Bottom user */
+.sb-user {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.sb-user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.sb-user-name {
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===================== MAIN AREA ===================== */
+#main-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--main-bg);
+}
+
+/* Top bar */
+#top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  height: 52px;
+  min-height: 52px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tb-hamburger {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.tb-hamburger:hover { background: var(--main-bg); color: var(--text); }
+.tb-project-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tb-tab {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  border-right: 1px solid var(--border);
+}
+.tb-tab:last-child { border-right: none; }
+.tb-tab:hover { background: var(--main-bg); color: var(--text); }
+.tb-tab.active { background: var(--accent); color: #fff; }
+.tb-actions { display: flex; gap: 8px; }
+
+/* Content area */
+#content-area {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ===================== BADGES ===================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.status-未着手 { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.3); }
+.status-進行中 { background: rgba(61,90,254,0.1);   color: #3d5afe; border: 1px solid rgba(61,90,254,0.3); }
+.status-完了   { background: rgba(0,184,169,0.12); color: #00897b; border: 1px solid rgba(0,184,169,0.3); }
+.status-要確認 { background: rgba(217,119,6,0.12);  color: #b45309; border: 1px solid rgba(217,119,6,0.3); }
+.status-保留   { background: rgba(109,40,217,0.1);  color: #6d28d9; border: 1px solid rgba(109,40,217,0.3); }
+.priority-最優先 { background: rgba(220,38,38,0.1);  color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
+.priority-高     { background: rgba(234,88,12,0.1);  color: #ea580c; border: 1px solid rgba(234,88,12,0.3); }
+.priority-中     { background: rgba(202,138,4,0.1);  color: #a16207; border: 1px solid rgba(202,138,4,0.3); }
+.priority-低     { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.25); }
+
+/* ===================== CARDS ===================== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2a3eb8; }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--main-bg); }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid transparent; padding: 5px 10px; }
+.btn-ghost:hover { color: var(--text); background: var(--main-bg); }
+.btn-sm { padding: 4px 11px; font-size: 12px; }
+.btn-teal { background: var(--accent2); color: #fff; }
+.btn-teal:hover { background: #009688; }
+
+/* ===================== AVATAR ===================== */
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+
+/* ===================== HOME VIEW ===================== */
+.home-status-card {
+  margin-bottom: 20px;
+}
+.home-status-card .hsc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.home-status-card .hsc-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.home-status-card select {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--main-bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+.home-status-card textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--main-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.home-status-card textarea:focus { border-color: var(--accent); }
+
+.home-2col {
+  display: grid;
+  grid-template-columns: 60% 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) { .home-2col { grid-template-columns: 1fr; } }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  transition: border-color 0.12s;
+  cursor: pointer;
+}
+.milestone-item:hover { border-color: var(--accent); }
+.milestone-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.milestone-name { flex: 1; font-size: 13px; font-weight: 500; }
+.milestone-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+.resource-link:hover { background: var(--main-bg); }
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row .dr-label { color: var(--muted); font-size: 12px; flex-shrink: 0; width: 80px; }
+.detail-row .dr-value { text-align: right; }
+
+.member-avatars { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.member-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
+  background: var(--main-bg);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+/* ===================== LIST VIEW ===================== */
+.list-header {
+  display: grid;
+  grid-template-columns: 1fr 100px 90px 80px 80px;
+  gap: 0;
+  padding: 8px 16px;
+  background: var(--main-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: none;
+}
+.task-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 90px 80px 80px;
+  gap: 0;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: none;
+  align-items: center;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+.task-row:last-child { border-radius: 0 0 8px 8px; }
+.task-row:hover { background: #f0f3ff; }
+.task-row .tr-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.task-checkbox {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: var(--accent2);
+}
+.task-row.is-done { opacity: 0.5; }
+.task-row.is-done .tr-name span { text-decoration: line-through; color: var(--muted); }
+
+.section-group-header {
+  padding: 12px 16px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-group-header::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.add-task-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  margin-top: 8px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.add-task-row:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===================== BOARD VIEW ===================== */
+.board-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 1100px) { .board-cols { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .board-cols { grid-template-columns: 1fr; } }
+
+.board-col {
+  background: var(--main-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.board-col-header {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.board-col-count {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.06);
+  font-weight: 600;
+}
+.board-cards { padding: 8px; min-height: 80px; }
+.board-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  cursor: grab;
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+.board-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.board-card .bc-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+.board-card .bc-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.bc-date-chip {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: rgba(107,114,128,0.1);
+  color: var(--muted);
+  border: 1px solid rgba(107,114,128,0.2);
+}
+.bc-date-chip.overdue { background: rgba(220,38,38,0.1); color: #dc2626; border-color: rgba(220,38,38,0.3); }
+.bc-date-chip.soon { background: rgba(234,88,12,0.1); color: #ea580c; border-color: rgba(234,88,12,0.3); }
+
+/* Column color accents */
+.board-col[data-status="未着手"] .board-col-header { border-top: 3px solid #9ca3af; }
+.board-col[data-status="進行中"] .board-col-header { border-top: 3px solid var(--accent); }
+.board-col[data-status="要確認"] .board-col-header { border-top: 3px solid #f59e0b; }
+.board-col[data-status="完了"] .board-col-header { border-top: 3px solid var(--accent2); }
+
+/* ===================== MODAL ===================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  position: relative;
+}
+.modal-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; color: var(--muted);
+  font-size: 20px; cursor: pointer;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; transition: background 0.15s;
+}
+.modal-close:hover { background: var(--main-bg); color: var(--text); }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 8px 12px;
+  background: var(--main-bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px;
+  font-family: inherit; transition: border-color 0.15s; outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* ===================== EMPTY STATE ===================== */
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--muted);
+}
+.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===================== ANIMATIONS ===================== */
+#content-area { animation: fadeIn 0.18s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  #sidebar { position: absolute; top: 0; left: 0; height: 100%; z-index: 200; }
+  #sidebar.collapsed { width: 0; min-width: 0; }
+  #content-area { padding: 16px; }
+  .list-header, .task-row { grid-template-columns: 1fr 80px 80px; }
+  .list-header span:nth-child(4),
+  .list-header span:nth-child(5),
+  .task-row > *:nth-child(4),
+  .task-row > *:nth-child(5) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Common Nav -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイト制作</a>
+  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="project-mgmt-v2.html" class="cn-active">プロジェクト v2</a>
+</nav>
+
+<!-- App Shell -->
+<div id="app-shell">
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <!-- Brand -->
+    <div class="sb-brand">
+      <div class="sb-brand-icon">👁️</div>
+      <div class="sb-brand-name">eye care lab</div>
+    </div>
+
+    <!-- Main nav -->
+    <div class="sb-nav">
+      <div class="sb-nav-item" data-nav="home" onclick="navTo('home')">
+        <span class="sb-icon">🏠</span> ホーム
+      </div>
+      <div class="sb-nav-item" data-nav="mytasks" onclick="navTo('mytasks')">
+        <span class="sb-icon">✅</span> マイタスク
+      </div>
+      <div class="sb-nav-item" data-nav="inbox" onclick="navTo('inbox')">
+        <span class="sb-icon">📥</span> 受信トレイ
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+    <div class="sb-section-label">プロジェクト</div>
+
+    <!-- Project list -->
+    <div class="sb-projects" id="sb-projects"></div>
+
+    <!-- User -->
+    <div class="sb-user">
+      <div class="sb-user-avatar">こ</div>
+      <div class="sb-user-name">こうた</div>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div id="main-area">
+    <!-- Top bar -->
+    <div id="top-bar">
+      <button class="tb-hamburger" onclick="toggleSidebar()" title="サイドバー切り替え">☰</button>
+      <div class="tb-project-name" id="tb-title">プロジェクトを選択</div>
+      <div class="tb-tabs" id="tb-tabs" style="display:none;">
+        <button class="tb-tab active" data-tab="home" onclick="switchTab('home')">ホーム</button>
+        <button class="tb-tab" data-tab="list" onclick="switchTab('list')">リスト</button>
+        <button class="tb-tab" data-tab="board" onclick="switchTab('board')">ボード</button>
+      </div>
+      <div class="tb-actions">
+        <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" title="新しいタスク (N)">＋ タスク</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="content-area">
+      <div class="empty-state">
+        <div class="es-icon">📋</div>
+        <p>左のサイドバーからプロジェクトを選んでください</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeAddTaskModal()">✕</button>
+    <h3>タスクを追加</h3>
+    <form onsubmit="submitAddTask(event)">
+      <div class="form-group">
+        <label>タスク名</label>
+        <input type="text" id="atm-name" required placeholder="タスク名を入力">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ステータス</label>
+          <select id="atm-status">
+            <option>未着手</option>
+            <option>進行中</option>
+            <option>完了</option>
+            <option>要確認</option>
+            <option>保留</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>優先度</label>
+          <select id="atm-priority">
+            <option>高</option>
+            <option selected>中</option>
+            <option>低</option>
+            <option>最優先</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>担当者</label>
+          <input type="text" id="atm-assignee" placeholder="例: がく">
+        </div>
+        <div class="form-group">
+          <label>期日</label>
+          <input type="date" id="atm-deadline">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>メモ</label>
+        <textarea id="atm-notes" rows="2"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeAddTaskModal()">キャンセル</button>
+        <button type="submit" class="btn btn-primary">追加する</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const CATEGORIES = [
+  { id: 'brand',      name: '全体ブランド',   icon: '🎯', color: '#8b5cf6', desc: 'ブランドコンセプト・ペルソナ・訴求軸の設計' },
+  { id: 'site',       name: '本体サイト',      icon: '🌐', color: '#3b82f6', desc: 'サイトマップ・各ページ・コンテンツ設計' },
+  { id: '365',        name: 'アイケア365',     icon: '📅', color: '#14b8a6', desc: '365ブランド反映・ローンチ・媒体選定' },
+  { id: 'glasses',    name: 'アイケアグラス',  icon: '👓', color: '#f59e0b', desc: 'グラスブランド定義・ローンチ・コンテンツ' },
+  { id: 'events',     name: 'イベント',        icon: '🎪', color: '#f97316', desc: '論文発表・ローンチイベント・集客' },
+  { id: 'app',        name: 'アプリ',          icon: '📱', color: '#06b6d4', desc: 'アプリUI設計・ローンチタイミング調整' },
+  { id: 'management', name: '管理・体制',      icon: '📋', color: '#10b981', desc: 'スケジュール可視化・体制整理・アサイン' },
+];
+
+const DEFAULT_ROLES = {
+  director: { label: '統括',              person: 'こうた' },
+  brand:    { label: 'ブランド戦略',      person: 'こうた' },
+  ux:       { label: 'サイト設計 / UX',   person: 'がく' },
+  design:   { label: 'デザイン制作',      person: 'ささじま、ワーカー' },
+  dev:      { label: '開発',              person: '別人材' },
+  event:    { label: 'イベント / 集客',   person: '鷲巣' },
+  content:  { label: 'コンテンツ / SEO', person: 'ちなり' },
+};
+
+function makeDefaultTasks(pid) {
+  return [
+    { id: `${pid}-1`, name: '目的整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-2`, name: '要件整理',         status: '未着手', priority: '高', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-3`, name: '構成作成',         status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-4`, name: 'デザイン方針作成', status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-5`, name: '制作',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-6`, name: '確認',             status: '未着手', priority: '中', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-7`, name: '修正',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '', children: [] },
+    { id: `${pid}-8`, name: '完了',             status: '未着手', priority: '低', assignee: '', deadline: '', notes: '', children: [] },
+  ];
+}
+
+const DEFAULT_PROJECTS = [
+  { id:1,  categoryId:'brand',      name:'アイケアラボ全体ブランド設計',        purpose:'アイケアラボとは何かを定義し、全施策の上位コンセプトを統一する', status:'未着手', priority:'最優先', deadline:'', leadRole:'brand',    assignee:'こうた',          members:'がく、ちなり、鷲巣',                        deliverables:'ブランド方針メモ、ブランドキーワード、打ち出し軸、主要ページへの反映方針', overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:2,  categoryId:'brand',      name:'ペルソナ設計',                         purpose:'誰に届けるかを明確にし、全施策のターゲット基盤を作る',             status:'未着手', priority:'最優先', deadline:'', leadRole:'brand',    assignee:'こうた',          members:'ちなり、がく',                              deliverables:'ペルソナシート、優先ターゲット一覧、ユーザー課題マップ',              overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:3,  categoryId:'brand',      name:'インサイト・訴求軸設計',               purpose:'有効な訴求軸を定義し、コンテンツ・広告・LPの方針を統一する',        status:'未着手', priority:'高',     deadline:'', leadRole:'brand',    assignee:'こうた',          members:'ちなり、がく、鷲巣',                        deliverables:'訴求軸一覧、NG訴求/有効訴求の整理、コピー方針',                      overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:4,  categoryId:'site',       name:'本体サイトサイトマップ再設計',         purpose:'サイト全体の構造を整理し、制作優先順序と導線を決める',              status:'未着手', priority:'最優先', deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、ちなり、開発',                      deliverables:'サイトマップ、ページ一覧、優先制作順',                               overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:5,  categoryId:'site',       name:'Aboutページ設計',                      purpose:'ブランドの信頼性と独自性を伝えるAboutページを設計する',             status:'未着手', priority:'高',     deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、ちなり、ささじま',                  deliverables:'Aboutページ構成案、掲載テキスト案、セクション設計',                 overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:6,  categoryId:'site',       name:'トップページ再構成',                   purpose:'最初の接点となるトップページの構成・訴求を最適化する',              status:'未着手', priority:'最優先', deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、ささじま、ワーカー、開発、ちなり',  deliverables:'トップ構成案、セクション順、ワイヤー',                               overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:7,  categoryId:'site',       name:'ニュース導線設計',                     purpose:'お知らせ・最新情報を見せる導線とUIを設計する',                      status:'未着手', priority:'中',     deadline:'', leadRole:'ux',       assignee:'がく',            members:'ちなり、こうた、開発',                      deliverables:'ニュースUI方針、一覧/詳細構造、運用ルール案',                        overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:8,  categoryId:'site',       name:'お客様の声ページ設計',                 purpose:'ユーザーの信頼を高める「声」コンテンツの掲載設計をする',            status:'未着手', priority:'中',     deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、ささじま、ちなり',                  deliverables:'声の掲載フォーマット、一覧/詳細構成、レイアウト案',                 overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:9,  categoryId:'site',       name:'FAQ / 問い合わせ設計',                 purpose:'疑問解消と問い合わせ導線を整備し、CVRを高める',                     status:'未着手', priority:'中',     deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、ちなり、開発',                      deliverables:'FAQ構成、問い合わせ導線図、CTA文言案',                               overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:10, categoryId:'site',       name:'セルフ視界チェック設計',               purpose:'ユーザーが自分で視界を確認できるインタラクティブコンテンツを設計する', status:'未着手', priority:'高',    deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、開発、ちなり、ささじま',            deliverables:'設問一覧、フロー図、UIワイヤー',                                    overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:11, categoryId:'365',        name:'アイケア365ブランド反映',              purpose:'本体ブランドの方針を365サービスに反映し、世界観を統一する',          status:'未着手', priority:'高',     deadline:'', leadRole:'brand',    assignee:'こうた',          members:'がく、ささじま、ワーカー、ちなり、開発',    deliverables:'365トップ方針、デザイン反映方針、文言案',                            overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:12, categoryId:'365',        name:'アイケア365ローンチ準備',              purpose:'365のサービスを公開するための必要タスクを整理・実行する',            status:'未着手', priority:'最優先', deadline:'', leadRole:'content',  assignee:'ちなり',          members:'こうた、がく、開発、鷲巣',                  deliverables:'ローンチタスク一覧、初期公開範囲、スケジュール',                     overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:13, categoryId:'365',        name:'365媒体選定 / 申請整理',              purpose:'365の集客・プロモーション媒体を選定し、申請を進める',               status:'未着手', priority:'高',     deadline:'', leadRole:'content',  assignee:'ちなり',          members:'こうた、鷲巣',                              deliverables:'媒体比較表、推奨媒体案、申請タスク',                                 overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:14, categoryId:'glasses',    name:'アイケアグラス ブランド定義',          purpose:'グラス事業のブランド位置づけを明確にし、本体との関係を整理する',     status:'未着手', priority:'高',     deadline:'', leadRole:'brand',    assignee:'こうた',          members:'がく、ちなり、鷲巣',                        deliverables:'ブランド位置づけメモ、本体との関係図',                               overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:15, categoryId:'glasses',    name:'アイケアグラス ローンチ計画',          purpose:'グラスのローンチに向けた全体計画・制作物・役割を整理する',           status:'未着手', priority:'最優先', deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'こうた、がく、ちなり、開発、ささじま',      deliverables:'ローンチスケジュール、必要制作物一覧、役割分担',                     overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:16, categoryId:'glasses',    name:'アイケアグラス紹介コンテンツ開発',     purpose:'グラスの価値を伝える紹介コンテンツ（絵本/冊子等）を企画・制作する',  status:'未着手', priority:'高',     deadline:'', leadRole:'design',   assignee:'ささじま、ワーカー', members:'こうた、ちなり、がく',                    deliverables:'絵本/冊子構成案、コンテンツ企画書、制作要件',                       overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:17, categoryId:'events',     name:'論文発表会企画',                       purpose:'眼科論文の発表会を企画し、ブランドの専門性を外部に示す',             status:'未着手', priority:'高',     deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'こうた、ちなり、ささじま、ワーカー',        deliverables:'イベント企画書、アジェンダ、必要制作物一覧',                         overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:18, categoryId:'events',     name:'アイケアグラス ローンチイベント企画',  purpose:'グラスのローンチを告知・集客する大型イベントを企画する',             status:'未着手', priority:'最優先', deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'こうた、がく、ささじま、ワーカー、ちなり、開発', deliverables:'ローンチイベント企画書、演出構成、集客計画、制作物一覧',        overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:19, categoryId:'events',     name:'予防眼科協会会員化導線企画',           purpose:'協会への会員入会を促す導線とフローを設計する',                      status:'未着手', priority:'中',     deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'こうた、ちなり、開発',                      deliverables:'導線企画、フロー図、文言案',                                         overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:20, categoryId:'events',     name:'アフロスクイーンイベント',             purpose:'展示・出展イベントの出展物・レイアウトを設計する',                  status:'未着手', priority:'最優先', deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'こうた、ささじま、ワーカー、がく、ちなり',  deliverables:'出展物リスト、サイズ確認表、レイアウト案',                           overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:21, categoryId:'events',     name:'イベント動画 / CM制作',               purpose:'イベント告知・記録のための動画・CMを企画・制作する',                status:'未着手', priority:'高',     deadline:'', leadRole:'design',   assignee:'ささじま、ワーカー', members:'こうた、鷲巣、ちなり',                    deliverables:'動画構成案、絵コンテ、制作指示書',                                   overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:22, categoryId:'events',     name:'イベント集客プロジェクト',             purpose:'各イベントへの集客フローと告知素材を整備する',                      status:'未着手', priority:'高',     deadline:'', leadRole:'event',    assignee:'鷲巣',            members:'ちなり、こうた',                            deliverables:'集客リスト、集客フロー、告知素材一覧',                               overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:23, categoryId:'app',        name:'アイケアアプリUI設計',                 purpose:'アプリの画面構成とUIを設計し、開発に渡せる形に整理する',             status:'未着手', priority:'中',     deadline:'', leadRole:'ux',       assignee:'がく',            members:'こうた、開発、ささじま',                    deliverables:'画面一覧、ワイヤー、UI方針',                                         overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:24, categoryId:'app',        name:'アプリ ローンチタイミング調整',         purpose:'他施策との依存関係を整理し、最適なアプリローンチ時期を決める',        status:'未着手', priority:'中',     deadline:'', leadRole:'director', assignee:'こうた',          members:'がく、開発、鷲巣、ちなり',                  deliverables:'時系列表、依存関係整理',                                             overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:25, categoryId:'management', name:'タスク・スケジュール可視化',            purpose:'全プロジェクトのタスク・スケジュールを一覧で管理できる状態にする',    status:'未着手', priority:'高',     deadline:'', leadRole:'director', assignee:'こうた',          members:'開発、全員',                                deliverables:'プロジェクト一覧、スケジュール表、KPI表',                            overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:26, categoryId:'management', name:'制作体制・キャパシティ整理',            purpose:'各メンバーの役割と工数を整理し、無理のない体制を作る',               status:'未着手', priority:'中',     deadline:'', leadRole:'director', assignee:'こうた',          members:'がく、ささじま、ちなり、鷲巣、開発',        deliverables:'体制図、担当表、工数見立て',                                         overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:27, categoryId:'management', name:'プロジェクト別アサイン整理',            purpose:'プロジェクトごとの担当・連絡体制・会議体を整理する',                status:'未着手', priority:'中',     deadline:'', leadRole:'director', assignee:'こうた',          members:'全員',                                      deliverables:'アサイン表、連絡体制、会議体整理',                                   overview:'', background:'', completionCriteria:'', notes:'' },
+  { id:28, categoryId:'brand',      name:'本部ロゴ制作',                          purpose:'アイケアラボ本部のロゴを制作し、ブランドの統一イメージを確立する',    status:'進行中', priority:'最優先', deadline:'2026-04-15', leadRole:'design', assignee:'こうた', members:'がく、ささじま',                            deliverables:'ロゴデータ（AI/PNG/SVG）、ガイドライン',                            overview:'明日（4/3）ロゴ提出、4/15完成', background:'', completionCriteria:'ロゴデータ入稿完了', notes:'ロゴ提出期限: 2026-04-03' },
+];
+
+const STORAGE_KEY = 'aicare-projects-v3';
+
+const DEFAULT_PEOPLE = ['こうた','がく','ささじま','ワーカー','鷲巣','ちなり','開発'];
+const PERSON_COLORS = ['#818cf8','#34d399','#60a5fa','#a78bfa','#fb923c','#f472b6','#94a3b8','#f87171','#34d399','#fbbf24'];
+
+function personColor(name) {
+  const all = DEFAULT_PEOPLE;
+  const i = all.indexOf(name);
+  return PERSON_COLORS[(i >= 0 ? i : Math.abs((name || '').split('').reduce((a,c)=>a+c.charCodeAt(0),0))) % PERSON_COLORS.length];
+}
+
+// ===================== STORAGE =====================
+function ensureChildren(tasks) {
+  (tasks||[]).forEach(t => { if (!t.children) t.children = []; ensureChildren(t.children); });
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d && d.projects && Array.isArray(d.projects)) {
+        d.projects.forEach(p => { if (!p.categoryId && p.category) p.categoryId = p.category; ensureChildren(p.tasks||[]); });
+        return d;
+      }
+    }
+  } catch(e) {}
+  // Fall back to defaults
+  const projects = DEFAULT_PROJECTS.map(p => ({ ...p, tasks: makeDefaultTasks(p.id) }));
+  return { projects, roles: JSON.parse(JSON.stringify(DEFAULT_ROLES)), categories: JSON.parse(JSON.stringify(CATEGORIES)) };
+}
+
+let APP = loadData();
+
+function getProjects() { return APP.projects; }
+
+function getProjectById(id) {
+  return APP.projects.find(p => String(p.id) === String(id));
+}
+
+function getCategoryById(id) {
+  const cats = (APP && APP.categories) ? APP.categories : CATEGORIES;
+  return cats.find(c => c.id === id) || CATEGORIES.find(c => c.id === id) || { name: id, icon: '📁', color: '#6b7280', desc: '' };
+}
+
+// ===================== PROGRESS =====================
+function calcProgress(p) {
+  let total = 0, done = 0;
+  function walk(tasks) {
+    (tasks || []).forEach(t => {
+      total++;
+      if (t.status === '完了') done++;
+      if (t.children && t.children.length) walk(t.children);
+    });
+  }
+  walk(p.tasks);
+  const pct = total === 0 ? 0 : Math.round(done / total * 100);
+  return { total, done, pct };
+}
+
+// ===================== HELPERS =====================
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  return `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  return Math.ceil((d - now) / 86400000);
+}
+
+function statusBadge(s) {
+  return `<span class="badge status-${s}">${s}</span>`;
+}
+function priorityBadge(p) {
+  return `<span class="badge priority-${p}">${p}</span>`;
+}
+
+function avatarHtml(name, size) {
+  const sz = size || 24;
+  const color = personColor((name||'').split(/[、,，\s]+/)[0].trim());
+  const initials = (name||'?').slice(0,2);
+  return `<span class="avatar" style="width:${sz}px;height:${sz}px;background:${color};font-size:${Math.floor(sz*0.45)}px;">${initials}</span>`;
+}
+
+// ===================== STATE =====================
+let currentProjectId = null;
+let currentTab = 'home';
+let sidebarCollapsed = false;
+
+// ===================== SIDEBAR =====================
+function renderSidebar() {
+  const projects = getProjects();
+  const sbProjects = document.getElementById('sb-projects');
+  if (!sbProjects) return;
+
+  sbProjects.innerHTML = projects.map(p => {
+    const { pct } = calcProgress(p);
+    const cat = getCategoryById(p.categoryId);
+    const isActive = currentProjectId && String(p.id) === String(currentProjectId);
+    return `<div class="sb-proj-item${isActive ? ' active' : ''}" onclick="selectProject('${p.id}')" title="${p.name}">
+      <div class="spi-name">${cat.icon} ${p.name}</div>
+      <div class="spi-progress-track">
+        <div class="spi-progress-bar" style="width:${pct}%;background:${isActive ? '#818cf8' : 'var(--accent)'};"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update active state in nav
+  document.querySelectorAll('.sb-nav-item').forEach(el => {
+    el.classList.remove('active');
+  });
+}
+
+function updateSidebarActiveProject() {
+  document.querySelectorAll('.sb-proj-item').forEach(el => {
+    el.classList.remove('active');
+  });
+  if (currentProjectId) {
+    const items = document.querySelectorAll('.sb-proj-item');
+    items.forEach((el, i) => {
+      const p = getProjects()[i];
+      if (p && String(p.id) === String(currentProjectId)) el.classList.add('active');
+    });
+  }
+}
+
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  const sb = document.getElementById('sidebar');
+  if (sidebarCollapsed) sb.classList.add('collapsed');
+  else sb.classList.remove('collapsed');
+}
+
+// ===================== NAV =====================
+function navTo(page) {
+  // Clear project selection for nav items
+  currentProjectId = null;
+  document.querySelectorAll('.sb-nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.querySelector(`.sb-nav-item[data-nav="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  const tbTabs = document.getElementById('tb-tabs');
+  const tbTitle = document.getElementById('tb-title');
+  tbTabs.style.display = 'none';
+
+  updateSidebarActiveProject();
+
+  if (page === 'home') {
+    tbTitle.textContent = 'ホーム';
+    renderDashboardHome();
+  } else if (page === 'mytasks') {
+    tbTitle.textContent = 'マイタスク';
+    renderMyTasks();
+  } else if (page === 'inbox') {
+    tbTitle.textContent = '受信トレイ';
+    renderInbox();
+  }
+}
+
+function selectProject(id) {
+  currentProjectId = id;
+  currentTab = 'home';
+  document.querySelectorAll('.sb-nav-item').forEach(el => el.classList.remove('active'));
+  updateSidebarActiveProject();
+
+  const p = getProjectById(id);
+  if (!p) return;
+
+  const tbTitle = document.getElementById('tb-title');
+  tbTitle.textContent = p.name;
+
+  const tbTabs = document.getElementById('tb-tabs');
+  tbTabs.style.display = '';
+
+  document.querySelectorAll('.tb-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === 'home');
+  });
+
+  renderProjectView('home');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tb-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  renderProjectView(tab);
+}
+
+// ===================== DASHBOARD HOME =====================
+function renderDashboardHome() {
+  const projects = getProjects();
+  const total = projects.length;
+  const doing = projects.filter(p => p.status === '進行中').length;
+  const done = projects.filter(p => p.status === '完了').length;
+  const todo = projects.filter(p => p.status === '未着手').length;
+
+  // upcoming deadlines
+  const withDeadline = projects
+    .filter(p => p.deadline && p.status !== '完了')
+    .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
+    .slice(0, 5);
+
+  const milestones = withDeadline.map(p => {
+    const d = daysUntil(p.deadline);
+    const dot = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 7 ? '#f59e0b' : '#3d5afe';
+    const dlText = d === null ? '' : d < 0 ? `超過${Math.abs(d)}日` : d === 0 ? '今日！' : `あと${d}日`;
+    return `<div class="milestone-item" onclick="selectProject('${p.id}')">
+      <div class="milestone-dot" style="background:${dot};"></div>
+      <div class="milestone-name">${p.name}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${statusBadge(p.status)}
+        <span class="milestone-date">${formatDate(p.deadline)} <span style="color:${dot};">${dlText}</span></span>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px 0;">期限設定済みのプロジェクトはありません</div>';
+
+  // High priority active projects
+  const highPrio = projects
+    .filter(p => p.status !== '完了' && (p.priority === '最優先' || p.priority === '高'))
+    .slice(0, 6);
+
+  const content = document.getElementById('content-area');
+  content.innerHTML = `
+    <div style="max-width:1100px;">
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+        <div class="card" style="text-align:center;padding:16px;">
+          <div style="font-size:28px;font-weight:800;color:var(--accent);">${total}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">総プロジェクト</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px;">
+          <div style="font-size:28px;font-weight:800;color:#3d5afe;">${doing}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">進行中</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px;">
+          <div style="font-size:28px;font-weight:800;color:#f59e0b;">${todo}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">未着手</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px;">
+          <div style="font-size:28px;font-weight:800;color:#00b8a9;">${done}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">完了</div>
+        </div>
+      </div>
+
+      <!-- 2 col -->
+      <div class="home-2col">
+        <div>
+          <!-- Milestones -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="section-label">マイルストーン</div>
+            ${milestones}
+          </div>
+
+          <!-- Priority projects -->
+          <div class="card">
+            <div class="section-label">優先プロジェクト</div>
+            ${highPrio.map(p => {
+              const cat = getCategoryById(p.categoryId);
+              return `<div class="milestone-item" onclick="selectProject('${p.id}')">
+                <div class="milestone-dot" style="background:${cat.color};"></div>
+                <div class="milestone-name">${p.name}</div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  ${priorityBadge(p.priority)}
+                  ${statusBadge(p.status)}
+                </div>
+              </div>`;
+            }).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px 0;">なし</div>'}
+          </div>
+        </div>
+
+        <div>
+          <!-- カテゴリ別 -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="section-label">カテゴリ別</div>
+            ${CATEGORIES.map(cat => {
+              const count = projects.filter(p => p.categoryId === cat.id).length;
+              return `<div class="resource-link" onclick="filterByCategory('${cat.id}')">
+                <span style="font-size:18px;">${cat.icon}</span>
+                <span style="flex:1;">${cat.name}</span>
+                <span style="font-size:12px;color:var(--muted);">${count}件</span>
+              </div>`;
+            }).join('')}
+          </div>
+
+          <!-- Members -->
+          <div class="card">
+            <div class="section-label">メンバー</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              ${DEFAULT_PEOPLE.map(name => `
+                <div class="member-chip">
+                  ${avatarHtml(name, 24)}
+                  <span style="font-size:13px;">${name}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function filterByCategory(catId) {
+  const projects = getProjects().filter(p => p.categoryId === catId);
+  if (projects.length > 0) selectProject(projects[0].id);
+}
+
+// ===================== MY TASKS =====================
+function renderMyTasks() {
+  const projects = getProjects();
+  const myName = 'こうた';
+  const tasks = [];
+  function collectTasks(taskList, proj) {
+    (taskList || []).forEach(t => {
+      if ((t.assignee || '').includes(myName) || (proj.assignee || '').includes(myName)) {
+        tasks.push({ task: t, project: proj });
+      }
+      if (t.children) collectTasks(t.children, proj);
+    });
+  }
+  projects.forEach(p => collectTasks(p.tasks, p));
+
+  const content = document.getElementById('content-area');
+  if (tasks.length === 0) {
+    content.innerHTML = `<div class="empty-state"><div class="es-icon">✅</div><p>タスクがありません</p></div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div style="max-width:800px;">
+      <div class="list-header">
+        <span>タスク名</span>
+        <span>プロジェクト</span>
+        <span>期日</span>
+        <span>優先度</span>
+        <span>ステータス</span>
+      </div>
+      ${tasks.map(({task, project}) => {
+        const d = daysUntil(task.deadline);
+        const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#f59e0b' : 'var(--muted)';
+        return `<div class="task-row${task.status === '完了' ? ' is-done' : ''}" onclick="selectProject('${project.id}')">
+          <div class="tr-name">
+            <input type="checkbox" class="task-checkbox" ${task.status === '完了' ? 'checked' : ''} onclick="event.stopPropagation()">
+            <span>${task.name}</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${project.name}</span>
+          <span style="font-size:12px;color:${dlColor};">${task.deadline ? formatDate(task.deadline) : '—'}</span>
+          <span>${priorityBadge(task.priority)}</span>
+          <span>${statusBadge(task.status)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ===================== INBOX =====================
+function renderInbox() {
+  const content = document.getElementById('content-area');
+  content.innerHTML = `<div class="empty-state"><div class="es-icon">📥</div><p>新しいメッセージはありません</p></div>`;
+}
+
+// ===================== PROJECT VIEW =====================
+function renderProjectView(tab) {
+  const p = getProjectById(currentProjectId);
+  if (!p) return;
+
+  if (tab === 'home') renderProjectHome(p);
+  else if (tab === 'list') renderProjectList(p);
+  else if (tab === 'board') renderProjectBoard(p);
+}
+
+// --- HOME TAB ---
+function renderProjectHome(p) {
+  const cat = getCategoryById(p.categoryId);
+  const d = daysUntil(p.deadline);
+  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#f59e0b' : 'var(--muted)';
+  const dlText = p.deadline ? `${formatDate(p.deadline)} ${d !== null ? (d < 0 ? `(超過${Math.abs(d)}日)` : d === 0 ? '(今日！)' : `(あと${d}日)`) : ''}` : '未設定';
+  const { pct, done, total } = calcProgress(p);
+
+  const members = (p.members || '').split(/[、,，]+/).map(n => n.trim()).filter(Boolean);
+
+  // Milestones from tasks with deadlines
+  const taskMilestones = (p.tasks || []).filter(t => t.deadline).sort((a,b) => new Date(a.deadline) - new Date(b.deadline)).slice(0, 5);
+
+  const content = document.getElementById('content-area');
+  content.innerHTML = `
+    <div style="max-width:1100px;">
+      <!-- Status card -->
+      <div class="card home-status-card" style="margin-bottom:20px;">
+        <div class="hsc-header">
+          <div class="hsc-title">今週のステータス</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${statusBadge(p.status)}
+            <select onchange="quickUpdateStatus('${p.id}',this.value)">
+              ${['未着手','進行中','完了','要確認','保留'].map(s => `<option${s===p.status?' selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <textarea placeholder="今週の進捗・メモを入力…">${p.thisWeek || ''}</textarea>
+        <!-- Progress -->
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${pct===100?'var(--accent2)':'var(--accent)'};border-radius:99px;transition:width 0.3s;"></div>
+          </div>
+          <span style="font-size:14px;font-weight:700;color:${pct===100?'var(--accent2)':'var(--accent)'};">${pct}%</span>
+          <span style="font-size:12px;color:var(--muted);">${done}/${total} タスク完了</span>
+        </div>
+      </div>
+
+      <!-- 2-col -->
+      <div class="home-2col">
+        <!-- Left 60% -->
+        <div>
+          <!-- Milestones -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="section-label">マイルストーン</div>
+            ${taskMilestones.length ? taskMilestones.map(t => {
+              const td = daysUntil(t.deadline);
+              const dot = td !== null && td < 0 ? '#ef4444' : td !== null && td <= 7 ? '#f59e0b' : '#00b8a9';
+              return `<div class="milestone-item">
+                <div class="milestone-dot" style="background:${dot};"></div>
+                <div class="milestone-name">${t.name}</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  ${statusBadge(t.status)}
+                  <span class="milestone-date" style="color:${dot};">${formatDate(t.deadline)}</span>
+                </div>
+              </div>`;
+            }).join('') : `<div style="color:var(--muted);font-size:13px;padding:8px 0;">期限付きタスクなし</div>`}
+          </div>
+
+          <!-- Resources -->
+          <div class="card">
+            <div class="section-label">主要リソース</div>
+            ${p.deliverables ? `<div class="resource-link"><span>📦</span><span>成果物: ${p.deliverables}</span></div>` : ''}
+            ${p.purpose ? `<div class="resource-link"><span>🎯</span><span>目的: ${p.purpose}</span></div>` : ''}
+            ${p.completionCriteria ? `<div class="resource-link"><span>✅</span><span>完了条件: ${p.completionCriteria}</span></div>` : ''}
+            ${!p.deliverables && !p.purpose ? `<div style="color:var(--muted);font-size:13px;">リソース未設定</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Right 40% -->
+        <div>
+          <!-- Project details -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="section-label">プロジェクト詳細</div>
+            <div class="detail-row">
+              <span class="dr-label">期限</span>
+              <span class="dr-value" style="color:${dlColor};">${dlText}</span>
+            </div>
+            <div class="detail-row">
+              <span class="dr-label">カテゴリ</span>
+              <span class="dr-value"><span style="color:${cat.color};">${cat.icon}</span> ${cat.name}</span>
+            </div>
+            <div class="detail-row">
+              <span class="dr-label">優先度</span>
+              <span class="dr-value">${priorityBadge(p.priority)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="dr-label">オーナー</span>
+              <span class="dr-value" style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+                ${avatarHtml(p.assignee || '未設定', 22)}
+                ${p.assignee || '未設定'}
+              </span>
+            </div>
+            ${members.length ? `<div class="detail-row">
+              <span class="dr-label">メンバー</span>
+              <span class="dr-value">
+                <div style="display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap;">
+                  ${members.map(n => `<span class="member-chip" style="padding:2px 8px 2px 2px;">
+                    ${avatarHtml(n,20)}
+                    <span style="font-size:11px;">${n}</span>
+                  </span>`).join('')}
+                </div>
+              </span>
+            </div>` : ''}
+          </div>
+
+          <!-- Member avatars -->
+          <div class="card">
+            <div class="section-label">メンバー</div>
+            <div class="member-avatars">
+              ${[p.assignee, ...members].filter(Boolean).map(n => `
+                <div style="text-align:center;">
+                  ${avatarHtml(n, 36)}
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;">${n}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function quickUpdateStatus(pid, status) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  p.status = status;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  renderSidebar();
+  updateSidebarActiveProject();
+}
+
+// --- LIST TAB ---
+function renderProjectList(p) {
+  const tasks = p.tasks || [];
+  const content = document.getElementById('content-area');
+
+  if (tasks.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">📋</div>
+        <p>タスクがありません</p>
+      </div>
+      <div class="add-task-row" onclick="openAddTaskModal()">
+        <span style="font-size:18px;">＋</span> タスクを追加
+      </div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div style="max-width:900px;">
+      <div class="list-header">
+        <span>タスク名</span>
+        <span>担当者</span>
+        <span>期日</span>
+        <span>優先度</span>
+        <span>ステータス</span>
+      </div>
+      ${tasks.map(t => renderTaskRow(t, p.id)).join('')}
+      <div class="add-task-row" onclick="openAddTaskModal()">
+        <span style="font-size:18px;">＋</span> タスクを追加
+      </div>
+    </div>`;
+}
+
+function renderTaskRow(t, projectId) {
+  const d = daysUntil(t.deadline);
+  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#f59e0b' : 'var(--muted)';
+  const isDone = t.status === '完了';
+  return `<div class="task-row${isDone ? ' is-done' : ''}">
+    <div class="tr-name">
+      <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskDone('${projectId}','${t.id}',this)">
+      <span>${t.name}</span>
+    </div>
+    <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);">
+      ${t.assignee ? avatarHtml(t.assignee.split(/[、,]+/)[0].trim(),20) : ''}
+      ${t.assignee ? `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;">${t.assignee}</span>` : '<span style="color:var(--muted);font-style:italic;">未設定</span>'}
+    </span>
+    <span style="font-size:12px;color:${dlColor};">${t.deadline ? formatDate(t.deadline) : '—'}</span>
+    <span>${priorityBadge(t.priority)}</span>
+    <span>${statusBadge(t.status)}</span>
+  </div>`;
+}
+
+function toggleTaskDone(projectId, taskId, checkbox) {
+  const p = getProjectById(projectId);
+  if (!p) return;
+  function findTask(tasks) {
+    for (const t of (tasks||[])) {
+      if (String(t.id) === String(taskId)) return t;
+      const found = findTask(t.children);
+      if (found) return found;
+    }
+    return null;
+  }
+  const task = findTask(p.tasks);
+  if (task) {
+    task.status = checkbox.checked ? '完了' : '未着手';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+    renderSidebar();
+    updateSidebarActiveProject();
+  }
+}
+
+// --- BOARD TAB ---
+function renderProjectBoard(p) {
+  const tasks = p.tasks || [];
+  const cols = ['未着手', '進行中', '要確認', '完了'];
+
+  const content = document.getElementById('content-area');
+  content.innerHTML = `
+    <div class="board-cols">
+      ${cols.map(status => {
+        const colTasks = tasks.filter(t => t.status === status);
+        const colorMap = { '未着手': '#9ca3af', '進行中': '#3d5afe', '要確認': '#f59e0b', '完了': '#00b8a9' };
+        const col = colorMap[status] || '#6b7280';
+        return `<div class="board-col" data-status="${status}">
+          <div class="board-col-header" style="border-top:3px solid ${col};">
+            <span style="color:${col};">${status}</span>
+            <span class="board-col-count">${colTasks.length}</span>
+          </div>
+          <div class="board-cards">
+            ${colTasks.map(t => renderBoardCard(t)).join('')}
+            ${colTasks.length === 0 ? '<div style="padding:16px;text-align:center;color:var(--muted);font-size:12px;">なし</div>' : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderBoardCard(t) {
+  const d = daysUntil(t.deadline);
+  const dateClass = d !== null && d < 0 ? 'overdue' : d !== null && d <= 3 ? 'soon' : '';
+  const dateText = t.deadline ? (d === 0 ? '今日' : d !== null && d < 0 ? `${Math.abs(d)}日超過` : formatDate(t.deadline)) : '';
+  return `<div class="board-card" draggable="true">
+    <div class="bc-name">${t.name}</div>
+    <div class="bc-meta">
+      ${t.assignee ? `<span style="display:flex;align-items:center;gap:4px;">${avatarHtml(t.assignee.split(/[、,]+/)[0].trim(),20)}<span style="font-size:11px;color:var(--muted);">${t.assignee}</span></span>` : '<span></span>'}
+      ${dateText ? `<span class="bc-date-chip ${dateClass}">${dateText}</span>` : '<span></span>'}
+    </div>
+    ${priorityBadge(t.priority)}
+  </div>`;
+}
+
+// ===================== ADD TASK MODAL =====================
+function openAddTaskModal() {
+  document.getElementById('addTaskModal').classList.add('open');
+  document.getElementById('atm-name').focus();
+}
+
+function closeAddTaskModal() {
+  document.getElementById('addTaskModal').classList.remove('open');
+}
+
+function submitAddTask(e) {
+  e.preventDefault();
+  if (!currentProjectId) { alert('プロジェクトを選択してください'); return; }
+  const p = getProjectById(currentProjectId);
+  if (!p) return;
+  if (!p.tasks) p.tasks = [];
+  const newTask = {
+    id: `${p.id}-${Date.now()}`,
+    name: document.getElementById('atm-name').value.trim(),
+    status: document.getElementById('atm-status').value,
+    priority: document.getElementById('atm-priority').value,
+    assignee: document.getElementById('atm-assignee').value.trim(),
+    deadline: document.getElementById('atm-deadline').value,
+    notes: document.getElementById('atm-notes').value.trim(),
+    children: []
+  };
+  p.tasks.push(newTask);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  closeAddTaskModal();
+  renderSidebar();
+  updateSidebarActiveProject();
+  renderProjectView(currentTab);
+  // Reset form
+  e.target.reset();
+}
+
+// ===================== KEYBOARD =====================
+document.addEventListener('keydown', e => {
+  const active = document.activeElement;
+  const isInput = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+  if (!isInput && e.key === 'n' || e.key === 'N') {
+    if (!isInput) { e.preventDefault(); openAddTaskModal(); }
+  }
+  if (e.key === 'Escape') {
+    closeAddTaskModal();
+  }
+});
+
+// ===================== INIT =====================
+function init() {
+  renderSidebar();
+  // Show dashboard by default
+  navTo('home');
+  document.querySelector('.sb-nav-item[data-nav="home"]').classList.add('active');
+}
+
+init();
+</script>
+</body>
+</html>
