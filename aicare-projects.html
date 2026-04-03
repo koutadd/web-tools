@@ -235,7 +235,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 20px;
+  padding: 26px 22px;
   transition: border-color 0.15s;
 }
 .project-card:hover { border-color: rgba(245,158,11,0.4); transform: translateY(-1px); }
@@ -1330,6 +1330,7 @@ function initializeApp() {
   }
   // Save if we changed anything
   if (APP.projects.length !== before) saveData(APP);
+  initProgressSnapshot();
   if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
   render();
   // Background cloud sync (doesn't block rendering)
@@ -2223,6 +2224,35 @@ function renderProjectCard(p) {
 </div>`;
 }
 
+// ===================== PROGRESS SNAPSHOT (昨日比) =====================
+const PROGRESS_SNAP_KEY = 'aicare-progress-snap';
+
+function _dateStr() { return new Date().toISOString().slice(0, 10); }
+
+function initProgressSnapshot() {
+  const today = _dateStr();
+  let snap = null;
+  try { snap = JSON.parse(localStorage.getItem(PROGRESS_SNAP_KEY)); } catch(e) {}
+  if (snap && snap.date === today) return; // already initialized today
+  // New day: previous snap becomes "yesterday" reference
+  const prevData = snap ? { date: snap.date, data: snap.data } : null;
+  const todayData = {};
+  (APP.projects || []).forEach(p => { todayData[String(p.id)] = calcProgress(p).pct; });
+  localStorage.setItem(PROGRESS_SNAP_KEY, JSON.stringify({ date: today, data: todayData, prev: prevData }));
+}
+
+function getProgressDelta(p) {
+  try {
+    const snap = JSON.parse(localStorage.getItem(PROGRESS_SNAP_KEY));
+    if (!snap) return null;
+    const ref = (snap.date === _dateStr() && snap.prev) ? snap.prev : snap;
+    if (!ref || !ref.data) return null;
+    const prev = ref.data[String(p.id)];
+    if (prev === undefined || prev === null) return null;
+    return calcProgress(p).pct - prev;
+  } catch(e) { return null; }
+}
+
 // ===================== PROGRESS CALC =====================
 function calcProgress(p) {
   let total = 0, done = 0;
@@ -2243,12 +2273,17 @@ function progressBarHtml(p, opts) {
   const height   = (opts && opts.height)  || '4px';
   const fontSize = (opts && opts.fontSize) || '11px';
   const color = pct === 100 ? '#10b981' : pct >= 50 ? '#3b82f6' : '#94a3b8';
+  const delta = getProgressDelta(p);
+  const deltaHtml = (delta !== null && delta !== 0)
+    ? `<span style="font-size:${fontSize};color:${delta > 0 ? '#10b981' : '#f87171'};font-weight:700;white-space:nowrap;">${delta > 0 ? '+' : ''}${delta}% 昨日比</span>`
+    : (delta === 0 ? `<span style="font-size:${fontSize};color:#3d5070;white-space:nowrap;">±0 昨日比</span>` : '');
   return `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
     <div style="flex:1;height:${height};background:#1e2d42;border-radius:99px;overflow:hidden;">
       <div style="width:${pct}%;height:100%;background:${color};border-radius:99px;transition:width .3s;"></div>
     </div>
     <span style="font-size:${fontSize};color:${color};font-weight:700;white-space:nowrap;">${pct}%</span>
     ${total > 0 ? `<span style="font-size:${fontSize};color:#3d5070;white-space:nowrap;">${done}/${total}</span>` : ''}
+    ${deltaHtml}
   </div>`;
 }
 
