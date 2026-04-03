@@ -2272,19 +2272,19 @@ function progressBarHtml(p, opts) {
   const { pct, done, total } = calcProgress(p);
   const height   = (opts && opts.height)  || '4px';
   const fontSize = (opts && opts.fontSize) || '11px';
-  const color = pct === 100 ? '#4ade8066' : '#60a5fa44';
-  const textColor = pct === 100 ? '#6ee7b7' : '#93c5fd';
-  const trackColor = 'rgba(255,255,255,0.05)';
+  const barColor = pct === 100 ? 'rgba(74,222,128,0.4)' : 'rgba(96,165,250,0.35)';
+  const trackColor = 'rgba(255,255,255,0.06)';
+  const pctColor = pct === 100 ? '#4ade80' : pct >= 50 ? '#60a5fa' : '#94a3b8';
   const delta = getProgressDelta(p);
   const deltaHtml = (delta !== null && delta !== 0)
-    ? `<span style="font-size:${fontSize};color:${delta > 0 ? '#6ee7b7' : '#fca5a5'};opacity:0.75;white-space:nowrap;">${delta > 0 ? '+' : ''}${delta}%</span>`
+    ? `<span style="font-size:10px;padding:1px 5px;border-radius:4px;background:${delta > 0 ? 'rgba(74,222,128,0.12)' : 'rgba(248,113,113,0.12)'};color:${delta > 0 ? '#4ade80' : '#f87171'};white-space:nowrap;">${delta > 0 ? '▲' : '▼'}${Math.abs(delta)}%</span>`
     : '';
-  return `<div style="display:flex;align-items:center;gap:5px;margin-top:4px;opacity:0.72;">
+  return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px;">
     <div style="flex:1;height:${height};background:${trackColor};border-radius:99px;overflow:hidden;">
-      <div style="width:${pct}%;height:100%;background:${color};border-radius:99px;transition:width .3s;"></div>
+      <div style="width:${pct}%;height:100%;background:${barColor};border-radius:99px;transition:width .3s;"></div>
     </div>
-    <span style="font-size:${fontSize};color:${textColor};white-space:nowrap;">${pct}%</span>
-    ${total > 0 ? `<span style="font-size:${fontSize};color:#3d5070;white-space:nowrap;">${done}/${total}</span>` : ''}
+    <span style="font-size:13px;font-weight:700;color:${pctColor};white-space:nowrap;letter-spacing:-0.3px;">${pct}<span style="font-size:10px;font-weight:500;opacity:0.7;">%</span></span>
+    ${total > 0 ? `<span style="font-size:10px;color:#3d5070;white-space:nowrap;">${done}/${total}</span>` : ''}
     ${deltaHtml}
   </div>`;
 }
