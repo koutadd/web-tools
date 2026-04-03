@@ -1,0 +1,244 @@
+[2026-04-02T07:22:03.674Z] ロゴ収集開始: 200社
+[2026-04-02T07:22:05.686Z]   アクセス失敗 https://www.aozorabank.co.jp/: write EPROTO 00F11E0902000000:error:0A00018A:SSL routines:tls_process_ske_dhe:dh key too small:ssl/statem/statem_clnt.c:2355:
+
+[2026-04-02T07:22:21.948Z]   アクセス失敗 https://www.shinseibank.com/: timeout of 12000ms exceeded
+[2026-04-02T07:22:45.926Z]   アクセス失敗 https://www.jal.com/ja/: timeout of 12000ms exceeded
+[2026-04-02T07:23:01.473Z]   アクセス失敗 https://holdings.panasonic/jp/: timeout of 12000ms exceeded
+[2026-04-02T07:23:03.392Z]   アクセス失敗 https://www.mitsubishi-motors.com/ja/: Request failed with status code 404
+[2026-04-02T07:23:06.571Z]   アクセス失敗 https://www.toyota-tsusho.com/jp/: Request failed with status code 404
+[2026-04-02T07:23:08.109Z]   アクセス失敗 https://www.jreast.co.jp/: Request failed with status code 403
+[2026-04-02T07:23:16.898Z]   アクセス失敗 https://www.kyuden.co.jp/: Request failed with status code 403
+[2026-04-02T07:23:32.556Z]   アクセス失敗 https://www.tbs-holdings.co.jp/: getaddrinfo ENOTFOUND www.tbs-holdings.co.jp
+[2026-04-02T07:23:48.944Z]   アクセス失敗 https://www.zensho.com/jp/: timeout of 12000ms exceeded
+[2026-04-02T07:23:49.497Z]   アクセス失敗 https://www.tv-asahi.co.jp/hd/: Request failed with status code 404
+[2026-04-02T07:23:55.047Z]   アクセス失敗 https://www.mcgc.com/jp/: Request failed with status code 404
+[2026-04-02T07:33:10.781Z]   アクセス失敗 https://www.fujioilholdings.com/ja/: Request failed with status code 404
+[2026-04-02T07:33:12.075Z]   アクセス失敗 https://www.agc.com/ja/: Request failed with status code 404
+[2026-04-02T07:33:19.560Z]   アクセス失敗 https://www.fpg-net.co.jp/: getaddrinfo ENOTFOUND www.fpg-net.co.jp
+[2026-04-02T07:33:32.599Z]   アクセス失敗 https://www.gmo-fh.com/: timeout of 12000ms exceeded
+[2026-04-02T07:33:33.019Z]   アクセス失敗 https://www.id-e-holdings.co.jp/: getaddrinfo ENOTFOUND www.id-e-holdings.co.jp
+[2026-04-02T07:33:35.829Z]   アクセス失敗 https://www.nisso-holdings.co.jp/: getaddrinfo ENOTFOUND www.nisso-holdings.co.jp
+[2026-04-02T07:33:36.267Z]   アクセス失敗 https://www.ntn.co.jp/: Request failed with status code 403
+[2026-04-02T07:33:36.689Z]   アクセス失敗 https://www.obara-group.co.jp/: getaddrinfo ENOTFOUND www.obara-group.co.jp
+[2026-04-02T07:33:37.845Z]   アクセス失敗 https://www.sbiholdings.co.jp/: getaddrinfo ENOTFOUND www.sbiholdings.co.jp
+[2026-04-02T07:33:52.820Z]   アクセス失敗 https://www.tdk.com/ja/: timeout of 12000ms exceeded
+[2026-04-02T07:33:54.609Z]   アクセス失敗 https://v-holdings.co.jp/: getaddrinfo ENOTFOUND v-holdings.co.jp
+[2026-04-02T07:33:57.900Z]   アクセス失敗 https://www.apa.co.jp/: Request failed with status code 403
+[2026-04-02T07:33:58.417Z]   アクセス失敗 https://www.alconix.co.jp/: getaddrinfo ENOTFOUND www.alconix.co.jp
+[2026-04-02T07:38:03.066Z]   アクセス失敗 https://www.uokatsu.co.jp/: Hostname/IP does not match certificate's altnames: Host: www.uokatsu.co.jp. is not in the cert's altnames: DNS:*.xserver.jp, DNS:xserver.jp
+[2026-04-02T07:38:04.808Z]   アクセス失敗 https://corporate.epson/ja/: Request failed with status code 403
+[2026-04-02T07:38:05.957Z]   アクセス失敗 https://www.omron.co.jp/: Request failed with status code 403
+[2026-04-02T07:38:12.358Z]   アクセス失敗 https://www.kiraboshi-fg.co.jp/: getaddrinfo ENOTFOUND www.kiraboshi-fg.co.jp
+[2026-04-02T07:38:26.358Z]   アクセス失敗 https://www.ksdenki.co.jp/: timeout of 12000ms exceeded
+[2026-04-02T07:38:26.779Z]   アクセス失敗 https://geo-hd.co.jp/: getaddrinfo ENOTFOUND geo-hd.co.jp
+[2026-04-02T07:38:27.202Z]   アクセス失敗 https://www.koeitecmogroup.co.jp/: getaddrinfo ENOTFOUND www.koeitecmogroup.co.jp
+[2026-04-02T07:38:41.751Z]   アクセス失敗 https://www.cosmospc.co.jp/: timeout of 12000ms exceeded
+[2026-04-02T07:38:42.745Z]   アクセス失敗 https://www.golf-nihonkai.co.jp/: getaddrinfo ENOTFOUND www.golf-nihonkai.co.jp
+[2026-04-02T07:38:44.829Z]   アクセス失敗 https://www.suntory.co.jp/: Request failed with status code 403
+[2026-04-02T07:40:16.432Z]   アクセス失敗 https://www.cmic.co.jp/: getaddrinfo ENOTFOUND www.cmic.co.jp
+[2026-04-02T07:40:19.448Z]   アクセス失敗 https://www.segasammy-holdings.com/: getaddrinfo ENOTFOUND www.segasammy-holdings.com
+[2026-04-02T07:40:20.496Z]   アクセス失敗 https://www.sony.com/ja/: Request failed with status code 403
+[2026-04-02T07:40:24.747Z]   アクセス失敗 https://www.chugginfinancialgroup.co.jp/: getaddrinfo ENOTFOUND www.chugginfinancialgroup.co.jp
+[2026-04-02T07:40:26.495Z]   アクセス失敗 https://www.descente.co.jp/ja/ir/: Request failed with status code 404
+[2026-04-02T07:40:26.946Z]   アクセス失敗 https://digital-holdings.co.jp/: unable to verify the first certificate; if the root CA is installed locally, try running Node.js with --use-system-ca
+[2026-04-02T07:40:27.391Z]   アクセス失敗 https://www.denso.com/jp/ja/: Request failed with status code 403
+[2026-04-02T07:40:27.824Z]   アクセス失敗 https://www.tempholdings.co.jp/: getaddrinfo ENOTFOUND www.tempholdings.co.jp
+[2026-04-02T07:40:29.010Z]   アクセス失敗 https://www.tomod.co.jp/: getaddrinfo ENOTFOUND www.tomod.co.jp
+[2026-04-02T07:40:52.379Z] 
+完了: 成功=138, missing=62
+[2026-04-02T07:41:21.580Z] アセット検証開始
+[2026-04-02T07:41:21.581Z]   missing: [1] MS&ADインシュアランスグループホールディングス
+[2026-04-02T07:41:21.581Z]   missing: [4] あおぞらグループ
+[2026-04-02T07:41:21.581Z]   missing: [5] みずほフィナンシャルグループ
+[2026-04-02T07:41:21.581Z]   missing: [6] ゆうちょ銀行グループ
+[2026-04-02T07:41:21.581Z]   missing: [11] 新生銀行グループ
+[2026-04-02T07:41:21.582Z]   missing: [17] ANAホールディングス
+[2026-04-02T07:41:21.582Z]   missing: [18] JALグループ
+[2026-04-02T07:41:21.582Z]   missing: [23] ダイハツグループ
+[2026-04-02T07:41:21.582Z]   missing: [25] パナソニックホールディングス
+[2026-04-02T07:41:21.582Z]   missing: [28] 三菱自動車グループ
+[2026-04-02T07:41:21.582Z]   missing: [32] 日立製作所グループ
+[2026-04-02T07:41:21.583Z]   missing: [33] 豊田通商グループ
+[2026-04-02T07:41:21.583Z]   missing: [36] JR東日本グループ
+[2026-04-02T07:41:21.584Z]   missing: [49] 九州電力グループ
+[2026-04-02T07:41:21.585Z]   missing: [70] TBSホールディングス
+[2026-04-02T07:41:21.585Z]   missing: [75] セイノーホールディングス
+[2026-04-02T07:41:21.585Z]   missing: [76] ゼンショーホールディングス
+[2026-04-02T07:41:21.585Z]   missing: [77] テレビ朝日ホールディングス
+[2026-04-02T07:41:21.585Z]   missing: [86] 三菱ケミカルグループ
+[2026-04-02T07:41:21.585Z]   missing: [92] 大阪ガスグループ
+[2026-04-02T07:41:21.586Z]   missing: [105] 不二製油グループ本社
+[2026-04-02T07:41:21.586Z]   missing: [107] AGCグループ
+[2026-04-02T07:41:21.586Z]   missing: [112] DOWAホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [114] FPGホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [116] GMOフィナンシャルホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [117] ID&Eホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [120] NECグループ
+[2026-04-02T07:41:21.586Z]   missing: [121] NHKグループ
+[2026-04-02T07:41:21.586Z]   missing: [122] NISSOホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [123] NTNグループ
+[2026-04-02T07:41:21.586Z]   missing: [124] OBARA GROUP
+[2026-04-02T07:41:21.586Z]   missing: [126] SBIホールディングス
+[2026-04-02T07:41:21.586Z]   missing: [128] SUMITOMOグループ
+[2026-04-02T07:41:21.586Z]   missing: [129] TDKグループ
+[2026-04-02T07:41:21.587Z]   missing: [132] Vホールディングス
+[2026-04-02T07:41:21.587Z]   missing: [137] アパグループ
+[2026-04-02T07:41:21.587Z]   missing: [138] アルコニックスグループ
+[2026-04-02T07:41:21.587Z]   missing: [141] イビデングループ
+[2026-04-02T07:41:21.587Z]   missing: [143] ウェルシアホールディングス
+[2026-04-02T07:41:21.587Z]   missing: [144] ウオカツグループ
+[2026-04-02T07:41:21.587Z]   missing: [147] エプソングループ
+[2026-04-02T07:41:21.587Z]   missing: [149] オムロングループ
+[2026-04-02T07:41:21.587Z]   missing: [159] きらぼしフィナンシャルグループ
+[2026-04-02T07:41:21.587Z]   missing: [162] ケーズホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [163] ゲオホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [164] コーエーテクモホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [167] コスモスホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [169] ゴルフ日本海ホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [172] サントリーホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [174] しまむらグループ
+[2026-04-02T07:41:21.588Z]   missing: [175] シミックホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [180] セガサミーホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [182] ソニーグループ
+[2026-04-02T07:41:21.588Z]   missing: [185] ダイキングループ
+[2026-04-02T07:41:21.588Z]   missing: [187] ちゅうぎんフィナンシャルグループ
+[2026-04-02T07:41:21.588Z]   missing: [189] ディスコグループ
+[2026-04-02T07:41:21.588Z]   missing: [190] デサントグループ
+[2026-04-02T07:41:21.588Z]   missing: [191] デジタルホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [192] デンソーグループ
+[2026-04-02T07:41:21.588Z]   missing: [193] テンプホールディングス
+[2026-04-02T07:41:21.588Z]   missing: [195] トモズグループ
+[2026-04-02T07:41:21.588Z]   missing: [197] ニトリホールディングス
+[2026-04-02T07:41:21.589Z] 検証完了: 取得済み=138, missing=62
+[2026-04-02T08:04:05.150Z] TOP50 brand logo collection started: 50 companies
+[2026-04-02T08:04:05.151Z] 
+[1] MS&ADインシュアランスグループホールディングス
+[2026-04-02T08:04:08.753Z] 
+[2] SOMPOホールディングス
+[2026-04-02T08:04:14.549Z] 
+[3] T&Dホールディングス
+[2026-04-02T08:04:16.796Z] 
+[4] あおぞらグループ
+[2026-04-02T08:04:17.257Z]     WARNING access failed https://www.aozorabank.co.jp/: write EPROTO 00F11E0902000000:error:0A00018A:SSL routines:tls_process_ske_dhe:dh key too small:ssl/statem/statem_clnt.c:2355:
+
+[2026-04-02T08:04:17.783Z]     WARNING access failed https://www.aozorasec.co.jp/: getaddrinfo ENOTFOUND www.aozorasec.co.jp
+[2026-04-02T08:04:18.284Z] 
+[5] みずほフィナンシャルグループ
+[2026-04-02T08:04:20.230Z] 
+[6] ゆうちょ銀行グループ
+[2026-04-02T08:04:22.052Z] 
+[7] りそなホールディングス
+[2026-04-02T08:04:24.320Z] 
+[8] 三井住友フィナンシャルグループ
+[2026-04-02T08:04:27.542Z] 
+[9] 三菱UFJフィナンシャル・グループ
+[2026-04-02T08:04:31.114Z] 
+[10] 松井証券グループ
+[2026-04-02T08:04:31.731Z] 
+[11] 新生銀行グループ
+[2026-04-02T08:07:53.207Z] 
+[12] 大和証券グループ本社
+[2026-04-02T08:07:55.583Z] 
+[13] 第一生命ホールディングス
+[2026-04-02T08:07:57.536Z] 
+[14] 東京海上ホールディングス
+[2026-04-02T08:07:59.386Z] 
+[15] 日本生命グループ
+[2026-04-02T08:08:00.067Z]     WARNING access failed https://www.hanasaku-life.co.jp/: getaddrinfo ENOTFOUND www.hanasaku-life.co.jp
+[2026-04-02T08:08:01.192Z] 
+[16] 野村ホールディングス
+[2026-04-02T08:08:02.741Z]     WARNING access failed https://www.nomura-am.co.jp/: Request failed with status code 404
+[2026-04-02T08:08:04.050Z] 
+[17] ANAホールディングス
+[2026-04-02T08:12:47.669Z] TOP50 brand logo collection started: 50 companies
+[2026-04-02T08:12:47.670Z] 
+[1] MS&ADインシュアランスグループホールディングス
+[2026-04-02T08:12:47.671Z]   CACHED: 三井住友海上
+[2026-04-02T08:12:47.671Z]   CACHED: あいおいニッセイ同和損保
+[2026-04-02T08:12:47.671Z]   CACHED: 三井住友海上あいおい生命
+[2026-04-02T08:12:47.671Z] 
+[2] SOMPOホールディングス
+[2026-04-02T08:12:47.671Z]   CACHED: 損保ジャパン
+[2026-04-02T08:12:47.671Z]   CACHED: SOMPOひまわり生命
+[2026-04-02T08:12:47.671Z]   CACHED: SOMPOケア
+[2026-04-02T08:12:47.671Z] 
+[3] T&Dホールディングス
+[2026-04-02T08:12:47.671Z]   CACHED: 太陽生命
+[2026-04-02T08:12:47.671Z]   CACHED: 大同生命
+[2026-04-02T08:12:47.671Z]   CACHED: T&Dフィナンシャル生命
+[2026-04-02T08:12:47.671Z] 
+[4] あおぞらグループ
+[2026-04-02T08:12:47.846Z]     WARNING access failed https://www.aozorabank.co.jp/: write EPROTO 00F11E0902000000:error:0A00018A:SSL routines:tls_process_ske_dhe:dh key too small:ssl/statem/statem_clnt.c:2355:
+
+[2026-04-02T08:12:48.357Z]     WARNING access failed https://www.aozorasec.co.jp/: getaddrinfo ENOTFOUND www.aozorasec.co.jp
+[2026-04-02T08:12:48.861Z] 
+[5] みずほフィナンシャルグループ
+[2026-04-02T08:12:51.004Z] 
+[6] ゆうちょ銀行グループ
+[2026-04-02T08:12:51.586Z]   CACHED: 日本郵便
+[2026-04-02T08:12:51.587Z]   CACHED: かんぽ生命
+[2026-04-02T08:12:51.587Z] 
+[7] りそなホールディングス
+[2026-04-02T08:12:51.587Z]   CACHED: りそな銀行
+[2026-04-02T08:12:51.587Z]   CACHED: 埼玉りそな銀行
+[2026-04-02T08:12:51.587Z]   CACHED: 関西みらい銀行
+[2026-04-02T08:12:51.588Z] 
+[8] 三井住友フィナンシャルグループ
+[2026-04-02T08:12:51.588Z]   CACHED: 三井住友銀行
+[2026-04-02T08:12:51.588Z]   CACHED: SMBC日興証券
+[2026-04-02T08:12:53.499Z] 
+[9] 三菱UFJフィナンシャル・グループ
+[2026-04-02T08:12:53.499Z]   CACHED: MUFG銀行
+[2026-04-02T08:12:53.500Z]   CACHED: 三菱UFJ信託銀行
+[2026-04-02T08:12:54.103Z]   CACHED: アコム
+[2026-04-02T08:12:54.103Z] 
+[10] 松井証券グループ
+[2026-04-02T08:12:54.103Z]   CACHED: 松井証券
+[2026-04-02T08:12:54.103Z] 
+[11] 新生銀行グループ
+[2026-04-02T08:16:25.500Z] TOP50 brand logo collection started: 50 companies
+[2026-04-02T08:16:25.501Z] 
+[1] MS&ADインシュアランスグループホールディングス
+[2026-04-02T08:16:25.501Z]   CACHED: 三井住友海上
+[2026-04-02T08:16:25.501Z]   CACHED: あいおいニッセイ同和損保
+[2026-04-02T08:16:25.501Z]   CACHED: 三井住友海上あいおい生命
+[2026-04-02T08:16:25.501Z] 
+[2] SOMPOホールディングス
+[2026-04-02T08:16:25.501Z]   CACHED: 損保ジャパン
+[2026-04-02T08:16:25.501Z]   CACHED: SOMPOひまわり生命
+[2026-04-02T08:16:25.501Z]   CACHED: SOMPOケア
+[2026-04-02T08:16:25.501Z] 
+[3] T&Dホールディングス
+[2026-04-02T08:16:25.501Z]   CACHED: 太陽生命
+[2026-04-02T08:16:25.502Z]   CACHED: 大同生命
+[2026-04-02T08:16:25.502Z]   CACHED: T&Dフィナンシャル生命
+[2026-04-02T08:16:25.502Z] 
+[4] あおぞらグループ
+[2026-04-02T08:16:25.558Z]     WARNING access failed https://www.aozorabank.co.jp/: write EPROTO 00F11E0902000000:error:0A00018A:SSL routines:tls_process_ske_dhe:dh key too small:ssl/statem/statem_clnt.c:2355:
+
+[2026-04-02T08:16:26.068Z]     WARNING access failed https://www.aozorasec.co.jp/: getaddrinfo ENOTFOUND www.aozorasec.co.jp
+[2026-04-02T08:16:26.571Z] 
+[5] みずほフィナンシャルグループ
+[2026-04-02T08:16:29.021Z] 
+[6] ゆうちょ銀行グループ
+[2026-04-02T08:16:29.612Z]   CACHED: 日本郵便
+[2026-04-02T08:16:29.613Z]   CACHED: かんぽ生命
+[2026-04-02T08:16:29.613Z] 
+[7] りそなホールディングス
+[2026-04-02T08:16:29.613Z]   CACHED: りそな銀行
+[2026-04-02T08:16:29.613Z]   CACHED: 埼玉りそな銀行
+[2026-04-02T08:16:29.613Z]   CACHED: 関西みらい銀行
+[2026-04-02T08:16:29.614Z] 
+[8] 三井住友フィナンシャルグループ
+[2026-04-02T08:16:29.615Z]   CACHED: 三井住友銀行
+[2026-04-02T08:16:29.616Z]   CACHED: SMBC日興証券
+[2026-04-02T08:16:32.231Z] 
+[9] 三菱UFJフィナンシャル・グループ
+[2026-04-02T08:16:32.231Z]   CACHED: MUFG銀行
+[2026-04-02T08:16:32.232Z]   CACHED: 三菱UFJ信託銀行
+[2026-04-02T08:16:32.810Z]   CACHED: アコム
+[2026-04-02T08:16:32.811Z] 
+[10] 松井証券グループ
+[2026-04-02T08:16:32.811Z]   CACHED: 松井証券
+[2026-04-02T08:16:32.811Z] 
+[11] 新生銀行グループ

@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<!--[if lte IE 9 ]> <html lang="ja" dir="ltr" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="ja" dir="ltr"><!--<![endif]-->
+<head>
+<!-- Usercentrics CMP Script Tag v2 -->
+<script id="usercentrics-cmp" src="https://app.usercentrics.eu/browser-ui/latest/loader.js" data-settings-id="ibjQRuNa3" data-language="ja" async></script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NQ4KXP');</script>
+<!-- End Google Tag Manager -->
+<script>
+(function (a, t, i) { var e = "MSCI"; var s = "Analytics"; var o = e + "queue"; a[o] = a[o] || []; var r = a[e] || function (n) { var t = {}; t[s] = {}; function e(e) { while (e.length) { var r = e.pop(); t[s][r] = function (e) { return function () { a[o].push([e, n, arguments]) } }(r) } } var r = "track"; var i = "set"; e([r + "Event", r + "View", r + "Action", i + "Config", i + "Property", i + "User", "initialize", "teardown"]); return t }(i.name); var n = i.name; if (!a[e]) { a[n] = r[s]; a[o].push(["new", n]); setTimeout(function () { var e = "script"; var r = t.createElement(e); r.async = 1; r.src = i.src; var n = t.getElementsByTagName(e)[0]; n.parentNode.insertBefore(r, n) }, 1) } else { a[n] = new r[s] } if (i.user) { a[n].setUser(i.user) } if (i.props) { for (var c in i.props) { a[n].setProperty(c, i.props[c]) } } a[n].initialize(i.cfg) })(window, document, {
+src: "https://cxppeur1rdrect01sa02cdn-endpoint.azureedge.net/webtracking/WebTracking/WebTracking.bundle.js",
+name: "MSCI",
+cfg: {
+ingestionKey: "f81dd32907e44cc2a98bb00802033e5b-d7b32ed1-7ea1-4fd0-a266-bdba6a210729-7434",
+endpointUrl: "https://mobile.events.data.microsoft.com/OneCollector/1.0/",
+autoCapture: {
+view: true,
+click: true
+},
+orgInfo: {
+orgId: "e5afc310-7838-4813-9fe2-291fdf3e99cc",
+orgTenantId: "02036d9e-e633-44bb-9d07-77f03d3bf44c",
+orgGeo: "EUR"
+}
+}
+});
+</script>
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>DMG MORI</title>
+<meta name="Keywords" content="DMG MORI,森精機,MORISEIKI,工作機械,5軸/複合加工機,旋盤,マシニングセンタ,超音波/レーザ加工機,ECOLINE,CELOS/ソフトウェア,自動化システム,プリセッタ">
+<meta name="Description" content="DMG MORIは、最高の技術とサービスを絶えず追及し、工作機械の新しい価値を、 そして無限の可能性を世界中のお客様へお届けしてまいります。お客様にとって一番の工作機械メーカーであること。それが私たちのグローバルワンです。">
+<meta property="og:title" content="DMG MORI">
+<meta property="og:description" content="DMG MORIは、最高の技術とサービスを絶えず追及し、工作機械の新しい価値を、 そして無限の可能性を世界中のお客様へお届けしてまいります。お客様にとって一番の工作機械メーカーであること。それが私たちのグローバルワンです。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DMG MORI">
+<meta property="og:url" content="https://www.dmgmori.co.jp/">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="robots" content="NOODP">
+<meta name="robots" content="NOYDIR">
+<link rel="home" href="/" title="DMG MORI" >
+<link rel="index" href="/sitemap/" title="DMG MORI サイトマップ" >
+<link rel="canonical" href="https://www.dmgmori.co.jp/">
+<link rel="alternate" media="handheld" href="https://www.dmgmori.co.jp/" >
+<link rel="alternate" hreflang="ja" href="https://www.dmgmori.co.jp/" />
+<link rel="alternate" hreflang="en" href="https://www.dmgmori.co.jp/en/" />
+<link rel="alternate" hreflang="th" href="https://www.dmgmori.co.jp/th/" />
+<link rel="alternate" hreflang="id" href="https://www.dmgmori.co.jp/id/" />
+<link rel="alternate" hreflang="tl" href="https://www.dmgmori.co.jp/tl/" />
+<link rel="alternate" hreflang="ko" href="https://www.dmgmori.co.jp/ko/" />
+<link rel="alternate" hreflang="zh-TW" href="https://www.dmgmori.co.jp/zh_tw/" />
+<link rel="alternate" hreflang="vi" href="https://www.dmgmori.co.jp/vi/" />
+<link rel="alternate" hreflang="x-default" href="https://www.dmgmori.co.jp/en/" />
+<link rel="alternate" type="application/rss+xml" title="DMG MORI" href="https://www.dmgmori.co.jp/RSS.rdf">
+<meta name="author" content="">
+<meta name="google-site-verification" content="tm1T3T14IWirBvBTYtZQ2h7qMwFzBiZKLVKr6ZFc0Dg" />
+<meta name="google-site-verification" content="bXjBYSgXyGDlvdpPPMHk-_04-nBqSo37SBlPP70uYP8" />
+<meta name="apple-mobile-web-app-title" content="DMG MORI">
+<link rel="apple-touch-icon" href="/files/user/img/common/touch_icon.png"/>
+<link rel="icon" href="/files/user/dms-jp-favicon.ico">
+<link rel="stylesheet" href="/files/user/css/reset.css" media="all">
+<link rel="stylesheet" href="/files/user/css/style.css" media="all">
+<link rel="stylesheet" href="/files/user/js/lib/css/slick.css" media="all">
+<link rel="stylesheet" href="/files/user/js/lib/css/style.css" media="all">
+<link rel="stylesheet" href="/files/user/css/top.css?20210409" media="all">
+<link rel="stylesheet" href="/files/user/js/lib/css/magnific-popup.css" media="all">
+<!--[if lte IE 9]><script> var flgIE9 = true; </script><![endif]-->
+<script src="/files/user/js/lib/jquery.min.js"></script>
+<script src="/files/user/js/lib/jquery-ui.min.js"></script>
+<script src="/files/user/js/lib/slidebars.v2.js"></script>
+<script src="/files/user/js/lib/glide.v2.mod.js"></script>
+<script src="/files/user/js/lib/jquery.magnific-popup.min.js"></script>
+<script src="/files/user/js/top_modal.js"></script>
+<script src="/files/user/js/lib/ajustheight.js"></script>
+<script src="/files/user/js/common.js"></script>
+<script src="/files/user/js/top.js"></script><script src="/files/user/js/spmenu.js"></script>
+<script src="/js/jqueryCookie/jquery.cookie.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+    // Build search form
+    $(".search-form").each(function(index) {
+        var searchForm = $("<form></form>", {
+            name: "SS_searchForm",
+            id: "SS_searchForm" + (index + 1),
+            action: "https://www.dmgmori.co.jp/search/",
+            method: "get",
+            enctype: "application/x-www-form-urlencoded"
+        });
+        searchForm.append($("<input />", {
+            type: "hidden",
+            name: "site",
+            value: "Q1T44A05"
+        }));
+        searchForm.append($("<input />", {
+            type: "hidden",
+            name: "charset",
+            value: "UTF-8"
+        }));
+        searchForm.append($("<input />", {
+            type: "hidden",
+            name: "group",
+            value: "3"
+        }));
+        searchForm.append($("<input />", {
+            type: "hidden",
+            name: "design",
+            value: "5"
+        }));
+        
+        if ($(this).attr("subcategory")) {
+            var subcategories = $(this).attr("subcategory").split(",");
+            for (var i in subcategories) {
+                var subcategoryInput = $("<input />", {
+                    type: "hidden",
+                    name: "subcategory",
+                    value: subcategories[i]
+                });
+                searchForm.append(subcategoryInput);
+            }
+        }
+        searchForm.append($("<span></span>", {
+            class: "input"
+        }).append($("<input />", {
+            type: "text",
+            id: "SS_searchQuery" + (index + 1),
+            name: "query",
+            value: "",
+            maxlength: "100",
+            placeholder: "製品名、気になるキーワード etc..."
+        })));
+        searchForm.append($("<button />", {
+            class: "btn-search",
+        }).text("検索"));
+        $(this).html(searchForm);
+    });
+    // End of Build search form
+});
+</script>
+
+
+
+
+<script type="text/javascript">
+        $(document).ready(function(){
+            var parameter = {
+                "year":             0,
+                "month":            0,
+                "templateedit_id":  165,
+                "lang":  'ja'
+            };
+            
+            $.ajax({
+                data:       parameter,
+                url:        '/direct/calendar/calendar/',
+                type:       'post',
+                success:    function (response) {
+                    if ( response.indexOf('class="calendar"') != -1) {
+                        $("#select-from-date").html(response);
+                    }
+                }
+            });
+        });
+    </script>
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NQ4KXP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<script>
+var dataLayer = dataLayer || [];
+dataLayer.push({
+  "module_type":"topics",
+  "main_module_id":"",
+  "page_sysnm":"top",
+        "lang":"ja"
+});
+</script>
+
+<div id="wrapper">
+<header id="header-201909">
+	<div class="header">
+		<div class="nav-sub">
+			<div class="meta-nav">
+				<div class="lang u-mt-2">
+					<a href="https://www.dmgmori.co.jp/countries/" class="en" style="margin-bottom: 1px;">Countries</a>
+					<a href="https://www.dmgmori.co.jp/en/" class="u-ml-10">English</a>
+				<!--/.lang--></div>
+				<ul class="nav">
+				    <li><a rel="noopener" href="https://www.technium.net/" target="_blank" class="ga-header-menu"><b class="em">my</b>&thinsp;<b class="u-fw-b">DMG MORI</b></a></li>
+					<li><a href="https://www.dmgmori.co.jp/support/" class="ga-header-menu">サポート</a></li>
+					<li><a href="https://www.dmgmori.co.jp/inquiry/" class="ga-header-menu">お問い合わせ</a></li>
+					<li><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/" target="_blank" class="ga-header-menu">企業・IR情報</a></li>
+					<li><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/sustainability/" target="_blank" class="ga-header-menu">サステナビリティ</a></li>
+					<li><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/recruit/" target="_blank" class="ga-header-menu">採用情報</a></li>
+					<li><a rel="noopener" href="https://www.technium.net/contact/" target="_blank" class="ga-header-menu">サービスリクエスト(24時間365日受付)</a></li>
+				<!--/.nav--></ul>
+				<ul class="util">
+                      <li class="login"><a href="https://www.dmgmori.co.jp/login/?Return_URL=/" class="ga-header-menu">ログイン</a></li>
+            <li class="regist"><a href="https://www.dmgmori.co.jp/member/" class="ga-header-menu">会員登録<br>メルマガ登録</a></li>
+          				<!--/.util--></ul>
+			<!--/.meta-nav--></div>
+		<!--/.nav-sub--></div>
+
+		<div class="nav-main">
+			<p class="logo"><a href="https://www.dmgmori.co.jp/"><img src="/files/user/img/common/logo.svg" alt="DMG MORI"></a></p>
+			<ul class="gNav">
+				<li><a href="#products" class="megamenu-trigger ga-header-menu" data-default="machine">製品情報</a></li>
+				<li><a href="#knowledge" class="megamenu-trigger ga-header-menu">加工ノウハウ/ナレッジ</a></li>
+				<li><a href="https://www.dmgmori.co.jp/topics/" class="ga-header-menu">製品トピックス</a></li>
+				<li><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library/" target="_blank" class="ga-header-menu">動画</a></li>
+				<li><a href="#download" class="megamenu-trigger ga-header-menu">ダウンロード</a></li>
+				<li><a href="#exhibition" class="megamenu-trigger ga-header-menu">オープンハウス</a></li>
+			<!--/.gNav--></ul>
+			<div class="nav-act">
+				<div class="menu-sp"><a class="btn-mega-menu-201909-humburger megamenu-trigger" href="#product_menu"><span></span></a></div>
+				<div class="search"><a class="btn-search megamenu-trigger" href="#search"></a ></div>
+			<!--/.nav-act--></div>
+		<!--/.nav-main--></div>
+	<!--/.header--></div>
+
+	<div class="mega-menu-201909">
+		<div class="cont-pc">
+
+			<div id="knowledge" class="mega-menu-inner">
+				<div class="nav-flyout">
+																																																																																																																																																																																																																																																																																																																																																																																																																															
+																											<div class="nav-flyout-col">
+							<ul class="list-links">
+														<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=5axis" data-img="/files/user/img/header/knowledge_5axis.jpg" data-name="5軸化/複合化" data-summary="5軸・複合加工に関する情報や資料を掲載しています。" class="ga-header-menu">5軸化/複合化</a></li>
+																																																																				<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=automation" data-img="/files/user/img/header/knowledge_automation.png" data-name="自動化" data-summary="自動化に関する情報や資料を掲載しています。" class="ga-header-menu">自動化</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=digitalization" data-img="/files/user/img/header/knowledge_digitalization.png" data-name="デジタル化" data-summary="デジタル化に関する情報や資料を掲載しています。" class="ga-header-menu">デジタル化</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=additive-manufacturing" data-img="/files/user/img/header/knowledge_additive.png" data-name="アディティブマニュファクチャリング" data-summary="金属積層造形に関する情報や資料を掲載しています。" class="ga-header-menu">アディティブマニュファクチャリング</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=technology" data-img="/files/user/img/header/knowledge_technology.png" data-name="最先端技術" data-summary="工作機械の最先端技術に関する情報や資料を掲載しています。" class="ga-header-menu">最先端技術</a></li>
+																													</ul>
+						</div>
+																																	<div class="nav-flyout-col">
+							<ul class="list-links">
+														<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=mt_solution" data-img="/files/user/img/header/knowledge_mt_solution.png" data-name="加工のコツ" data-summary="金属加工に役立つちょっとしたコツをご紹介" class="ga-header-menu">加工のコツ</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=wgm" data-img="/files/user/img/header/knowledge_wgm.png" data-name="世界の逸品" data-summary="世界中から厳選した逸品周辺機器をご紹介" class="ga-header-menu">世界の逸品</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=customer_case" data-img="/files/user/img/header/knowledge_customer_case.png" data-name="お客様事例" data-summary="先進的な取り組みをされているフロントランナー企業を映像と記事でご紹介" class="ga-header-menu">お客様事例</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=case" data-img="/files/user/img/header/knowledge_case.png" data-name="加工事例" data-summary="さまざまな業種の加工ワーク事例をご紹介" class="ga-header-menu">加工事例</a></li>
+																																																			<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/onlineseminar/" target="_blank" data-img="/files/user/img/header/knowledge_seminar.png" data-name="セミナー" data-summary="加工技術者育成をサポートする各種スクールや、お役立ちセミナーなどを開催しています。" class="ga-header-menu">セミナー</a></li>
+																													</ul>
+						</div>
+																																	<div class="nav-flyout-col">
+							<ul class="list-links">
+														<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper" data-img="/files/user/img/header/knowledge_white_paper.png" data-name="セミナー資料/論文/研究者紹介" data-summary="工作機械に関する各種資料や研究論文などを掲載しています。" class="ga-header-menu">セミナー資料/論文/研究者紹介</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper" data-img="/files/user/img/header/knowledge_MX_Whitepaper.jpg" data-name="MXガイドブック" data-summary="" class="ga-header-menu">MXガイドブック</a></li>
+																																																			<li class="toItem"><a rel="noopener" href="https://www.technium.net/process_advisor/" target="_blank" data-img="/files/user/img/header/process_advisor.png" data-name="工程設計アドバイザー" data-summary="100種類のワーク事例から加工の工程設計を5分程度の動画で学べるeラーニングサービス" class="ga-header-menu">工程設計アドバイザー</a></li>
+																													</ul>
+						</div>
+																																																																																																					<div class="nav-flyout-col item-view">
+						<div class="item-image">
+							<p><img src="/files/user/img/header/knowledge_5axis.jpg" alt="5軸化/複合化"></p>
+						</div>
+						<div>
+							<p class="item-name">5軸化/複合化</p>
+							<p class="item-summary">5軸・複合加工に関する情報や資料を掲載しています。</p>
+						</div>
+					<!--/.nav-flyout-col.item-view--></div>
+				<!--/.nav-flyout--></div>
+			<!--/#knowledge--></div>
+			<div id="products" class="mega-menu-inner accr">
+	<div class="accr-triggerlist">
+		<ul>
+			<li class="accr-trigger"><a href="#machine_automation"><span>工作機械/自動化システム</span></a></li>
+			<li class="accr-trigger"><a href="#solution"><span>ソリューション</span></a></li>
+			<li class="accr-trigger"><a href="#mro"><span>MRO</span></a></li>
+			<li class="accr-trigger"><a href="#dmqp"><span>DMQP</span></a></li>
+		</ul>
+	<!--/.accr-triggerlist--></div>
+
+	<div class="accr-cnt accr-cnt--inner-nav">
+
+		<div id="machine_automation">
+			<div class="accr-nav">
+				<p class="accr-nav-title">工作機械</p>
+				<ul class="accr-nav-list">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=59">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_02.jpg" alt="複合加工機">
+							</div>
+							<span>複合加工機</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=62">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_01.jpg" alt="5軸加工機">
+							</div>
+							<span>5軸加工機</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=113">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_03.jpg" alt="金属積層造形機(AM)">
+							</div>
+							<span>金属積層造形機(AM)</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=7">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_06.jpg" alt="ターニングセンタ">
+							</div>
+							<span>ターニングセンタ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=92">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_04.jpg" alt="横形マシニングセンタ">
+							</div>
+							<span>横形マシニングセンタ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=91">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_05.jpg" alt="立形マシニングセンタ">
+							</div>
+							<span>立形マシニングセンタ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=112">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_07.jpg" alt="超音波加工機">
+							</div>
+							<span>超音波加工機</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=111">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_08.jpg" alt="超精密レーザ加工機">
+							</div>
+							<span>超精密レーザ加工機</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=584">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_09.jpg" alt="横中ぐりマシニングセンタ">
+							</div>
+							<span>横中ぐりマシニングセンタ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=601">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_10.jpg" alt="グラインディングセンタ">
+							</div>
+							<span>グラインディングセンタ</span>
+						</a>
+					</li>
+					<li>
+						<a rel="noopener" href="https://www.dmgmori.co.jp/sp/usedmachines/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_11.jpg" alt="特選中古機">
+							</div>
+							<span>特選中古機</span>
+						</a>
+					</li>
+				</ul>
+				<p class="accr-nav-title">自動化システム</p>
+				<ul class="accr-nav-list accr-nav-list--large">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=131">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_12.jpg" alt="ワークハンドリング">
+							</div>
+							<span>ワークハンドリング</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=132">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_13.jpg" alt="パレットハンドリング">
+							</div>
+							<span>パレットハンドリング</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=133">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_14.jpg" alt="ツールハンドリング">
+							</div>
+							<span>ツールハンドリング</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		<div id="karte-contents-megamenu1"></div>
+
+			<div class="accr-nav accr-nav--grey accr-nav--bottom">
+				<p class="accr-nav-title">工作機械から探す</p>
+				<div class="accr-nav-search">
+					<a href="https://www.dmgmori.co.jp/products/list2/">
+						<img src="/files/user/img/header/icon_work.svg" alt="">
+						<p>
+							<span>ワーク例から探す</span>ワーク例から加工可能な機種を見つけよう。
+						</p>
+					</a>
+					<a href="https://www.dmgmori.co.jp/sp/workpiece_size/">
+						<img src="/files/user/img/header/icon_size.svg" alt="">
+						<p>
+							<span>サイズから探す</span>サイズから加工可能な機種を見つけよう。
+						</p>
+					</a>
+				</div>
+			</div>
+
+		<!--/#machine_automation--></div>
+
+		<div id="solution">
+			<div class="accr-nav">
+				<ul class="accr-nav-list">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=551">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_01.jpg" alt="計測">
+							</div>
+							<span>計測</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=552">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_02.jpg" alt="加工3悪(切りくず/クーラント/ミスト)">
+							</div>
+							<span>加工3悪(切りくず/クーラント/ミスト)</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/contents_type=265">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_03.jpg" alt="テクノロジーサイクル">
+							</div>
+							<span><span class="accr-nav-sub-txt">生産性向上のトータルソリューション<br></span>テクノロジーサイクル</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=127">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_04.jpg" alt="CELOS X">
+							</div>
+							<span>CELOS X</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/machine/?id=7291">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_06.jpg" alt="TULIP">
+							</div>
+							<span><span class="accr-nav-sub-txt">製造現場プラットフォーム<br></span>TULIP</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/machine/?id=6758">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_07.jpg" alt="DMG MORI GATEWAY">
+							</div>
+							<span><span class="accr-nav-sub-txt">工場内のネットワーク構築・接続<br></span>DMG MORI GATEWAY</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/machine/?id=6297">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_08.jpg" alt="CELOS DYNAMICpost">
+							</div>
+							<span><span class="accr-nav-sub-txt">CAMと機械をつなぐソフトウェア<br></span>CELOS DYNAMIC<i class="italic-text">post</i></span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=564">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_09.jpg" alt="Condition Agent">
+							</div>
+							<span><span class="accr-nav-sub-txt">故障の予兆を早期発見<br></span>Condition Agent</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=129">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_05.jpg" alt="ソフトウェア">
+							</div>
+							<span>ソフトウェア</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		<div id="karte-contents-megamenu1"></div>
+
+			<div class="accr-nav accr-nav--grey accr-nav--bottom">
+				<p class="accr-nav-title">工作機械から探す</p>
+				<div class="accr-nav-search">
+					<a href="https://www.dmgmori.co.jp/products/list2/">
+						<img src="/files/user/img/header/icon_work.svg" alt="">
+						<p>
+							<span>ワーク例から探す</span>ワーク例から加工可能な機種を見つけよう。
+						</p>
+					</a>
+					<a href="https://www.dmgmori.co.jp/sp/workpiece_size/">
+						<img src="/files/user/img/header/icon_size.svg" alt="">
+						<p>
+							<span>サイズから探す</span>サイズから加工可能な機種を見つけよう。
+						</p>
+					</a>
+				</div>
+			</div>
+
+		<!--/#solution--></div>
+
+		<div id="mro">
+			<div class="accr-nav">
+				<p class="accr-nav-title">メンテナンス / Maintenance</p>
+				<ul class="accr-nav-list">
+					<li>
+						<a rel="noopener" href="https://www.technium.net/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_01.jpg" alt="my DMG MORI">
+							</div>
+							<span><span class="accr-nav-sub-txt">会員制ポータルサイト<br></span><i class="italic-text">my</i> DMG MORI</span>
+						</a>
+					</li>
+					<li>
+						<a rel="noopener" href="https://www.technium.net/preventive_maintenance/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_03.jpg" alt="プリベンティブ メンテナンス">
+							</div>
+							<span><span class="accr-nav-sub-txt">予防保全サービス<br></span>プリベンティブ メンテナンス</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/list/?contents_type=564">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_02_09.jpg" alt="Condition Agent">
+							</div>
+							<span><span class="accr-nav-sub-txt">故障の予兆を早期発見<br></span>Condition Agent</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list-mt">
+					<li>
+						<a rel="noopener" href="https://www.technium.net/celosclub/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_02.jpg" alt="CELOS Club">
+							</div>
+							<span><span class="accr-nav-sub-txt">メンテナンスの課題を解決<br></span>CELOS Club</span>
+						</a>
+					</li>
+					<li>
+						<a rel="noopener" href="https://www.technium.net/celosclub/dmgmorimessenger/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_07.jpg" alt="DMG MORI Messenger">
+							</div>
+							<span><span class="accr-nav-sub-txt">機械の稼働状況データをモニタリング<br></span>DMG MORI Messenger</span>
+						</a>
+					</li>
+					<li>
+						<a rel="noopener" href="https://www.technium.net/celosclub/netservice/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_08.jpg" alt="NETSERVICE">
+							</div>
+							<span><span class="accr-nav-sub-txt">トラブル時の遠隔サポート<br></span>NETSERVICE</span>
+						</a>
+					</li>
+				</ul>
+				<p class="accr-nav-title">リペア / Repair</p>
+				<ul class="accr-nav-list">
+					<li>
+						<a rel="noopener" href="https://selectparts-stg.technium.net/parts/top/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_04.jpg" alt="スペアパーツ">
+							</div>
+							<span>スペアパーツ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/machine/id=8602">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_05.jpg" alt="主軸">
+							</div>
+							<span>主軸修理・交換</span>
+						</a>
+					</li>
+				</ul>
+				<p class="accr-nav-title">オーバーホール / Overhaul</p>
+				<ul class="accr-nav-list">
+					<li>
+						<a rel="noopener" href="https://www.dmgmori.co.jp/sp/usedmachines/" target="_blank">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_01_11.jpg" alt="特選中古機">
+							</div>
+							<span>特選中古機</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/circular-economy/">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_03_06.jpg" alt="サーキュラエコノミー">
+							</div>
+							<span><span class="accr-nav-sub-txt">工作機械のリサイクル<br></span>サーキュラエコノミー</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		<div id="karte-contents-megamenu1"></div>
+
+			<div class="accr-nav accr-nav--grey accr-nav--bottom">
+				<p class="accr-nav-title">工作機械から探す</p>
+				<div class="accr-nav-search">
+					<a href="https://www.dmgmori.co.jp/products/list2/">
+						<img src="/files/user/img/header/icon_work.svg" alt="">
+						<p>
+							<span>ワーク例から探す</span>ワーク例から加工可能な機種を見つけよう。
+						</p>
+					</a>
+					<a href="https://www.dmgmori.co.jp/sp/workpiece_size/">
+						<img src="/files/user/img/header/icon_size.svg" alt="">
+						<p>
+							<span>サイズから探す</span>サイズから加工可能な機種を見つけよう。
+						</p>
+					</a>
+				</div>
+			</div>
+
+		<!--/#mro--></div>
+
+		<div id="dmqp">
+			<div class="accr-nav">
+				<ul class="accr-nav-list accr-nav-list--small">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=325">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_01.jpg" alt="切削工具">
+							</div>
+							<span>切削工具</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=544">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_02.jpg" alt="ホルダ・バイト">
+							</div>
+							<span>ホルダ・バイト</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=549">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_03.jpg" alt="治具・バイス">
+							</div>
+							<span>治具・バイス</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=540">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_04.jpg" alt="チャック・振れ止め">
+							</div>
+							<span>チャック・振れ止め</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list--small accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=537">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_11.jpg" alt="クーラント・油脂">
+							</div>
+							<span>クーラント・油脂</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=362">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_06.jpg" alt="工具段取り装置">
+							</div>
+							<span>工具段取り装置</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=361">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_07.jpg" alt="ツールプリセッタ">
+							</div>
+							<span>ツールプリセッタ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/detail/?id=3840">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_08.jpg" alt="バランス測定装置">
+							</div>
+							<span>バランス測定装置</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list--small accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=319">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_09.jpg" alt="機内計測関連">
+							</div>
+							<span>機内計測関連</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=319">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_10.jpg" alt="計測機器">
+							</div>
+							<span>計測機器</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=326">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_12.jpg" alt="クーラント関連装置">
+							</div>
+							<span>クーラント関連装置</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=15">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_13.jpg" alt="CAD/CAM">
+							</div>
+							<span>CAD/CAM</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list--small accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=329">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_14.jpg" alt="バーフィーダ">
+							</div>
+							<span>バーフィーダ</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=324">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_16.jpg" alt="エア関連機器">
+							</div>
+							<span>エア関連機器</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=546">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_15.jpg" alt="3Dプリンタ（樹脂）">
+							</div>
+							<span>3Dプリンタ（樹脂）</span>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=545">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_05.jpg" alt="工具ストッカ">
+							</div>
+							<span>工具ストッカ</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="accr-nav-list accr-nav-list--small accr-nav-list-mt">
+					<li>
+						<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=323">
+							<div class="accr-nav-img-wrap">
+								<img src="/files/user/img/header/nav_img_04_17.jpg" alt="その他">
+							</div>
+							<span>その他</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		<!--/#dmqp--></div>
+
+	<!--/.accr-cnt--></div>
+<!--/#knowledge.accr--></div>
+
+			<div id="download" class="mega-menu-inner">
+				<div class="nav-flyout">
+																																																																																																																																																																																																																																																																																																										
+																																																																																																																																																													<div class="nav-flyout-col">
+							<ul class="list-links">
+														<li class="toItem"><a href="https://www.dmgmori.co.jp/download/catalog/" data-img="/files/user/img/header/download_catalogs.png" data-name="製品カタログ/パンフレット" data-summary="最新の製品カタログやパンフレットをダウンロードいただけます。" class="ga-header-menu">製品カタログ/パンフレット</a></li>
+																																																																				<li class="toItem"><a href="https://www.dmgmori.co.jp/download/catalog/?contents_type=416" data-img="/files/user/img/header/download_magazines.png" data-name="DMG MORIマガジン" data-summary="DMG MORIが発行する刊行物をご覧いただけます。" class="ga-header-menu">DMG MORIマガジン</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=9" data-img="/files/user/img/header/download_seminar.png" data-name="セミナー資料" data-summary="展示会やセミナーで発表した資料を掲載しています。" class="ga-header-menu">セミナー資料</a></li>
+																																																			<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=5" data-img="/files/user/img/header/download_dissertations.png" data-name="論文" data-summary="研究論文や雑誌で紹介された記事などを掲載しています。" class="ga-header-menu">論文</a></li>
+																													</ul>
+						</div>
+																																																													<div class="nav-flyout-col item-view">
+						<div class="item-image">
+							<p><img src="/files/user/img/header/download_catalogs.png" alt="製品カタログ/パンフレット"></p>
+						</div>
+						<div>
+							<p class="item-name">製品カタログ/パンフレット</p>
+							<p class="item-summary">最新の製品カタログやパンフレットをダウンロードいただけます。</p>
+						</div>
+					<!--/.nav-flyout-col.item-view--></div>
+				<!--/.nav-flyout--></div>
+			<!--/#download--></div>
+
+			<div id="exhibition" class="mega-menu-inner">
+				<div class="nav-flyout">
+																																																																																																																																																																																																																																																																																																										
+																																																																																																																																																																																																					<div class="nav-flyout-col">
+							<ul class="list-links">
+														<li class="toItem"><a href="https://www.dmgmori.co.jp/event/list/" data-img="/files/user/img/header/exhibitions.png" data-name="オープンハウス" data-summary="当社が出展予定の展示会をご覧いただけます。" class="ga-header-menu">オープンハウス</a></li>
+																																																																				<li class="toItem"><a href="https://www.dmgmori.co.jp/showroom/" data-img="/files/user/img/header/showroom.png" data-name="ソリューションセンタ" data-summary="東京、伊賀（三重）のショールームをご紹介" class="ga-header-menu">ソリューションセンタ</a></li>
+																																																			<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/dtsr_top/" target="_blank" data-img="/files/user/img/header/dtsr.png" data-name="デジタルツインショールーム" data-summary="360°パノラマビューにより、実際にショールームを歩いているような臨場感をご体験いただけます。" class="ga-header-menu">デジタルツインショールーム</a></li>
+																																																			<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/techfri/techfri2020/" target="_blank" data-img="/files/user/img/header/techfri.png" data-name="DMG MORI テクノロジーフライデイ" data-summary="伊賀事業所、東京グローバルヘッドクォータの2拠点で金曜日に「DMG MORI テクノロジーフライデイ」を開催します。" class="ga-header-menu">DMG MORI テクノロジーフライデイ</a></li>
+																													</ul>
+						</div>
+																					<div class="nav-flyout-col item-view">
+						<div class="item-image">
+							<p><img src="/files/user/img/header/exhibitions.png" alt="オープンハウス"></p>
+						</div>
+						<div>
+							<p class="item-name">オープンハウス</p>
+							<p class="item-summary">当社が出展予定の展示会をご覧いただけます。</p>
+						</div>
+					<!--/.nav-flyout-col.item-view--></div>
+				<!--/.nav-flyout--></div>
+			<!--/#exhibition--></div>
+
+			<div id="search" class="mega-menu-inner">
+				<div class="search-form-wrapper">
+					<div class="search-form">&nbsp;</div>
+
+                      <dl class="hotkeyword">
+              <dt>ホットキーワード：</dt>
+              <dd>
+                <ul class="list-h">
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%9E%E3%82%B7%E3%83%8B%E3%83%B3%E3%82%B0%E3%83%BB%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B9%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3" class="ga-header-menu">マシニング・トランスフォーメーション</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=5%E8%BB%B8" class="ga-header-menu">5軸</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E8%87%AA%E5%8B%95%E5%8C%96" class="ga-header-menu">自動化</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E5%B7%A5%E7%A8%8B%E9%9B%86%E7%B4%84" class="ga-header-menu">工程集約</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%82%B5%E3%82%B9%E3%83%86%E3%83%8A%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3" class="ga-header-menu">サステナビリティ</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=DX" class="ga-header-menu">DX</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=GX" class="ga-header-menu">GX</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%A9%E3%83%B3%E3%83%8A%E3%83%BC" class="ga-header-menu">フロントランナー</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%86%E3%82%AF%E3%83%8E%E3%83%AD%E3%82%B8%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB" class="ga-header-menu">テクノロジーサイクル</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%82%A2%E3%83%87%E3%82%A3%E3%83%86%E3%82%A3%E3%83%96%E3%83%9E%E3%83%8B%E3%83%A5%E3%83%95%E3%82%A1%E3%82%AF%E3%83%81%E3%83%A3%E3%83%AA%E3%83%B3%E3%82%B0" class="ga-header-menu">アディティブマニュファクチャリング</a></li>
+                                </ul>
+              </dd>
+            </dl>
+          				<!-- /.search-form-wrapper --></div>			
+			<!--/#search--></div>
+		<!--/.cont-pc--></div>
+
+		<div class="cont-sp">
+			<div id="product_menu_sp">
+				<div class="mobile-nav-level level-1">
+
+					<div class="mobile-nav-level-item">
+						<ul class="list-links gNav-sp">
+							<li><a href="#" data-target="list_0002" class="ga-header-menu">製品情報</a></li>
+							<li><a href="#" data-target="list_0001" class="ga-header-menu">加工ノウハウ/ナレッジ</a></li>
+							<li class="toItem"><a href="https://www.dmgmori.co.jp/topics/" class="ga-header-menu">製品トピックス</a></li>
+							<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library/" target="_blank" class="ga-header-menu">動画</a></li>
+							<li><a href="#" data-target="list_0003" class="ga-header-menu">ダウンロード</a></li>
+							<li><a href="#" data-target="list_0004" class="ga-header-menu">オープンハウス</a></li>
+						<!--/.gNav--></ul>
+						<div class="nav-sub">
+							<ul class="list-links nav-sp">
+								<li class="toItem"><a href="https://www.dmgmori.co.jp/countries/" class="ico-lang ga-header-menu">Countries</a></li>
+								<li class="toItem"><a href="https://www.dmgmori.co.jp/en/" class="ga-header-menu">English</a></li>
+							  <li class="toItem"><a rel="noopener" href="https://www.technium.net/" target="_blank" class="ga-header-menu"><b class="em">my</b>&thinsp;<b class="u-fw-b">DMG MORI</b></a></li>
+								<li class="toItem"><a href="https://www.dmgmori.co.jp/support/" class="ga-header-menu">サポート</a></li>
+								<li class="toItem"><a href="https://www.dmgmori.co.jp/inquiry/" class="ga-header-menu">お問い合わせ</a></li>
+								<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/" target="_blank" class="ga-header-menu">企業・IR情報</a></li>
+								<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/sustainability/" target="_blank" class="ga-header-menu">サステナビリティ</a></li>
+								<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/recruit/" target="_blank" class="ga-header-menu">採用情報</a></li>
+							</ul>
+							<ul class="list-links util-sp">
+								<li class="toItem"><a rel="noopener" href="https://www.technium.net/contact/" target="_blank" class="ga-header-menu">サービスリクエスト(24時間365日受付)</a></li>
+                                  <li class="toItem"><a href="https://www.dmgmori.co.jp/login/?Return_URL=/" class="ico-login ga-header-menu">ログイン</a></li>
+                  <li class="toItem"><a href="https://www.dmgmori.co.jp/member/" class="ico-user ga-header-menu">会員登録/メルマガ登録</a></li>
+                							</ul>
+						<!--/.nav-sub--></div>
+					<!--/.mobile-nav-level-item--></div>
+
+					<div class="mobile-nav-level-item">
+						<div class="list_0001">
+							<p class="goBack">
+								<a href="#">加工ノウハウ/ナレッジ</a>
+							</p>
+							<ul class="list-links">
+																								<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=5axis" class="ga-header-menu">5軸化/複合化</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=automation" class="ga-header-menu">自動化</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=digitalization" class="ga-header-menu">デジタル化</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=additive-manufacturing" class="ga-header-menu">アディティブマニュファクチャリング</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=technology" class="ga-header-menu">最先端技術</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=mt_solution" class="ga-header-menu">加工のコツ</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=wgm" class="ga-header-menu">世界の逸品</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=customer_case" class="ga-header-menu">お客様事例</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=case" class="ga-header-menu">加工事例</a></li>
+																																<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/onlineseminar/" target="_blank" class="ga-header-menu">セミナー</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper" class="ga-header-menu">セミナー資料/論文/研究者紹介</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper" class="ga-header-menu">MXガイドブック</a></li>
+																																<li class="toItem"><a rel="noopener" href="https://www.technium.net/process_advisor/" target="_blank" class="ga-header-menu">工程設計アドバイザー</a></li>
+																																																																																																																																														</ul>
+						</div>
+
+						<div class="list_0002">
+							<p class="goBack">
+								<a href="#">製品情報</a>
+							</p>
+							<ul class="list-links">
+								<li><a href="#" data-target="list_0005">工作機械/自動化システム</a></li>
+								<li><a href="#" data-target="list_0006">ソリューション</a></li>
+								<li><a href="#" data-target="list_0007">MRO</a></li>
+								<li><a href="#" data-target="list_0008">DMQP</a></li>
+							</ul>
+						</div>
+
+						<div class="list_0003">
+							<p class="goBack">
+								<a href="#">ダウンロード</a>
+							</p>
+							<ul class="list-links">
+																																																																																																																																																																																																																											<li class="toItem"><a href="https://www.dmgmori.co.jp/download/catalog/" class="ga-header-menu">製品カタログ/パンフレット</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/download/catalog/?contents_type=416" class="ga-header-menu">DMG MORIマガジン</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=9" class="ga-header-menu">セミナー資料</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=5" class="ga-header-menu">論文</a></li>
+																																																																																		</ul>
+						</div>
+
+						<div class="list_0004">
+							<p class="goBack">
+								<a href="#">オープンハウス</a>
+							</p>
+							<ul class="list-links">
+																																																																																																																																																																																																																																																																																							<li class="toItem"><a href="https://www.dmgmori.co.jp/event/list/" class="ga-header-menu">オープンハウス</a></li>
+																																<li class="toItem"><a href="https://www.dmgmori.co.jp/showroom/" class="ga-header-menu">ソリューションセンタ</a></li>
+																																<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/dtsr_top/" target="_blank" class="ga-header-menu">デジタルツインショールーム</a></li>
+																																<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/techfri/techfri2020/" target="_blank" class="ga-header-menu">DMG MORI テクノロジーフライデイ</a></li>
+																						</ul>
+						</div>
+					<!--/.mobile-nav-level-item--></div>
+				
+				<!--parent_category-->
+				<div class="mobile-nav-level-item">
+					<div class="list_0005">
+	<p class="goBack">
+		<a href="#">工作機械/自動化システム</a>
+	</p>
+	<div class="mobile-menu">
+		<p class="mobile-menu-title">工作機械</p>
+		<ul class="mobile-menu-list">
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=59">
+					<img src="/files/user/img/header/nav_img_01_02.jpg" alt="複合加工機">
+					<span>複合加工機</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=62">
+					<img src="/files/user/img/header/nav_img_01_01.jpg" alt="5軸加工機">
+					<span>5軸加工機</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=113">
+					<img src="/files/user/img/header/nav_img_01_03.jpg" alt="金属積層造形機(AM)">
+					<span>金属積層造形機(AM)</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=7">
+					<img src="/files/user/img/header/nav_img_01_06.jpg" alt="ターニングセンタ">
+					<span>ターニングセンタ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=92">
+					<img src="/files/user/img/header/nav_img_01_04.jpg" alt="横形マシニングセンタ">
+					<span>横形マシニングセンタ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=91">
+					<img src="/files/user/img/header/nav_img_01_05.jpg" alt="立形マシニングセンタ">
+					<span>立形マシニングセンタ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=112">
+					<img src="/files/user/img/header/nav_img_01_07.jpg" alt="超音波加工機">
+					<span>超音波加工機</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=111">
+					<img src="/files/user/img/header/nav_img_01_08.jpg" alt="超精密レーザ加工機">
+					<span>超精密レーザ加工機</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=584">
+					<img src="/files/user/img/header/nav_img_01_09.jpg" alt="横中ぐりマシニングセンタ">
+					<span>横中ぐりマシニングセンタ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=601">
+					<img src="/files/user/img/header/nav_img_01_10.jpg" alt="グラインディングセンタ">
+					<span>グラインディングセンタ</span>
+				</a>
+			</li>
+			<li>
+				<a rel="noopener" href="https://www.dmgmori.co.jp/sp/usedmachines/" target="_blank">
+					<img src="/files/user/img/header/nav_img_01_11.jpg" alt="特選中古機">
+					<span>特選中古機</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="mobile-menu">
+		<p class="mobile-menu-title">自動化システム</p>
+		<ul class="mobile-menu-list">
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=131">
+					<img src="/files/user/img/header/nav_img_01_12.jpg" alt="ワークハンドリング">
+					<span>ワークハンドリング</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=132">
+					<img src="/files/user/img/header/nav_img_01_13.jpg" alt="パレットハンドリング">
+					<span>パレットハンドリング</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=133">
+					<img src="/files/user/img/header/nav_img_01_14.jpg" alt="ツールハンドリング">
+					<span>ツールハンドリング</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="list_0006">
+	<p class="goBack">
+		<a href="#">ソリューション</a>
+	</p>
+	<div class="mobile-menu">
+		<ul class="mobile-menu-list">
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=551">
+					<img src="/files/user/img/header/nav_img_02_01.jpg" alt="計測">
+					<span>計測</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=552">
+					<img src="/files/user/img/header/nav_img_02_02.jpg" alt="加工3悪(切りくず/クーラント/ミスト)">
+					<span>加工3悪(切りくず/クーラント/ミスト)</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/contents_type=265">
+					<img src="/files/user/img/header/nav_img_02_03.jpg" alt="テクノロジーサイクル">
+					<span><span class="mobile-menu-sub-txt">生産性向上のトータルソリューション<br></span>テクノロジーサイクル</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=127">
+					<img src="/files/user/img/header/nav_img_02_04.jpg" alt="CELOS X">
+					<span>CELOS X</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/machine/?id=7291">
+					<img src="/files/user/img/header/nav_img_02_06.jpg" alt="TULIP">
+					<span><span class="mobile-menu-sub-txt">製造現場プラットフォーム<br></span>TULIP</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/machine/?id=6758">
+					<img src="/files/user/img/header/nav_img_02_07.jpg" alt="DMG MORI GATEWAY">
+					<span><span class="mobile-menu-sub-txt">工場内のネットワーク構築・接続<br></span>DMG MORI GATEWAY</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/machine/?id=6297">
+					<img src="/files/user/img/header/nav_img_02_08.jpg" alt="CELOS DYNAMICpost">
+					<span><span class="mobile-menu-sub-txt">CAMと機械をつなぐソフトウェア<br></span>CELOS DYNAMIC<i class="italic-text">post</i></span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=564">
+					<img src="/files/user/img/header/nav_img_02_09.jpg" alt="Condition Agent">
+					<span><span class="mobile-menu-sub-txt">故障の予兆を早期発見<br></span>Condition Agent</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=129">
+					<img src="/files/user/img/header/nav_img_02_05.jpg" alt="ソフトウェア">
+					<span>ソフトウェア</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="list_0007">
+	<p class="goBack"> <a href="#">MRO</a> </p>
+	<div class="mobile-menu">
+		<p class="mobile-menu-title">メンテナンス / Maintenance</p>
+		<ul class="mobile-menu-list">
+			<li>
+				<a rel="noopener" href="https://www.technium.net/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_01.jpg" alt="my DMG MORI">
+					<span><span class="mobile-menu-sub-txt">会員制ポータルサイト<br></span><i class="italic-text">my</i> DMG MORI</span>
+				</a>
+			</li>
+			<li>
+				<a rel="noopener" href="https://www.technium.net/preventive_maintenance/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_03.jpg" alt="プリベンティブ メンテナンス">
+					<span><span class="mobile-menu-sub-txt">予防保全サービス<br></span>プリベンティブ メンテナンス</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/list/?contents_type=564">
+					<img src="/files/user/img/header/nav_img_02_09.jpg" alt="Condition Agent">
+					<span><span class="mobile-menu-sub-txt">故障の予兆を早期発見<br></span>Condition Agent</span>
+				</a>
+			</li>
+			<li>
+				<a rel="noopener" href="https://www.technium.net/celosclub/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_02.jpg" alt="CELOS Club">
+					<span><span class="mobile-menu-sub-txt">メンテナンスの課題を解決<br></span>CELOS Club</span>
+				</a>
+			</li>
+			<li>
+				<a rel="noopener" href="https://www.technium.net/celosclub/dmgmorimessenger/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_07.jpg" alt="DMG MORI Messenger">
+					<span><span class="mobile-menu-sub-txt">機械の稼働状況データをモニタリング<br></span>DMG MORI Messenger</span>
+				</a>
+			</li>
+			<li>
+				<a rel="noopener" href="https://www.technium.net/celosclub/netservice/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_08.jpg" alt="NETSERVICE">
+					<span><span class="mobile-menu-sub-txt">トラブル時の遠隔サポート<br></span>NETSERVICE</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="mobile-menu">
+		<p class="mobile-menu-title">リペア / Repair</p>
+		<ul class="mobile-menu-list">
+			<li>
+				<a rel="noopener" href="https://selectparts-stg.technium.net/parts/top/" target="_blank">
+					<img src="/files/user/img/header/nav_img_03_04.jpg" alt="スペアパーツ">
+					<span>スペアパーツ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/machine/id=8602">
+					<img src="/files/user/img/header/nav_img_03_05.jpg" alt="主軸修理・交換">
+					<span>主軸修理・交換</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="mobile-menu">
+		<p class="mobile-menu-title">オーバーホール / Overhaul</p>
+		<ul class="mobile-menu-list">
+			<li>
+				<a rel="noopener" href="https://www.dmgmori.co.jp/sp/usedmachines/" target="_blank">
+					<img src="/files/user/img/header/nav_img_01_11.jpg" alt="特選中古機">
+					<span>特選中古機</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/circular-economy/">
+					<img src="/files/user/img/header/nav_img_03_06.jpg" alt="サーキュラエコノミー">
+					<span>サーキュラエコノミー</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="list_0008">
+	<p class="goBack"> <a href="#">DMQP</a> </p>
+	<div class="mobile-menu">
+		<ul class="mobile-menu-list">
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=325">
+					<img src="/files/user/img/header/nav_img_04_01.jpg" alt="切削工具">
+					<span>切削工具</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=544">
+					<img src="/files/user/img/header/nav_img_04_02.jpg" alt="ホルダ・バイト">
+					<span>ホルダ・バイト</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=549">
+					<img src="/files/user/img/header/nav_img_04_03.jpg" alt="治具・バイス">
+					<span>治具・バイス</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=540">
+					<img src="/files/user/img/header/nav_img_04_04.jpg" alt="チャック・振れ止め">
+					<span>チャック・振れ止め</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=537">
+					<img src="/files/user/img/header/nav_img_04_11.jpg" alt="クーラント・油脂">
+					<span>クーラント・油脂</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=362">
+					<img src="/files/user/img/header/nav_img_04_06.jpg" alt="工具段取り装置">
+					<span>工具段取り装置</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=361">
+					<img src="/files/user/img/header/nav_img_04_07.jpg" alt="ツールプリセッタ">
+					<span>ツールプリセッタ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/detail/?id=3840">
+					<img src="/files/user/img/header/nav_img_04_08.jpg" alt="バランス測定装置">
+					<span>バランス測定装置</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=319">
+					<img src="/files/user/img/header/nav_img_04_09.jpg" alt="機内計測関連">
+					<span>機内計測関連</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=319">
+					<img src="/files/user/img/header/nav_img_04_10.jpg" alt="計測機器">
+					<span>計測機器</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=326">
+					<img src="/files/user/img/header/nav_img_04_12.jpg" alt="クーラント関連装置">
+					<span>クーラント関連装置</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=15">
+					<img src="/files/user/img/header/nav_img_04_13.jpg" alt="CAD/CAM">
+					<span>CAD/CAM</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/?contents_type=329">
+					<img src="/files/user/img/header/nav_img_04_14.jpg" alt="バーフィーダ">
+					<span>バーフィーダ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=324">
+					<img src="/files/user/img/header/nav_img_04_16.jpg" alt="エア関連機器">
+					<span>エア関連機器</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=546">
+					<img src="/files/user/img/header/nav_img_04_15.jpg" alt="3Dプリンタ（樹脂）">
+					<span>3Dプリンタ（樹脂）</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=545">
+					<img src="/files/user/img/header/nav_img_04_05.jpg" alt="工具ストッカ">
+					<span>工具ストッカ</span>
+				</a>
+			</li>
+			<li>
+				<a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=323">
+					<img src="/files/user/img/header/nav_img_04_17.jpg" alt="その他">
+					<span>その他</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+					<div class="list_0009">
+						<p class="goBack">
+							<a href="#">業種別ソリューション</a>
+						</p>
+						<ul class="list-links">
+						    <li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/automotive/" target="_blank" class="ga-header-menu">自動車部品加工ソリューション</a></li>
+							<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/diemold/" target="_blank" class="ga-header-menu">金型ソリューション</a></li>
+						</ul>
+					</div>
+					<div class="list_0010">
+						<p class="goBack">
+							<a href="#">マシニング・トランスフォーメーション</a>
+						</p>
+						<ul class="list-links">
+						    <li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/mx/" target="_blank" class="ga-header-menu">マシニング・トランスフォーメーション</a></li>
+							<li class="toItem"><a rel="noopener" href="https://www.dmgmori.co.jp/sp/mxmap/" target="_blank" class="ga-header-menu">マシニング・トランスフォーメーションマップ</a></li>
+						</ul>
+					</div>
+				<!--/.mobile-nav-level-item--></div>
+
+				<!--child_category-->
+				<div class="mobile-nav-level-item">
+											<div class="list_18">
+							<p class="goBack">
+								<a href="#">5軸/複合加工機</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=18" class="ga-header-menu">5軸/複合加工機TOP</a></li>
+																
+																											<li><a href="#" data-target="list_62" class="ga-header-menu">5軸加工機</a></li>
+																																				<li><a href="#" data-target="list_59" class="ga-header-menu">複合加工機</a></li>
+																																				<li><a href="#" data-target="list_58" class="ga-header-menu">4軸複合加工機</a></li>
+																								</ul>
+						</div>
+											<div class="list_7">
+							<p class="goBack">
+								<a href="#">ターニングセンタ</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=7" class="ga-header-menu">ターニングセンタTOP</a></li>
+																
+																											<li><a href="#" data-target="list_37" class="ga-header-menu">ターニングセンタ</a></li>
+																																				<li><a href="#" data-target="list_39" class="ga-header-menu">並行2スピンドルターニングセンタ</a></li>
+																																				<li><a href="#" data-target="list_33" class="ga-header-menu">自動ターニングセンタ</a></li>
+																																				<li><a href="#" data-target="list_40" class="ga-header-menu">WASINO</a></li>
+																								</ul>
+						</div>
+											<div class="list_27">
+							<p class="goBack">
+								<a href="#">マシニングセンタ</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=27" class="ga-header-menu">マシニングセンタTOP</a></li>
+																
+																											<li><a href="#" data-target="list_91" class="ga-header-menu">立形マシニングセンタ</a></li>
+																																				<li><a href="#" data-target="list_92" class="ga-header-menu">横形マシニングセンタ</a></li>
+																																				<li><a href="#" data-target="list_584" class="ga-header-menu">横中ぐりマシニングセンタ</a></li>
+																								</ul>
+						</div>
+											<div class="list_29">
+							<p class="goBack">
+								<a href="#">超音波/レーザ加工機</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=29" class="ga-header-menu">超音波/レーザ加工機TOP</a></li>
+																
+																											<li><a href="#" data-target="list_113" class="ga-header-menu">アディティブマニュファクチャリング(3Dプリンタ)</a></li>
+																																				<li><a href="#" data-target="list_112" class="ga-header-menu">超音波加工機</a></li>
+																																				<li><a href="#" data-target="list_111" class="ga-header-menu">超精密レーザ加工機</a></li>
+																								</ul>
+						</div>
+											<div class="list_601">
+							<p class="goBack">
+								<a href="#">グラインディングセンタ</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=601" class="ga-header-menu">グラインディングセンタTOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=602" class="ga-header-menu">立形複合グラインディングセンタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=603" class="ga-header-menu">小型立形グラインディングセンタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=604" class="ga-header-menu">深穴専用グラインディングセンタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=605" class="ga-header-menu">内面グラインディングセンタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=606" class="ga-header-menu">ねじグラインディングセンタ</a></li>
+																																		</ul>
+						</div>
+											<div class="list_322">
+							<p class="goBack">
+								<a href="#">加工関連</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=322" class="ga-header-menu">加工関連TOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=549" class="ga-header-menu">治具・バイス</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=540" class="ga-header-menu">チャック・振れ止め</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=537" class="ga-header-menu">クーラント・油脂</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=325" class="ga-header-menu">切削工具</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=326" class="ga-header-menu">クーラント関連装置</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=324" class="ga-header-menu">エア関連機器</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=365" class="ga-header-menu">クーラントノズル</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=158" class="ga-header-menu">ミストコレクタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=362" class="ga-header-menu">工具段取り装置</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=545" class="ga-header-menu">工具ストッカ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=544" class="ga-header-menu">ホルダ・バイト</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=546" class="ga-header-menu">3Dプリンタ（樹脂）</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=323" class="ga-header-menu">その他</a></li>
+																																		</ul>
+						</div>
+											<div class="list_327">
+							<p class="goBack">
+								<a href="#">計測関連</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=327" class="ga-header-menu">計測関連TOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=361" class="ga-header-menu">ツールプリセッタ</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=363" class="ga-header-menu">バランス測定装置</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=319" class="ga-header-menu">機内計測関連</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=624" class="ga-header-menu">計測機器</a></li>
+																																		</ul>
+						</div>
+											<div class="list_328">
+							<p class="goBack">
+								<a href="#">搬送関連</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=328" class="ga-header-menu">搬送関連TOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=329" class="ga-header-menu">バーフィーダ</a></li>
+																																		</ul>
+						</div>
+											<div class="list_15">
+							<p class="goBack">
+								<a href="#">CAD/CAM</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=15" class="ga-header-menu">CAD/CAMTOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/dmqp/contents_type=161" class="ga-header-menu">CAMソフトウエア</a></li>
+																																		</ul>
+						</div>
+											<div class="list_265">
+							<p class="goBack">
+								<a href="#">テクノロジーサイクル</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=265" class="ga-header-menu">テクノロジーサイクルTOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=273" class="ga-header-menu">ハンドリングサイクル</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=274" class="ga-header-menu">切削サイクル</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=275" class="ga-header-menu">モニタリングサイクル</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=276" class="ga-header-menu">計測サイクル</a></li>
+																																		</ul>
+						</div>
+											<div class="list_31">
+							<p class="goBack">
+								<a href="#">CELOS / ソフトウェア</a>
+							</p>
+							<ul class="list-links">
+																	<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=31" class="ga-header-menu">CELOS / ソフトウェアTOP</a></li>
+																
+																																						<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=127" class="ga-header-menu">CELOS</a></li>
+																																																									<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=129" class="ga-header-menu">ソフトウェア / デジタル製品</a></li>
+																																		</ul>
+						</div>
+									<!--/.mobile-nav-level-item--></div>
+
+				<!--grandChild_category-->
+				<div class="mobile-nav-level-item">
+											<div class="list_62">
+							<p class="goBack">
+								<a href="#">5軸加工機</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=62" class="ga-header-menu">5軸加工機TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=558" class="ga-header-menu">INH</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=536" class="ga-header-menu">CMX U</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=75" class="ga-header-menu">DMU</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=76" class="ga-header-menu">DMU eVo</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=589" class="ga-header-menu">monoBLOCK</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=590" class="ga-header-menu">H monoBLOCK</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=591" class="ga-header-menu">duoBLOCK</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=81" class="ga-header-menu">NMV</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=88" class="ga-header-menu">HSC</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=89" class="ga-header-menu">DMF</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=592" class="ga-header-menu">Gantry</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=593" class="ga-header-menu">Portal</a></li>
+															</ul>
+						</div>
+											<div class="list_59">
+							<p class="goBack">
+								<a href="#">複合加工機</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=59" class="ga-header-menu">複合加工機TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=559" class="ga-header-menu">NZ Platform</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=72" class="ga-header-menu">NTX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=71" class="ga-header-menu">NT</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=70" class="ga-header-menu">CTX TC</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=547" class="ga-header-menu">CLX TC</a></li>
+															</ul>
+						</div>
+											<div class="list_58">
+							<p class="goBack">
+								<a href="#">4軸複合加工機</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=58" class="ga-header-menu">4軸複合加工機TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=68" class="ga-header-menu">NZX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=69" class="ga-header-menu">NZX-S</a></li>
+															</ul>
+						</div>
+											<div class="list_37">
+							<p class="goBack">
+								<a href="#">ターニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=37" class="ga-header-menu">ターニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=312" class="ga-header-menu">ALX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=49" class="ga-header-menu">NLX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=50" class="ga-header-menu">SL</a></li>
+															</ul>
+						</div>
+											<div class="list_39">
+							<p class="goBack">
+								<a href="#">並行2スピンドルターニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=39" class="ga-header-menu">並行2スピンドルターニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=52" class="ga-header-menu">NRX</a></li>
+															</ul>
+						</div>
+											<div class="list_33">
+							<p class="goBack">
+								<a href="#">自動ターニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=33" class="ga-header-menu">自動ターニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=364" class="ga-header-menu">MULTISPRINT</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=44" class="ga-header-menu">SPRINT</a></li>
+															</ul>
+						</div>
+											<div class="list_40">
+							<p class="goBack">
+								<a href="#">WASINO</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=40" class="ga-header-menu">WASINOTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=53" class="ga-header-menu">A シリーズ</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=54" class="ga-header-menu">G シリーズ</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=55" class="ga-header-menu">J シリーズ</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=56" class="ga-header-menu">精密旋盤</a></li>
+															</ul>
+						</div>
+											<div class="list_91">
+							<p class="goBack">
+								<a href="#">立形マシニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=91" class="ga-header-menu">立形マシニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=399" class="ga-header-menu">DMP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=272" class="ga-header-menu">CMX V</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=97" class="ga-header-menu">NVX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=95" class="ga-header-menu">NV</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=96" class="ga-header-menu">NVD</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=94" class="ga-header-menu">i-SERIES</a></li>
+															</ul>
+						</div>
+											<div class="list_92">
+							<p class="goBack">
+								<a href="#">横形マシニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=92" class="ga-header-menu">横形マシニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=102" class="ga-header-menu">NHX</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=101" class="ga-header-menu">NH</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=100" class="ga-header-menu">i-SERIES</a></li>
+															</ul>
+						</div>
+											<div class="list_584">
+							<p class="goBack">
+								<a href="#">横中ぐりマシニングセンタ</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=584" class="ga-header-menu">横中ぐりマシニングセンタTOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=585" class="ga-header-menu">PBT 110</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=586" class="ga-header-menu">PBT 130</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=587" class="ga-header-menu">PBT 150</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=625" class="ga-header-menu">PBN 200</a></li>
+															</ul>
+						</div>
+											<div class="list_113">
+							<p class="goBack">
+								<a href="#">アディティブマニュファクチャリング(3Dプリンタ)</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=113" class="ga-header-menu">アディティブマニュファクチャリング(3Dプリンタ)TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=596" class="ga-header-menu">LASERTEC DED(Directed Energy Deposition)</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=597" class="ga-header-menu">LASERTEC SLM(Selective Laser Melting)</a></li>
+															</ul>
+						</div>
+											<div class="list_112">
+							<p class="goBack">
+								<a href="#">超音波加工機</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=112" class="ga-header-menu">超音波加工機TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=118" class="ga-header-menu">ULTRASONIC Universal</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=119" class="ga-header-menu">ULTRASONIC Precision</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=120" class="ga-header-menu">ULTRASONIC Production</a></li>
+															</ul>
+						</div>
+											<div class="list_111">
+							<p class="goBack">
+								<a href="#">超精密レーザ加工機</a>
+							</p>
+							<ul class="list-links">
+								<li class="toItem top"><a href="https://www.dmgmori.co.jp/products/list/contents_type=111" class="ga-header-menu">超精密レーザ加工機TOP</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=117" class="ga-header-menu">LASERTEC Shape</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=116" class="ga-header-menu">LASERTEC PrecisionTool</a></li>
+																	<li class="toItem"><a href="https://www.dmgmori.co.jp/products/list/contents_type=115" class="ga-header-menu">LASERTEC PowerDrill</a></li>
+															</ul>
+						</div>
+									<!--/.mobile-nav-level-item--></div>
+
+			<!--/.mobile-nav-level--></div>
+
+
+			<!--/#product_menu_sp--></div>
+			<div id="search_sp">
+				<div class="search-form-wrapper">
+					<div class="search-form">&nbsp;</div>
+
+                      <dl class="hotkeyword">
+              <dt>ホットキーワード：</dt>
+              <dd>
+                <ul class="list-h">
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%9E%E3%82%B7%E3%83%8B%E3%83%B3%E3%82%B0%E3%83%BB%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B9%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3" class="ga-header-menu">マシニング・トランスフォーメーション</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=5%E8%BB%B8" class="ga-header-menu">5軸</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E8%87%AA%E5%8B%95%E5%8C%96" class="ga-header-menu">自動化</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E5%B7%A5%E7%A8%8B%E9%9B%86%E7%B4%84" class="ga-header-menu">工程集約</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%82%B5%E3%82%B9%E3%83%86%E3%83%8A%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3" class="ga-header-menu">サステナビリティ</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=DX" class="ga-header-menu">DX</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=GX" class="ga-header-menu">GX</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%A9%E3%83%B3%E3%83%8A%E3%83%BC" class="ga-header-menu">フロントランナー</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%83%86%E3%82%AF%E3%83%8E%E3%83%AD%E3%82%B8%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB" class="ga-header-menu">テクノロジーサイクル</a></li>
+                                                    <li><a href="https://www.dmgmori.co.jp/search/?site=Q1T44A05&amp;start=0&amp;count=10&amp;group=3&amp;charset=UTF-8&amp;query=%E3%82%A2%E3%83%87%E3%82%A3%E3%83%86%E3%82%A3%E3%83%96%E3%83%9E%E3%83%8B%E3%83%A5%E3%83%95%E3%82%A1%E3%82%AF%E3%83%81%E3%83%A3%E3%83%AA%E3%83%B3%E3%82%B0" class="ga-header-menu">アディティブマニュファクチャリング</a></li>
+                                </ul>
+              </dd>
+            </dl>
+          				<!-- /.search-form-wrapper --></div>			
+			<!--/#search_sp--></div>
+		<!--/.cont-sp--></div>
+
+		<div class="freearea">
+		<!--/.freearea--></div>
+
+		<div class="closer">
+			<p class="btn-mega-menu-201909-close">CLOSE</p>
+		<!--/.closer--></div>
+
+	<!--/.mega-menu-201909--></div>
+
+	<div class="header-lines">
+		<div class="header-lines-inner">
+			<p class="line-1"></p><p class="line-2"></p><p class="line-3"></p><p class="line-4"></p>
+		</div>
+	<!--/.header-lines--></div>
+
+</header>
+<div class="header-bglayer"></div>
+
+
+
+
+
+
+
+<div class="headline-contents">
+<div class="headline-gallery">
+	<div class="slider">
+    		<div data-title="DMG MORIおすすめの仕様を新価格で販売" data-description="ターニングセンタALXシリーズと立形マシニングセンタCMX Vシリーズを新価格で販売いたします。">
+                                        <a rel="noopener" href="https://www.dmgmori.co.jp/sp/alx-cmxv/" class="headline-image" target="_blank">
+                                        <img class="ie-imgClip" src="/files/topics/8183_ext_01_0.jpg" alt="DMG MORIおすすめの仕様を新価格で販売">
+                                        <!--/.headline-image--></a>
+            		</div>
+    		<div data-title="DMG MORI テクノロジーフライデイ" data-description="伊賀事業所・東京グローバルヘッドクォータ・アカデミーでテクノロジーフライデイを開催しています。">
+                                        <a rel="noopener" href="https://www.dmgmori.co.jp/sp/techfri/techfri2025/" class="headline-image" target="_blank">
+                                        <img class="ie-imgClip" src="/files/topics/5096_ext_01_0.jpg" alt="DMG MORI テクノロジーフライデイ">
+                                        <!--/.headline-image--></a>
+            		</div>
+    		<div data-title="NLX 2500 | 700 2nd Generation" data-description="多種多様なワークを高剛性・高精度に加工可能なターニングセンタ">
+                                        <a href="https://www.dmgmori.co.jp/products/machine/id=1399" class="headline-image">
+                                        <img class="ie-imgClip" src="/files/topics/8085_ext_01_0.jpg" alt="NLX 2500 | 700 2nd Generation">
+                                        <!--/.headline-image--></a>
+            		</div>
+    		<div data-title="ERGOline X with CELOS X" data-description="DXを実現するためのアプリケーションを搭載し、生産現場全体の生産性を向上">
+                                        <a href="https://www.dmgmori.co.jp/products/machine/id=7176" class="headline-image">
+                                        <img class="ie-imgClip" src="/files/topics/8086_ext_01_0.png" alt="ERGOline X with CELOS X">
+                                        <!--/.headline-image--></a>
+            		</div>
+    		<div data-title="DMQP特設サイト リニューアル" data-description="DMG森精機の認定周辺機器(DMQP)をご紹介している特設サイトがリニューアルしました。ぜひご確認ください。">
+                                        <a rel="noopener" href="https://www.dmgmori.co.jp/sp/dmqp/" class="headline-image" target="_blank">
+                                        <img class="ie-imgClip" src="/files/topics/3016_ext_01_0.png" alt="DMQP特設サイト リニューアル">
+                                        <!--/.headline-image--></a>
+            		</div>
+    	<!--/.slider--></div>
+	<div class="summary">
+		<div class="summary-header">
+			<div class="prev">&lt;前へ</div>
+			<div class="title"></div>
+			<div class="next">次へ&gt;</div>
+		</div>
+		<ul class="dots"></ul>
+		<div class="description"></div>
+		<a href="#" class="linkBtn">Go</a>
+	<!--/.summary--></div>
+<!--/.headline-gallery--></div>
+
+	<div class="content-inner">
+		<div class="headline-overview">
+			<ul class="headline-list">
+                                              				<li>
+					<a rel="noopener" href="https://www.dmgmori.co.jp/sp/mx/" target="_blank">
+						<div class="link-box">
+							<div class="text-block">
+								<p class="title">MX</p>
+								<p class="description">マシニング・トランスフォーメーションを実現するための方法をご紹介</p>
+							<!--/.text-block--></div>
+							<p class="image"><img src="/files/topics/4676_ext_15_0.png" alt=""></p>
+						<!--/.link-box--></div>
+					</a>
+				</li>
+                                              				<li>
+					<a rel="noopener" href="https://www.dmgmori.co.jp/sp/onlineseminar/" target="_blank">
+						<div class="link-box">
+							<div class="text-block">
+								<p class="title">オンラインセミナー</p>
+								<p class="description">DMG森精機の製品・技術・ソリューションをご紹介。製品の特長を加工動画などを交えてわかりやすく解説</p>
+							<!--/.text-block--></div>
+							<p class="image"><img src="/files/topics/4676_ext_15_1.jpg" alt=""></p>
+						<!--/.link-box--></div>
+					</a>
+				</li>
+                                              				<li>
+					<a rel="noopener" href="https://www.dmgmori.co.jp/sp/techfri/techfri2025/" target="_blank">
+						<div class="link-box">
+							<div class="text-block">
+								<p class="title">テクノロジーフライデイ</p>
+								<p class="description">伊賀事業所、東京グローバルヘッドクォータ、DMG MORI ACADEMYにて少人数制オープンハウスを開催</p>
+							<!--/.text-block--></div>
+							<p class="image"><img src="/files/topics/4676_ext_15_2.jpg" alt=""></p>
+						<!--/.link-box--></div>
+					</a>
+				</li>
+                                              				<li>
+					<a rel="noopener" href="https://www.dmgmori.co.jp/movie_library/" target="_blank">
+						<div class="link-box">
+							<div class="text-block">
+								<p class="title">動画ライブラリ</p>
+								<p class="description">工程集約や自動化などの最新の動画をご紹介</p>
+							<!--/.text-block--></div>
+							<p class="image"><img src="/files/topics/4676_ext_15_3.png" alt=""></p>
+						<!--/.link-box--></div>
+					</a>
+				</li>
+      			</ul>
+		<!--/.headline-list--></div>
+	<!--/.content-inner--></div>
+<!--/.headline-contents--></div>
+
+
+
+<section>
+  <div id="contents">
+    <section>
+      <div id="main-contents">
+        <article>
+          <div id="newsroom" class="content">
+            <div class="content-inner">
+              <h2 class="ct-hdl3"><span>NEWSROOM</span></h2>
+            <!--/.content-inner--></div>
+            <div class="filtering-container">
+              <div class="filtering-tabs">
+                <ul>
+                  <li class="current"><a href="javascript:void(0);" onclick="getContents('/new_contents/?data_format=json',1)">NEW CONTENTS</a></li>
+                  <li><a href="javascript:void(0);" onclick="getContents('/access_ranking/?data_format=json', 2)">ACCESS RANKING</a></li>
+                  <li><a href="javascript:void(0);" onclick="getContents('/hot_contents/?data_format=json',0)">HOT CONTENTS</a></li>
+                </ul>
+              <!--/.filtering-tabs--></div>
+  						<div class="content-inner">
+                  <div class="mdl-list-topix" id="itemList">
+                  </div>
+  						<!--/.content-inner--></div>
+            <!--/.filtering-container--></div>
+          <!-- /.content --></div>
+                      <div id="products_overview" class="content">
+              <div class="content-inner">
+                <h2 class="ct-hdl3"><span>PRODUCTS</span></h2>
+                <div class="product-introduction">
+                  <div class="viewport">
+<ul class="list-product column-4-pctb" style="margin-left: 40px;">
+	<li>
+	<div class="mdl-card-product"><a href="https://www.dmgmori.co.jp/products/machines/">
+	<div>
+	<p class="image"><img alt="" src="/files/user/img/top/fig_products_01.png"></p>
+
+	<div class="summary">
+	<p class="title">工作機械</p>
+
+	<div class="lead-txt">
+	<p>5軸・複合加工機、ターニングセンタ、マシニングセンタなど最先端の工作機械をご紹介</p>
+	</div>
+	</div>
+	</div>
+	</a></div>
+	</li>
+	<li>
+	<div class="mdl-card-product"><a href="https://www.dmgmori.co.jp/products/automation/">
+	<p class="image"><img alt="" src="/files/user/img/top/fig_products_02.png"></p>
+
+	<div class="summary">
+	<p class="title">自動化システム</p>
+
+	<div class="lead-txt">
+	<p>ロボットシステムやパレットプールシステムなど生産をサポートする自動化システムをご紹介</p>
+	</div>
+	</div>
+	</a></div>
+	</li>
+	<li>
+	<div class="mdl-card-product"><a href="https://www.dmgmori.co.jp/products/dmqp/">
+	<p class="image"><img alt="" src="/files/user/img/top/fig_products_03.png"></p>
+
+	<div class="summary">
+	<p class="title">周辺機器（DMQP）</p>
+
+	<div class="lead-txt">
+	<p>DMG MORIがオフィシャルに認定した品質・性能・保守性に優れた世界中の周辺機器をご紹介</p>
+	</div>
+	</div>
+	</a></div>
+	</li>
+	<li>
+	<div class="mdl-card-product"><a href="https://www.dmgmori.co.jp/products/digitalization/">
+	<p class="image"><img alt="" src="/files/user/img/top/fig_products_04.png"></p>
+
+	<div class="summary">
+	<p class="title">デジタル<br>
+	ソリューション</p>
+
+	<div class="lead-txt">
+	<p>生産計画から準備、生産、モニタリング、メンテナンスまでお客様の課題を解決するデジタルソリューションをご紹介</p>
+	</div>
+	</div>
+	</a></div>
+	</li>
+</ul>
+<!--/.list-product--></div>
+<!--/.viewport-->                <!--/.product-introduction--></div>
+              <!--/.content-inner--></div>
+            <!-- /.content --></div>
+          
+                      <div id="pickup_technology" class="content">
+              <div class="content-inner">
+                <h2 class="ct-hdl3"><span>SOLUTION & TECHNOLOGY</span></h2>
+                <div class="pickup-introduction viewport">
+				<ul class="pickup-list">
+					<li>
+						<img alt="" src="/files/user/img/top/fig_pickup_02.png">
+						<div class="summary">
+							<div class="lead">基礎から分かる<br>5軸加工</div>
+							<p class="lead-text">5軸加工機の基礎的な情報を徹底解説した特設サイト。<br>
+							5軸加工機の特長やメリット、選定のポイントなどをご紹介しています。</p>
+							<p><a rel="noopener" class="btn-proceed btn-small" href="https://www.dmgmori.co.jp/sp/5axis/" target="_blank">5軸加工</a></p>
+						</div>
+					</li>
+					<li>
+						<img alt="" src="/files/user/img/top/fig_pickup_01.png">
+						<div class="summary">
+							<div class="lead">基礎から分かる<br>自動化システム</div>
+							<p class="lead-text">自動化システムを導入すると、どのような効果があるのか？<br>
+							DMG MORIが考える自動化システムの導入効果をご紹介します。</p>
+							<p><a rel="noopener" class="btn-proceed btn-small" href="https://www.dmgmori.co.jp/sp/automation/" target="_blank">自動化</a></p>
+						</div>
+					</li>
+					<li>
+						<img alt="" src="/files/user/img/top/fig_pickup_03.png">
+						<div class="summary">
+							<div class="lead">デジタルソリューション</div>
+							<p class="lead-text">DMG MORIがめざすデジタルソリューション。<br>
+							お客様一人ひとりに新たな価値を創出する最適なデジタルソリューションをご紹介します。</p>
+							<p><a rel="noopener" class="btn-proceed btn-small" href="https://www.dmgmori.co.jp/sp/digitalization/" target="_blank">デジタルソリューション</a></p>
+						</div>
+					</li>
+					<li>
+						<img alt="" src="/files/user/img/top/fig_pickup_04.png">
+						<div class="summary">
+							<div class="lead">DMQP<br>(DMG森精機認定周辺機器)</div>
+							<p class="lead-text">DMG MORIは、機械本体だけでなく、周辺機器のご相談から納入・保守、DMQPの購入まで幅広くサポート。<br>品質・性能・保守性に優れたDMQP（周辺機器）をご紹介します。</p>
+							<p><a rel="noopener" class="btn-proceed btn-small" href="https://www.dmgmori.co.jp/sp/dmqp/" target="_blank">DMQP</a></p>
+						</div>
+					</li>
+				</ul>
+			</div>              <!--/.content-inner--></div>
+            <!-- /.content --></div>
+          
+                      <div id="knowledge_overview" class="content">
+              <div class="content-inner">
+                <h2 class="ct-hdl3"><span>KNOWLEDGE</span></h2>
+                <div class="knowledge-overview">
+                  <div class="viewport">
+                    <ul class="knowledge-list">
+                                            <li>
+                        <div class="mdl-card-product">
+                                                      <a href="https://www.dmgmori.co.jp/knowledge/category/?type=mt_solution&amp;contents_type=405">
+                                                      <div>
+                              <p class="image"><img src="/files/user/img/top/fig_knowledge_01.png" alt=""></p>
+                              <div class="summary">
+                                <p class="title">加工のコツ</p>
+                                <div class="lead-txt">
+                                  <p>切りくず対策や効果的なバリ取り、切削油剤の上手な使い方など、加工に役立つポイントをご紹介</p>
+                                </div>
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                        <ul class="list-links">
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/MT_solution_v29.html">加工のコツvol.29<br>DED方式を活用した冷却配管を有した<br>ダイカスト金型製作のコツ</a>
+                            </li>
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/MT_solution_v28.html">加工のコツvol.28<br>突き出し量が長い正面フライス加工の<br>びびり抑制方法</a>
+                            </li>
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/MT_solution_v27.html">加工のコツvol.27<br>切削速度が低い時に発生する溶着の防ぎ方</a>
+                            </li>
+                            
+                        </ul>
+                      </li>
+                                          <li>
+                        <div class="mdl-card-product">
+                                                      <a href="https://www.dmgmori.co.jp/knowledge/category/?type=wgm&amp;contents_type=406">
+                                                      <div>
+                              <p class="image"><img src="/files/user/img/top/fig_knowledge_02.png" alt=""></p>
+                              <div class="summary">
+                                <p class="title">世界の逸品</p>
+                                <div class="lead-txt">
+                                  <p>DMG MORIが世界中のさまざまなパートナー企業様と連携して、厳選した逸品周辺機器をご紹介</p>
+                                </div>
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                        <ul class="list-links">
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/Series_WGM_v37.html">世界の逸品機器 #37<br>比類なき速さと精度で工具を自動測定<br>過酷な環境下でも高い信頼性を発揮するレーザ測定システム「LC50-DIGILOG」（ブルーム-ノボテスト株式会社）</a>
+                            </li>
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/Series_WGM_v36.html">世界の逸品機器 #36<br>比類なき速度の穴あけ加工を実現！3枚刃・超速ヘッド交換式ドリル「LOGIQ3CHAM」（イスカル株式会社）</a>
+                            </li>
+                                                      <li >
+                              <a href="https://www.dmgmori.co.jp/trend/detail/Series_WGM_v35.html">世界の逸品機器 #35<br>サイクルタイムの大幅な短縮や<br>切りくずトラブルを解消する特注工具</a>
+                            </li>
+                            
+                        </ul>
+                      </li>
+                                          <li>
+                        <div class="mdl-card-product">
+                                                      <a href="https://www.dmgmori.co.jp/knowledge/category/?type=customer_case&amp;contents_type=22">
+                                                      <div>
+                              <p class="image"><img src="/files/user/img/trend/img_topics_04.jpg" alt=""></p>
+                              <div class="summary">
+                                <p class="title">お客様事例</p>
+                                <div class="lead-txt">
+                                  <p>先進的な取り組みに挑戦し、成功を収めている「フロントランナー企業」を映像と記事でご紹介</p>
+                                </div>
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                        <ul class="list-links">
+                                                      <li class="new">
+                              <a href="https://www.dmgmori.co.jp/theme/case/id=8915">人や機械に優しい切削油「ECOCOOL GLOBAL 1000」</a>
+                            </li>
+                                                      <li class="new">
+                              <a href="https://www.dmgmori.co.jp/theme/case/id=8505">超音波加工による技術革新 硬脆材加工のキーテクノロジー</a>
+                            </li>
+                                                      <li class="new">
+                              <a href="https://www.dmgmori.co.jp/theme/case/id=7869">金型製造における6面・複合全加工</a>
+                            </li>
+                            
+                        </ul>
+                      </li>
+                                        <!--/.knowledge-list--></ul>
+                  <!--/.viewport--></div>
+                <!--/.knowledge-overview--></div>
+              <!--/.content-inner--></div>
+            <!-- /.content --></div>
+          
+                      <div id="video" class="content">
+              <div class="content-inner">
+                <h2 class="ct-hdl3"><span>VIDEO</span></h2>
+              <!--/.content-inner--></div>
+              <div class="movie-title">
+                <video src="/files/user/img/top/movie.mp4" autoplay muted playsinline loop></video>
+              </div>
+              <div class="content-inner">
+                <div class="movies-catalog">
+                  <div class="viewport">
+                    <ul class="movies-catalog-columns">
+                                            <li class="movies-catalog-column">
+                        <h3>お客様事例</h3>
+                        <ul class="list-movies">
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/K7N4J76hzFY?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                  <span class="lbl-new">NEW</span>                                  
+                                  <img src="/files/topics/8845_ext_01_0.jpg" alt="">
+                                </p>
+                                <figcaption>Road to Front Runner Vol. 76 「株式会社 ケイ・エフ・ケイ小川」ロボットシステムを活用した自動化のスペシャリスト</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/RJHJPHopK0Q?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8913_ext_01_0.png" alt="">
+                                </p>
+                                <figcaption>DMG MORI TVCM 「Front Runner Vol.91 有限会社五和工業」</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    </ul>
+                          <p><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library_list/?topics_ext_options_search=1&amp;search_ext_col_11[]=011" class="btn-priamry more" target="_blank">もっと見る</a></p>
+                      <!--/.movies-catalog-colmun--></li>
+                                            <li class="movies-catalog-column">
+                        <h3>5軸/複合加工機</h3>
+                        <ul class="list-movies">
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/gXoxeNiv0lw?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8801_ext_01_0.png" alt="NMV_thumbnail">
+                                </p>
+                                <figcaption>【ハイライト】5軸制御立形マシニングセンタ「NMV 3000 / 5000 2<sup>nd</sup> Generation」</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/-bTs34GzBp0?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8782_ext_01_0.png" alt="NTX-S_title">
+                                </p>
+                                <figcaption>【ハイライト】複合加工機 「NTX 1000 3<sup>rd</sup> Generation」</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    </ul>
+                          <p><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library_list/?topics_ext_options_search=1&amp;search_ext_col_11[]=001" class="btn-priamry more" target="_blank">もっと見る</a></p>
+                      <!--/.movies-catalog-colmun--></li>
+                                            <li class="movies-catalog-column">
+                        <h3>自動化</h3>
+                        <ul class="list-movies">
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/5T_OX6ymVdU?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8643_ext_01_0.png" alt="Automatic tool change in turning centres">
+                                </p>
+                                <figcaption>4軸複合加工機 NZX 2000＋刃物台の工具自動交換の事例 Sandvik Coromant</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/JlLd0eghA6Q?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8413_ext_01_0.png" alt="CPP 80 2<sup>nd</sup> Generation">
+                                </p>
+                                <figcaption>【ハイライト】工場スペースを最大限に活用し生産性を向上させる自動化システム「CPP 80 2<sup>nd</sup> Generation」</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    </ul>
+                          <p><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library_list/?topics_ext_options_search=1&amp;search_ext_col_11[]=007" class="btn-priamry more" target="_blank">もっと見る</a></p>
+                      <!--/.movies-catalog-colmun--></li>
+                                            <li class="movies-catalog-column">
+                        <h3>ターニングセンタ</h3>
+                        <ul class="list-movies">
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/7fyNpFACY5E?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8430_ext_01_0.png" alt="">
+                                </p>
+                                <figcaption>サイクルタイムを従来機比50%短縮！NLX 2500 2<sup>nd</sup> Generationでのアウターレース加工</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    <li>
+                            <a href="https://www.youtube.com/embed/4ZiFqrHgjT0?rel=0&amp;autoplay=1" class="modal-trigger">
+                              <figure>
+                                <p class="image">
+                                                                    
+                                  <img src="/files/topics/8398_ext_01_0.png" alt="">
+                                </p>
+                                <figcaption>ターニングセンタ「NLX 2500 | 1250 2<sup>nd</sup> Generation」紹介映像</figcaption>
+                              </figure>
+                            </a>
+                          </li>
+                                                    </ul>
+                          <p><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library_list/?topics_ext_options_search=1&amp;search_ext_col_51[]=002" class="btn-priamry more" target="_blank">もっと見る</a></p>
+                      <!--/.movies-catalog-colmun--></li>
+                                          <!--/.movies-catalog-columns--></ul>
+                  <!--/.viewport--></div>
+                  <div class="link-media-library">
+                    <a rel="noopener" href="https://www.dmgmori.co.jp/movie_library/" class="btn-proceed" target="_blank">メディアライブラリ</a>
+                  </div>
+                <!--/.movies-catalog--></div>
+              <!--/.content-inner--></div>
+            <!-- /.content --></div>
+          
+                      <div id="get_more_information" class="content">
+              <div class="content-inner">
+                <h2 class="ct-hdl3"><span>MORE INFORMATION</span></h2>
+                <ul class="teaser-newsboard">
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/serviceGuide/">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_01.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">Web会員登録/<br class="sp-only">
+	メールマガジン購読</p>
+
+	<p class="teaser-newsboard-teasertext">業界のトレンドや世界の最先端事例、次世代の技術、ソリューション情報などを会員様限定でお届けします。</p>
+	</div>
+	</a></li>
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/showroom/">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_02.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">ソリューションセンタ</p>
+
+	<p class="teaser-newsboard-teasertext">お客様ごとに専任スタッフがご案内いたします。ぜひ、お近くのソリューションセンタ（ショールーム）にお越しください。</p>
+	</div>
+	</a></li>
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/download/catalog/">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_03.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">カタログダウンロード</p>
+
+	<p class="teaser-newsboard-teasertext">最新の製品カタログやパンフレットをダウンロードいただけます。</p>
+	</div>
+	</a></li>
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/inquiry/">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_04.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">お問い合わせ</p>
+
+	<p class="teaser-newsboard-teasertext">DMG MORIの製品、製品の修理/復旧、および企業活動についてのお問い合わせ窓口をご案内しています。</p>
+	</div>
+	</a></li>
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/download/catalog/?contents_type=416">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_05.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">テクノロジーエクセレンス</p>
+
+	<p class="teaser-newsboard-teasertext">工作機械の技術情報やDMG MORIの最新製品、お客様事例など旬な情報を掲載したマガジンをご覧いただけます。</p>
+	</div>
+	</a></li>
+	<li class="teaser-newsboard-item"><a href="https://www.dmgmori.co.jp/movie_library/movie/id=8157">
+	<p class="image"><img alt="" src="/files/user/img/top/more_information/cardteaser_06.png"></p>
+
+	<div class="teaser-newsboard-text">
+	<p class="teaser-newsboard-title">DMG MORI SAILING TEAM</p>
+
+	<p class="teaser-newsboard-teasertext">世界のトップセーラーが集う、単独・無寄港・無補給の世界一周ヨットレース&ldquo;Vend&eacute;e Globe&ldquo;へ挑戦いたします。</p>
+	</div>
+	</a></li>
+</ul>              <!--/.content-inner--></div>
+            <!-- /.content --></div>
+                  </article>
+      <!-- /#main-contents --></div>
+    </section>
+
+    <aside>
+      <div class="content-inner">			
+        <div class="aside-news-facebook">
+          <div class="news">
+  <h3 class="ct-hdl3"><span>NEWS</span></h3>
+  <ul class="list-news">
+      <li class="list-news-item">
+      <div class="list-news-item-head">
+        <p class="update-date">2026/03/31</p>
+        <p class="category-label">更新情報</p>
+      </div>
+      <p class="news-text"><a rel="noopener" href="https://www.dmgmori.co.jp/theme/case/id=8915" target="_blank">お客様事例「人や機械に優しい切削油 "ECOCOOL GLOBAL 1000"」を公開しました。</a></p>
+    </li>
+      <li class="list-news-item">
+      <div class="list-news-item-head">
+        <p class="update-date">2026/03/30</p>
+        <p class="category-label">NEWS</p>
+      </div>
+      <p class="news-text"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/news/2026/20260330_nmv2nd.html" target="_blank">加工能力を向上し高生産性を実現、5軸制御立形マシニングセンタ NMV 3000 / 5000 DCG 2nd Generationが登場</a></p>
+    </li>
+      <li class="list-news-item">
+      <div class="list-news-item-head">
+        <p class="update-date">2026/03/30</p>
+        <p class="category-label">投資家情報</p>
+      </div>
+      <p class="news-text"><a rel="noopener" href="https://www.youtube.com/watch?v=bvuQn0R0pCY" target="_blank">第78回定時株主総会の映像を公開しました。（公開期間：2026年6月30日まで）</a></p>
+    </li>
+      <li class="list-news-item">
+      <div class="list-news-item-head">
+        <p class="update-date">2026/03/30</p>
+        <p class="category-label">投資家情報</p>
+      </div>
+      <p class="news-text"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/ir/ir_library/integrated_report.html" target="_blank">統合報告書2025を公開しました。</a></p>
+    </li>
+      <li class="list-news-item">
+      <div class="list-news-item-head">
+        <p class="update-date">2026/03/30</p>
+        <p class="category-label">企業情報</p>
+      </div>
+      <p class="news-text"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/sustainability/esg/pdf/20260327_green-gas-emissions-report-2025_e.pdf" target="_blank">2025年度 CO2排出量レポート(英語版)を公開しました。（PDF:1.54 MB）</a></p>
+    </li>
+    </ul>
+  <p><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/news/" class="btn-proceed u-fz-m" target="_blank">お知らせ一覧</a></p>						
+<!--/.news--></div>
+
+                      <div class="facebook">
+              <h3 class="ct-hdl3"><span>FACEBOOK</span></h3>
+              <iframe allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true" frameborder="0" height="500" scrolling="no" src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FDMGMORI.CO%2F&amp;show_posts=true&amp;width=340&amp;height=500&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=false&amp;appId" style="border:none;overflow:hidden" width="340"></iframe>            <!--/.facebook--></div>
+                  <!--/.aside-news-facebook--></div>
+                  <div class="list-banners-container">
+          <div class="viewport">
+<ul class="list-banners">
+	<li class="list-banners-item"><a rel="noopener" href="https://www.youtube.com/user/MORISEIKI" target="_blank">
+	<p class="image"><img alt="" class="ie-imgCover" src="/files/user/img/top/bnr_youtube.png"></p>
+
+	<div class="summary">
+	<div class="title">DMG MORIのYouTube公式チャンネル</div>
+
+	<div class="text">DMG MORIのYouTube公式チャンネルです。</div>
+	</div>
+	</a></li>
+	<li class="list-banners-item"><a rel="noopener" href="https://www.dmgmori.co.jp/corporate/library/tsunagari.html" target="_blank">
+	<p class="image"><img alt="" class="ie-imgCover" src="/files/user/img/top/bnr_tsunagari.png"></p>
+
+	<div class="summary">
+	<div class="title">広報誌「つながり」</div>
+
+	<div class="text">「つながり」を基本コンセプトにモノができるまでのプロセスや歴史にスポットをあてた広報誌です。</div>
+	</div>
+	</a></li>
+	<li class="list-banners-item"><a rel="noopener" href="https://ec.technium.net/shop/" target="_blank">
+	<p class="image"><img alt="" class="ie-imgCover" src="/files/user/img/top/bar_eMarket2.png"></p>
+
+	<div class="summary">
+	<div class="title"><em>my </em>DMG MORI eMarket</div>
+
+	<div class="text">カスタマーポータル<em>my </em>DMG MORIの会員限定で利用可能なオンラインショップです。</div>
+	</div>
+	</a></li>
+	<!--/.list-banners-->
+</ul>
+<!--/.viewport--></div>          <!--/.banners--></div>
+              <!--/.content-inner--></div>
+    </aside>
+  <!-- /#contents --></div>
+</section>
+
+
+
+
+
+
+<footer id="footer-2019">
+	<div class="footer-top-item">
+
+		<div class="footer-social">
+			<!--<p>修理復旧センタ（お問い合わせ窓口）<br>TEL：0120-124-280 / 0077-78-0222<span>（20時間365日*3:00～7:00を除く）</span></p>-->
+            <p>MROセンタ（お問い合わせ窓口）<br><a rel="noopener" href="https://www.technium.net/contact/" target="_blank"><em>my</em> DMG MORI</a>より24時間お問い合わせを受け付けております。
+			受付が完了したお問い合わせに関しては順次、担当者よりご連絡させていただきます。<br>
+            <a rel="noopener" href="https://www.technium.net/contact/" target="_blank">▶<em>my</em> DMG MORIはこちら</a></p>
+			<ul class="social-link-list">
+				<li><a rel="noopener" href="https://twitter.com/dmgmorijapan" target="_blank" class="link-icon-twitter"><img class="u-mt-3" width="24px" src="/files/user/img/footer/bnr_x.png" alt="x"></a></li>
+				<li><a rel="noopener" href="https://www.instagram.com/dmgmorijapan/" target="_blank" class="link-icon-instagram"><img class="u-mt-3" width="24px" src="/files/user/img/footer/bnr_instagram.png" alt="Instagram"></a></li>
+				<li><a rel="noopener" href="https://www.facebook.com/DMGMORI.CO/" target="_blank" class="link-icon-facebook"><span>Facebook</span></a></li>				
+				<li><a rel="noopener" href="https://www.youtube.com/user/MORISEIKI" target="_blank" class="link-icon-youtube"><span>YouTube</span></a></li>
+			</ul>
+		<!--/.footer-social--></div>
+	<!--/.footer-top-item--></div>
+	<div class="footer-inner">
+		<div class="link-list-group ui_toggle-group">
+			<div class="link-list-column">
+				<ul class="menu-group">
+					<li class="menu ui_toggle">
+						<p class="menu-title ui_toggle-trigger">加工ノウハウ/ナレッジ</p>
+						<ul class="menu-list ui_toggle-content">
+                                                    								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=5axis">5軸化/複合化</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=automation">自動化</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=digitalization">デジタル化</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=additive-manufacturing">アディティブマニュファクチャリング</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=technology">最先端技術</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=mt_solution">加工のコツ</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=wgm">世界の逸品</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=customer_case">お客様事例</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=case">加工事例</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/sp/onlineseminar/">セミナー</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper">セミナー資料/論文/研究者紹介</a></li>
+                                                                                								<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper">MXガイドブック</a></li>
+                                                                                								<li><a href="https://www.technium.net/process_advisor/">工程設計アドバイザー</a></li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    						</ul>
+					<!--/.ul-toggle-content--></li>
+				</ul>
+			<!--/.link-list-column--></div>
+			<div class="link-list-column">
+				<ul class="menu-group">
+					<li class="link-category"><a href="https://www.dmgmori.co.jp/topics/">製品トピックス</a></li>
+					<li class="menu ui_toggle">
+						<p class="menu-title ui_toggle-trigger">製品情報</p>
+						<ul class="menu-list ui_toggle-content">
+							<li><a href="https://www.dmgmori.co.jp/products/machines/">工作機械</a></li>
+							<li><a href="https://www.dmgmori.co.jp/products/automation/">自動化システム</a></li>
+							<li><a href="https://www.dmgmori.co.jp/products/digitalization/">デジタルソリューション</a></li>
+							<li><a href="https://www.dmgmori.co.jp/products/dmqp/">周辺機器</a></li>
+							<li><a rel="noopener" href="https://www.dmgmori.co.jp/sp/usedmachines/" target="_blank">中古機械</a></li>
+							<li><a rel="noopener" href="https://www.dmgmori.co.jp/sp/automotive/" target="_blank">自動車部品加工ソリューション</a></li>
+							<li><a rel="noopener" href="https://www.dmgmori.co.jp/sp/diemold/" target="_blank">金型ソリューション</a></li>
+							<li><a href="https://www.dmgmori.co.jp/support/">サポート</a></li>
+						</ul>
+					<!--/.ul-toggle-content--></li>
+					<li class="link-category"><a rel="noopener" href="https://www.dmgmori.co.jp/movie_library/" target="_blank">動画</a></li>
+				</ul>
+			<!--/.link-list-column--></div>
+			<div class="link-list-column">
+				<ul class="menu-group">
+					<li class="menu ui_toggle">
+						<p class="menu-title ui_toggle-trigger">ダウンロード</p>
+						<ul class="menu-list ui_toggle-content">
+                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        															<li><a href="https://www.dmgmori.co.jp/download/catalog/">製品カタログ/パンフレット</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/download/catalog/?contents_type=416">DMG MORIマガジン</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=9">セミナー資料</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/knowledge/category/?type=white_paper&amp;contents_type=5">論文</a></li>
+							                        							                        							                        							                        							                        						</ul>
+					<!--/.ul-toggle-content--></li>
+					<li class="menu ui_toggle">
+						<p class="menu-title ui_toggle-trigger">オープンハウス</p>
+						<ul class="menu-list ui_toggle-content">
+                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        							                        															<li><a href="https://www.dmgmori.co.jp/event/list/">オープンハウス</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/showroom/">ソリューションセンタ</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/sp/dtsr_top/">デジタルツインショールーム</a></li>
+							                        															<li><a href="https://www.dmgmori.co.jp/sp/techfri/techfri2020/">DMG MORI テクノロジーフライデイ</a></li>
+							                        						</ul>
+					<!--/.ul-toggle-content--></li>
+					<li class="link-category"><a rel="noopener" href="https://www.dmgmori.co.jp/serviceGuide/" target="_blank">Web会員登録/メールマガジン購読</a></li>
+				</ul>
+			<!--/.link-list-column--></div>
+		<!--/.link-list-group--></div>		
+
+		<div class="footer-bottom-navi">
+			<ul>
+				<li><a rel="noopener" href="https://en.dmgmori.com/" target="_blank">DMG MORI-Products and Services<span class="icon-popup"></span></a></li>
+				<li><a rel="noopener" href="https://en.dmgmori-ag.com/" target="_blank">DMG MORI AG<span class="icon-popup"></span></a></li>
+				<!-- <li><a rel="noopener" href="https://infodrap2.moriseiki.co.jp/distributors/login.aspx?Language=JPN" target="_blank">販売店様向け情報提供サイト<span class="icon-popup"></span></a></li> -->
+			</ul>
+			<ul class="footer-bottom-navi-right">
+				<li><a rel="noopener" href="https://en.dmgmori.com/company/dmg-mori-sailing-team-jp?_gl=1*14xrimg*_ga*MTUzMjI2NTU0MC4xNzMyNDk4OTAx*_ga_QFPL7QS8VP*czE3NTgwMTY2OTgkbzEyNCRnMSR0MTc1ODAxODM2NSRqNDckbDAkaDA." target="_blank">DMG MORI SAILING TEAM<span class="icon-popup"></span></a></li>
+				<li><a rel="noopener" href="https://www.jno.co.jp/ja" target="_blank">Japan National Orchestra<span class="icon-popup"></span></a></li>
+				<li><a rel="noopener" href="https://www.dmgmori.co.jp/sp/art/" target="_blank">DMG MORI ART GALLERY<span class="icon-popup"></span></a></li>
+			</ul>
+		<!--/.footer-bottom-navi--></div>
+
+		<div class="footer-bottom-item">
+			<p class="copyright">Copyright &copy; DMG MORI CO., LTD. All rights reserved.</p>
+			<div class="footer-bottom-utility">
+				<ul class="navi-list">
+					<!--<li><a href="https://www.dmgmori.co.jp/sitemap/">サイトマップ</a></li>-->
+					<li><a href="https://www.dmgmori.co.jp/attention/">ご利用上の注意</a></li>
+					<li><a rel="noopener" href="https://www.dmgmori.co.jp/privacy/" target="_blank">個人情報保護方針<span class="icon-popup"></span></a></li>
+					<li><a href="https://www.dmgmori.co.jp/socialmedia/">ソーシャルメディアポリシー</a></li>
+				</ul>
+			<!--/.footer-bottom-utility--></div>
+		<!--/.footer-bottom-item--></div>
+	<!--/.footer-inner--></div>
+</footer>
+<!-- /#wrapper --></div>
+<ul class="to-top">
+    <li><a href="#" class="btn-toTop">トップに戻る"</a></li>
+</ul>
+
+
+<script type="text/javascript">
+if (location .protocol == "https:") {
+    document.write(unescape('%3Cscript src="https://ssl.syncsearch.jp/common/js/sync_suggest.js" type="text/javascript"%3E%3C/script%3E')); 
+} else {
+    document.write(unescape('%3Cscript src="http://pro.syncsearch.jp/common/js/sync_suggest.js" type="text/javascript"%3E%3C/script%3E')); 
+}
+</script>
+<script type="text/javascript"> 
+    SYNCSEARCH_SITE="Q1T44A05";
+    SYNCSEARCH_GROUP=1;
+</script>
+
+
+
+<!-- /#wrapper --></div>
+
+<script id="top-category-list" data-top-category-list='{"18":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"62":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"558":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"536":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"75":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"76":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"589":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"590":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"591":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"81":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"88":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"89":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"592":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"593":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"77":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"78":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"79":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"80":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"542":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"61":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"311":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"150":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"151":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"74":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"59":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"559":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"72":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"71":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"70":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"547":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"58":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"68":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"69":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"67":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"65":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"64":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"63":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"82":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"84":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"543":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"83":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"85":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"87":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"60":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"73":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"86":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"66":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"90":{"top_category_id":18,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"407":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"417":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"459":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"460":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"461":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"462":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"463":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"464":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"465":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"533":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"534":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"418":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"466":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"467":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"468":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"469":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"535":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"419":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"470":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"471":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"472":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"548":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"420":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"473":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"474":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"475":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"421":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"476":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"422":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"477":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"423":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"478":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"479":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"480":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"481":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"482":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"424":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"483":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"484":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"425":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"485":{"top_category_id":407,"top_category_nm":"5\u8ef8\/\u8907\u5408\u52a0\u5de5\u6a5f"},"7":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"37":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"312":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"49":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"48":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"45":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"50":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"46":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"39":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"52":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"33":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"364":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"44":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"38":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"51":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"40":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"53":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"54":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"55":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"57":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"56":{"top_category_id":7,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"408":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"426":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"486":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"487":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"488":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"489":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"490":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"491":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"427":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"492":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"428":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"493":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"494":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"429":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"495":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"430":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"496":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"497":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"498":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"499":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"500":{"top_category_id":408,"top_category_nm":"\u30bf\u30fc\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"27":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"91":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"399":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"272":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"97":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"95":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"96":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"94":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"93":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"92":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"102":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"101":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"100":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"584":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"585":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"586":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"587":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"588":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"625":{"top_category_id":27,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"409":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"431":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"501":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"502":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"503":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"504":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"505":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"506":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"507":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"432":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"508":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"509":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"510":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"511":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"598":{"top_category_id":409,"top_category_nm":"\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"28":{"top_category_id":28,"top_category_nm":"\u4e2d\u3050\u308a\u76e4"},"29":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"113":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"596":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"597":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"112":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"118":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"119":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"120":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"121":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"122":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"111":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"117":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"116":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"114":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"115":{"top_category_id":29,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"410":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"433":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"512":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"513":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"514":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"515":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"516":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"531":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"434":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"517":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"518":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"519":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"520":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"521":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"530":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"532":{"top_category_id":410,"top_category_nm":"\u8d85\u97f3\u6ce2\/\u30ec\u30fc\u30b6\u52a0\u5de5\u6a5f"},"550":{"top_category_id":550,"top_category_nm":"DMG MORI\u30c6\u30af\u30ce\u30ed\u30b8\u30fc"},"553":{"top_category_id":550,"top_category_nm":"DMG MORI\u30c6\u30af\u30ce\u30ed\u30b8\u30fc"},"554":{"top_category_id":550,"top_category_nm":"DMG MORI\u30c6\u30af\u30ce\u30ed\u30b8\u30fc"},"599":{"top_category_id":550,"top_category_nm":"DMG MORI\u30c6\u30af\u30ce\u30ed\u30b8\u30fc"},"601":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"602":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"603":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"604":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"605":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"606":{"top_category_id":601,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"607":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"608":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"609":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"610":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"611":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"612":{"top_category_id":607,"top_category_nm":"\u30b0\u30e9\u30a4\u30f3\u30c7\u30a3\u30f3\u30b0\u30bb\u30f3\u30bf"},"441":{"top_category_id":441,"top_category_nm":"\u8a08\u6e2c"},"551":{"top_category_id":551,"top_category_nm":"\u8a08\u6e2c"},"552":{"top_category_id":552,"top_category_nm":"\u52a0\u5de53\u60aa\uff08\u5207\u308a\u304f\u305a\/\u30af\u30fc\u30e9\u30f3\u30c8\/\u30df\u30b9\u30c8\uff09"},"564":{"top_category_id":564,"top_category_nm":"\u4fdd\u5b88"},"579":{"top_category_id":564,"top_category_nm":"\u4fdd\u5b88"},"265":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"266":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"267":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"268":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"269":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"270":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"273":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"274":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"275":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"276":{"top_category_id":265,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"568":{"top_category_id":568,"top_category_nm":"TULIP\uff08\u88fd\u9020\u73fe\u5834DX\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\uff09"},"31":{"top_category_id":31,"top_category_nm":"CELOS \/ \u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"127":{"top_category_id":31,"top_category_nm":"CELOS \/ \u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"128":{"top_category_id":31,"top_category_nm":"CELOS \/ \u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"129":{"top_category_id":31,"top_category_nm":"CELOS \/ \u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"560":{"top_category_id":560,"top_category_nm":"\u751f\u7523\u8a08\u753b"},"569":{"top_category_id":560,"top_category_nm":"\u751f\u7523\u8a08\u753b"},"561":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"570":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"571":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"572":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"573":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"574":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"575":{"top_category_id":561,"top_category_nm":"\u751f\u7523\u6e96\u5099"},"562":{"top_category_id":562,"top_category_nm":"\u30e2\u30cb\u30bf\u30ea\u30f3\u30b0"},"576":{"top_category_id":562,"top_category_nm":"\u30e2\u30cb\u30bf\u30ea\u30f3\u30b0"},"577":{"top_category_id":562,"top_category_nm":"\u30e2\u30cb\u30bf\u30ea\u30f3\u30b0"},"563":{"top_category_id":563,"top_category_nm":"\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u69cb\u7bc9"},"578":{"top_category_id":563,"top_category_nm":"\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u69cb\u7bc9"},"565":{"top_category_id":565,"top_category_nm":"\u30c7\u30b8\u30bf\u30eb\u30b5\u30fc\u30d3\u30b9"},"580":{"top_category_id":565,"top_category_nm":"\u30c7\u30b8\u30bf\u30eb\u30b5\u30fc\u30d3\u30b9"},"581":{"top_category_id":565,"top_category_nm":"\u30c7\u30b8\u30bf\u30eb\u30b5\u30fc\u30d3\u30b9"},"566":{"top_category_id":566,"top_category_nm":"\u6559\u80b2"},"582":{"top_category_id":566,"top_category_nm":"\u6559\u80b2"},"583":{"top_category_id":566,"top_category_nm":"\u6559\u80b2"},"32":{"top_category_id":32,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"134":{"top_category_id":32,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"131":{"top_category_id":32,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"132":{"top_category_id":32,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"133":{"top_category_id":32,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"30":{"top_category_id":30,"top_category_nm":"\u30d7\u30ea\u30bb\u30c3\u30bf"},"123":{"top_category_id":30,"top_category_nm":"\u30d7\u30ea\u30bb\u30c3\u30bf"},"126":{"top_category_id":30,"top_category_nm":"\u30d7\u30ea\u30bb\u30c3\u30bf"},"124":{"top_category_id":30,"top_category_nm":"\u30d7\u30ea\u30bb\u30c3\u30bf"},"125":{"top_category_id":30,"top_category_nm":"\u30d7\u30ea\u30bb\u30c3\u30bf"},"104":{"top_category_id":104,"top_category_nm":"CNC\u65cb\u76e4"},"105":{"top_category_id":105,"top_category_nm":"5\u8ef8\u5236\u5fa1\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"106":{"top_category_id":106,"top_category_nm":"\u7acb\u5f62\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"103":{"top_category_id":103,"top_category_nm":"\u30b3\u30f3\u30d1\u30af\u30c8\u30de\u30b7\u30cb\u30f3\u30b0\u30bb\u30f3\u30bf"},"10":{"top_category_id":10,"top_category_nm":"\u88fd\u54c1\u30c8\u30d4\u30c3\u30af\u30b9"},"107":{"top_category_id":107,"top_category_nm":"MILLTAP"},"108":{"top_category_id":108,"top_category_nm":"ecoTurn"},"109":{"top_category_id":109,"top_category_nm":"ecoMill"},"110":{"top_category_id":110,"top_category_nm":"ecoMill V"},"405":{"top_category_id":405,"top_category_nm":"\u52a0\u5de5\u306e\u30b3\u30c4"},"406":{"top_category_id":406,"top_category_nm":"\u4e16\u754c\u306e\u9038\u54c1"},"9":{"top_category_id":9,"top_category_nm":"\u30bb\u30df\u30ca\u30fc\u30fb\u304a\u5f79\u7acb\u3061\u8cc7\u6599"},"99":{"top_category_id":99,"top_category_nm":"DMC H linear"},"5":{"top_category_id":5,"top_category_nm":"\u8ad6\u6587"},"322":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"549":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"540":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"537":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"325":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"326":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"324":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"365":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"158":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"362":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"545":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"544":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"546":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"323":{"top_category_id":322,"top_category_nm":"\u52a0\u5de5\u95a2\u9023"},"327":{"top_category_id":327,"top_category_nm":"\u8a08\u6e2c\u95a2\u9023"},"361":{"top_category_id":327,"top_category_nm":"\u8a08\u6e2c\u95a2\u9023"},"363":{"top_category_id":327,"top_category_nm":"\u8a08\u6e2c\u95a2\u9023"},"319":{"top_category_id":327,"top_category_nm":"\u8a08\u6e2c\u95a2\u9023"},"624":{"top_category_id":327,"top_category_nm":"\u8a08\u6e2c\u95a2\u9023"},"328":{"top_category_id":328,"top_category_nm":"\u642c\u9001\u95a2\u9023"},"329":{"top_category_id":328,"top_category_nm":"\u642c\u9001\u95a2\u9023"},"320":{"top_category_id":320,"top_category_nm":"\u76e3\u8996\u95a2\u9023"},"321":{"top_category_id":320,"top_category_nm":"\u76e3\u8996\u95a2\u9023"},"6":{"top_category_id":6,"top_category_nm":"\u52a0\u5de5\u4e8b\u4f8b"},"8":{"top_category_id":8,"top_category_nm":"\u30aa\u30fc\u30d7\u30f3\u30cf\u30a6\u30b9"},"526":{"top_category_id":8,"top_category_nm":"\u30aa\u30fc\u30d7\u30f3\u30cf\u30a6\u30b9"},"527":{"top_category_id":8,"top_category_nm":"\u30aa\u30fc\u30d7\u30f3\u30cf\u30a6\u30b9"},"528":{"top_category_id":8,"top_category_nm":"\u30aa\u30fc\u30d7\u30f3\u30cf\u30a6\u30b9"},"600":{"top_category_id":8,"top_category_nm":"\u30aa\u30fc\u30d7\u30f3\u30cf\u30a6\u30b9"},"14":{"top_category_id":14,"top_category_nm":"\u52a0\u5de5\u54c1\u8cea\/\u74b0\u5883\u6a5f\u5668"},"155":{"top_category_id":14,"top_category_nm":"\u52a0\u5de5\u54c1\u8cea\/\u74b0\u5883\u6a5f\u5668"},"159":{"top_category_id":14,"top_category_nm":"\u52a0\u5de5\u54c1\u8cea\/\u74b0\u5883\u6a5f\u5668"},"15":{"top_category_id":15,"top_category_nm":"CAD\/CAM"},"161":{"top_category_id":15,"top_category_nm":"CAD\/CAM"},"16":{"top_category_id":16,"top_category_nm":"\u30c6\u30fc\u30d6\u30eb\/\u30d1\u30ec\u30c3\u30c8"},"165":{"top_category_id":16,"top_category_nm":"\u30c6\u30fc\u30d6\u30eb\/\u30d1\u30ec\u30c3\u30c8"},"19":{"top_category_id":19,"top_category_nm":"\u30bb\u30df\u30ca\u30fc"},"20":{"top_category_id":20,"top_category_nm":"\u30b9\u30af\u30fc\u30eb"},"21":{"top_category_id":21,"top_category_nm":"\u696d\u754c\u95a2\u9023\u30a4\u30d9\u30f3\u30c8"},"22":{"top_category_id":22,"top_category_nm":"\u304a\u5ba2\u69d8\u4e8b\u4f8b"},"23":{"top_category_id":23,"top_category_nm":"\u7814\u7a76\u8005\u7d39\u4ecb"},"24":{"top_category_id":24,"top_category_nm":"\u52d5\u753b"},"136":{"top_category_id":136,"top_category_nm":"\u8a08\u6e2c\/\u76e3\u8996\u6a5f\u5668"},"167":{"top_category_id":136,"top_category_nm":"\u8a08\u6e2c\/\u76e3\u8996\u6a5f\u5668"},"168":{"top_category_id":136,"top_category_nm":"\u8a08\u6e2c\/\u76e3\u8996\u6a5f\u5668"},"153":{"top_category_id":153,"top_category_nm":"\u5de5\u5177\u95a2\u9023\u88fd\u54c1"},"179":{"top_category_id":153,"top_category_nm":"\u5de5\u5177\u95a2\u9023\u88fd\u54c1"},"180":{"top_category_id":153,"top_category_nm":"\u5de5\u5177\u95a2\u9023\u88fd\u54c1"},"154":{"top_category_id":154,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"182":{"top_category_id":154,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"411":{"top_category_id":411,"top_category_nm":"ECOLINE"},"435":{"top_category_id":411,"top_category_nm":"ECOLINE"},"522":{"top_category_id":411,"top_category_nm":"ECOLINE"},"436":{"top_category_id":411,"top_category_nm":"ECOLINE"},"523":{"top_category_id":411,"top_category_nm":"ECOLINE"},"437":{"top_category_id":411,"top_category_nm":"ECOLINE"},"524":{"top_category_id":411,"top_category_nm":"ECOLINE"},"438":{"top_category_id":411,"top_category_nm":"ECOLINE"},"525":{"top_category_id":411,"top_category_nm":"ECOLINE"},"412":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"439":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"440":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"442":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"443":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"444":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"445":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"446":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"447":{"top_category_id":412,"top_category_nm":"\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u30b5\u30a4\u30af\u30eb"},"413":{"top_category_id":413,"top_category_nm":"CELOS\/\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"448":{"top_category_id":413,"top_category_nm":"CELOS\/\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"449":{"top_category_id":413,"top_category_nm":"CELOS\/\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"450":{"top_category_id":413,"top_category_nm":"CELOS\/\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2"},"414":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"451":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"452":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"453":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"454":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"529":{"top_category_id":414,"top_category_nm":"\u81ea\u52d5\u5316\u30b7\u30b9\u30c6\u30e0"},"415":{"top_category_id":415,"top_category_nm":"DMQP\uff08\u5468\u8fba\u6a5f\u5668\uff09"},"455":{"top_category_id":415,"top_category_nm":"DMQP\uff08\u5468\u8fba\u6a5f\u5668\uff09"},"456":{"top_category_id":415,"top_category_nm":"DMQP\uff08\u5468\u8fba\u6a5f\u5668\uff09"},"457":{"top_category_id":415,"top_category_nm":"DMQP\uff08\u5468\u8fba\u6a5f\u5668\uff09"},"458":{"top_category_id":415,"top_category_nm":"DMQP\uff08\u5468\u8fba\u6a5f\u5668\uff09"},"416":{"top_category_id":416,"top_category_nm":"DMG MORI\u30de\u30ac\u30b8\u30f3"},"538":{"top_category_id":538,"top_category_nm":"\u4e2d\u53e4\u6a5f\u68b0"},"539":{"top_category_id":539,"top_category_nm":"\u5207\u524a\u52a0\u5de5\u30c9\u30ea\u30fc\u30e0\u30b3\u30f3\u30c6\u30b9\u30c8\u4f5c\u54c1\u96c6"},"541":{"top_category_id":541,"top_category_nm":"\u30d1\u30f3\u30d5\u30ec\u30c3\u30c8"},"555":{"top_category_id":555,"top_category_nm":"\u5de5\u4f5c\u6a5f\u68b0\u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c4"},"556":{"top_category_id":555,"top_category_nm":"\u5de5\u4f5c\u6a5f\u68b0\u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c4"},"557":{"top_category_id":555,"top_category_nm":"\u5de5\u4f5c\u6a5f\u68b0\u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c4"}}'></script>
+
+<script>
+function getContents(url,checker){
+  $.getJSON(url, function(data){
+    var html = ""
+    //checkerはHotContents:0, NewContents:1, AccessRanking:2
+    if(checker == 2){
+      html += "<ul class='itemList lanking column-4'>"
+    }else if(checker == 1){
+      html += "<ul class='itemList new-contents column-4'>"
+    }else if(checker == 0){
+      html += "<ul class='itemList hot-contents column-4'>"
+    }
+    var topicsList = data.topicsList
+    var topCategoryList = $("#top-category-list").data('top-category-list')
+    $.each(topicsList, function(key, item){
+      html += "<li class='no-counter'>"
+      if (item["topics_group_id"] == '13') {
+        html += "<a href='/movie_library_movie/id="+item["topics_id"]+"' target='_blank'>"
+      } else {
+        html += "<a href='/topics_detail"+item["topics_group_id"]+"/id="+item["topics_id"]+"'>"
+      }
+      html += "<p class='label'>"
+      html += topCategoryList[item["contents_type"]]["top_category_nm"]
+      html += "</p>"
+      html += "<div class='fig'>"
+      html += "<p class='thumbnail'>"
+      if(checker !== 2){
+        if(item["new_flg"] == "1"){
+          html += "<span class='lbl-new'>NEW</span>"
+        }
+      }
+      var imagePath = item["image_url"]
+      html += '<img src="'+imagePath+'" alt="'+item["ext_col_01"]+'"></p>'
+      html += "</div>"
+      html += "<div class='summary'>"
+      html += "<p class='update'>"
+      html += item["ymd_str"]
+      html += "</p>"
+      html += "<div class='box-description'>"
+      html += "<p class='title'>"
+      if(item["topics_group_id"] == "6" && item["ext_col_15"]){
+        html += item["ext_col_15"]
+      }else{
+        html += item["subject"]
+      }
+      html += "</p>"
+      html += "</div>"
+      html += "</div>"
+      html += "</a>"
+      html += "</li>"
+      
+    })
+    html += "</ul>"
+    $("#itemList").html(html)
+  })
+}
+
+$(function(){
+  getContents('/new_contents/?data_format=json',1)
+  $("div.filtering-tabs ul li").click(function(){
+    $("div.filtering-tabs ul li.current").removeClass("current")
+    $(this).addClass("current")
+  });
+})
+</script>
+</body>
+</html>
