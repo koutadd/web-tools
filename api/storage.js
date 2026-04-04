@@ -4,7 +4,7 @@ const REPO   = 'web-tools';
 const BRANCH = 'main';
 
 // Allowed keys to prevent path traversal
-const ALLOWED_KEYS = ['sitemap', 'projects', 'schedule', 'dashboard', 'portfolio', 'lab365', 'stores'];
+const ALLOWED_KEYS = ['sitemap', 'projects', 'schedule', 'dashboard', 'portfolio', 'lab365', 'stores', 'branding-research'];
 
 function token() { return process.env.GITHUB_PAT; }
 
