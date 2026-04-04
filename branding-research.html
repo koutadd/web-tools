@@ -8,320 +8,258 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:       #07101f;
-      --panel:    #0c1b2e;
-      --card:     #0f2035;
-      --card2:    #112240;
-      --border:   rgba(59,130,246,0.14);
-      --border2:  rgba(59,130,246,0.28);
-      --blue:     #3b82f6;
-      --blue-lt:  #60a5fa;
-      --blue-dim: rgba(59,130,246,0.10);
-      --amber:    #f59e0b;
-      --amber-dim:rgba(245,158,11,0.10);
-      --green:    #10b981;
-      --green-lt: #34d399;
-      --green-dim:rgba(16,185,129,0.10);
-      --red:      #ef4444;
-      --red-dim:  rgba(239,68,68,0.10);
-      --purple:   #a78bfa;
+      --bg:        #07101f;
+      --panel:     #0c1b2e;
+      --card:      #0f2035;
+      --card2:     #112240;
+      --border:    rgba(59,130,246,0.14);
+      --border2:   rgba(59,130,246,0.28);
+      --blue:      #3b82f6;
+      --blue-lt:   #60a5fa;
+      --blue-dim:  rgba(59,130,246,0.10);
+      --amber:     #f59e0b;
+      --amber-dim: rgba(245,158,11,0.10);
+      --green:     #10b981;
+      --green-lt:  #34d399;
+      --green-dim: rgba(16,185,129,0.10);
+      --teal:      #2dd4bf;
+      --teal-dim:  rgba(45,212,191,0.10);
+      --red:       #ef4444;
+      --purple:    #a78bfa;
       --purple-dim:rgba(167,139,250,0.10);
-      --orange:   #fb923c;
-      --text:     #dde6f0;
-      --text2:    #8fa8c4;
-      --text3:    #4e6a88;
-      --mono:     'DM Mono', monospace;
-      --body:     'Noto Sans JP', sans-serif;
-      --radius:   8px;
+      --text:      #dde6f0;
+      --text2:     #8fa8c4;
+      --text3:     #4e6a88;
+      --mono:      'DM Mono', monospace;
+      --body:      'Noto Sans JP', sans-serif;
+      --r:         8px;
     }
     html { scroll-behavior: smooth; }
     body { font-family: var(--body); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.75; -webkit-font-smoothing: antialiased; }
 
-    /* ─── COMMON NAV ─────────────────────────────── */
-    #aicare-common-nav {
-      background: #030912; border-bottom: 1px solid rgba(59,130,246,0.12);
-      display: flex; align-items: center; gap: 0;
-      padding: 0 20px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
-    }
-    #aicare-common-nav::-webkit-scrollbar { display: none; }
-    #aicare-common-nav > * { flex-shrink: 0; }
-    #aicare-common-nav .cn-label {
-      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text3); padding: 10px 12px;
-    }
-    #aicare-common-nav a {
-      font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
-      color: var(--text3); text-decoration: none;
-      padding: 10px 11px; border-right: 1px solid rgba(59,130,246,0.08);
-      transition: color 0.14s, background 0.14s;
-    }
-    #aicare-common-nav a:hover { color: var(--text2); background: rgba(59,130,246,0.05); }
-    #aicare-common-nav a.cn-active { color: var(--blue-lt); background: rgba(59,130,246,0.08); border-bottom: 2px solid var(--blue); }
+    /* ── COMMON NAV ── */
+    #cn { background:#030912; border-bottom:1px solid rgba(59,130,246,0.12); display:flex; align-items:center; gap:0; padding:0 20px; overflow-x:auto; white-space:nowrap; scrollbar-width:none; }
+    #cn::-webkit-scrollbar { display:none; }
+    #cn > * { flex-shrink:0; }
+    #cn .lbl { font-family:var(--mono); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--text3); padding:10px 12px; }
+    #cn a { font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--text3); text-decoration:none; padding:10px 11px; border-right:1px solid rgba(59,130,246,0.08); transition:color .14s,background .14s; }
+    #cn a:hover { color:var(--text2); background:rgba(59,130,246,0.05); }
+    #cn a.on { color:var(--blue-lt); background:rgba(59,130,246,0.08); border-bottom:2px solid var(--blue); }
 
-    /* ─── PAGE NAV ──────────────────────────────── */
-    .nav {
-      position: sticky; top: 0; z-index: 200;
-      background: #040c18; border-bottom: 1px solid rgba(245,158,11,0.2);
-      display: flex; align-items: center; gap: 8px; padding: 10px 32px; flex-wrap: wrap;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
-    }
-    .nav a { color: var(--text2); text-decoration: none; padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.15); transition: color 0.15s; }
-    .nav a:hover { color: var(--text); }
-    .nav a.active { color: var(--amber); border-color: rgba(245,158,11,0.35); background: var(--amber-dim); }
-    .nav-sep { color: var(--text3); margin: 0 4px; }
+    /* ── PAGE NAV ── */
+    .nav { position:sticky; top:0; z-index:200; background:#040c18; border-bottom:1px solid rgba(245,158,11,0.2); display:flex; align-items:center; gap:8px; padding:10px 32px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; letter-spacing:.06em; }
+    .nav a { color:var(--text2); text-decoration:none; padding:5px 14px; border-radius:4px; border:1px solid rgba(148,163,184,0.15); transition:color .15s; }
+    .nav a:hover { color:var(--text); }
+    .nav a.on { color:var(--amber); border-color:rgba(245,158,11,0.35); background:var(--amber-dim); }
+    .nav-sep { color:var(--text3); margin:0 4px; }
 
-    /* ─── LAYOUT ─────────────────────────────────── */
-    .wrap { max-width: 1280px; margin: 0 auto; padding: 32px 28px 100px; }
-    @media(max-width:640px){ .wrap { padding: 20px 14px 80px; } }
+    /* ── LAYOUT ── */
+    .wrap { max-width:1320px; margin:0 auto; padding:32px 28px 100px; }
 
-    /* ─── PAGE HEADER ────────────────────────────── */
-    .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-    .page-header-left {}
-    .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 8px; display: block; }
-    .page-title { font-size: clamp(20px,3vw,28px); font-weight: 700; color: var(--text); margin-bottom: 4px; letter-spacing: -0.02em; }
-    .page-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
-    .save-area { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .save-btn {
-      font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-      padding: 9px 22px; border-radius: 6px;
-      border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1);
-      color: var(--green-lt); cursor: pointer; transition: all 0.15s; white-space: nowrap;
-    }
-    .save-btn:hover { background: rgba(52,211,153,0.2); }
-    .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #save-status { font-size: 11px; color: var(--text3); font-family: var(--mono); max-width: 220px; }
+    /* ── HEADER ── */
+    .ph { margin-bottom:28px; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .eyebrow { font-family:var(--mono); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--green-lt); margin-bottom:8px; display:block; }
+    h1 { font-size:clamp(20px,3vw,28px); font-weight:700; color:var(--text); margin-bottom:4px; letter-spacing:-.02em; }
+    .sub { font-size:13px; color:var(--text2); }
+    .save-area { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .save-btn { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.08em; padding:9px 22px; border-radius:6px; border:1px solid rgba(52,211,153,0.5); background:rgba(52,211,153,0.1); color:var(--green-lt); cursor:pointer; transition:all .15s; }
+    .save-btn:hover { background:rgba(52,211,153,0.2); }
+    .save-btn:disabled { opacity:.4; cursor:not-allowed; }
+    #ss { font-size:11px; color:var(--text3); font-family:var(--mono); }
 
-    /* ─── SUMMARY ────────────────────────────────── */
-    .summary-section { margin-bottom: 36px; }
-    .summary-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; }
-    .summary-top { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
-    @media(max-width:760px){ .summary-top { grid-template-columns: repeat(2,1fr); } }
-    .stat-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px;
-    }
-    .stat-card.c-wip  { border-left: 3px solid var(--amber); }
-    .stat-card.c-done { border-left: 3px solid var(--green); }
-    .stat-card.c-none { border-left: 3px solid var(--text3); }
-    .stat-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; display: block; }
-    .stat-val { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; font-family: var(--mono); }
-    .stat-unit { font-size: 12px; color: var(--text3); margin-left: 3px; }
+    /* ── SUMMARY ── */
+    .smry { margin-bottom:36px; }
+    .smry-label { font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--text3); margin-bottom:14px; }
+    .smry-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px; }
+    @media(max-width:900px){ .smry-stats { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:560px){ .smry-stats { grid-template-columns:repeat(2,1fr); } }
+    .scard { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 18px; }
+    .scard.c-none { border-left:3px solid var(--text3); }
+    .scard.c-wip  { border-left:3px solid var(--amber); }
+    .scard.c-done { border-left:3px solid var(--green); }
+    .scard.c-done2{ border-left:3px solid var(--teal); }
+    .slabel { font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; display:block; }
+    .sval { font-family:var(--mono); font-size:26px; font-weight:700; color:var(--text); line-height:1; }
+    .sunit { font-size:12px; color:var(--text3); margin-left:3px; }
 
-    .summary-axis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
-    @media(max-width:900px){ .summary-axis { grid-template-columns: repeat(2,1fr); } }
-    @media(max-width:480px){ .summary-axis { grid-template-columns: 1fr; } }
-    .axis-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
-    .axis-card-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .axis-icon { width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
-    .top-list { list-style: none; }
-    .top-list li {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 4px 0; border-bottom: 1px solid rgba(59,130,246,0.08);
-      font-size: 12px; color: var(--text2); gap: 6px;
-    }
-    .top-list li:last-child { border-bottom: none; }
-    .top-list .rank { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; }
-    .top-list .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .score-pill { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 3px; flex-shrink: 0; }
-    .sp-audio  { background: rgba(59,130,246,0.15); color: var(--blue-lt); }
-    .sp-visual { background: var(--purple-dim); color: var(--purple); }
-    .sp-sns    { background: var(--green-dim); color: var(--green-lt); }
-    .sp-story  { background: var(--amber-dim); color: var(--amber); }
-    .top-empty { font-size: 11px; color: var(--text3); padding: 4px 0; font-family: var(--mono); }
+    .smry-axis { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    @media(max-width:860px){ .smry-axis { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:480px){ .smry-axis { grid-template-columns:1fr; } }
+    .acard { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
+    .acard-label { font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+    .top-list { list-style:none; }
+    .top-list li { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid rgba(59,130,246,0.07); font-size:12px; color:var(--text2); }
+    .top-list li:last-child { border-bottom:none; }
+    .rnk { font-family:var(--mono); font-size:10px; color:var(--text3); flex-shrink:0; width:22px; }
+    .tnm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .spill { font-family:var(--mono); font-size:10px; padding:1px 7px; border-radius:3px; flex-shrink:0; }
+    .sp-a { background:var(--blue-dim); color:var(--blue-lt); }
+    .sp-v { background:var(--purple-dim); color:var(--purple); }
+    .sp-s { background:var(--green-dim); color:var(--green-lt); }
+    .sp-t { background:var(--amber-dim); color:var(--amber); }
+    .top-empty { font-size:11px; color:var(--text3); padding:4px 0; font-family:var(--mono); }
 
-    /* ─── CONTROLS ───────────────────────────────── */
-    .controls { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
-    .ctrl-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .ctrl-row + .ctrl-row { margin-top: 10px; }
-    .ctrl-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3); white-space: nowrap; }
-    .filter-btn {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px;
-      border-radius: 5px; cursor: pointer; border: 1px solid var(--border2); background: transparent;
-      color: var(--text2); transition: all 0.15s; white-space: nowrap;
-    }
-    .filter-btn:hover { color: var(--text); border-color: rgba(59,130,246,0.4); }
-    .fb-active-all  { background: var(--blue-dim); border-color: var(--blue); color: var(--blue-lt) !important; }
-    .fb-active-大手 { background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
-    .fb-active-vc   { background: var(--purple-dim); border-color: var(--purple); color: var(--purple) !important; }
-    .fb-active-未調査{ background: rgba(78,106,136,0.2); border-color: var(--text3); color: var(--text2) !important; }
-    .fb-active-調査中{ background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
-    .fb-active-完了  { background: var(--green-dim); border-color: var(--green); color: var(--green-lt) !important; }
-    .fb-active-音   { background: var(--blue-dim); border-color: var(--blue); color: var(--blue-lt) !important; }
-    .fb-active-視覚 { background: var(--purple-dim); border-color: var(--purple); color: var(--purple) !important; }
-    .fb-active-SNS  { background: var(--green-dim); border-color: var(--green); color: var(--green-lt) !important; }
-    .fb-active-ストーリー { background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
-    .ctrl-sep { color: var(--text3); font-size: 12px; }
-    .search-input {
-      font-family: var(--body); font-size: 13px; padding: 6px 13px; border-radius: 5px;
-      border: 1px solid var(--border2); background: var(--card); color: var(--text);
-      outline: none; width: 180px; transition: border-color 0.15s;
-    }
-    .search-input:focus { border-color: var(--blue); }
-    .search-input::placeholder { color: var(--text3); }
-    .sort-select {
-      font-family: var(--mono); font-size: 11px; padding: 5px 10px; border-radius: 5px;
-      border: 1px solid var(--border2); background: var(--panel); color: var(--text2);
-      outline: none; cursor: pointer;
-    }
+    /* ── CONTROLS ── */
+    .ctrl { background:var(--panel); border:1px solid var(--border); border-radius:var(--r); padding:16px 20px; margin-bottom:20px; }
+    .ctrl-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .ctrl-row + .ctrl-row { margin-top:10px; }
+    .clabel { font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--text3); white-space:nowrap; }
+    .fb { font-family:var(--mono); font-size:11px; letter-spacing:.06em; padding:5px 14px; border-radius:5px; cursor:pointer; border:1px solid var(--border2); background:transparent; color:var(--text2); transition:all .15s; white-space:nowrap; }
+    .fb:hover { color:var(--text); border-color:rgba(59,130,246,0.4); }
+    .fb.a-all { background:var(--blue-dim); border-color:var(--blue); color:var(--blue-lt) !important; }
+    .fb.a-ote { background:var(--amber-dim); border-color:var(--amber); color:var(--amber) !important; }
+    .fb.a-vc  { background:var(--purple-dim); border-color:var(--purple); color:var(--purple) !important; }
+    .fb.a-s0  { background:rgba(78,106,136,0.2); border-color:var(--text3); color:var(--text2) !important; }
+    .fb.a-s1  { background:var(--amber-dim); border-color:var(--amber); color:var(--amber) !important; }
+    .fb.a-s2  { background:var(--teal-dim); border-color:var(--teal); color:var(--teal) !important; }
+    .fb.a-s3  { background:var(--green-dim); border-color:var(--green); color:var(--green-lt) !important; }
+    .fb.a-ax-音 { background:var(--blue-dim); border-color:var(--blue); color:var(--blue-lt) !important; }
+    .fb.a-ax-視覚 { background:var(--purple-dim); border-color:var(--purple); color:var(--purple) !important; }
+    .fb.a-ax-SNS  { background:var(--green-dim); border-color:var(--green); color:var(--green-lt) !important; }
+    .fb.a-ax-ストーリー { background:var(--amber-dim); border-color:var(--amber); color:var(--amber) !important; }
+    .csep { color:var(--text3); font-size:12px; }
+    .srch { font-family:var(--body); font-size:13px; padding:6px 13px; border-radius:5px; border:1px solid var(--border2); background:var(--card); color:var(--text); outline:none; width:180px; transition:border-color .15s; }
+    .srch:focus { border-color:var(--blue); }
+    .srch::placeholder { color:var(--text3); }
+    .sortsel { font-family:var(--mono); font-size:11px; padding:5px 10px; border-radius:5px; border:1px solid var(--border2); background:var(--panel); color:var(--text2); outline:none; cursor:pointer; }
 
-    /* ─── RESULT COUNT ───────────────────────────── */
-    .result-count { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 12px; }
-    .result-count strong { color: var(--text2); }
-
-    /* ─── TABLE ──────────────────────────────────── */
-    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--text3); padding: 11px 14px; text-align: left;
-      border-bottom: 1px solid var(--border2); background: var(--panel); white-space: nowrap;
-    }
-    thead th.sort-active { color: var(--blue-lt); }
-    tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(59,130,246,0.07); }
-    tbody tr.row-wip  { border-left: 3px solid var(--amber); }
-    tbody tr.row-done { border-left: 3px solid var(--green); }
-    tbody tr.row-none { border-left: 3px solid transparent; }
-    tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
-    .td-id { color: var(--text3); font-family: var(--mono); font-size: 10px; }
-    .td-name { font-weight: 600; min-width: 120px; }
-    .td-summary { color: var(--text2); font-size: 12px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .td-score { font-family: var(--mono); font-size: 12px; text-align: center; }
-    .td-total { font-family: var(--mono); font-size: 13px; font-weight: 700; text-align: center; }
-    .td-total.high { color: var(--green-lt); }
-    .td-total.mid  { color: var(--blue-lt); }
-    .td-date { font-family: var(--mono); font-size: 10px; color: var(--text3); white-space: nowrap; }
+    /* ── TABLE ── */
+    .rcount { font-family:var(--mono); font-size:11px; color:var(--text3); margin-bottom:12px; }
+    .rcount strong { color:var(--text2); }
+    .tw { overflow-x:auto; border-radius:var(--r); border:1px solid var(--border); margin-bottom:48px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); padding:11px 14px; text-align:left; border-bottom:1px solid var(--border2); background:var(--panel); white-space:nowrap; }
+    tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(59,130,246,0.07); }
+    tbody tr.r-wip  { border-left:3px solid var(--amber); }
+    tbody tr.r-done { border-left:3px solid var(--teal); }
+    tbody tr.r-cmp  { border-left:3px solid var(--green); }
+    tbody tr.r-none { border-left:3px solid transparent; }
+    tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
 
     /* badges */
-    .badge { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.04em; white-space: nowrap; }
-    .badge-大手   { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-    .badge-vc     { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
-    .badge-未調査  { background: rgba(78,106,136,0.2); color: var(--text3); border: 1px solid rgba(78,106,136,0.3); }
-    .badge-調査中  { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.4); }
-    .badge-完了    { background: var(--green-dim); color: var(--green-lt); border: 1px solid rgba(16,185,129,0.4); }
-    .badge-音     { background: var(--blue-dim); color: var(--blue-lt); border: 1px solid rgba(59,130,246,0.3); }
-    .badge-視覚   { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
-    .badge-SNS    { background: var(--green-dim); color: var(--green-lt); border: 1px solid rgba(16,185,129,0.3); }
-    .badge-ストーリー { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-    .badge-none   { background: rgba(78,106,136,0.15); color: var(--text3); border: 1px solid rgba(78,106,136,0.2); }
+    .b { display:inline-block; font-family:var(--mono); font-size:10px; padding:2px 7px; border-radius:3px; letter-spacing:.04em; white-space:nowrap; margin:1px 1px; }
+    .b-ote { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,158,11,0.3); }
+    .b-vc  { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(167,139,250,0.3); }
+    .b-s0  { background:rgba(78,106,136,0.2); color:var(--text3); border:1px solid rgba(78,106,136,0.3); }
+    .b-s1  { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,158,11,0.4); }
+    .b-s2  { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(45,212,191,0.4); }
+    .b-s3  { background:var(--green-dim); color:var(--green-lt); border:1px solid rgba(16,185,129,0.4); }
+    .b-ax-音 { background:var(--blue-dim); color:var(--blue-lt); border:1px solid rgba(59,130,246,0.3); }
+    .b-ax-視覚 { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(167,139,250,0.3); }
+    .b-ax-SNS  { background:var(--green-dim); color:var(--green-lt); border:1px solid rgba(16,185,129,0.3); }
+    .b-ax-ストーリー { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,158,11,0.3); }
+    .b-ax-none { background:rgba(78,106,136,0.15); color:var(--text3); border:1px solid rgba(78,106,136,0.2); }
 
     /* score dots */
-    .score-dots { display: flex; gap: 2px; align-items: center; justify-content: center; }
-    .sd { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
-    .sd.on { background: var(--blue-lt); }
+    .dots { display:flex; gap:2px; align-items:center; justify-content:center; }
+    .dot { width:5px; height:5px; border-radius:50%; background:var(--border2); }
+    .dot.on { background:var(--blue-lt); }
+    .td-id { color:var(--text3); font-family:var(--mono); font-size:10px; }
+    .td-nm { font-weight:600; min-width:110px; }
+    .td-sum { color:var(--text2); font-size:12px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .td-sc { font-family:var(--mono); font-size:12px; text-align:center; }
+    .td-tot { font-family:var(--mono); font-size:13px; font-weight:700; text-align:center; }
+    .td-tot.hi { color:var(--green-lt); }
+    .td-tot.md { color:var(--blue-lt); }
+    .td-dt { font-family:var(--mono); font-size:10px; color:var(--text3); white-space:nowrap; }
 
-    /* ─── MODAL ──────────────────────────────────── */
-    .overlay {
-      display: none; position: fixed; inset: 0; background: rgba(4,12,24,0.88);
-      z-index: 500; overflow-y: auto; padding: 20px;
-    }
-    .overlay.open { display: block; }
-    .modal {
-      background: var(--panel); border: 1px solid var(--border2); border-radius: 12px;
-      max-width: 720px; margin: 0 auto; position: relative;
-      animation: slideup 0.2s ease;
-    }
-    @keyframes slideup { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
-    .modal-header {
-      padding: 24px 28px 0;
-      border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 0;
-    }
-    .modal-close {
-      position: absolute; top: 18px; right: 20px;
-      font-family: var(--mono); font-size: 11px; color: var(--text3);
-      cursor: pointer; background: none; border: 1px solid var(--border); border-radius: 4px;
-      padding: 4px 10px; transition: color 0.15s, border-color 0.15s;
-    }
-    .modal-close:hover { color: var(--text); border-color: var(--text3); }
-    .modal-company-name { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
-    .modal-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0; }
+    /* ── MODAL ── */
+    .ov { display:none; position:fixed; inset:0; background:rgba(4,12,24,0.9); z-index:500; overflow-y:auto; padding:20px; }
+    .ov.open { display:block; }
+    .modal { background:var(--panel); border:1px solid var(--border2); border-radius:12px; max-width:760px; margin:0 auto; position:relative; animation:su .2s ease; }
+    @keyframes su { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+    .mhd { padding:24px 28px 20px; border-bottom:1px solid var(--border); }
+    .mcls { position:absolute; top:18px; right:20px; font-family:var(--mono); font-size:11px; color:var(--text3); cursor:pointer; background:none; border:1px solid var(--border); border-radius:4px; padding:4px 10px; transition:all .15s; }
+    .mcls:hover { color:var(--text); border-color:var(--text3); }
+    .mcomp { font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; line-height:1.3; padding-right:80px; }
+    .mbdg { display:flex; flex-wrap:wrap; gap:5px; }
 
-    /* tabs */
-    .modal-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 28px; margin-bottom: 0; }
-    .mtab {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; padding: 12px 18px;
-      color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s; background: none; border-top: none; border-left: none; border-right: none;
-    }
-    .mtab:hover { color: var(--text2); }
-    .mtab.active { color: var(--blue-lt); border-bottom-color: var(--blue); }
+    .mtabs { display:flex; gap:0; border-bottom:1px solid var(--border); padding:0 28px; }
+    .mtab { font-family:var(--mono); font-size:11px; letter-spacing:.08em; padding:12px 18px; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; transition:color .15s,border-color .15s; background:none; border-top:none; border-left:none; border-right:none; }
+    .mtab:hover { color:var(--text2); }
+    .mtab.on { color:var(--blue-lt); border-bottom-color:var(--blue); }
 
-    .modal-body { padding: 24px 28px 28px; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .mbody { padding:24px 28px 20px; }
+    .tp { display:none; }
+    .tp.on { display:block; }
 
-    /* form fields */
-    .field { margin-bottom: 20px; }
-    .field:last-child { margin-bottom: 0; }
-    .field-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--text3); margin-bottom: 7px; display: block;
-    }
-    .field-label.required::after { content: ' *'; color: var(--red); }
-    .field-hint { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
-    .f-input, .f-textarea, .f-select {
-      width: 100%; font-family: var(--body); font-size: 13px; padding: 9px 13px;
-      border-radius: 6px; border: 1px solid var(--border2); background: var(--card);
-      color: var(--text); outline: none; transition: border-color 0.15s;
-    }
-    .f-textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
-    .f-input:focus, .f-textarea:focus, .f-select:focus { border-color: var(--blue); }
-    .f-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:540px){ .f-grid2 { grid-template-columns: 1fr; } }
+    /* view fields */
+    .vf { margin-bottom:18px; }
+    .vlbl { font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; display:block; }
+    .vval { color:var(--text); font-size:13px; line-height:1.8; white-space:pre-wrap; word-break:break-word; }
+    .vval.emp { color:var(--text3); font-style:italic; font-size:12px; }
+    .vg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:560px){ .vg2 { grid-template-columns:1fr; } }
+    .vscores { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:10px; }
+    @media(max-width:480px){ .vscores { grid-template-columns:repeat(2,1fr); } }
+    .vsci { background:var(--card2); border-radius:6px; padding:10px 12px; text-align:center; }
+    .vsci-ax { font-family:var(--mono); font-size:9.5px; color:var(--text3); margin-bottom:4px; }
+    .vsci-n { font-family:var(--mono); font-size:22px; font-weight:700; }
+    .ref-link { display:block; margin-bottom:6px; }
+    .ref-link a { color:var(--blue-lt); text-decoration:none; font-size:13px; border-bottom:1px solid rgba(96,165,250,0.3); padding-bottom:1px; transition:border-color .15s; }
+    .ref-link a:hover { border-bottom-color:var(--blue-lt); }
+    .ref-link .rurl { font-family:var(--mono); font-size:10px; color:var(--text3); display:block; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* edit fields */
+    .ef { margin-bottom:18px; }
+    .ef:last-child { margin-bottom:0; }
+    .elbl { font-family:var(--mono); font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin-bottom:7px; display:block; }
+    .ehint { font-size:11px; color:var(--text3); margin-bottom:6px; }
+    .einp,.etxt,.esel { width:100%; font-family:var(--body); font-size:13px; padding:9px 13px; border-radius:6px; border:1px solid var(--border2); background:var(--card); color:var(--text); outline:none; transition:border-color .15s; }
+    .etxt { resize:vertical; min-height:80px; line-height:1.65; }
+    .einp:focus,.etxt:focus,.esel:focus { border-color:var(--blue); }
+    .eg2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:560px){ .eg2 { grid-template-columns:1fr; } }
+
+    /* axis checkboxes */
+    .ax-cbs { display:flex; flex-wrap:wrap; gap:8px; }
+    .ax-cb { display:none; }
+    .ax-cb-lbl { font-family:var(--mono); font-size:11px; padding:5px 14px; border-radius:5px; border:1px solid var(--border2); color:var(--text2); cursor:pointer; transition:all .15s; }
+    .ax-cb:checked + .ax-cb-lbl.la { background:var(--blue-dim); border-color:var(--blue); color:var(--blue-lt); }
+    .ax-cb:checked + .ax-cb-lbl.lv { background:var(--purple-dim); border-color:var(--purple); color:var(--purple); }
+    .ax-cb:checked + .ax-cb-lbl.ls { background:var(--green-dim); border-color:var(--green); color:var(--green-lt); }
+    .ax-cb:checked + .ax-cb-lbl.lt { background:var(--amber-dim); border-color:var(--amber); color:var(--amber); }
 
     /* scores */
-    .scores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media(max-width:440px){ .scores-grid { grid-template-columns: 1fr; } }
-    .score-field label {
-      display: flex; justify-content: space-between; align-items: center;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3);
-      margin-bottom: 6px;
-    }
-    .score-val { font-size: 13px; font-weight: 700; color: var(--blue-lt); }
-    input[type=range] { width: 100%; accent-color: var(--blue-lt); cursor: pointer; }
-    .total-line { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 12px; color: var(--text3); }
-    .total-line span { font-size: 18px; font-weight: 700; color: var(--blue-lt); }
+    .sg { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:440px){ .sg { grid-template-columns:1fr; } }
+    .sfi label { display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--text3); margin-bottom:6px; }
+    .sv { font-size:13px; font-weight:700; color:var(--blue-lt); }
+    input[type=range] { width:100%; accent-color:var(--blue-lt); cursor:pointer; }
+    .tline { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); font-family:var(--mono); font-size:12px; color:var(--text3); }
+    .tline span { font-size:18px; font-weight:700; color:var(--blue-lt); }
 
-    /* view mode */
-    .view-field { margin-bottom: 18px; }
-    .view-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; display: block; }
-    .view-val { color: var(--text); font-size: 13px; line-height: 1.75; white-space: pre-wrap; }
-    .view-val.empty { color: var(--text3); font-style: italic; font-size: 12px; }
-    .view-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:540px){ .view-grid2 { grid-template-columns: 1fr; } }
-    .view-scores { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 8px; }
-    @media(max-width:480px){ .view-scores { grid-template-columns: repeat(2,1fr); } }
-    .vscore-item { background: var(--card2); border-radius: 6px; padding: 10px 12px; text-align: center; }
-    .vscore-axis { font-family: var(--mono); font-size: 9.5px; color: var(--text3); margin-bottom: 4px; }
-    .vscore-num { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+    /* references editor */
+    .refs-list { display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+    .ref-row { display:flex; gap:6px; align-items:center; }
+    .ref-row .einp { flex:1; }
+    .ref-row .einp.url { flex:2; }
+    .ref-del { font-family:var(--mono); font-size:10px; padding:6px 10px; border-radius:4px; border:1px solid rgba(239,68,68,0.3); background:rgba(239,68,68,0.07); color:var(--red); cursor:pointer; flex-shrink:0; white-space:nowrap; }
+    .ref-del:hover { background:rgba(239,68,68,0.14); }
+    .ref-add { font-family:var(--mono); font-size:11px; padding:6px 16px; border-radius:5px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; transition:all .15s; }
+    .ref-add:hover { color:var(--text); }
 
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; padding: 0 28px 24px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap; }
-    .btn-primary { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 9px 24px; border-radius: 6px; border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1); color: var(--green-lt); cursor: pointer; transition: all 0.15s; }
-    .btn-primary:hover { background: rgba(52,211,153,0.2); }
-    .btn-edit   { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 9px 24px; border-radius: 6px; border: 1px solid rgba(96,165,250,0.4); background: rgba(59,130,246,0.08); color: var(--blue-lt); cursor: pointer; transition: all 0.15s; }
-    .btn-edit:hover { background: rgba(59,130,246,0.14); }
-    .btn-cancel { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; padding: 9px 20px; border-radius: 6px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
-    .btn-cancel:hover { color: var(--text); }
+    /* modal actions */
+    .mact { display:flex; gap:10px; justify-content:flex-end; padding:0 28px 24px; border-top:1px solid var(--border); padding-top:18px; flex-wrap:wrap; }
+    .btn-p { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.08em; padding:9px 24px; border-radius:6px; border:1px solid rgba(52,211,153,0.5); background:rgba(52,211,153,0.1); color:var(--green-lt); cursor:pointer; transition:all .15s; }
+    .btn-p:hover { background:rgba(52,211,153,0.2); }
+    .btn-e { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.08em; padding:9px 24px; border-radius:6px; border:1px solid rgba(96,165,250,0.4); background:rgba(59,130,246,0.08); color:var(--blue-lt); cursor:pointer; transition:all .15s; }
+    .btn-e:hover { background:rgba(59,130,246,0.14); }
+    .btn-c { font-family:var(--mono); font-size:11px; letter-spacing:.08em; padding:9px 20px; border-radius:6px; border:1px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; transition:all .15s; }
+    .btn-c:hover { color:var(--text); }
+    .upd { font-family:var(--mono); font-size:10px; color:var(--text3); margin-top:10px; text-align:right; padding:0 28px 6px; }
 
-    .updated-hint { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 10px; text-align: right; }
-
-    /* ─── LOADING ────────────────────────────────── */
-    .loading-row td { text-align: center; color: var(--text3); padding: 48px; font-family: var(--mono); font-size: 12px; }
-
-    @media(max-width:640px){
-      .nav { padding: 8px 14px; }
-      .modal-body { padding: 18px 18px 22px; }
-      .modal-header { padding: 18px 18px 16px; }
-      .modal-tabs { padding: 0 18px; }
-      .modal-actions { padding: 16px 18px 20px; }
-    }
+    .loading-r td { text-align:center; color:var(--text3); padding:48px; font-family:var(--mono); font-size:12px; }
+    @media(max-width:640px){ .wrap{padding:20px 14px 80px;} .nav{padding:8px 14px;} .mhd{padding:18px 18px 16px;} .mbody{padding:18px 18px 18px;} .mtabs{padding:0 18px;} .mact{padding:14px 18px 20px;} .upd{padding:0 18px 6px;} }
   </style>
 </head>
 <body>
 
-<!-- ─── COMMON NAV ────────────────────────────────── -->
-<nav id="aicare-common-nav">
-  <span class="cn-label">aicare lab</span>
+<!-- common nav -->
+<nav id="cn">
+  <span class="lbl">aicare lab</span>
   <a href="aicare-top-prototype.html">サイト TOP</a>
   <a href="aicare-sitemap.html">サイトマップ</a>
   <a href="aicare-stores.html">店舗一覧</a>
@@ -329,74 +267,70 @@
   <a href="persona-dashboard.html">ペルソナ</a>
   <a href="aicare-brand-overview.html">ブランドマップ</a>
   <a href="eyecare-glass-branding.html">グラス</a>
-  <a href="branding-research.html" class="cn-active">ブランド調査</a>
+  <a href="branding-research.html" class="on">ブランド調査</a>
   <a href="reference-sites.html">参考サイト集</a>
   <a href="aicare-schedule.html">スケジュール</a>
   <a href="aicare-projects.html">プロジェクト管理</a>
 </nav>
 <script>
-(function(){
-  var cur = location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
-    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
-  });
-})();
+(function(){var c=location.pathname.split('/').pop()||'index.html';document.querySelectorAll('#cn a').forEach(function(a){if(a.getAttribute('href')===c)a.classList.add('on');});})();
 </script>
 
 <nav class="nav">
   <span style="color:var(--text3)">eye care lab</span>
   <span class="nav-sep">/</span>
   <a href="eyecare-glass-branding.html">グラス ブランディング</a>
-  <a href="branding-research.html" class="active">🔍 ブランド事例調査</a>
+  <a href="branding-research.html" class="on">🔍 ブランド事例調査</a>
 </nav>
 
 <div class="wrap">
 
-  <!-- ─── PAGE HEADER ──────────────────────────────── -->
-  <div class="page-header">
-    <div class="page-header-left">
+  <!-- header -->
+  <div class="ph">
+    <div>
       <span class="eyebrow">Brand Case Research — 日本企業50社</span>
-      <h1 class="page-title">ブランド事例調査</h1>
-      <p class="page-sub">なぜ強いのか・どうなったのか・アイケアLaBoに転用できることを整理する</p>
+      <h1>ブランド事例調査</h1>
+      <p class="sub">なぜ強いのか・どうやってそうなったのか・アイケアLaBoに転用できることを整理する</p>
     </div>
     <div class="save-area">
-      <button class="save-btn" id="save-btn" onclick="saveData()">💾 保存</button>
-      <span id="save-status">読み込み中...</span>
+      <button class="save-btn" id="savebtn" onclick="saveData()">💾 保存</button>
+      <span id="ss">読み込み中...</span>
     </div>
   </div>
 
-  <!-- ─── SUMMARY ──────────────────────────────────── -->
-  <div class="summary-section">
-    <div class="summary-title">調査まとめ</div>
-    <div class="summary-top" id="summary-top"><!-- JS --></div>
-    <div class="summary-axis" id="summary-axis"><!-- JS --></div>
+  <!-- summary -->
+  <div class="smry">
+    <div class="smry-label">調査まとめ</div>
+    <div class="smry-stats" id="smry-stats"></div>
+    <div class="smry-axis" id="smry-axis"></div>
   </div>
 
-  <!-- ─── CONTROLS ─────────────────────────────────── -->
-  <div class="controls">
+  <!-- controls -->
+  <div class="ctrl">
     <div class="ctrl-row">
-      <span class="ctrl-label">区分</span>
-      <button class="filter-btn fb-active-all" data-g="cat" data-v="all" onclick="setFilter('cat','all',this)">全て</button>
-      <button class="filter-btn" data-g="cat" data-v="大手" onclick="setFilter('cat','大手',this)">大手</button>
-      <button class="filter-btn" data-g="cat" data-v="vc" onclick="setFilter('cat','vc',this)">ベンチャー・中小</button>
-      <span class="ctrl-sep">|</span>
-      <span class="ctrl-label">ステータス</span>
-      <button class="filter-btn fb-active-all" data-g="status" data-v="all" onclick="setFilter('status','all',this)">全て</button>
-      <button class="filter-btn" data-g="status" data-v="未調査" onclick="setFilter('status','未調査',this)">未調査</button>
-      <button class="filter-btn" data-g="status" data-v="調査中" onclick="setFilter('status','調査中',this)">調査中</button>
-      <button class="filter-btn" data-g="status" data-v="完了" onclick="setFilter('status','完了',this)">完了</button>
+      <span class="clabel">区分</span>
+      <button class="fb a-all" data-g="cat" data-v="all"    onclick="sf('cat','all',this)">全て</button>
+      <button class="fb"       data-g="cat" data-v="大手"   onclick="sf('cat','大手',this)">大手</button>
+      <button class="fb"       data-g="cat" data-v="vc"     onclick="sf('cat','vc',this)">ベンチャー・中小</button>
+      <span class="csep">|</span>
+      <span class="clabel">ステータス</span>
+      <button class="fb a-all" data-g="st" data-v="all"     onclick="sf('st','all',this)">全て</button>
+      <button class="fb"       data-g="st" data-v="未調査"  onclick="sf('st','未調査',this)">未調査</button>
+      <button class="fb"       data-g="st" data-v="調査中"  onclick="sf('st','調査中',this)">調査中</button>
+      <button class="fb"       data-g="st" data-v="調査済み" onclick="sf('st','調査済み',this)">調査済み</button>
+      <button class="fb"       data-g="st" data-v="完了"    onclick="sf('st','完了',this)">完了</button>
     </div>
     <div class="ctrl-row">
-      <span class="ctrl-label">主軸</span>
-      <button class="filter-btn fb-active-all" data-g="axis" data-v="all" onclick="setFilter('axis','all',this)">全軸</button>
-      <button class="filter-btn" data-g="axis" data-v="音" onclick="setFilter('axis','音',this)">🎵 音</button>
-      <button class="filter-btn" data-g="axis" data-v="視覚" onclick="setFilter('axis','視覚',this)">👁 視覚</button>
-      <button class="filter-btn" data-g="axis" data-v="SNS" onclick="setFilter('axis','SNS',this)">📣 SNS</button>
-      <button class="filter-btn" data-g="axis" data-v="ストーリー" onclick="setFilter('axis','ストーリー',this)">📖 ストーリー</button>
-      <span class="ctrl-sep">|</span>
-      <input class="search-input" id="search" type="text" placeholder="企業名で検索" oninput="renderTable()" />
-      <span class="ctrl-label">並び替え</span>
-      <select class="sort-select" id="sort-sel" onchange="renderTable()">
+      <span class="clabel">主軸</span>
+      <button class="fb a-all"  data-g="ax" data-v="all"      onclick="sf('ax','all',this)">全軸</button>
+      <button class="fb"        data-g="ax" data-v="音"        onclick="sf('ax','音',this)">🎵 音</button>
+      <button class="fb"        data-g="ax" data-v="視覚"      onclick="sf('ax','視覚',this)">👁 視覚</button>
+      <button class="fb"        data-g="ax" data-v="SNS"       onclick="sf('ax','SNS',this)">📣 SNS</button>
+      <button class="fb"        data-g="ax" data-v="ストーリー" onclick="sf('ax','ストーリー',this)">📖 ストーリー</button>
+      <span class="csep">|</span>
+      <input class="srch" id="srch" type="text" placeholder="企業名で検索" oninput="rt()" />
+      <span class="clabel">並び替え</span>
+      <select class="sortsel" id="srt" onchange="rt()">
         <option value="id">登録順</option>
         <option value="name">企業名順</option>
         <option value="score">スコア順</option>
@@ -404,611 +338,649 @@
       </select>
     </div>
   </div>
-  <div class="result-count" id="result-count"></div>
+  <div class="rcount" id="rcount"></div>
 
-  <!-- ─── TABLE ────────────────────────────────────── -->
-  <div class="table-wrap">
-    <table id="main-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>企業名</th>
-          <th>区分</th>
-          <th>主軸</th>
-          <th>ステータス</th>
-          <th>一言要約</th>
-          <th style="text-align:center">音</th>
-          <th style="text-align:center">視覚</th>
-          <th style="text-align:center">SNS</th>
-          <th style="text-align:center">STR</th>
-          <th style="text-align:center">合計</th>
-          <th>更新日</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <tr class="loading-row"><td colspan="12">読み込み中...</td></tr>
-      </tbody>
+  <!-- table -->
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>#</th><th>企業名</th><th>区分</th><th>業界</th><th>主軸</th><th>ステータス</th>
+        <th>一言要約</th>
+        <th style="text-align:center">音</th><th style="text-align:center">視覚</th>
+        <th style="text-align:center">SNS</th><th style="text-align:center">STR</th>
+        <th style="text-align:center">合計</th><th>更新日</th>
+      </tr></thead>
+      <tbody id="tbody"><tr class="loading-r"><td colspan="13">読み込み中...</td></tr></tbody>
     </table>
   </div>
 </div>
 
-<!-- ─── DETAIL / EDIT MODAL ──────────────────────── -->
-<div class="overlay" id="overlay" onclick="overlayClick(event)">
+<!-- modal -->
+<div class="ov" id="ov" onclick="ovClick(event)">
   <div class="modal" id="modal">
-
-    <div class="modal-header">
-      <button class="modal-close" onclick="closeModal()">✕ 閉じる</button>
-      <div class="modal-company-name" id="m-name"></div>
-      <div class="modal-badges" id="m-badges"></div>
+    <div class="mhd">
+      <button class="mcls" onclick="closeMod()">✕ 閉じる</button>
+      <div class="mcomp" id="mc"></div>
+      <div class="mbdg" id="mb"></div>
     </div>
-
-    <div class="modal-tabs">
-      <button class="mtab active" onclick="switchTab('view',this)">詳細</button>
-      <button class="mtab" onclick="switchTab('edit',this)">編集</button>
+    <div class="mtabs">
+      <button class="mtab on" id="tab-v" onclick="stab('v')">詳細</button>
+      <button class="mtab"    id="tab-e" onclick="stab('e')">編集</button>
     </div>
+    <div class="mbody">
 
-    <!-- ─── VIEW TAB ─── -->
-    <div class="modal-body">
-      <div class="tab-panel active" id="tab-view">
-        <div class="view-grid2">
-          <div class="view-field">
-            <span class="view-label">業界</span>
-            <div class="view-val" id="v-industry"></div>
-          </div>
-          <div class="view-field">
-            <span class="view-label">主軸</span>
-            <div id="v-main-axis"></div>
-          </div>
+      <!-- VIEW -->
+      <div class="tp on" id="tp-v">
+        <div class="vg2">
+          <div class="vf"><span class="vlbl">業界</span><div class="vval" id="v-ind"></div></div>
+          <div class="vf"><span class="vlbl">主軸</span><div id="v-ax"></div></div>
         </div>
-        <div class="view-field">
-          <span class="view-label">一言要約</span>
-          <div class="view-val" id="v-summary"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">なぜ強いのか</span>
-          <div class="view-val" id="v-why"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">どうやってそうなったのか</span>
-          <div class="view-val" id="v-how"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">どこで刷り込んだのか</span>
-          <div class="view-val" id="v-where"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">成果の兆候</span>
-          <div class="view-val" id="v-traction"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">アイケアLaBoへの示唆</span>
-          <div class="view-val" id="v-implication"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">メモ</span>
-          <div class="view-val" id="v-memo"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">参考リンク</span>
-          <div class="view-val" id="v-refs"></div>
-        </div>
-        <div class="view-field">
-          <span class="view-label">スコア</span>
-          <div class="view-scores">
-            <div class="vscore-item">
-              <div class="vscore-axis">🎵 音</div>
-              <div class="vscore-num" id="vs-audio" style="color:var(--blue-lt)">—</div>
-            </div>
-            <div class="vscore-item">
-              <div class="vscore-axis">👁 視覚</div>
-              <div class="vscore-num" id="vs-visual" style="color:var(--purple)">—</div>
-            </div>
-            <div class="vscore-item">
-              <div class="vscore-axis">📣 SNS</div>
-              <div class="vscore-num" id="vs-sns" style="color:var(--green-lt)">—</div>
-            </div>
-            <div class="vscore-item">
-              <div class="vscore-axis">📖 ストーリー</div>
-              <div class="vscore-num" id="vs-story" style="color:var(--amber)">—</div>
-            </div>
+        <div class="vf"><span class="vlbl">一言要約</span><div class="vval" id="v-ol"></div></div>
+        <div class="vf"><span class="vlbl">なぜ強いのか</span><div class="vval" id="v-why"></div></div>
+        <div class="vf"><span class="vlbl">どうやってそうなったのか</span><div class="vval" id="v-how"></div></div>
+        <div class="vf"><span class="vlbl">どこで刷り込んだのか</span><div class="vval" id="v-whr"></div></div>
+        <div class="vf"><span class="vlbl">成果の兆候</span><div class="vval" id="v-tr"></div></div>
+        <div class="vf"><span class="vlbl">アイケアLaBoへの示唆</span><div class="vval" id="v-imp"></div></div>
+        <div class="vf"><span class="vlbl">メモ</span><div class="vval" id="v-memo"></div></div>
+        <div class="vf"><span class="vlbl">参考リンク</span><div id="v-refs"></div></div>
+        <div class="vf">
+          <span class="vlbl">スコア</span>
+          <div class="vscores">
+            <div class="vsci"><div class="vsci-ax">🎵 音</div><div class="vsci-n" id="vs-a" style="color:var(--blue-lt)">—</div></div>
+            <div class="vsci"><div class="vsci-ax">👁 視覚</div><div class="vsci-n" id="vs-v" style="color:var(--purple)">—</div></div>
+            <div class="vsci"><div class="vsci-ax">📣 SNS</div><div class="vsci-n" id="vs-s" style="color:var(--green-lt)">—</div></div>
+            <div class="vsci"><div class="vsci-ax">📖 ストーリー</div><div class="vsci-n" id="vs-t" style="color:var(--amber)">—</div></div>
           </div>
         </div>
-        <div class="updated-hint" id="v-updated"></div>
       </div>
 
-      <!-- ─── EDIT TAB ─── -->
-      <div class="tab-panel" id="tab-edit">
-        <div class="f-grid2">
-          <div class="field">
-            <span class="field-label">業界</span>
-            <input class="f-input" id="e-industry" type="text" placeholder="例：食品・飲料、アパレル、IT など" />
-          </div>
-          <div class="field">
-            <span class="field-label">主軸</span>
-            <select class="f-select" id="e-main-axis">
-              <option value="">— 未設定 —</option>
-              <option value="音">🎵 音</option>
-              <option value="視覚">👁 視覚</option>
-              <option value="SNS">📣 SNS</option>
-              <option value="ストーリー">📖 ストーリー</option>
-            </select>
-          </div>
-        </div>
-        <div class="f-grid2">
-          <div class="field">
-            <span class="field-label">ステータス</span>
-            <select class="f-select" id="e-status">
+      <!-- EDIT -->
+      <div class="tp" id="tp-e">
+        <div class="eg2">
+          <div class="ef"><span class="elbl">業界</span><input class="einp" id="e-ind" type="text" placeholder="例：食品、アパレル、ヘルスケア" /></div>
+          <div class="ef">
+            <span class="elbl">ステータス</span>
+            <select class="esel" id="e-st">
               <option value="未調査">未調査</option>
               <option value="調査中">調査中</option>
+              <option value="調査済み">調査済み</option>
               <option value="完了">完了</option>
             </select>
           </div>
         </div>
-        <div class="field">
-          <span class="field-label">一言要約</span>
-          <span class="field-hint">このブランドの特徴を一言で</span>
-          <input class="f-input" id="e-summary" type="text" placeholder="例：CMジングルで感情を刷り込む老舗マーケティング" />
-        </div>
-        <div class="field">
-          <span class="field-label">なぜ強いのか</span>
-          <textarea class="f-textarea" id="e-why" placeholder="ブランドの強さの本質・差別化要因を記述する"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">どうやってそうなったのか</span>
-          <textarea class="f-textarea" id="e-how" placeholder="歴史・経緯・具体的な打ち手・プロセス"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">どこで刷り込んだのか</span>
-          <textarea class="f-textarea" id="e-where" placeholder="TV / SNS / 店頭 / 音楽 / パッケージ / 体験 など接触点"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">成果の兆候</span>
-          <textarea class="f-textarea" id="e-traction" placeholder="売上推移・SNS反応・認知率・ファン数・メディア露出など"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">アイケアLaBoへの示唆</span>
-          <textarea class="f-textarea" id="e-implication" placeholder="アイケアLaBoが転用・参考にできることは何か"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">メモ</span>
-          <textarea class="f-textarea" id="e-memo" placeholder="調査中の気づき・補足など自由記述"></textarea>
-        </div>
-        <div class="field">
-          <span class="field-label">参考リンク</span>
-          <textarea class="f-textarea" id="e-refs" rows="3" placeholder="URL や記事名など。改行で複数入力可。"></textarea>
-        </div>
-
-        <!-- Scores -->
-        <div class="field">
-          <span class="field-label">4軸スコア（0〜10）</span>
-          <div class="scores-grid">
-            <div class="score-field">
-              <label>🎵 音<span class="score-val" id="sv-audio">0</span></label>
-              <input type="range" id="e-audio" min="0" max="10" value="0"
-                oninput="document.getElementById('sv-audio').textContent=this.value;calcTotal()">
-            </div>
-            <div class="score-field">
-              <label>👁 視覚<span class="score-val" id="sv-visual" style="color:var(--purple)">0</span></label>
-              <input type="range" id="e-visual" min="0" max="10" value="0"
-                oninput="document.getElementById('sv-visual').textContent=this.value;calcTotal()">
-            </div>
-            <div class="score-field">
-              <label>📣 SNS<span class="score-val" id="sv-sns" style="color:var(--green-lt)">0</span></label>
-              <input type="range" id="e-sns" min="0" max="10" value="0"
-                oninput="document.getElementById('sv-sns').textContent=this.value;calcTotal()">
-            </div>
-            <div class="score-field">
-              <label>📖 ストーリー<span class="score-val" id="sv-story" style="color:var(--amber)">0</span></label>
-              <input type="range" id="e-story" min="0" max="10" value="0"
-                oninput="document.getElementById('sv-story').textContent=this.value;calcTotal()">
-            </div>
+        <div class="ef">
+          <span class="elbl">主軸（複数選択可）</span>
+          <div class="ax-cbs">
+            <input type="checkbox" class="ax-cb" id="ax-a" value="音"><label for="ax-a" class="ax-cb-lbl la">🎵 音</label>
+            <input type="checkbox" class="ax-cb" id="ax-v" value="視覚"><label for="ax-v" class="ax-cb-lbl lv">👁 視覚</label>
+            <input type="checkbox" class="ax-cb" id="ax-s" value="SNS"><label for="ax-s" class="ax-cb-lbl ls">📣 SNS</label>
+            <input type="checkbox" class="ax-cb" id="ax-t" value="ストーリー"><label for="ax-t" class="ax-cb-lbl lt">📖 ストーリー</label>
           </div>
-          <div class="total-line">合計スコア：<span id="e-total">0</span> / 40</div>
+        </div>
+        <div class="ef"><span class="elbl">一言要約</span><span class="ehint">このブランドの特徴を一文で</span><input class="einp" id="e-ol" type="text" placeholder="例：参加型ハッシュタグで3億回視聴を生んだUGC施策" /></div>
+        <div class="ef"><span class="elbl">なぜ強いのか</span><textarea class="etxt" id="e-why"></textarea></div>
+        <div class="ef"><span class="elbl">どうやってそうなったのか</span><textarea class="etxt" id="e-how"></textarea></div>
+        <div class="ef"><span class="elbl">どこで刷り込んだのか</span><textarea class="etxt" id="e-whr" placeholder="TV / SNS / 店頭 / 音楽 / パッケージ / 体験など"></textarea></div>
+        <div class="ef"><span class="elbl">成果の兆候</span><textarea class="etxt" id="e-tr" placeholder="売上・SNS反応・認知率・ファン数・受賞歴など"></textarea></div>
+        <div class="ef"><span class="elbl">アイケアLaBoへの示唆</span><textarea class="etxt" id="e-imp" placeholder="アイケアLaBoが転用・参考にできることは何か"></textarea></div>
+        <div class="ef"><span class="elbl">メモ</span><textarea class="etxt" id="e-memo"></textarea></div>
+        <div class="ef">
+          <span class="elbl">参考リンク</span>
+          <span class="ehint">タイトルとURLをセットで追加</span>
+          <div class="refs-list" id="refs-list"></div>
+          <button class="ref-add" onclick="addRef()">＋ 参考リンクを追加</button>
+        </div>
+        <div class="ef">
+          <span class="elbl">4軸スコア（0〜10）</span>
+          <div class="sg">
+            <div class="sfi"><label>🎵 音<span class="sv" id="sva">0</span></label><input type="range" id="ea" min="0" max="10" value="0" oninput="document.getElementById('sva').textContent=this.value;ct()"></div>
+            <div class="sfi"><label>👁 視覚<span class="sv" id="svv" style="color:var(--purple)">0</span></label><input type="range" id="ev" min="0" max="10" value="0" oninput="document.getElementById('svv').textContent=this.value;ct()"></div>
+            <div class="sfi"><label>📣 SNS<span class="sv" id="svs" style="color:var(--green-lt)">0</span></label><input type="range" id="es" min="0" max="10" value="0" oninput="document.getElementById('svs').textContent=this.value;ct()"></div>
+            <div class="sfi"><label>📖 ストーリー<span class="sv" id="svt" style="color:var(--amber)">0</span></label><input type="range" id="et" min="0" max="10" value="0" oninput="document.getElementById('svt').textContent=this.value;ct()"></div>
+          </div>
+          <div class="tline">合計スコア：<span id="etot">0</span> / 40</div>
         </div>
       </div>
     </div>
 
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">閉じる</button>
-      <button class="btn-edit" id="btn-switch-edit" onclick="switchTab('edit', document.querySelector('.mtab:nth-child(2)'))">編集する</button>
-      <button class="btn-primary" id="btn-save-item" onclick="saveItem()" style="display:none">保存</button>
+    <div class="mact">
+      <button class="btn-c" onclick="closeMod()">閉じる</button>
+      <button class="btn-e" id="btn-ed" onclick="stab('e')">編集する</button>
+      <button class="btn-p" id="btn-sv" onclick="saveItem()" style="display:none">保存</button>
     </div>
+    <div class="upd" id="upd"></div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════
-   DATA DEFINITIONS
-═══════════════════════════════════════════════ */
-const COMPANIES = [
-  {id:1,  name:'カゴメ',                     cat:'大手'},
-  {id:2,  name:'エステー',                    cat:'大手'},
-  {id:3,  name:'味の素',                      cat:'大手'},
-  {id:4,  name:'TBSグループ',                 cat:'大手'},
-  {id:5,  name:'テレビ東京',                  cat:'大手'},
-  {id:6,  name:'永谷園ホールディングス',      cat:'大手'},
-  {id:7,  name:'日産自動車',                  cat:'大手'},
-  {id:8,  name:'明治',                        cat:'大手'},
-  {id:9,  name:'リクルート',                  cat:'大手'},
-  {id:10, name:'任天堂',                      cat:'大手'},
-  {id:11, name:'メルカリ',                    cat:'大手'},
-  {id:12, name:'イオン',                      cat:'大手'},
-  {id:13, name:'セブン-イレブン・ジャパン',   cat:'大手'},
-  {id:14, name:'日本マクドナルド',            cat:'大手'},
-  {id:15, name:'APAMAN',                      cat:'大手'},
-  {id:16, name:'ユニクロ',                    cat:'大手'},
-  {id:17, name:'ニトリ',                      cat:'大手'},
-  {id:18, name:'ビックカメラ',                cat:'大手'},
-  {id:19, name:'トヨタ自動車',                cat:'大手'},
-  {id:20, name:'ヤンマー',                    cat:'大手'},
-  {id:21, name:'スシロー',                    cat:'大手'},
-  {id:22, name:'しまむら',                    cat:'大手'},
-  {id:23, name:'すかいらーくホールディングス',cat:'大手'},
-  {id:24, name:'ロート製薬',                  cat:'大手'},
-  {id:25, name:'OWNDAYS',                     cat:'大手'},
-  {id:26, name:'kay me',           cat:'vc'},
-  {id:27, name:'COHINA',           cat:'vc'},
-  {id:28, name:'ALL YOURS',        cat:'vc'},
-  {id:29, name:'FABRIC TOKYO',     cat:'vc'},
-  {id:30, name:'17kg',             cat:'vc'},
-  {id:31, name:'ジャパンスコープ', cat:'vc'},
-  {id:32, name:'BASE FOOD',        cat:'vc'},
-  {id:33, name:'Minimal',          cat:'vc'},
-  {id:34, name:'Mr. CHEESECAKE',   cat:'vc'},
-  {id:35, name:'snaq.me',          cat:'vc'},
-  {id:36, name:'meeth',            cat:'vc'},
-  {id:37, name:'バルクオム',       cat:'vc'},
-  {id:38, name:'FUJIMI',           cat:'vc'},
-  {id:39, name:'PHOEBE BEAUTY UP', cat:'vc'},
-  {id:40, name:'MEDULLA',          cat:'vc'},
-  {id:41, name:'ALOBABY',          cat:'vc'},
-  {id:42, name:'PostCoffee',       cat:'vc'},
-  {id:43, name:'GREEN SPOON',      cat:'vc'},
-  {id:44, name:'nosh',             cat:'vc'},
-  {id:45, name:'Sui+',             cat:'vc'},
-  {id:46, name:'Mitas',            cat:'vc'},
-  {id:47, name:'スマートラウンド', cat:'vc'},
-  {id:48, name:'Sales Marker',     cat:'vc'},
-  {id:49, name:'スペースマーケット',cat:'vc'},
-  {id:50, name:'ペイトナー',       cat:'vc'},
+/* ══════════════════════════════════════════════
+   50社マスタ
+══════════════════════════════════════════════ */
+const COS = [
+  {id:1,  name:'カゴメ',                      cat:'大手'},
+  {id:2,  name:'エステー',                     cat:'大手'},
+  {id:3,  name:'味の素',                       cat:'大手'},
+  {id:4,  name:'TBSグループ',                  cat:'大手'},
+  {id:5,  name:'テレビ東京',                   cat:'大手'},
+  {id:6,  name:'永谷園ホールディングス',       cat:'大手'},
+  {id:7,  name:'日産自動車',                   cat:'大手'},
+  {id:8,  name:'明治',                         cat:'大手'},
+  {id:9,  name:'リクルート',                   cat:'大手'},
+  {id:10, name:'任天堂',                       cat:'大手'},
+  {id:11, name:'メルカリ',                     cat:'大手'},
+  {id:12, name:'イオン',                       cat:'大手'},
+  {id:13, name:'セブン-イレブン・ジャパン',    cat:'大手'},
+  {id:14, name:'日本マクドナルド',             cat:'大手'},
+  {id:15, name:'APAMAN',                       cat:'大手'},
+  {id:16, name:'ユニクロ',                     cat:'大手'},
+  {id:17, name:'ニトリ',                       cat:'大手'},
+  {id:18, name:'ビックカメラ',                 cat:'大手'},
+  {id:19, name:'トヨタ自動車',                 cat:'大手'},
+  {id:20, name:'ヤンマー',                     cat:'大手'},
+  {id:21, name:'スシロー',                     cat:'大手'},
+  {id:22, name:'しまむら',                     cat:'大手'},
+  {id:23, name:'すかいらーくホールディングス', cat:'大手'},
+  {id:24, name:'ロート製薬',                   cat:'大手'},
+  {id:25, name:'OWNDAYS',                      cat:'大手'},
+  {id:26, name:'kay me',           cat:'ベンチャー・中小'},
+  {id:27, name:'COHINA',           cat:'ベンチャー・中小'},
+  {id:28, name:'ALL YOURS',        cat:'ベンチャー・中小'},
+  {id:29, name:'FABRIC TOKYO',     cat:'ベンチャー・中小'},
+  {id:30, name:'17kg',             cat:'ベンチャー・中小'},
+  {id:31, name:'ジャパンスコープ', cat:'ベンチャー・中小'},
+  {id:32, name:'BASE FOOD',        cat:'ベンチャー・中小'},
+  {id:33, name:'Minimal',          cat:'ベンチャー・中小'},
+  {id:34, name:'Mr. CHEESECAKE',   cat:'ベンチャー・中小'},
+  {id:35, name:'snaq.me',          cat:'ベンチャー・中小'},
+  {id:36, name:'meeth',            cat:'ベンチャー・中小'},
+  {id:37, name:'BULK HOMME',       cat:'ベンチャー・中小'},
+  {id:38, name:'FUJIMI',           cat:'ベンチャー・中小'},
+  {id:39, name:'PHOEBE BEAUTY UP', cat:'ベンチャー・中小'},
+  {id:40, name:'MEDULLA',          cat:'ベンチャー・中小'},
+  {id:41, name:'ALOBABY',          cat:'ベンチャー・中小'},
+  {id:42, name:'PostCoffee',       cat:'ベンチャー・中小'},
+  {id:43, name:'GREEN SPOON',      cat:'ベンチャー・中小'},
+  {id:44, name:'nosh',             cat:'ベンチャー・中小'},
+  {id:45, name:'Sui+',             cat:'ベンチャー・中小'},
+  {id:46, name:'Mitas',            cat:'ベンチャー・中小'},
+  {id:47, name:'スマートラウンド', cat:'ベンチャー・中小'},
+  {id:48, name:'Sales Marker',     cat:'ベンチャー・中小'},
+  {id:49, name:'スペースマーケット',cat:'ベンチャー・中小'},
+  {id:50, name:'ペイトナー',        cat:'ベンチャー・中小'},
 ];
 
-function newItem(c) {
-  return {
-    id:c.id, company_name:c.name, category:c.cat,
-    industry:'', main_axis:'', status:'未調査',
-    summary:'', why_strong:'', how_built:'', where_embedded:'',
-    traction:'', implication:'', memo:'', references:'',
+/* ── 13社シードデータ ── */
+const SEED = [
+  {name:'味の素',industry:'食品',axes:['音','視覚'],status:'調査済み',score_audio:5,score_visual:3,score_sns:1,score_story:2,
+   one_line:'1999年から使う『あ・じ・の・も・と』のサウンドロゴを2015年に音商標登録し、文字ブランドと音をセットで守りながら浸透させた事例。',
+   why_strong:'ブランド名そのものを短いメロディと言葉で固定し、テレビCMなど反復接触の多い場で長年使い続けたことで、音だけでも企業名を想起しやすい。',
+   how_built:'1999年以来テレビCMなどで『あ・じ・の・も・と』の歌詞とメロディを使用し、2015年に音商標として登録。音を単発演出ではなくコーポレートブランド資産として扱った。',
+   where_embedded:'TVCMなどのマス接点で継続利用。文字ロゴ『AJINOMOTO』と合わせて使用。',
+   traction:'味の素自身が、文字だけでなく『音』としても商標権で保護し、コーポレートブランドの浸透と価値向上を目指すと明言。',
+   implication:'短い音＋ブランド名を固定し、CM・SNS冒頭・イベント開幕・受付端末など反復接点で一貫使用する。音を早い段階で資産化する発想が参考になる。',
+   references:[{title:'味の素(株)のサウンドロゴが新しいタイプの商標（音商標）として登録',url:'https://www.ajinomoto.co.jp/company/jp/presscenter/press/detail/2015_11_27.html'},{title:'味の素 公式サイト',url:'https://www.ajinomoto.co.jp/'}]},
+  {name:'カゴメ',industry:'食品',axes:['音','ストーリー'],status:'調査済み',score_audio:5,score_visual:2,score_sns:1,score_story:3,
+   one_line:'『自然を、おいしく、楽しく。KAGOME』というサウンドロゴを、ユーザーアンケートの声も踏まえて決定した参加型の音資産事例。',
+   why_strong:'企業メッセージをそのままメロディ化しており、言葉と音が一致する。さらに『みなさんのお声で決定』という参加プロセス自体が記憶を強めている。',
+   how_built:'コミュニティ上で『カゴメを音にすると？』のアンケートを行い、その結果をもとに社内会議で決定。2017年に『自然を、おいしく、楽しく。KAGOME』を発表した。',
+   where_embedded:'ブランドメッセージとサウンドロゴを企業コミュニティ、広報、広告接点で連動。',
+   traction:'カゴメ公式コミュニティ上でサウンドロゴの決定経緯を公開。企業メッセージを耳からも感じ取れる状態を作った。',
+   implication:'アイケアラボも、代表だけで決めるのではなく『候補音をチームや顧客接点でテストする』と、刷り込み前に共感の土台を作れる。',
+   references:[{title:'みなさんのお声でカゴメ「サウンドロゴ」が決定しました！',url:'https://and.kagome.co.jp/article/blog/message/3086/'},{title:'サウンドロゴ決定',url:'https://and.kagome.co.jp/project/voices/1'}]},
+  {name:'TBSグループ',industry:'メディア',axes:['音','視覚'],status:'調査済み',score_audio:4,score_visual:5,score_sns:2,score_story:3,
+   one_line:'ロゴ、色、フォント、モーション、サウンドまでを統合し、『最高の"時"』をブランドデザインとして一体設計した事例。',
+   why_strong:'単なるロゴ変更で終わらず、色・フォント・アニメーション・音をまとめて設計しているため、接点が変わっても同じブランド体験として感じやすい。',
+   how_built:'ブランドプロミス『最高の"時"で、明日の世界をつくる。』を起点に新ロゴを開発。TBS BLUE、オリジナルフォント、モーショングラフィックス、オリジナルサウンドを順に整備した。',
+   where_embedded:'放送画面、デジタル接点、ロゴアニメーション、ブランドデザインサイトなど、複数の媒体に横展開。',
+   traction:'公式ブランドデザインサイトで、ロゴ・色・フォント・モーション・サウンドの各設計意図を公開し、統一運用している。',
+   implication:'アイケアラボも、ロゴだけでなく『色・書体・動画の動き・音』まで同時に設計すると、一気にブランドとして見えやすくなる。',
+   references:[{title:'TBS Brand Design',url:'https://www.tbsholdings.co.jp/design/'}]},
+  {name:'ロート製薬',industry:'ヘルスケア・製薬',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:5,score_sns:2,score_story:5,
+   one_line:'2024年にスローガンとロゴを刷新し、『ロートは、ハートだ。』を中心に"人"起点の物語へブランドを再定義した事例。',
+   why_strong:'企業の強みや歴史ではなく『人のハートを動かす』という感情軸に再編集し、ロゴの意味・色の意味まで言語化して公開している。',
+   how_built:'125周年を機にコーポレートスローガンとロゴを刷新。『人』を起点にしたいという意思を掲げ、新ロゴではRを『人』に見立て、青を知性、赤を情熱として再設計した。',
+   where_embedded:'コーポレートスローガン、ロゴデザイン、色設計、対外発信記事で一体的に展開。',
+   traction:'公式に刷新理由・スローガン・ロゴの意味まで公開しており、ブランド再定義を社外に説明できる形にしている。',
+   implication:'『眼から体を科学する』も、機能説明だけでなく『誰の何をどう動かしたいのか』まで言葉に落とし、ロゴと色の意味を説明可能にするべき。',
+   references:[{title:'2024年、ロート製薬は、コーポレートスローガンとロゴデザインを一新します。',url:'https://www.shop.rohto.co.jp/column-list/column-niconico-0071.html'}]},
+  {name:'ヤンマー',industry:'産業機械',axes:['視覚','ストーリー'],status:'調査済み',score_audio:3,score_visual:5,score_sns:2,score_story:5,
+   one_line:'『A SUSTAINABLE FUTURE』と『HANASAKA』を軸に、ロゴ・活動・施設・アート・音楽まで広げている長期ブランド刷新事例。',
+   why_strong:'BtoB寄りの企業でありながら、理念を『A SUSTAINABLE FUTURE』と『HANASAKA』に整理し、スポーツ・アート・施設・音楽まで一貫してつないでいる。',
+   how_built:'2010年に『Solutioneering Together』を掲げた後、2012年以降プレミアムブランドプロジェクトで施設や接点を刷新。現在は『A SUSTAINABLE FUTURE』をブランドステートメントに置き、HANASAKAを価値観として展開。',
+   where_embedded:'コーポレートロゴ、HANASAKAロゴ、施設リブランディング、スポーツ・アート活動、応援ソング『Find A Way』、アニメプロジェクトなど。',
+   traction:'公式サイト上でブランド、理念、HANASAKA、施設刷新、応援ソングまで公開。ブランドを単なる見た目ではなく活動全体に広げている。',
+   implication:'アイケアラボも『理念→象徴→活動→施設/イベント』まで通すべき。絵本やムービー、イベントを全部バラバラにせず、ひとつの価値観に結びつける設計が参考になる。',
+   references:[{title:'企業情報｜ヤンマー',url:'https://www.yanmar.com/jp/about/'},{title:'Our Brand｜ヤンマー',url:'https://www.yanmar.com/jp/about/brand/'},{title:'HANASAKA｜ヤンマー',url:'https://www.yanmar.com/jp/about/hanasaka/'}]},
+  {name:'ユニクロ',industry:'アパレル',axes:['SNS','視覚'],status:'調査済み',score_audio:2,score_visual:4,score_sns:5,score_story:3,
+   one_line:'UTのTikTokハッシュタグチャレンジで約3.3億回視聴、約18.5万投稿を生み、SNS参加型でブランドを拡張した事例。',
+   why_strong:'商品を一方的に見せるのではなく、UGC参加型のフォーマットに変えたことで、ブランド体験が『見る』から『参加する』に変わった。',
+   how_built:'2019年、UTでTikTokグローバルハッシュタグチャレンジ『#UTPlayYourWorld』を実施。5市場で参加型施策を行い、受賞者はTVCMや店舗モニター、公式SNSにも出演。',
+   where_embedded:'TikTokチャレンジ、UGC投稿、TVCM、店舗モニター、公式SNS。',
+   traction:'約3.3億回視聴、投稿数185,671、参加者95,641、総エンゲージメント数43,431,224。',
+   implication:'音やフレーズを作ったら、単に配信するだけでなく『参加型チャレンジ』に変換すると、SNS上で記憶資産が広がりやすい。',
+   references:[{title:'UT×TikTokグローバルハッシュタグチャレンジ 史上最高の約3.3億視聴数を記録',url:'https://www.uniqlo.com/jp/ja/contents/corp/press-release/2019/09/19091315_uttiktok.html'}]},
+  {name:'ニトリ',industry:'小売',axes:['SNS','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:5,score_story:2,
+   one_line:'TikTokで生活者目線のクリエイター動画とSpark Adsを組み合わせ、若年層来店率を施策前後比で2倍にした事例。',
+   why_strong:'商品説明ではなく生活シーンを見せたこと、企業投稿だけでなくクリエイター起点にしたこと、そして来店アンケートで効果を検証したことが強い。',
+   how_built:'新生活需要が高まる3月に合わせ、TikTokクリエイターが生活者目線で商品を紹介。投稿をSpark Adsでブーストし、来店促進につなげた。',
+   where_embedded:'TikTok動画、クリエイター投稿、Spark Ads、店舗来店アンケート。',
+   traction:'若年層のTikTokきっかけ来店率が施策前後比で2倍。コメント欄で商品への質問も増え、利用意向を高めたと分析。',
+   implication:'『眼から体を科学する』も、専門説明だけでなく『生活者目線の困りごと→変化』を短尺動画に変換し、来店・体験への導線をつくるべき。',
+   references:[{title:'ニトリ | TikTok for Business Case Study',url:'https://ads.tiktok.com/business/ja/inspiration/nitori'},{title:'ニトリが新生活者向けTikTok施策',url:'https://ads.tiktok.com/business/ja/blog/advertimes-nitori-casestudy'}]},
+  {name:'kay me',industry:'アパレル',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:5,
+   one_line:'創業者自身の『忙しい女性の服の悩み』を起点に、『一瞬で華やか ずっとラク』な問題解決型ブランドへ落とし込んだ事例。',
+   why_strong:'創業者課題がそのままブランドの中核課題になっており、便益が『忙しい人の時間・手間・不快の削減』として明確。',
+   how_built:'戦略コンサルとして理想の仕事服が見つからなかった創業者が、快適さときちんと感を両立する服を構想。2011年創業後、100% Made in Japanやジャージー素材の技術課題を越えながらブランドを育てた。',
+   where_embedded:'公式サイト、商品設計、Founder\'s story、店舗接客、会員コミュニティ。',
+   traction:'公式に『Problem-solving clothing』を掲げ、挑戦する人を応援するミッションと、日本製・洗える・ストレッチなどの具体便益を一貫して訴求。',
+   implication:'アイケアラボも『眼の悩み』を一般論で語るより、誰のどんな不便をどう解決するかを問題解決型で言い切ると強い。',
+   references:[{title:'About kay me',url:'https://gl.kayme.com/pages/about-kay-me'},{title:'Company – kay me',url:'https://gl.kayme.com/pages/company'}]},
+  {name:'FABRIC TOKYO',industry:'アパレル・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:4,
+   one_line:'『洋服をもっと便利で楽しくかっこいい存在にしたい』を起点に、採寸×EC×機能性でオーダースーツ体験を再設計した事例。',
+   why_strong:'プロダクトだけでなく購入体験そのものをブランド化している。店舗は採寸、ECは再購入と役割分担が明確。',
+   how_built:'テクノロジーを使った新しい洋服D2Cとして立ち上げ、採寸データを起点に、オンラインで継続購入できる構造を作った。',
+   where_embedded:'ブランドサイト、店舗採寸、EC、商品機能訴求。',
+   traction:'公式に10万人超の採寸実績を掲載し、体験データがブランド信頼の証拠になっている。',
+   implication:'アイケアラボも、計測や診断を単なる前処理ではなく『ブランド体験の起点』として見せると強い。',
+   references:[{title:'ABOUT US | 株式会社FABRIC TOKYO',url:'https://corp.fabric-tokyo.com/about'},{title:'FABRIC TOKYO 公式サイト',url:'https://fabric-tokyo.com/'}]},
+  {name:'BASE FOOD',industry:'フードテック',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:3,score_story:5,
+   one_line:'100回以上の試作を経て『主食をイノベーションし、健康をあたりまえに』へたどり着いた、課題起点のブランド事例。',
+   why_strong:'機能訴求だけでなく、『栄養のインフラ』という大きな物語に昇華しているため、商品群が増えてもブランドがぶれにくい。',
+   how_built:'1年以上にわたり100種類以上の試作を繰り返し、最初の商品BASE PASTAを完成。そこから『主食をイノベーションし、健康をあたりまえに』というミッションを定義した。',
+   where_embedded:'ブランドストーリー、商品開発背景、商品コピー、D2C導線。',
+   traction:'公式ストーリーで『栄養のインフラ』を明示。商品単体でなく生活の基盤価値としてブランドを位置づけている。',
+   implication:'アイケアラボも単発メニューの話ではなく、『目から体を整えることを当たり前にする』レベルの大義に上げると、ブランドの伸びしろが広がる。',
+   references:[{title:'STORY | BASE FOOD',url:'https://basefood.co.jp/brand/story'}]},
+  {name:'Mr. CHEESECAKE',industry:'食品・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+   one_line:'『世界一じゃなく、あなたの人生最高に。』という言葉で、味ではなく"人生の記憶"に位置づけたブランド事例。',
+   why_strong:'おいしさの説明を、香り・口溶け・温度変化・シェフの記憶という体験言語に変換している。商品説明がそのまま世界観になっている。',
+   how_built:'シェフ田村浩二が幼少期の『おいしい記憶』を起点にブランドを構築。香り、食感、食べ方の変化を細かく体験価値として整理した。',
+   where_embedded:'公式サイト、ブランドストーリー、店舗体験、デザートコース、Instagram、会員プログラム。',
+   traction:'公式にブランドストーリー、香り設計、食感設計、食べ方の提案、旗艦店体験まで整備。',
+   implication:'アイケアラボも『検査や施術の説明』ではなく、『体験した時の変化』を感覚言語で語れると、強いブランドになる。',
+   references:[{title:'ブランド紹介 | Mr. CHEESECAKE',url:'https://mr-cheesecake.com/pages/about'}]},
+  {name:'GREEN SPOON',industry:'ウェルネス・食品',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+   one_line:'『たのしい食のセルフケア文化を創る』を軸に、商品・世界観・ポップアップまで一貫させているウェルネスブランド事例。',
+   why_strong:'"健康"を我慢や正しさではなく"たのしいセルフケア"に再定義し、言葉・商品・ビジュアルのテンションを揃えている。',
+   how_built:'MISSION・VISION・VALUESを明文化し、『自分を好きでいつづけられる人生を。』という感情価値まで接続。商品だけでなくブランド思想を組織にも共有している。',
+   where_embedded:'ブランドサイト、定期便、限定メニュー、ポップアップ、コラボ商品、採用ページ。',
+   traction:'公式ニュースでポップアップ『GREEN SCOOP by GREEN SPOON』の3日間来場1,200名超を掲載。',
+   implication:'アイケアラボも『正しいケア』ではなく『続けたくなるセルフケア文化』に変換できると、365との接続が強くなる。',
+   references:[{title:'株式会社Greenspoon',url:'https://greenspoon.co.jp/'},{title:'GREEN SPOON ニュース',url:'https://greenspoon.co.jp/archives/category/%E6%9C%AA%E5%88%86%E9%A1%9E'}]},
+  {name:'BULK HOMME',industry:'化粧品',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:4,
+   one_line:'『メンズスキンケアブランド世界シェアNo.1』を掲げ、体験・デザイン・信頼を一体で設計しているブランド事例。',
+   why_strong:'カテゴリ自体を更新する大きな目標を持ちつつ、白黒を基調とした視覚表現と体験価値を揃えている。',
+   how_built:'『最も優れた化粧品は何か？』という創業問いから出発し、MISSIONを世界No.1シェア、VISIONを世界のメンズビューティをアップデートすると明確化。体験・デザイン・信頼を価値として整理した。',
+   where_embedded:'コーポレートサイト、商品デザイン、ホテルアメニティ『THE JOURNEY』、SNS。',
+   traction:'公式にMISSION/VISION/VALUESを明示し、ブランド体験・デザイン・信頼を中核価値として公開している。',
+   implication:'アイケアラボも『目の整体院カテゴリをどう更新するか』まで言い切ると、ブランドが単店舗文脈を超えやすい。',
+   references:[{title:'ABOUT｜BULK HOMME｜カンパニーサイト',url:'https://company.bulk.co.jp/about'},{title:'VISION - BULK HOMME RECRUITING SITE',url:'https://recruit.bulk.co.jp/vision/'}]},
+];
+
+/* ── 名前→IDマップ ── */
+const NAME_ID = {};
+COS.forEach(c => { NAME_ID[c.name] = c.id; });
+// JSON→マスタ名の別名マッピング
+const ALIAS = { 'BULK HOMME':'BULK HOMME' };
+
+function blankItem(c) {
+  return { id:c.id, company_name:c.name, category:c.cat,
+    industry:'', main_axis:[], status:'未調査',
+    one_line:'', why_strong:'', how_built:'', where_embedded:'',
+    traction:'', implication:'', memo:'', references:[],
     score_audio:0, score_visual:0, score_sns:0, score_story:0,
-    total_score:0, updated_at:null
-  };
+    total_score:0, updated_at:null };
 }
 
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    STATE
-═══════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 let items = [];
-let editId = null;
-let currentTab = 'view';
-let filters = { cat:'all', status:'all', axis:'all' };
+let eid = null;
+let flt = { cat:'all', st:'all', ax:'all' };
 
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    STORAGE
-═══════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 async function loadData() {
-  setStatus('読み込み中...');
+  setSS('読み込み中...');
   try {
     const r = await fetch('/api/storage?key=branding-research');
     if (r.ok) {
       const d = await r.json();
-      if (d && Array.isArray(d.items)) {
-        mergeData(d.items); return;
+      if (d && Array.isArray(d.items) && d.items.length > 0) {
+        mergeItems(d.items); return;
       }
     }
   } catch(_) {}
-  // fallback: localStorage
   try {
     const lc = localStorage.getItem('branding-research');
-    if (lc) { const d = JSON.parse(lc); if (d && d.items) { mergeData(d.items); return; } }
+    if (lc) { const d = JSON.parse(lc); if (d && d.items && d.items.length > 0) { mergeItems(d.items); return; } }
   } catch(_) {}
-  items = COMPANIES.map(newItem);
-  setStatus('初期データ表示中');
+  initFresh();
+}
+
+function initFresh() {
+  items = COS.map(blankItem);
+  applySeed();
+  setSS('初期データ（13社調査済み）');
   render();
 }
 
-function mergeData(saved) {
+function mergeItems(saved) {
   const map = new Map(saved.map(i => [i.id, i]));
-  items = COMPANIES.map(c => map.get(c.id) || newItem(c));
-  setStatus('読み込み完了');
+  items = COS.map(c => {
+    const s = map.get(c.id);
+    if (s) { s.company_name = c.name; s.category = c.cat; return s; }
+    return blankItem(c);
+  });
+  // check if seed already applied (any調査済み)
+  const hasData = items.some(i => i.status === '調査済み');
+  if (!hasData) applySeed();
+  setSS('読み込み完了');
   render();
+}
+
+function applySeed() {
+  SEED.forEach(sd => {
+    const aliasName = ALIAS[sd.name] || sd.name;
+    const id = NAME_ID[aliasName];
+    if (!id) return;
+    const item = items.find(i => i.id === id);
+    if (!item || item.status !== '未調査') return; // don't overwrite edited data
+    item.industry       = sd.industry;
+    item.main_axis      = sd.axes || [];
+    item.status         = sd.status;
+    item.one_line       = sd.one_line;
+    item.why_strong     = sd.why_strong;
+    item.how_built      = sd.how_built;
+    item.where_embedded = sd.where_embedded;
+    item.traction       = sd.traction;
+    item.implication    = sd.implication;
+    item.memo           = '';
+    item.references     = sd.references || [];
+    item.score_audio    = sd.score_audio;
+    item.score_visual   = sd.score_visual;
+    item.score_sns      = sd.score_sns;
+    item.score_story    = sd.score_story;
+    item.total_score    = sd.score_audio + sd.score_visual + sd.score_sns + sd.score_story;
+    item.updated_at     = new Date().toISOString();
+  });
 }
 
 async function saveData() {
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  setStatus('保存中...');
+  const btn = document.getElementById('savebtn');
+  btn.disabled = true; setSS('保存中...');
   const payload = JSON.stringify({ items });
   localStorage.setItem('branding-research', payload);
   try {
     const r = await fetch('/api/storage?key=branding-research', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:payload
     });
-    setStatus(r.ok ? '✓ 保存完了 — ' + new Date().toLocaleTimeString('ja-JP') : '⚠ API失敗（ローカル保存済）');
-  } catch(_) {
-    setStatus('⚠ ネットワークエラー（ローカル保存済）');
-  }
+    setSS(r.ok ? '✓ 保存完了 — '+new Date().toLocaleTimeString('ja-JP') : '⚠ API失敗（ローカル保存済）');
+  } catch(_) { setSS('⚠ ネットワークエラー（ローカル保存済）'); }
   btn.disabled = false;
 }
+function setSS(m){ document.getElementById('ss').textContent = m; }
 
-function setStatus(msg){ document.getElementById('save-status').textContent = msg; }
-
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    FILTER / SORT
-═══════════════════════════════════════════════ */
-function setFilter(group, val, el) {
-  filters[group] = val;
-  document.querySelectorAll(`[data-g="${group}"]`).forEach(b => {
-    b.className = 'filter-btn';
-  });
-  const cls = val === 'all' ? 'fb-active-all' : val === 'vc' ? 'fb-active-vc' : 'fb-active-' + val;
-  el.className = 'filter-btn ' + cls;
-  renderTable();
+══════════════════════════════════════════════ */
+function sf(g, v, el) {
+  flt[g] = v;
+  document.querySelectorAll(`[data-g="${g}"]`).forEach(b => b.className = 'fb');
+  const cls = v === 'all' ? 'a-all' : g === 'cat' ? (v==='大手'?'a-ote':'a-vc') :
+    g === 'st' ? {未調査:'a-s0',調査中:'a-s1',調査済み:'a-s2',完了:'a-s3'}[v]||'' :
+    ('a-ax-'+v);
+  el.className = 'fb ' + cls;
+  rt();
 }
 
-function getFiltered() {
-  const q = (document.getElementById('search').value || '').toLowerCase();
-  const sort = document.getElementById('sort-sel').value;
+function getList() {
+  const q = (document.getElementById('srch').value||'').toLowerCase();
+  const srt = document.getElementById('srt').value;
   let list = items.filter(item => {
-    if (filters.cat !== 'all' && item.category !== filters.cat) return false;
-    if (filters.status !== 'all' && item.status !== filters.status) return false;
-    if (filters.axis !== 'all' && item.main_axis !== filters.axis) return false;
+    if (flt.cat !== 'all') {
+      if (flt.cat === '大手' && item.category !== '大手') return false;
+      if (flt.cat === 'vc' && item.category === '大手') return false;
+    }
+    if (flt.st !== 'all' && item.status !== flt.st) return false;
+    if (flt.ax !== 'all' && !(item.main_axis||[]).includes(flt.ax)) return false;
     if (q && !item.company_name.toLowerCase().includes(q)) return false;
     return true;
   });
-  if (sort === 'name')    list.sort((a,b) => a.company_name.localeCompare(b.company_name, 'ja'));
-  if (sort === 'score')   list.sort((a,b) => (b.total_score||0) - (a.total_score||0));
-  if (sort === 'updated') list.sort((a,b) => (b.updated_at||'') > (a.updated_at||'') ? 1 : -1);
+  if (srt === 'name')    list.sort((a,b) => a.company_name.localeCompare(b.company_name,'ja'));
+  if (srt === 'score')   list.sort((a,b) => (b.total_score||0)-(a.total_score||0));
+  if (srt === 'updated') list.sort((a,b) => (b.updated_at||'')>(a.updated_at||'')?1:-1);
   return list;
 }
 
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    RENDER
-═══════════════════════════════════════════════ */
-function render() { renderSummary(); renderTable(); }
+══════════════════════════════════════════════ */
+function render() { rSummary(); rt(); }
 
-// ── Summary ──────────────────────────────────
-function renderSummary() {
-  const total = items.length;
-  const none  = items.filter(i=>i.status==='未調査').length;
-  const wip   = items.filter(i=>i.status==='調査中').length;
-  const done  = items.filter(i=>i.status==='完了').length;
-
-  document.getElementById('summary-top').innerHTML =
-    stat('全企業数', total, '') +
-    stat('未調査',   none,  'c-none') +
-    stat('調査中',   wip,   'c-wip') +
-    stat('完了',     done,  'c-done');
-
-  document.getElementById('summary-axis').innerHTML =
-    topAxis('🎵 音トップ5',       'score_audio',  'sp-audio') +
-    topAxis('👁 視覚トップ5',     'score_visual', 'sp-visual') +
-    topAxis('📣 SNSトップ5',      'score_sns',    'sp-sns') +
-    topAxis('📖 ストーリートップ5','score_story',  'sp-story');
+function rSummary() {
+  const n  = items.length;
+  const n0 = items.filter(i=>i.status==='未調査').length;
+  const n1 = items.filter(i=>i.status==='調査中').length;
+  const n2 = items.filter(i=>i.status==='調査済み').length;
+  const n3 = items.filter(i=>i.status==='完了').length;
+  document.getElementById('smry-stats').innerHTML =
+    sc('登録企業数',n,'')+sc('未調査',n0,'c-none')+sc('調査中',n1,'c-wip')+sc('調査済み',n2,'c-done2')+sc('完了',n3,'c-done');
+  document.getElementById('smry-axis').innerHTML =
+    topAx('🎵 音トップ5','score_audio','sp-a')+
+    topAx('👁 視覚トップ5','score_visual','sp-v')+
+    topAx('📣 SNSトップ5','score_sns','sp-s')+
+    topAx('📖 ストーリートップ5','score_story','sp-t');
+}
+function sc(lbl,v,cls){
+  return `<div class="scard ${cls}"><span class="slabel">${lbl}</span><div class="sval">${v}<span class="sunit">社</span></div></div>`;
+}
+function topAx(lbl,key,pc){
+  const top=items.filter(i=>(i[key]||0)>0).sort((a,b)=>(b[key]||0)-(a[key]||0)).slice(0,5);
+  const rk=['🥇','🥈','🥉','4.','5.'];
+  return `<div class="acard"><div class="acard-label">${lbl}</div>${
+    top.length
+    ? `<ul class="top-list">${top.map((it,i)=>`<li><span class="rnk">${rk[i]}</span><span class="tnm">${it.company_name}</span><span class="spill ${pc}">${it[key]}</span></li>`).join('')}</ul>`
+    : `<p class="top-empty">スコア未入力</p>`
+  }</div>`;
 }
 
-function stat(label, val, cls) {
-  return `<div class="stat-card ${cls}">
-    <span class="stat-label">${label}</span>
-    <div class="stat-val">${val}<span class="stat-unit">社</span></div>
-  </div>`;
-}
-
-function topAxis(label, key, pillCls) {
-  const top = items.filter(i=>(i[key]||0)>0).sort((a,b)=>(b[key]||0)-(a[key]||0)).slice(0,5);
-  const ranks = ['🥇','🥈','🥉','4.','5.'];
-  const listHtml = top.length
-    ? `<ul class="top-list">${top.map((item,i)=>`<li>
-        <span class="rank">${ranks[i]}</span>
-        <span class="name">${item.company_name}</span>
-        <span class="score-pill ${pillCls}">${item[key]}</span>
-      </li>`).join('')}</ul>`
-    : `<p class="top-empty">スコア未入力</p>`;
-  return `<div class="axis-card">
-    <div class="axis-card-label">${label}</div>
-    ${listHtml}
-  </div>`;
-}
-
-// ── Table ─────────────────────────────────────
-function dots(val) {
-  const v = Math.round((val||0)/2);
-  return `<div class="score-dots">${[0,1,2,3,4].map(i=>`<div class="sd${i<v?' on':''}"></div>`).join('')}</div>`;
-}
-
-function fmtDate(dt) {
-  if (!dt) return '—';
-  const d = new Date(dt);
-  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-
-function renderTable() {
-  const list = getFiltered();
-  document.getElementById('result-count').innerHTML =
-    `<strong>${list.length}</strong> 社を表示 / 全50社`;
-
+function rt() {
+  const list = getList();
+  document.getElementById('rcount').innerHTML = `<strong>${list.length}</strong> 社を表示 / 全50社`;
   if (!list.length) {
-    document.getElementById('table-body').innerHTML =
-      '<tr class="loading-row"><td colspan="12">該当する企業がありません</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr class="loading-r"><td colspan="13">該当する企業がありません</td></tr>';
     return;
   }
-
-  const axisB = {
-    '音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー',
-    '':'badge-none'
-  };
-  const catB = { '大手':'badge-大手', 'vc':'badge-vc' };
-  const stB  = { '未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了' };
-  const rowC = { '未調査':'row-none','調査中':'row-wip','完了':'row-done' };
-
-  document.getElementById('table-body').innerHTML = list.map(item => {
-    const t = item.total_score || 0;
-    const tCls = t >= 30 ? 'high' : t >= 15 ? 'mid' : '';
-    return `<tr class="${rowC[item.status]||'row-none'}" onclick="openModal(${item.id})">
-      <td class="td-id">${item.id}</td>
-      <td class="td-name">${item.company_name}</td>
-      <td><span class="badge ${catB[item.category]||''}">${item.category==='vc'?'VC/中小':'大手'}</span></td>
-      <td><span class="badge ${axisB[item.main_axis]||'badge-none'}">${item.main_axis||'—'}</span></td>
-      <td><span class="badge ${stB[item.status]||''}">${item.status}</span></td>
-      <td class="td-summary">${item.summary||'<span style="color:var(--text3);font-size:11px;">—</span>'}</td>
-      <td class="td-score">${dots(item.score_audio)}</td>
-      <td class="td-score">${dots(item.score_visual)}</td>
-      <td class="td-score">${dots(item.score_sns)}</td>
-      <td class="td-score">${dots(item.score_story)}</td>
-      <td class="td-total ${tCls}">${t > 0 ? t : '—'}</td>
-      <td class="td-date">${fmtDate(item.updated_at)}</td>
+  const axB = { '音':'b-ax-音','視覚':'b-ax-視覚','SNS':'b-ax-SNS','ストーリー':'b-ax-ストーリー' };
+  const catB = { '大手':'b-ote','ベンチャー・中小':'b-vc' };
+  const stB  = { '未調査':'b-s0','調査中':'b-s1','調査済み':'b-s2','完了':'b-s3' };
+  const rowC = { '未調査':'r-none','調査中':'r-wip','調査済み':'r-done','完了':'r-cmp' };
+  document.getElementById('tbody').innerHTML = list.map(it => {
+    const t = it.total_score||0;
+    const tc = t>=30?'hi':t>=15?'md':'';
+    const axes = (it.main_axis||[]).map(a=>`<span class="b ${axB[a]||'b-ax-none'}">${a}</span>`).join('') || '<span class="b b-ax-none">—</span>';
+    return `<tr class="${rowC[it.status]||'r-none'}" onclick="openMod(${it.id})">
+      <td class="td-id">${it.id}</td>
+      <td class="td-nm">${it.company_name}</td>
+      <td><span class="b ${catB[it.category]||''}">${it.category==='大手'?'大手':'VC/中小'}</span></td>
+      <td style="font-size:12px;color:var(--text2)">${it.industry||'—'}</td>
+      <td>${axes}</td>
+      <td><span class="b ${stB[it.status]||''}">${it.status}</span></td>
+      <td class="td-sum">${it.one_line||'<span style="color:var(--text3)">—</span>'}</td>
+      <td class="td-sc">${dots(it.score_audio)}</td>
+      <td class="td-sc">${dots(it.score_visual)}</td>
+      <td class="td-sc">${dots(it.score_sns)}</td>
+      <td class="td-sc">${dots(it.score_story)}</td>
+      <td class="td-tot ${tc}">${t>0?t:'—'}</td>
+      <td class="td-dt">${fmtDt(it.updated_at)}</td>
     </tr>`;
   }).join('');
 }
+function dots(v){const n=Math.round((v||0)/2);return `<div class="dots">${[0,1,2,3,4].map(i=>`<div class="dot${i<n?' on':''}"></div>`).join('')}</div>`;}
+function fmtDt(dt){if(!dt)return'—';const d=new Date(dt);return`${d.getMonth()+1}/${d.getDate()}`;}
 
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    MODAL
-═══════════════════════════════════════════════ */
-function openModal(id) {
-  editId = id;
-  const item = items.find(i=>i.id===id);
-  if (!item) return;
-  // header
-  document.getElementById('m-name').textContent = item.company_name;
-  document.getElementById('m-badges').innerHTML =
-    `<span class="badge ${item.category==='vc'?'badge-vc':'badge-大手'}">${item.category==='vc'?'ベンチャー・中小':'大手'}</span>
-     <span class="badge ${{'未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了'}[item.status]||''}">${item.status}</span>
-     ${item.main_axis?`<span class="badge ${{'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'}[item.main_axis]||''}">${item.main_axis}</span>`:''}`;
-  fillView(item);
-  fillEdit(item);
-  switchTab('view', document.querySelector('.mtab'));
-  document.getElementById('overlay').classList.add('open');
+══════════════════════════════════════════════ */
+function openMod(id) {
+  eid = id;
+  const it = items.find(i=>i.id===id);
+  if (!it) return;
+  document.getElementById('mc').textContent = it.company_name;
+  const axB = {'音':'b-ax-音','視覚':'b-ax-視覚','SNS':'b-ax-SNS','ストーリー':'b-ax-ストーリー'};
+  const catB = {'大手':'b-ote','ベンチャー・中小':'b-vc'};
+  const stB  = {'未調査':'b-s0','調査中':'b-s1','調査済み':'b-s2','完了':'b-s3'};
+  document.getElementById('mb').innerHTML =
+    `<span class="b ${catB[it.category]||''}">${it.category==='大手'?'大手':'ベンチャー・中小'}</span>
+     <span class="b ${stB[it.status]||''}">${it.status}</span>
+     ${(it.main_axis||[]).map(a=>`<span class="b ${axB[a]||''}">${a}</span>`).join('')}`;
+  fillView(it);
+  fillEdit(it);
+  stab('v');
+  document.getElementById('ov').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-function fillView(item) {
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    if (!val || val.trim() === '') {
-      el.textContent = '（未入力）';
-      el.className = 'view-val empty';
-    } else {
-      el.textContent = val;
-      el.className = 'view-val';
-    }
-  };
-  set('v-industry',   item.industry);
-  set('v-summary',    item.summary);
-  set('v-why',        item.why_strong);
-  set('v-how',        item.how_built);
-  set('v-where',      item.where_embedded);
-  set('v-traction',   item.traction);
-  set('v-implication',item.implication);
-  set('v-memo',       item.memo);
-  set('v-refs',       item.references);
-
-  const axisEl = document.getElementById('v-main-axis');
-  const axisB = {'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'};
-  axisEl.innerHTML = item.main_axis
-    ? `<span class="badge ${axisB[item.main_axis]||''}">${item.main_axis}</span>`
-    : `<span class="view-val empty">（未設定）</span>`;
-
-  document.getElementById('vs-audio').textContent  = item.score_audio  || '—';
-  document.getElementById('vs-visual').textContent = item.score_visual || '—';
-  document.getElementById('vs-sns').textContent    = item.score_sns    || '—';
-  document.getElementById('vs-story').textContent  = item.score_story  || '—';
-  document.getElementById('v-updated').textContent =
-    item.updated_at ? '最終更新: ' + new Date(item.updated_at).toLocaleString('ja-JP') : '';
+function fillView(it) {
+  const sv = (id,v) => { const el=document.getElementById(id); if(!v||!v.trim()){el.textContent='（未入力）';el.className='vval emp';}else{el.textContent=v;el.className='vval';} };
+  const axB = {'音':'b-ax-音','視覚':'b-ax-視覚','SNS':'b-ax-SNS','ストーリー':'b-ax-ストーリー'};
+  sv('v-ind', it.industry);
+  sv('v-ol', it.one_line);
+  sv('v-why', it.why_strong);
+  sv('v-how', it.how_built);
+  sv('v-whr', it.where_embedded);
+  sv('v-tr', it.traction);
+  sv('v-imp', it.implication);
+  sv('v-memo', it.memo);
+  document.getElementById('v-ax').innerHTML = (it.main_axis||[]).length
+    ? (it.main_axis||[]).map(a=>`<span class="b ${axB[a]||''}">${a}</span>`).join(' ')
+    : `<span class="vval emp">（未設定）</span>`;
+  // references with clickable links
+  const refs = it.references || [];
+  const refc = document.getElementById('v-refs');
+  if (!refs.length) { refc.innerHTML='<span class="vval emp">（未入力）</span>'; }
+  else {
+    refc.innerHTML = refs.map(r => {
+      if (typeof r === 'string') {
+        return `<div class="ref-link"><a href="${r}" target="_blank" rel="noopener">${r}</a></div>`;
+      }
+      return `<div class="ref-link">
+        <a href="${r.url}" target="_blank" rel="noopener">${r.title||r.url}</a>
+        <span class="rurl">${r.url}</span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('vs-a').textContent = it.score_audio||'—';
+  document.getElementById('vs-v').textContent = it.score_visual||'—';
+  document.getElementById('vs-s').textContent = it.score_sns||'—';
+  document.getElementById('vs-t').textContent = it.score_story||'—';
+  document.getElementById('upd').textContent = it.updated_at ? '最終更新: '+new Date(it.updated_at).toLocaleString('ja-JP') : '';
 }
 
-function fillEdit(item) {
-  document.getElementById('e-industry').value  = item.industry    || '';
-  document.getElementById('e-main-axis').value = item.main_axis   || '';
-  document.getElementById('e-status').value    = item.status      || '未調査';
-  document.getElementById('e-summary').value   = item.summary     || '';
-  document.getElementById('e-why').value       = item.why_strong  || '';
-  document.getElementById('e-how').value       = item.how_built   || '';
-  document.getElementById('e-where').value     = item.where_embedded || '';
-  document.getElementById('e-traction').value  = item.traction    || '';
-  document.getElementById('e-implication').value = item.implication || '';
-  document.getElementById('e-memo').value      = item.memo        || '';
-  document.getElementById('e-refs').value      = item.references  || '';
-  setSlider('e-audio',  'sv-audio',  item.score_audio  || 0);
-  setSlider('e-visual', 'sv-visual', item.score_visual || 0);
-  setSlider('e-sns',    'sv-sns',    item.score_sns    || 0);
-  setSlider('e-story',  'sv-story',  item.score_story  || 0);
-  calcTotal();
+function fillEdit(it) {
+  document.getElementById('e-ind').value = it.industry||'';
+  document.getElementById('e-st').value  = it.status||'未調査';
+  document.getElementById('e-ol').value  = it.one_line||'';
+  document.getElementById('e-why').value = it.why_strong||'';
+  document.getElementById('e-how').value = it.how_built||'';
+  document.getElementById('e-whr').value = it.where_embedded||'';
+  document.getElementById('e-tr').value  = it.traction||'';
+  document.getElementById('e-imp').value = it.implication||'';
+  document.getElementById('e-memo').value= it.memo||'';
+  // axes
+  ['ax-a','ax-v','ax-s','ax-t'].forEach(id => { document.getElementById(id).checked = false; });
+  (it.main_axis||[]).forEach(a => {
+    const m = {'音':'ax-a','視覚':'ax-v','SNS':'ax-s','ストーリー':'ax-t'}[a];
+    if (m) document.getElementById(m).checked = true;
+  });
+  // references
+  renderRefsList(it.references||[]);
+  setSl('ea','sva', it.score_audio);
+  setSl('ev','svv', it.score_visual);
+  setSl('es','svs', it.score_sns);
+  setSl('et','svt', it.score_story);
+  ct();
 }
 
-function setSlider(sid, vid, val) {
-  document.getElementById(sid).value = val;
-  document.getElementById(vid).textContent = val;
-}
+function setSl(sid,vid,v){ document.getElementById(sid).value=v||0; document.getElementById(vid).textContent=v||0; }
+function ct(){ const t=['ea','ev','es','et'].reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0),0); document.getElementById('etot').textContent=t; }
 
-function calcTotal() {
-  const t = ['e-audio','e-visual','e-sns','e-story']
-    .reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0), 0);
-  document.getElementById('e-total').textContent = t;
+/* references editor */
+let _refs = [];
+function renderRefsList(refs) {
+  _refs = refs.map(r => typeof r==='string' ? {title:'',url:r} : {...r});
+  redrawRefs();
 }
+function redrawRefs() {
+  document.getElementById('refs-list').innerHTML = _refs.map((r,i) => `
+    <div class="ref-row">
+      <input class="einp" placeholder="タイトル" value="${esc(r.title)}" oninput="_refs[${i}].title=this.value" />
+      <input class="einp url" placeholder="URL (https://...)" value="${esc(r.url)}" oninput="_refs[${i}].url=this.value" />
+      <button class="ref-del" onclick="delRef(${i})">削除</button>
+    </div>`).join('');
+}
+function addRef() { _refs.push({title:'',url:''}); redrawRefs(); }
+function delRef(i) { _refs.splice(i,1); redrawRefs(); }
+function esc(s){ return (s||'').replace(/"/g,'&quot;'); }
 
-function switchTab(name, el) {
-  currentTab = name;
-  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
-  el && el.classList.add('active');
-  document.getElementById('tab-view').classList.toggle('active', name==='view');
-  document.getElementById('tab-edit').classList.toggle('active', name==='edit');
-  document.getElementById('btn-switch-edit').style.display = name==='view'?'':'none';
-  document.getElementById('btn-save-item').style.display   = name==='edit'?'':'none';
+function stab(t) {
+  document.getElementById('tp-v').classList.toggle('on',t==='v');
+  document.getElementById('tp-e').classList.toggle('on',t==='e');
+  document.getElementById('tab-v').classList.toggle('on',t==='v');
+  document.getElementById('tab-e').classList.toggle('on',t==='e');
+  document.getElementById('btn-ed').style.display = t==='v'?'':'none';
+  document.getElementById('btn-sv').style.display = t==='e'?'':'none';
 }
 
 function saveItem() {
-  const item = items.find(i=>i.id===editId);
-  if (!item) return;
-  item.industry         = document.getElementById('e-industry').value.trim();
-  item.main_axis        = document.getElementById('e-main-axis').value;
-  item.status           = document.getElementById('e-status').value;
-  item.summary          = document.getElementById('e-summary').value.trim();
-  item.why_strong       = document.getElementById('e-why').value.trim();
-  item.how_built        = document.getElementById('e-how').value.trim();
-  item.where_embedded   = document.getElementById('e-where').value.trim();
-  item.traction         = document.getElementById('e-traction').value.trim();
-  item.implication      = document.getElementById('e-implication').value.trim();
-  item.memo             = document.getElementById('e-memo').value.trim();
-  item.references       = document.getElementById('e-refs').value.trim();
-  item.score_audio      = parseInt(document.getElementById('e-audio').value)  || 0;
-  item.score_visual     = parseInt(document.getElementById('e-visual').value) || 0;
-  item.score_sns        = parseInt(document.getElementById('e-sns').value)    || 0;
-  item.score_story      = parseInt(document.getElementById('e-story').value)  || 0;
-  item.total_score      = item.score_audio + item.score_visual + item.score_sns + item.score_story;
-  item.updated_at       = new Date().toISOString();
-  // refresh view
-  fillView(item);
-  document.getElementById('m-badges').innerHTML =
-    `<span class="badge ${item.category==='vc'?'badge-vc':'badge-大手'}">${item.category==='vc'?'ベンチャー・中小':'大手'}</span>
-     <span class="badge ${{'未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了'}[item.status]||''}">${item.status}</span>
-     ${item.main_axis?`<span class="badge ${{'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'}[item.main_axis]||''}">${item.main_axis}</span>`:''}`;
-  switchTab('view', document.querySelector('.mtab'));
+  const it = items.find(i=>i.id===eid);
+  if (!it) return;
+  it.industry       = document.getElementById('e-ind').value.trim();
+  it.status         = document.getElementById('e-st').value;
+  it.one_line       = document.getElementById('e-ol').value.trim();
+  it.why_strong     = document.getElementById('e-why').value.trim();
+  it.how_built      = document.getElementById('e-how').value.trim();
+  it.where_embedded = document.getElementById('e-whr').value.trim();
+  it.traction       = document.getElementById('e-tr').value.trim();
+  it.implication    = document.getElementById('e-imp').value.trim();
+  it.memo           = document.getElementById('e-memo').value.trim();
+  it.references     = _refs.filter(r=>r.url.trim());
+  it.main_axis      = ['ax-a','ax-v','ax-s','ax-t']
+    .filter(id => document.getElementById(id).checked)
+    .map(id => ({'ax-a':'音','ax-v':'視覚','ax-s':'SNS','ax-t':'ストーリー'}[id]));
+  it.score_audio    = parseInt(document.getElementById('ea').value)||0;
+  it.score_visual   = parseInt(document.getElementById('ev').value)||0;
+  it.score_sns      = parseInt(document.getElementById('es').value)||0;
+  it.score_story    = parseInt(document.getElementById('et').value)||0;
+  it.total_score    = it.score_audio+it.score_visual+it.score_sns+it.score_story;
+  it.updated_at     = new Date().toISOString();
+  // refresh modal badges
+  const axB={'音':'b-ax-音','視覚':'b-ax-視覚','SNS':'b-ax-SNS','ストーリー':'b-ax-ストーリー'};
+  const catB={'大手':'b-ote','ベンチャー・中小':'b-vc'};
+  const stB={'未調査':'b-s0','調査中':'b-s1','調査済み':'b-s2','完了':'b-s3'};
+  document.getElementById('mb').innerHTML =
+    `<span class="b ${catB[it.category]||''}">${it.category==='大手'?'大手':'ベンチャー・中小'}</span>
+     <span class="b ${stB[it.status]||''}">${it.status}</span>
+     ${it.main_axis.map(a=>`<span class="b ${axB[a]||''}">${a}</span>`).join('')}`;
+  fillView(it);
+  stab('v');
   render();
-  setStatus('変更あり — 保存してください');
+  setSS('変更あり — 保存してください');
 }
 
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow = '';
-  editId = null;
+function closeMod() {
+  document.getElementById('ov').classList.remove('open');
+  document.body.style.overflow='';
+  eid=null;
 }
+function ovClick(e){ if(e.target===document.getElementById('ov')) closeMod(); }
 
-function overlayClick(e) {
-  if (e.target === document.getElementById('overlay')) closeModal();
-}
-
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    INIT
-═══════════════════════════════════════════════ */
+══════════════════════════════════════════════ */
 loadData();
 </script>
 </body>
