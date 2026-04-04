@@ -11,8 +11,9 @@
       --bg:       #07101f;
       --panel:    #0c1b2e;
       --card:     #0f2035;
+      --card2:    #112240;
       --border:   rgba(59,130,246,0.14);
-      --border2:  rgba(59,130,246,0.24);
+      --border2:  rgba(59,130,246,0.28);
       --blue:     #3b82f6;
       --blue-lt:  #60a5fa;
       --blue-dim: rgba(59,130,246,0.10);
@@ -23,373 +24,315 @@
       --green-dim:rgba(16,185,129,0.10);
       --red:      #ef4444;
       --red-dim:  rgba(239,68,68,0.10);
-      --orange:   #fb923c;
       --purple:   #a78bfa;
+      --purple-dim:rgba(167,139,250,0.10);
+      --orange:   #fb923c;
       --text:     #dde6f0;
       --text2:    #8fa8c4;
       --text3:    #4e6a88;
       --mono:     'DM Mono', monospace;
       --body:     'Noto Sans JP', sans-serif;
+      --radius:   8px;
     }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--body);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.75;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { font-family: var(--body); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.75; -webkit-font-smoothing: antialiased; }
 
-    /* ── NAV ── */
-    .nav {
-      position: sticky; top: 0; z-index: 200;
-      background: #040c18;
-      border-bottom: 1px solid rgba(245,158,11,0.2);
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 32px; flex-wrap: wrap;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
-    }
-    .nav a {
-      color: var(--text2); text-decoration: none;
-      padding: 5px 14px; border-radius: 4px;
-      border: 1px solid rgba(148,163,184,0.15); transition: color 0.15s;
-    }
-    .nav a:hover { color: var(--text); }
-    .nav a.active { color: var(--amber); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.08); }
-    .nav-sep { color: var(--text3); margin: 0 4px; }
-
-    /* ── LAYOUT ── */
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
-
-    /* ── HEADER ── */
-    .page-header { margin-bottom: 28px; }
-    .eyebrow {
-      font-family: var(--mono); font-size: 10px;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--green-lt); margin-bottom: 8px; display: block;
-    }
-    .page-title { font-size: clamp(20px,3vw,28px); font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .page-sub { font-size: 13px; color: var(--text2); }
-
-    /* ── SAVE STATUS ── */
-    .save-bar {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 24px;
-    }
-    .save-btn {
-      font-family: var(--mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.08em; padding: 8px 22px; border-radius: 6px;
-      border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1);
-      color: var(--green-lt); cursor: pointer; transition: all 0.15s;
-    }
-    .save-btn:hover { background: rgba(52,211,153,0.18); }
-    .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #save-status { font-size: 12px; color: var(--text3); font-family: var(--mono); }
-
-    /* ── SUMMARY ROW ── */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3,1fr) repeat(4,1fr);
-      gap: 10px;
-      margin-bottom: 28px;
-    }
-    @media(max-width:900px) { .summary-grid { grid-template-columns: repeat(3,1fr); } }
-    @media(max-width:600px) { .summary-grid { grid-template-columns: repeat(2,1fr); } }
-
-    .stat-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; padding: 14px 18px;
-    }
-    .stat-card.status-card { border-left: 3px solid var(--text3); }
-    .stat-card.status-card.wip  { border-left-color: var(--amber); }
-    .stat-card.status-card.done { border-left-color: var(--green); }
-    .stat-label {
-      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text3); margin-bottom: 6px; display: block;
-    }
-    .stat-val { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
-    .stat-unit { font-size: 11px; color: var(--text3); margin-left: 4px; }
-    .top-list { margin-top: 8px; }
-    .top-list li {
-      font-size: 11px; color: var(--text2); list-style: none;
-      padding: 2px 0; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between;
-    }
-    .top-list li:last-child { border-bottom: none; }
-    .top-list .rank { color: var(--text3); font-family: var(--mono); font-size: 10px; }
-    .top-list .score-badge {
-      font-family: var(--mono); font-size: 10px;
-      color: var(--amber); background: var(--amber-dim);
-      padding: 1px 6px; border-radius: 3px;
-    }
-
-    /* ── FILTERS ── */
-    .filters {
-      display: flex; flex-wrap: wrap; gap: 10px;
-      margin-bottom: 20px; align-items: center;
-    }
-    .filter-label {
-      font-family: var(--mono); font-size: 10px;
-      color: var(--text3); letter-spacing: 0.1em;
-    }
-    .filter-btn {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
-      padding: 6px 16px; border-radius: 5px; cursor: pointer;
-      border: 1px solid var(--border2); background: transparent;
-      color: var(--text2); transition: all 0.15s;
-    }
-    .filter-btn:hover { color: var(--text); }
-    .filter-btn.active-all  { background: var(--blue-dim); border-color: var(--blue); color: var(--blue-lt); }
-    .filter-btn.active-大手 { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
-    .filter-btn.active-ベンチャー中小 { background: rgba(167,139,250,0.1); border-color: var(--purple); color: var(--purple); }
-    .filter-btn.active-未調査 { background: rgba(78,106,136,0.2); border-color: var(--text3); color: var(--text2); }
-    .filter-btn.active-調査中 { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
-    .filter-btn.active-完了   { background: var(--green-dim); border-color: var(--green); color: var(--green); }
-    .filter-btn.active-音     { background: rgba(59,130,246,0.1); border-color: var(--blue); color: var(--blue-lt); }
-    .filter-btn.active-視覚   { background: rgba(167,139,250,0.1); border-color: var(--purple); color: var(--purple); }
-    .filter-btn.active-SNS    { background: var(--green-dim); border-color: var(--green); color: var(--green); }
-    .filter-btn.active-ストーリー { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
-    .filter-sep { color: var(--text3); font-size: 12px; }
-
-    .search-input {
-      font-family: var(--body); font-size: 13px;
-      padding: 7px 14px; border-radius: 5px;
-      border: 1px solid var(--border2); background: var(--panel);
-      color: var(--text); outline: none; width: 200px; transition: border-color 0.15s;
-    }
-    .search-input:focus { border-color: var(--blue); }
-    .search-input::placeholder { color: var(--text3); }
-
-    /* ── COUNT ── */
-    .result-count {
-      font-family: var(--mono); font-size: 11px;
-      color: var(--text3); margin-bottom: 12px;
-    }
-    .result-count span { color: var(--text2); }
-
-    /* ── TABLE ── */
-    .table-wrap { overflow-x: auto; margin-bottom: 40px; }
-    table {
-      width: 100%; border-collapse: collapse;
-      font-size: 13px;
-    }
-    thead th {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text3);
-      padding: 10px 14px; text-align: left;
-      border-bottom: 1px solid var(--border2);
-      white-space: nowrap;
-    }
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.12s;
-    }
-    tbody tr:hover { background: rgba(59,130,246,0.06); }
-    tbody tr.row-wip  { border-left: 3px solid var(--amber); }
-    tbody tr.row-done { border-left: 3px solid var(--green); }
-    tbody tr.row-none { border-left: 3px solid transparent; }
-    tbody td {
-      padding: 10px 14px; color: var(--text);
-      vertical-align: middle;
-    }
-    .badge {
-      display: inline-block; font-family: var(--mono);
-      font-size: 10px; padding: 2px 8px; border-radius: 3px;
-      letter-spacing: 0.06em;
-    }
-    .badge-大手      { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
-    .badge-ベンチャー { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
-    .badge-未調査    { background: rgba(78,106,136,0.2); color: var(--text3); border: 1px solid rgba(78,106,136,0.3); }
-    .badge-調査中    { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.4); }
-    .badge-完了      { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.4); }
-    .score-bar {
-      display: flex; gap: 3px; align-items: center;
-    }
-    .score-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--border2);
-    }
-    .score-dot.filled { background: var(--blue-lt); }
-    .total-score { font-family: var(--mono); font-size: 12px; color: var(--blue-lt); }
-    .total-score.high { color: var(--green-lt); }
-
-    /* ── MAP SECTION ── */
-    .map-section { margin-bottom: 40px; }
-    .map-header {
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 16px; flex-wrap: wrap;
-    }
-    .map-title { font-size: 15px; font-weight: 700; color: var(--text); }
-    .axis-select {
-      font-family: var(--mono); font-size: 11px;
-      padding: 5px 10px; border-radius: 5px;
-      border: 1px solid var(--border2); background: var(--panel);
-      color: var(--text2); outline: none; cursor: pointer;
-    }
-    .map-wrap {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 10px; padding: 20px; position: relative;
-    }
-    .map-canvas-wrap {
-      position: relative; width: 100%; max-width: 640px; margin: 0 auto;
-    }
-    canvas#posmap {
-      width: 100%; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--card);
-    }
-    .map-note {
-      font-size: 11px; color: var(--text3); margin-top: 8px; text-align: center;
-      font-family: var(--mono);
-    }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(4,12,24,0.85);
-      z-index: 500; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--panel); border: 1px solid var(--border2);
-      border-radius: 12px; padding: 32px;
-      width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto;
-      position: relative;
-    }
-    .modal-close {
-      position: absolute; top: 16px; right: 20px;
-      font-family: var(--mono); font-size: 12px;
-      color: var(--text3); cursor: pointer; background: none; border: none;
-      padding: 4px 8px; border-radius: 4px; transition: color 0.15s;
-    }
-    .modal-close:hover { color: var(--text); }
-    .modal-company {
-      font-size: 20px; font-weight: 700; color: var(--text);
-      margin-bottom: 4px;
-    }
-    .modal-meta {
-      display: flex; gap: 8px; align-items: center; margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-    .modal-section { margin-bottom: 22px; }
-    .modal-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text3); margin-bottom: 8px; display: block;
-    }
-    .modal-input, .modal-textarea, .modal-select {
-      width: 100%; font-family: var(--body); font-size: 13px;
-      padding: 9px 13px; border-radius: 6px;
-      border: 1px solid var(--border2); background: var(--card);
-      color: var(--text); outline: none; transition: border-color 0.15s;
-    }
-    .modal-textarea { resize: vertical; min-height: 80px; }
-    .modal-input:focus, .modal-textarea:focus, .modal-select:focus {
-      border-color: var(--blue);
-    }
-    .scores-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    }
-    .score-item label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
-      color: var(--text3); display: block; margin-bottom: 5px;
-    }
-    .score-slider {
-      width: 100%; accent-color: var(--blue-lt);
-    }
-    .score-value {
-      font-family: var(--mono); font-size: 12px;
-      color: var(--blue-lt); float: right;
-    }
-    .modal-actions {
-      display: flex; gap: 10px; margin-top: 28px;
-      justify-content: flex-end;
-    }
-    .btn-primary {
-      font-family: var(--mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.08em; padding: 9px 24px; border-radius: 6px;
-      border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1);
-      color: var(--green-lt); cursor: pointer; transition: all 0.15s;
-    }
-    .btn-primary:hover { background: rgba(52,211,153,0.2); }
-    .btn-secondary {
-      font-family: var(--mono); font-size: 11px;
-      letter-spacing: 0.08em; padding: 9px 20px; border-radius: 6px;
-      border: 1px solid var(--border2); background: transparent;
-      color: var(--text2); cursor: pointer; transition: all 0.15s;
-    }
-    .btn-secondary:hover { color: var(--text); }
-
-    .updated-at {
-      font-family: var(--mono); font-size: 10px;
-      color: var(--text3); margin-top: 8px;
-    }
-
-    /* ── LOADING ── */
-    .loading {
-      text-align: center; padding: 60px;
-      font-family: var(--mono); font-size: 12px; color: var(--text3);
-    }
-
-    /* ── COMMON NAV (same as branding page) ── */
+    /* ─── COMMON NAV ─────────────────────────────── */
     #aicare-common-nav {
-      background: #030912;
-      border-bottom: 1px solid rgba(59,130,246,0.12);
+      background: #030912; border-bottom: 1px solid rgba(59,130,246,0.12);
       display: flex; align-items: center; gap: 0;
-      padding: 0 20px; overflow-x: auto; white-space: nowrap;
+      padding: 0 20px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
     }
     #aicare-common-nav::-webkit-scrollbar { display: none; }
     #aicare-common-nav > * { flex-shrink: 0; }
     #aicare-common-nav .cn-label {
-      font-family: var(--mono); font-size: 9.5px;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text3); padding: 10px 12px;
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text3); padding: 10px 12px;
     }
-    #aicare-common-nav .cn-sep { color: var(--text3); padding: 0 4px; }
     #aicare-common-nav a {
       font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
       color: var(--text3); text-decoration: none;
       padding: 10px 11px; border-right: 1px solid rgba(59,130,246,0.08);
       transition: color 0.14s, background 0.14s;
     }
-    #aicare-common-nav a:hover {
-      color: var(--text2); background: rgba(59,130,246,0.05);
+    #aicare-common-nav a:hover { color: var(--text2); background: rgba(59,130,246,0.05); }
+    #aicare-common-nav a.cn-active { color: var(--blue-lt); background: rgba(59,130,246,0.08); border-bottom: 2px solid var(--blue); }
+
+    /* ─── PAGE NAV ──────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: #040c18; border-bottom: 1px solid rgba(245,158,11,0.2);
+      display: flex; align-items: center; gap: 8px; padding: 10px 32px; flex-wrap: wrap;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
     }
-    #aicare-common-nav a.cn-active {
-      color: var(--blue-lt); background: rgba(59,130,246,0.08);
-      border-bottom: 2px solid var(--blue);
+    .nav a { color: var(--text2); text-decoration: none; padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.15); transition: color 0.15s; }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--amber); border-color: rgba(245,158,11,0.35); background: var(--amber-dim); }
+    .nav-sep { color: var(--text3); margin: 0 4px; }
+
+    /* ─── LAYOUT ─────────────────────────────────── */
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 32px 28px 100px; }
+    @media(max-width:640px){ .wrap { padding: 20px 14px 80px; } }
+
+    /* ─── PAGE HEADER ────────────────────────────── */
+    .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .page-header-left {}
+    .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 8px; display: block; }
+    .page-title { font-size: clamp(20px,3vw,28px); font-weight: 700; color: var(--text); margin-bottom: 4px; letter-spacing: -0.02em; }
+    .page-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .save-area { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .save-btn {
+      font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      padding: 9px 22px; border-radius: 6px;
+      border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1);
+      color: var(--green-lt); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .save-btn:hover { background: rgba(52,211,153,0.2); }
+    .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #save-status { font-size: 11px; color: var(--text3); font-family: var(--mono); max-width: 220px; }
+
+    /* ─── SUMMARY ────────────────────────────────── */
+    .summary-section { margin-bottom: 36px; }
+    .summary-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; }
+    .summary-top { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+    @media(max-width:760px){ .summary-top { grid-template-columns: repeat(2,1fr); } }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px;
+    }
+    .stat-card.c-wip  { border-left: 3px solid var(--amber); }
+    .stat-card.c-done { border-left: 3px solid var(--green); }
+    .stat-card.c-none { border-left: 3px solid var(--text3); }
+    .stat-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; display: block; }
+    .stat-val { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; font-family: var(--mono); }
+    .stat-unit { font-size: 12px; color: var(--text3); margin-left: 3px; }
+
+    .summary-axis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    @media(max-width:900px){ .summary-axis { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:480px){ .summary-axis { grid-template-columns: 1fr; } }
+    .axis-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+    .axis-card-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .axis-icon { width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+    .top-list { list-style: none; }
+    .top-list li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0; border-bottom: 1px solid rgba(59,130,246,0.08);
+      font-size: 12px; color: var(--text2); gap: 6px;
+    }
+    .top-list li:last-child { border-bottom: none; }
+    .top-list .rank { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; }
+    .top-list .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .score-pill { font-family: var(--mono); font-size: 10px; padding: 1px 7px; border-radius: 3px; flex-shrink: 0; }
+    .sp-audio  { background: rgba(59,130,246,0.15); color: var(--blue-lt); }
+    .sp-visual { background: var(--purple-dim); color: var(--purple); }
+    .sp-sns    { background: var(--green-dim); color: var(--green-lt); }
+    .sp-story  { background: var(--amber-dim); color: var(--amber); }
+    .top-empty { font-size: 11px; color: var(--text3); padding: 4px 0; font-family: var(--mono); }
+
+    /* ─── CONTROLS ───────────────────────────────── */
+    .controls { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
+    .ctrl-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .ctrl-row + .ctrl-row { margin-top: 10px; }
+    .ctrl-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3); white-space: nowrap; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding: 5px 14px;
+      border-radius: 5px; cursor: pointer; border: 1px solid var(--border2); background: transparent;
+      color: var(--text2); transition: all 0.15s; white-space: nowrap;
+    }
+    .filter-btn:hover { color: var(--text); border-color: rgba(59,130,246,0.4); }
+    .fb-active-all  { background: var(--blue-dim); border-color: var(--blue); color: var(--blue-lt) !important; }
+    .fb-active-大手 { background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
+    .fb-active-vc   { background: var(--purple-dim); border-color: var(--purple); color: var(--purple) !important; }
+    .fb-active-未調査{ background: rgba(78,106,136,0.2); border-color: var(--text3); color: var(--text2) !important; }
+    .fb-active-調査中{ background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
+    .fb-active-完了  { background: var(--green-dim); border-color: var(--green); color: var(--green-lt) !important; }
+    .fb-active-音   { background: var(--blue-dim); border-color: var(--blue); color: var(--blue-lt) !important; }
+    .fb-active-視覚 { background: var(--purple-dim); border-color: var(--purple); color: var(--purple) !important; }
+    .fb-active-SNS  { background: var(--green-dim); border-color: var(--green); color: var(--green-lt) !important; }
+    .fb-active-ストーリー { background: var(--amber-dim); border-color: var(--amber); color: var(--amber) !important; }
+    .ctrl-sep { color: var(--text3); font-size: 12px; }
+    .search-input {
+      font-family: var(--body); font-size: 13px; padding: 6px 13px; border-radius: 5px;
+      border: 1px solid var(--border2); background: var(--card); color: var(--text);
+      outline: none; width: 180px; transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--blue); }
+    .search-input::placeholder { color: var(--text3); }
+    .sort-select {
+      font-family: var(--mono); font-size: 11px; padding: 5px 10px; border-radius: 5px;
+      border: 1px solid var(--border2); background: var(--panel); color: var(--text2);
+      outline: none; cursor: pointer;
     }
 
-    @media(max-width:640px) {
-      .wrap { padding: 20px 14px 60px; }
+    /* ─── RESULT COUNT ───────────────────────────── */
+    .result-count { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 12px; }
+    .result-count strong { color: var(--text2); }
+
+    /* ─── TABLE ──────────────────────────────────── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text3); padding: 11px 14px; text-align: left;
+      border-bottom: 1px solid var(--border2); background: var(--panel); white-space: nowrap;
+    }
+    thead th.sort-active { color: var(--blue-lt); }
+    tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(59,130,246,0.07); }
+    tbody tr.row-wip  { border-left: 3px solid var(--amber); }
+    tbody tr.row-done { border-left: 3px solid var(--green); }
+    tbody tr.row-none { border-left: 3px solid transparent; }
+    tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
+    .td-id { color: var(--text3); font-family: var(--mono); font-size: 10px; }
+    .td-name { font-weight: 600; min-width: 120px; }
+    .td-summary { color: var(--text2); font-size: 12px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .td-score { font-family: var(--mono); font-size: 12px; text-align: center; }
+    .td-total { font-family: var(--mono); font-size: 13px; font-weight: 700; text-align: center; }
+    .td-total.high { color: var(--green-lt); }
+    .td-total.mid  { color: var(--blue-lt); }
+    .td-date { font-family: var(--mono); font-size: 10px; color: var(--text3); white-space: nowrap; }
+
+    /* badges */
+    .badge { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.04em; white-space: nowrap; }
+    .badge-大手   { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-vc     { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+    .badge-未調査  { background: rgba(78,106,136,0.2); color: var(--text3); border: 1px solid rgba(78,106,136,0.3); }
+    .badge-調査中  { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.4); }
+    .badge-完了    { background: var(--green-dim); color: var(--green-lt); border: 1px solid rgba(16,185,129,0.4); }
+    .badge-音     { background: var(--blue-dim); color: var(--blue-lt); border: 1px solid rgba(59,130,246,0.3); }
+    .badge-視覚   { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+    .badge-SNS    { background: var(--green-dim); color: var(--green-lt); border: 1px solid rgba(16,185,129,0.3); }
+    .badge-ストーリー { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-none   { background: rgba(78,106,136,0.15); color: var(--text3); border: 1px solid rgba(78,106,136,0.2); }
+
+    /* score dots */
+    .score-dots { display: flex; gap: 2px; align-items: center; justify-content: center; }
+    .sd { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
+    .sd.on { background: var(--blue-lt); }
+
+    /* ─── MODAL ──────────────────────────────────── */
+    .overlay {
+      display: none; position: fixed; inset: 0; background: rgba(4,12,24,0.88);
+      z-index: 500; overflow-y: auto; padding: 20px;
+    }
+    .overlay.open { display: block; }
+    .modal {
+      background: var(--panel); border: 1px solid var(--border2); border-radius: 12px;
+      max-width: 720px; margin: 0 auto; position: relative;
+      animation: slideup 0.2s ease;
+    }
+    @keyframes slideup { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .modal-header {
+      padding: 24px 28px 0;
+      border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 0;
+    }
+    .modal-close {
+      position: absolute; top: 18px; right: 20px;
+      font-family: var(--mono); font-size: 11px; color: var(--text3);
+      cursor: pointer; background: none; border: 1px solid var(--border); border-radius: 4px;
+      padding: 4px 10px; transition: color 0.15s, border-color 0.15s;
+    }
+    .modal-close:hover { color: var(--text); border-color: var(--text3); }
+    .modal-company-name { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+    .modal-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0; }
+
+    /* tabs */
+    .modal-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 28px; margin-bottom: 0; }
+    .mtab {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; padding: 12px 18px;
+      color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s; background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .mtab:hover { color: var(--text2); }
+    .mtab.active { color: var(--blue-lt); border-bottom-color: var(--blue); }
+
+    .modal-body { padding: 24px 28px 28px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* form fields */
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 7px; display: block;
+    }
+    .field-label.required::after { content: ' *'; color: var(--red); }
+    .field-hint { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+    .f-input, .f-textarea, .f-select {
+      width: 100%; font-family: var(--body); font-size: 13px; padding: 9px 13px;
+      border-radius: 6px; border: 1px solid var(--border2); background: var(--card);
+      color: var(--text); outline: none; transition: border-color 0.15s;
+    }
+    .f-textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
+    .f-input:focus, .f-textarea:focus, .f-select:focus { border-color: var(--blue); }
+    .f-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:540px){ .f-grid2 { grid-template-columns: 1fr; } }
+
+    /* scores */
+    .scores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:440px){ .scores-grid { grid-template-columns: 1fr; } }
+    .score-field label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3);
+      margin-bottom: 6px;
+    }
+    .score-val { font-size: 13px; font-weight: 700; color: var(--blue-lt); }
+    input[type=range] { width: 100%; accent-color: var(--blue-lt); cursor: pointer; }
+    .total-line { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 12px; color: var(--text3); }
+    .total-line span { font-size: 18px; font-weight: 700; color: var(--blue-lt); }
+
+    /* view mode */
+    .view-field { margin-bottom: 18px; }
+    .view-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; display: block; }
+    .view-val { color: var(--text); font-size: 13px; line-height: 1.75; white-space: pre-wrap; }
+    .view-val.empty { color: var(--text3); font-style: italic; font-size: 12px; }
+    .view-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:540px){ .view-grid2 { grid-template-columns: 1fr; } }
+    .view-scores { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 8px; }
+    @media(max-width:480px){ .view-scores { grid-template-columns: repeat(2,1fr); } }
+    .vscore-item { background: var(--card2); border-radius: 6px; padding: 10px 12px; text-align: center; }
+    .vscore-axis { font-family: var(--mono); font-size: 9.5px; color: var(--text3); margin-bottom: 4px; }
+    .vscore-num { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; padding: 0 28px 24px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap; }
+    .btn-primary { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 9px 24px; border-radius: 6px; border: 1px solid rgba(52,211,153,0.5); background: rgba(52,211,153,0.1); color: var(--green-lt); cursor: pointer; transition: all 0.15s; }
+    .btn-primary:hover { background: rgba(52,211,153,0.2); }
+    .btn-edit   { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 9px 24px; border-radius: 6px; border: 1px solid rgba(96,165,250,0.4); background: rgba(59,130,246,0.08); color: var(--blue-lt); cursor: pointer; transition: all 0.15s; }
+    .btn-edit:hover { background: rgba(59,130,246,0.14); }
+    .btn-cancel { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; padding: 9px 20px; border-radius: 6px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+    .btn-cancel:hover { color: var(--text); }
+
+    .updated-hint { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 10px; text-align: right; }
+
+    /* ─── LOADING ────────────────────────────────── */
+    .loading-row td { text-align: center; color: var(--text3); padding: 48px; font-family: var(--mono); font-size: 12px; }
+
+    @media(max-width:640px){
       .nav { padding: 8px 14px; }
-      .summary-grid { grid-template-columns: repeat(2,1fr); }
-      .scores-grid { grid-template-columns: 1fr; }
-      .modal { padding: 20px; }
+      .modal-body { padding: 18px 18px 22px; }
+      .modal-header { padding: 18px 18px 16px; }
+      .modal-tabs { padding: 0 18px; }
+      .modal-actions { padding: 16px 18px 20px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── AICARE COMMON NAV ── -->
+<!-- ─── COMMON NAV ────────────────────────────────── -->
 <nav id="aicare-common-nav">
   <span class="cn-label">aicare lab</span>
   <a href="aicare-top-prototype.html">サイト TOP</a>
   <a href="aicare-sitemap.html">サイトマップ</a>
   <a href="aicare-stores.html">店舗一覧</a>
-  <a href="aicare-store-detail.html">店舗詳細</a>
   <a href="aicare-vision-check.html">視力チェック</a>
-  <span class="cn-sep">|</span>
-  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="persona-dashboard.html">ペルソナ</a>
   <a href="aicare-brand-overview.html">ブランドマップ</a>
-  <a href="store-persona-map.html">店舗ペルソナ</a>
   <a href="eyecare-glass-branding.html">グラス</a>
   <a href="branding-research.html" class="cn-active">ブランド調査</a>
-  <span class="cn-sep">|</span>
   <a href="reference-sites.html">参考サイト集</a>
-  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-schedule.html">スケジュール</a>
   <a href="aicare-projects.html">プロジェクト管理</a>
-  <a href="project-mgmt-v2.html">管理仮</a>
 </nav>
 <script>
 (function(){
@@ -399,676 +342,673 @@
   });
 })();
 </script>
-<!-- ── AICARE COMMON NAV END ── -->
 
 <nav class="nav">
   <span style="color:var(--text3)">eye care lab</span>
   <span class="nav-sep">/</span>
   <a href="eyecare-glass-branding.html">グラス ブランディング</a>
-  <a href="branding-research.html" class="active" style="color:#34d399;border-color:rgba(52,211,153,0.4);">🔍 ブランド事例調査</a>
+  <a href="branding-research.html" class="active">🔍 ブランド事例調査</a>
 </nav>
 
 <div class="wrap">
 
-  <!-- ── PAGE HEADER ── -->
+  <!-- ─── PAGE HEADER ──────────────────────────────── -->
   <div class="page-header">
-    <span class="eyebrow">Brand Case Research — 日本企業50社</span>
-    <h1 class="page-title">ブランド事例調査</h1>
-    <p class="page-sub">音 × 視覚 × SNS × ストーリーの4軸でブランドを比較・整理する</p>
-  </div>
-
-  <!-- ── SAVE BAR ── -->
-  <div class="save-bar">
-    <button class="save-btn" id="save-btn" onclick="saveData()">💾 保存</button>
-    <span id="save-status">読み込み中...</span>
-  </div>
-
-  <!-- ── SUMMARY GRID ── -->
-  <div class="summary-grid" id="summary-grid">
-    <!-- JS で描画 -->
-  </div>
-
-  <!-- ── POSITION MAP ── -->
-  <div class="map-section">
-    <div class="map-header">
-      <span class="map-title">ポジションマップ</span>
-      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">X軸</span>
-      <select class="axis-select" id="axis-x" onchange="drawMap()">
-        <option value="score_audio">音</option>
-        <option value="score_visual" selected>視覚</option>
-        <option value="score_sns">SNS</option>
-        <option value="score_story">ストーリー</option>
-      </select>
-      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Y軸</span>
-      <select class="axis-select" id="axis-y" onchange="drawMap()">
-        <option value="score_audio">音</option>
-        <option value="score_visual">視覚</option>
-        <option value="score_sns">SNS</option>
-        <option value="score_story" selected>ストーリー</option>
-      </select>
+    <div class="page-header-left">
+      <span class="eyebrow">Brand Case Research — 日本企業50社</span>
+      <h1 class="page-title">ブランド事例調査</h1>
+      <p class="page-sub">なぜ強いのか・どうなったのか・アイケアLaBoに転用できることを整理する</p>
     </div>
-    <div class="map-wrap">
-      <div class="map-canvas-wrap">
-        <canvas id="posmap" width="600" height="400"></canvas>
-      </div>
-      <p class="map-note">スコア入力済みの企業のみ表示。点をホバーで企業名表示。</p>
+    <div class="save-area">
+      <button class="save-btn" id="save-btn" onclick="saveData()">💾 保存</button>
+      <span id="save-status">読み込み中...</span>
     </div>
   </div>
 
-  <!-- ── FILTERS ── -->
-  <div class="filters" id="filters">
-    <span class="filter-label">カテゴリ</span>
-    <button class="filter-btn active-all" data-group="cat" data-val="all" onclick="setFilter('cat','all',this)">全て</button>
-    <button class="filter-btn" data-group="cat" data-val="大手" onclick="setFilter('cat','大手',this)">大手</button>
-    <button class="filter-btn" data-group="cat" data-val="ベンチャー中小" onclick="setFilter('cat','ベンチャー中小',this)">ベンチャー/中小</button>
-
-    <span class="filter-sep">|</span>
-    <span class="filter-label">ステータス</span>
-    <button class="filter-btn active-all" data-group="status" data-val="all" onclick="setFilter('status','all',this)">全て</button>
-    <button class="filter-btn" data-group="status" data-val="未調査" onclick="setFilter('status','未調査',this)">未調査</button>
-    <button class="filter-btn" data-group="status" data-val="調査中" onclick="setFilter('status','調査中',this)">調査中</button>
-    <button class="filter-btn" data-group="status" data-val="完了" onclick="setFilter('status','完了',this)">完了</button>
-
-    <span class="filter-sep">|</span>
-    <span class="filter-label">軸フィルタ</span>
-    <button class="filter-btn active-all" data-group="axis" data-val="all" onclick="setFilter('axis','all',this)">全軸</button>
-    <button class="filter-btn" data-group="axis" data-val="音" onclick="setFilter('axis','音',this)">音</button>
-    <button class="filter-btn" data-group="axis" data-val="視覚" onclick="setFilter('axis','視覚',this)">視覚</button>
-    <button class="filter-btn" data-group="axis" data-val="SNS" onclick="setFilter('axis','SNS',this)">SNS</button>
-    <button class="filter-btn" data-group="axis" data-val="ストーリー" onclick="setFilter('axis','ストーリー',this)">ストーリー</button>
-
-    <span class="filter-sep">|</span>
-    <input class="search-input" id="search-input" type="text" placeholder="企業名で検索" oninput="renderTable()" />
+  <!-- ─── SUMMARY ──────────────────────────────────── -->
+  <div class="summary-section">
+    <div class="summary-title">調査まとめ</div>
+    <div class="summary-top" id="summary-top"><!-- JS --></div>
+    <div class="summary-axis" id="summary-axis"><!-- JS --></div>
   </div>
 
+  <!-- ─── CONTROLS ─────────────────────────────────── -->
+  <div class="controls">
+    <div class="ctrl-row">
+      <span class="ctrl-label">区分</span>
+      <button class="filter-btn fb-active-all" data-g="cat" data-v="all" onclick="setFilter('cat','all',this)">全て</button>
+      <button class="filter-btn" data-g="cat" data-v="大手" onclick="setFilter('cat','大手',this)">大手</button>
+      <button class="filter-btn" data-g="cat" data-v="vc" onclick="setFilter('cat','vc',this)">ベンチャー・中小</button>
+      <span class="ctrl-sep">|</span>
+      <span class="ctrl-label">ステータス</span>
+      <button class="filter-btn fb-active-all" data-g="status" data-v="all" onclick="setFilter('status','all',this)">全て</button>
+      <button class="filter-btn" data-g="status" data-v="未調査" onclick="setFilter('status','未調査',this)">未調査</button>
+      <button class="filter-btn" data-g="status" data-v="調査中" onclick="setFilter('status','調査中',this)">調査中</button>
+      <button class="filter-btn" data-g="status" data-v="完了" onclick="setFilter('status','完了',this)">完了</button>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">主軸</span>
+      <button class="filter-btn fb-active-all" data-g="axis" data-v="all" onclick="setFilter('axis','all',this)">全軸</button>
+      <button class="filter-btn" data-g="axis" data-v="音" onclick="setFilter('axis','音',this)">🎵 音</button>
+      <button class="filter-btn" data-g="axis" data-v="視覚" onclick="setFilter('axis','視覚',this)">👁 視覚</button>
+      <button class="filter-btn" data-g="axis" data-v="SNS" onclick="setFilter('axis','SNS',this)">📣 SNS</button>
+      <button class="filter-btn" data-g="axis" data-v="ストーリー" onclick="setFilter('axis','ストーリー',this)">📖 ストーリー</button>
+      <span class="ctrl-sep">|</span>
+      <input class="search-input" id="search" type="text" placeholder="企業名で検索" oninput="renderTable()" />
+      <span class="ctrl-label">並び替え</span>
+      <select class="sort-select" id="sort-sel" onchange="renderTable()">
+        <option value="id">登録順</option>
+        <option value="name">企業名順</option>
+        <option value="score">スコア順</option>
+        <option value="updated">更新日順</option>
+      </select>
+    </div>
+  </div>
   <div class="result-count" id="result-count"></div>
 
-  <!-- ── TABLE ── -->
+  <!-- ─── TABLE ────────────────────────────────────── -->
   <div class="table-wrap">
     <table id="main-table">
       <thead>
         <tr>
           <th>#</th>
           <th>企業名</th>
-          <th>カテゴリ</th>
+          <th>区分</th>
+          <th>主軸</th>
           <th>ステータス</th>
-          <th>音</th>
-          <th>視覚</th>
-          <th>SNS</th>
-          <th>ストーリー</th>
-          <th>合計</th>
+          <th>一言要約</th>
+          <th style="text-align:center">音</th>
+          <th style="text-align:center">視覚</th>
+          <th style="text-align:center">SNS</th>
+          <th style="text-align:center">STR</th>
+          <th style="text-align:center">合計</th>
           <th>更新日</th>
         </tr>
       </thead>
       <tbody id="table-body">
-        <tr><td colspan="10" class="loading">読み込み中...</td></tr>
+        <tr class="loading-row"><td colspan="12">読み込み中...</td></tr>
       </tbody>
     </table>
   </div>
-
 </div>
 
-<!-- ── MODAL ── -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+<!-- ─── DETAIL / EDIT MODAL ──────────────────────── -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
   <div class="modal" id="modal">
-    <button class="modal-close" onclick="closeModal()">✕ 閉じる</button>
-    <div class="modal-company" id="m-company"></div>
-    <div class="modal-meta" id="m-meta"></div>
 
-    <div class="modal-section">
-      <span class="modal-label">ステータス</span>
-      <select class="modal-select" id="m-status">
-        <option value="未調査">未調査</option>
-        <option value="調査中">調査中</option>
-        <option value="完了">完了</option>
-      </select>
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">✕ 閉じる</button>
+      <div class="modal-company-name" id="m-name"></div>
+      <div class="modal-badges" id="m-badges"></div>
     </div>
 
-    <div class="modal-section">
-      <span class="modal-label">サマリー（ブランドの特徴・まとめ）</span>
-      <textarea class="modal-textarea" id="m-summary" rows="3" placeholder="このブランドの特徴やブランディング戦略のまとめ..."></textarea>
+    <div class="modal-tabs">
+      <button class="mtab active" onclick="switchTab('view',this)">詳細</button>
+      <button class="mtab" onclick="switchTab('edit',this)">編集</button>
     </div>
 
-    <div class="modal-section">
-      <span class="modal-label">メモ（気づき・調査メモ）</span>
-      <textarea class="modal-textarea" id="m-memo" rows="3" placeholder="調査中に気づいたこと、比較ポイントなど..."></textarea>
-    </div>
-
-    <div class="modal-section">
-      <span class="modal-label">参考リンク・出典</span>
-      <textarea class="modal-textarea" id="m-references" rows="2" placeholder="URL, 記事名など。改行で複数入力可。"></textarea>
-    </div>
-
-    <div class="modal-section">
-      <span class="modal-label">4軸スコア（0〜10）</span>
-      <div class="scores-grid">
-        <div class="score-item">
-          <label>🎵 音 <span class="score-value" id="sv-audio">0</span></label>
-          <input type="range" class="score-slider" id="m-audio" min="0" max="10" value="0"
-            oninput="document.getElementById('sv-audio').textContent=this.value; updateTotal()">
+    <!-- ─── VIEW TAB ─── -->
+    <div class="modal-body">
+      <div class="tab-panel active" id="tab-view">
+        <div class="view-grid2">
+          <div class="view-field">
+            <span class="view-label">業界</span>
+            <div class="view-val" id="v-industry"></div>
+          </div>
+          <div class="view-field">
+            <span class="view-label">主軸</span>
+            <div id="v-main-axis"></div>
+          </div>
         </div>
-        <div class="score-item">
-          <label>👁 視覚 <span class="score-value" id="sv-visual">0</span></label>
-          <input type="range" class="score-slider" id="m-visual" min="0" max="10" value="0"
-            oninput="document.getElementById('sv-visual').textContent=this.value; updateTotal()">
+        <div class="view-field">
+          <span class="view-label">一言要約</span>
+          <div class="view-val" id="v-summary"></div>
         </div>
-        <div class="score-item">
-          <label>📣 SNS <span class="score-value" id="sv-sns">0</span></label>
-          <input type="range" class="score-slider" id="m-sns" min="0" max="10" value="0"
-            oninput="document.getElementById('sv-sns').textContent=this.value; updateTotal()">
+        <div class="view-field">
+          <span class="view-label">なぜ強いのか</span>
+          <div class="view-val" id="v-why"></div>
         </div>
-        <div class="score-item">
-          <label>📖 ストーリー <span class="score-value" id="sv-story">0</span></label>
-          <input type="range" class="score-slider" id="m-story" min="0" max="10" value="0"
-            oninput="document.getElementById('sv-story').textContent=this.value; updateTotal()">
+        <div class="view-field">
+          <span class="view-label">どうやってそうなったのか</span>
+          <div class="view-val" id="v-how"></div>
         </div>
+        <div class="view-field">
+          <span class="view-label">どこで刷り込んだのか</span>
+          <div class="view-val" id="v-where"></div>
+        </div>
+        <div class="view-field">
+          <span class="view-label">成果の兆候</span>
+          <div class="view-val" id="v-traction"></div>
+        </div>
+        <div class="view-field">
+          <span class="view-label">アイケアLaBoへの示唆</span>
+          <div class="view-val" id="v-implication"></div>
+        </div>
+        <div class="view-field">
+          <span class="view-label">メモ</span>
+          <div class="view-val" id="v-memo"></div>
+        </div>
+        <div class="view-field">
+          <span class="view-label">参考リンク</span>
+          <div class="view-val" id="v-refs"></div>
+        </div>
+        <div class="view-field">
+          <span class="view-label">スコア</span>
+          <div class="view-scores">
+            <div class="vscore-item">
+              <div class="vscore-axis">🎵 音</div>
+              <div class="vscore-num" id="vs-audio" style="color:var(--blue-lt)">—</div>
+            </div>
+            <div class="vscore-item">
+              <div class="vscore-axis">👁 視覚</div>
+              <div class="vscore-num" id="vs-visual" style="color:var(--purple)">—</div>
+            </div>
+            <div class="vscore-item">
+              <div class="vscore-axis">📣 SNS</div>
+              <div class="vscore-num" id="vs-sns" style="color:var(--green-lt)">—</div>
+            </div>
+            <div class="vscore-item">
+              <div class="vscore-axis">📖 ストーリー</div>
+              <div class="vscore-num" id="vs-story" style="color:var(--amber)">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="updated-hint" id="v-updated"></div>
       </div>
-      <div style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3);">
-        合計スコア：<span id="m-total" style="color:var(--blue-lt);font-size:16px;font-weight:700;">0</span> / 40
+
+      <!-- ─── EDIT TAB ─── -->
+      <div class="tab-panel" id="tab-edit">
+        <div class="f-grid2">
+          <div class="field">
+            <span class="field-label">業界</span>
+            <input class="f-input" id="e-industry" type="text" placeholder="例：食品・飲料、アパレル、IT など" />
+          </div>
+          <div class="field">
+            <span class="field-label">主軸</span>
+            <select class="f-select" id="e-main-axis">
+              <option value="">— 未設定 —</option>
+              <option value="音">🎵 音</option>
+              <option value="視覚">👁 視覚</option>
+              <option value="SNS">📣 SNS</option>
+              <option value="ストーリー">📖 ストーリー</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-grid2">
+          <div class="field">
+            <span class="field-label">ステータス</span>
+            <select class="f-select" id="e-status">
+              <option value="未調査">未調査</option>
+              <option value="調査中">調査中</option>
+              <option value="完了">完了</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">一言要約</span>
+          <span class="field-hint">このブランドの特徴を一言で</span>
+          <input class="f-input" id="e-summary" type="text" placeholder="例：CMジングルで感情を刷り込む老舗マーケティング" />
+        </div>
+        <div class="field">
+          <span class="field-label">なぜ強いのか</span>
+          <textarea class="f-textarea" id="e-why" placeholder="ブランドの強さの本質・差別化要因を記述する"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">どうやってそうなったのか</span>
+          <textarea class="f-textarea" id="e-how" placeholder="歴史・経緯・具体的な打ち手・プロセス"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">どこで刷り込んだのか</span>
+          <textarea class="f-textarea" id="e-where" placeholder="TV / SNS / 店頭 / 音楽 / パッケージ / 体験 など接触点"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">成果の兆候</span>
+          <textarea class="f-textarea" id="e-traction" placeholder="売上推移・SNS反応・認知率・ファン数・メディア露出など"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">アイケアLaBoへの示唆</span>
+          <textarea class="f-textarea" id="e-implication" placeholder="アイケアLaBoが転用・参考にできることは何か"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">メモ</span>
+          <textarea class="f-textarea" id="e-memo" placeholder="調査中の気づき・補足など自由記述"></textarea>
+        </div>
+        <div class="field">
+          <span class="field-label">参考リンク</span>
+          <textarea class="f-textarea" id="e-refs" rows="3" placeholder="URL や記事名など。改行で複数入力可。"></textarea>
+        </div>
+
+        <!-- Scores -->
+        <div class="field">
+          <span class="field-label">4軸スコア（0〜10）</span>
+          <div class="scores-grid">
+            <div class="score-field">
+              <label>🎵 音<span class="score-val" id="sv-audio">0</span></label>
+              <input type="range" id="e-audio" min="0" max="10" value="0"
+                oninput="document.getElementById('sv-audio').textContent=this.value;calcTotal()">
+            </div>
+            <div class="score-field">
+              <label>👁 視覚<span class="score-val" id="sv-visual" style="color:var(--purple)">0</span></label>
+              <input type="range" id="e-visual" min="0" max="10" value="0"
+                oninput="document.getElementById('sv-visual').textContent=this.value;calcTotal()">
+            </div>
+            <div class="score-field">
+              <label>📣 SNS<span class="score-val" id="sv-sns" style="color:var(--green-lt)">0</span></label>
+              <input type="range" id="e-sns" min="0" max="10" value="0"
+                oninput="document.getElementById('sv-sns').textContent=this.value;calcTotal()">
+            </div>
+            <div class="score-field">
+              <label>📖 ストーリー<span class="score-val" id="sv-story" style="color:var(--amber)">0</span></label>
+              <input type="range" id="e-story" min="0" max="10" value="0"
+                oninput="document.getElementById('sv-story').textContent=this.value;calcTotal()">
+            </div>
+          </div>
+          <div class="total-line">合計スコア：<span id="e-total">0</span> / 40</div>
+        </div>
       </div>
     </div>
 
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
-      <button class="btn-primary" onclick="saveItem()">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">閉じる</button>
+      <button class="btn-edit" id="btn-switch-edit" onclick="switchTab('edit', document.querySelector('.mtab:nth-child(2)'))">編集する</button>
+      <button class="btn-primary" id="btn-save-item" onclick="saveItem()" style="display:none">保存</button>
     </div>
-    <div class="updated-at" id="m-updated"></div>
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────
-//  DATA
-// ─────────────────────────────────────────
-const INITIAL_COMPANIES = [
-  // 大手 (1–25)
-  { id:1,  companyName:'カゴメ',                   category:'大手' },
-  { id:2,  companyName:'エステー',                  category:'大手' },
-  { id:3,  companyName:'味の素',                    category:'大手' },
-  { id:4,  companyName:'TBSグループ',               category:'大手' },
-  { id:5,  companyName:'テレビ東京',                category:'大手' },
-  { id:6,  companyName:'永谷園ホールディングス',    category:'大手' },
-  { id:7,  companyName:'日産自動車',                category:'大手' },
-  { id:8,  companyName:'明治',                      category:'大手' },
-  { id:9,  companyName:'リクルート',                category:'大手' },
-  { id:10, companyName:'任天堂',                    category:'大手' },
-  { id:11, companyName:'メルカリ',                  category:'大手' },
-  { id:12, companyName:'イオン',                    category:'大手' },
-  { id:13, companyName:'セブン-イレブン・ジャパン', category:'大手' },
-  { id:14, companyName:'日本マクドナルド',          category:'大手' },
-  { id:15, companyName:'APAMAN',                    category:'大手' },
-  { id:16, companyName:'ユニクロ',                  category:'大手' },
-  { id:17, companyName:'ニトリ',                    category:'大手' },
-  { id:18, companyName:'ビックカメラ',              category:'大手' },
-  { id:19, companyName:'トヨタ自動車',              category:'大手' },
-  { id:20, companyName:'ヤンマー',                  category:'大手' },
-  { id:21, companyName:'スシロー',                  category:'大手' },
-  { id:22, companyName:'しまむら',                  category:'大手' },
-  { id:23, companyName:'すかいらーくホールディングス', category:'大手' },
-  { id:24, companyName:'ロート製薬',                category:'大手' },
-  { id:25, companyName:'OWNDAYS',                   category:'大手' },
-  // ベンチャー/中小 (26–50)
-  { id:26, companyName:'kay me',           category:'ベンチャー中小' },
-  { id:27, companyName:'COHINA',           category:'ベンチャー中小' },
-  { id:28, companyName:'ALL YOURS',        category:'ベンチャー中小' },
-  { id:29, companyName:'FABRIC TOKYO',     category:'ベンチャー中小' },
-  { id:30, companyName:'17kg',             category:'ベンチャー中小' },
-  { id:31, companyName:'ジャパンスコープ', category:'ベンチャー中小' },
-  { id:32, companyName:'BASE FOOD',        category:'ベンチャー中小' },
-  { id:33, companyName:'Minimal',          category:'ベンチャー中小' },
-  { id:34, companyName:'Mr. CHEESECAKE',   category:'ベンチャー中小' },
-  { id:35, companyName:'snaq.me',          category:'ベンチャー中小' },
-  { id:36, companyName:'meeth',            category:'ベンチャー中小' },
-  { id:37, companyName:'バルクオム',       category:'ベンチャー中小' },
-  { id:38, companyName:'FUJIMI',           category:'ベンチャー中小' },
-  { id:39, companyName:'PHOEBE BEAUTY UP', category:'ベンチャー中小' },
-  { id:40, companyName:'MEDULLA',          category:'ベンチャー中小' },
-  { id:41, companyName:'ALOBABY',          category:'ベンチャー中小' },
-  { id:42, companyName:'PostCoffee',       category:'ベンチャー中小' },
-  { id:43, companyName:'GREEN SPOON',      category:'ベンチャー中小' },
-  { id:44, companyName:'nosh',             category:'ベンチャー中小' },
-  { id:45, companyName:'Sui+',             category:'ベンチャー中小' },
-  { id:46, companyName:'Mitas',            category:'ベンチャー中小' },
-  { id:47, companyName:'スマートラウンド', category:'ベンチャー中小' },
-  { id:48, companyName:'Sales Marker',     category:'ベンチャー中小' },
-  { id:49, companyName:'スペースマーケット', category:'ベンチャー中小' },
-  { id:50, companyName:'ペイトナー',       category:'ベンチャー中小' },
+/* ═══════════════════════════════════════════════
+   DATA DEFINITIONS
+═══════════════════════════════════════════════ */
+const COMPANIES = [
+  {id:1,  name:'カゴメ',                     cat:'大手'},
+  {id:2,  name:'エステー',                    cat:'大手'},
+  {id:3,  name:'味の素',                      cat:'大手'},
+  {id:4,  name:'TBSグループ',                 cat:'大手'},
+  {id:5,  name:'テレビ東京',                  cat:'大手'},
+  {id:6,  name:'永谷園ホールディングス',      cat:'大手'},
+  {id:7,  name:'日産自動車',                  cat:'大手'},
+  {id:8,  name:'明治',                        cat:'大手'},
+  {id:9,  name:'リクルート',                  cat:'大手'},
+  {id:10, name:'任天堂',                      cat:'大手'},
+  {id:11, name:'メルカリ',                    cat:'大手'},
+  {id:12, name:'イオン',                      cat:'大手'},
+  {id:13, name:'セブン-イレブン・ジャパン',   cat:'大手'},
+  {id:14, name:'日本マクドナルド',            cat:'大手'},
+  {id:15, name:'APAMAN',                      cat:'大手'},
+  {id:16, name:'ユニクロ',                    cat:'大手'},
+  {id:17, name:'ニトリ',                      cat:'大手'},
+  {id:18, name:'ビックカメラ',                cat:'大手'},
+  {id:19, name:'トヨタ自動車',                cat:'大手'},
+  {id:20, name:'ヤンマー',                    cat:'大手'},
+  {id:21, name:'スシロー',                    cat:'大手'},
+  {id:22, name:'しまむら',                    cat:'大手'},
+  {id:23, name:'すかいらーくホールディングス',cat:'大手'},
+  {id:24, name:'ロート製薬',                  cat:'大手'},
+  {id:25, name:'OWNDAYS',                     cat:'大手'},
+  {id:26, name:'kay me',           cat:'vc'},
+  {id:27, name:'COHINA',           cat:'vc'},
+  {id:28, name:'ALL YOURS',        cat:'vc'},
+  {id:29, name:'FABRIC TOKYO',     cat:'vc'},
+  {id:30, name:'17kg',             cat:'vc'},
+  {id:31, name:'ジャパンスコープ', cat:'vc'},
+  {id:32, name:'BASE FOOD',        cat:'vc'},
+  {id:33, name:'Minimal',          cat:'vc'},
+  {id:34, name:'Mr. CHEESECAKE',   cat:'vc'},
+  {id:35, name:'snaq.me',          cat:'vc'},
+  {id:36, name:'meeth',            cat:'vc'},
+  {id:37, name:'バルクオム',       cat:'vc'},
+  {id:38, name:'FUJIMI',           cat:'vc'},
+  {id:39, name:'PHOEBE BEAUTY UP', cat:'vc'},
+  {id:40, name:'MEDULLA',          cat:'vc'},
+  {id:41, name:'ALOBABY',          cat:'vc'},
+  {id:42, name:'PostCoffee',       cat:'vc'},
+  {id:43, name:'GREEN SPOON',      cat:'vc'},
+  {id:44, name:'nosh',             cat:'vc'},
+  {id:45, name:'Sui+',             cat:'vc'},
+  {id:46, name:'Mitas',            cat:'vc'},
+  {id:47, name:'スマートラウンド', cat:'vc'},
+  {id:48, name:'Sales Marker',     cat:'vc'},
+  {id:49, name:'スペースマーケット',cat:'vc'},
+  {id:50, name:'ペイトナー',       cat:'vc'},
 ];
 
-function makeItem(c) {
+function newItem(c) {
   return {
-    id:             c.id,
-    companyName:    c.companyName,
-    category:       c.category,
-    axis_audio:     '',
-    axis_visual:    '',
-    axis_sns:       '',
-    axis_story:     '',
-    status:         '未調査',
-    summary:        '',
-    memo:           '',
-    references:     '',
-    score_audio:    0,
-    score_visual:   0,
-    score_sns:      0,
-    score_story:    0,
-    total_score:    0,
-    updatedAt:      null,
+    id:c.id, company_name:c.name, category:c.cat,
+    industry:'', main_axis:'', status:'未調査',
+    summary:'', why_strong:'', how_built:'', where_embedded:'',
+    traction:'', implication:'', memo:'', references:'',
+    score_audio:0, score_visual:0, score_sns:0, score_story:0,
+    total_score:0, updated_at:null
   };
 }
 
-// ─────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
 let items = [];
-let editingId = null;
-let filters = { cat: 'all', status: 'all', axis: 'all' };
+let editId = null;
+let currentTab = 'view';
+let filters = { cat:'all', status:'all', axis:'all' };
 
-// ─────────────────────────────────────────
-//  STORAGE
-// ─────────────────────────────────────────
+/* ═══════════════════════════════════════════════
+   STORAGE
+═══════════════════════════════════════════════ */
 async function loadData() {
-  setSaveStatus('読み込み中...');
+  setStatus('読み込み中...');
   try {
-    const res = await fetch('/api/storage?key=branding-research');
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.items && Array.isArray(data.items)) {
-        // Merge: keep saved data, add any missing companies
-        const savedMap = new Map(data.items.map(i => [i.id, i]));
-        items = INITIAL_COMPANIES.map(c => savedMap.get(c.id) || makeItem(c));
-      } else {
-        items = INITIAL_COMPANIES.map(makeItem);
+    const r = await fetch('/api/storage?key=branding-research');
+    if (r.ok) {
+      const d = await r.json();
+      if (d && Array.isArray(d.items)) {
+        mergeData(d.items); return;
       }
-    } else {
-      items = INITIAL_COMPANIES.map(makeItem);
     }
-  } catch (e) {
-    // Fallback to localStorage for local dev
-    const local = localStorage.getItem('branding-research');
-    if (local) {
-      try {
-        const data = JSON.parse(local);
-        if (data && data.items) {
-          const savedMap = new Map(data.items.map(i => [i.id, i]));
-          items = INITIAL_COMPANIES.map(c => savedMap.get(c.id) || makeItem(c));
-        }
-      } catch(_) {}
-    }
-    if (!items.length) items = INITIAL_COMPANIES.map(makeItem);
-  }
-  setSaveStatus('読み込み完了');
-  renderSummary();
-  renderTable();
-  drawMap();
+  } catch(_) {}
+  // fallback: localStorage
+  try {
+    const lc = localStorage.getItem('branding-research');
+    if (lc) { const d = JSON.parse(lc); if (d && d.items) { mergeData(d.items); return; } }
+  } catch(_) {}
+  items = COMPANIES.map(newItem);
+  setStatus('初期データ表示中');
+  render();
+}
+
+function mergeData(saved) {
+  const map = new Map(saved.map(i => [i.id, i]));
+  items = COMPANIES.map(c => map.get(c.id) || newItem(c));
+  setStatus('読み込み完了');
+  render();
 }
 
 async function saveData() {
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
-  setSaveStatus('保存中...');
+  setStatus('保存中...');
   const payload = JSON.stringify({ items });
-  // Also save to localStorage as backup
   localStorage.setItem('branding-research', payload);
   try {
-    const res = await fetch('/api/storage?key=branding-research', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload
+    const r = await fetch('/api/storage?key=branding-research', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:payload
     });
-    if (res.ok) {
-      setSaveStatus('✓ 保存しました — ' + new Date().toLocaleTimeString('ja-JP'));
-    } else {
-      setSaveStatus('⚠ API保存失敗（ローカル保存済）');
-    }
-  } catch(e) {
-    setSaveStatus('⚠ ネットワークエラー（ローカル保存済）');
+    setStatus(r.ok ? '✓ 保存完了 — ' + new Date().toLocaleTimeString('ja-JP') : '⚠ API失敗（ローカル保存済）');
+  } catch(_) {
+    setStatus('⚠ ネットワークエラー（ローカル保存済）');
   }
   btn.disabled = false;
 }
 
-function setSaveStatus(msg) {
-  document.getElementById('save-status').textContent = msg;
-}
+function setStatus(msg){ document.getElementById('save-status').textContent = msg; }
 
-// ─────────────────────────────────────────
-//  FILTERS
-// ─────────────────────────────────────────
+/* ═══════════════════════════════════════════════
+   FILTER / SORT
+═══════════════════════════════════════════════ */
 function setFilter(group, val, el) {
   filters[group] = val;
-  // Update button styles
-  document.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
+  document.querySelectorAll(`[data-g="${group}"]`).forEach(b => {
     b.className = 'filter-btn';
   });
-  el.className = `filter-btn active-${val}`;
+  const cls = val === 'all' ? 'fb-active-all' : val === 'vc' ? 'fb-active-vc' : 'fb-active-' + val;
+  el.className = 'filter-btn ' + cls;
   renderTable();
-  drawMap();
 }
 
 function getFiltered() {
-  const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
-  return items.filter(item => {
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  const sort = document.getElementById('sort-sel').value;
+  let list = items.filter(item => {
     if (filters.cat !== 'all' && item.category !== filters.cat) return false;
     if (filters.status !== 'all' && item.status !== filters.status) return false;
-    if (filters.axis !== 'all') {
-      const axisMap = { '音':'score_audio', '視覚':'score_visual', 'SNS':'score_sns', 'ストーリー':'score_story' };
-      const key = axisMap[filters.axis];
-      if (!key || (item[key] || 0) === 0) return false;
-    }
-    if (q && !item.companyName.toLowerCase().includes(q)) return false;
+    if (filters.axis !== 'all' && item.main_axis !== filters.axis) return false;
+    if (q && !item.company_name.toLowerCase().includes(q)) return false;
     return true;
   });
+  if (sort === 'name')    list.sort((a,b) => a.company_name.localeCompare(b.company_name, 'ja'));
+  if (sort === 'score')   list.sort((a,b) => (b.total_score||0) - (a.total_score||0));
+  if (sort === 'updated') list.sort((a,b) => (b.updated_at||'') > (a.updated_at||'') ? 1 : -1);
+  return list;
 }
 
-// ─────────────────────────────────────────
-//  RENDER TABLE
-// ─────────────────────────────────────────
-function scoreDots(val) {
-  const v = parseInt(val) || 0;
-  let html = '<div class="score-bar">';
-  for (let i = 0; i < 5; i++) {
-    html += `<div class="score-dot${i < Math.round(v/2) ? ' filled' : ''}"></div>`;
-  }
-  html += `</div>`;
-  return html;
+/* ═══════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════ */
+function render() { renderSummary(); renderTable(); }
+
+// ── Summary ──────────────────────────────────
+function renderSummary() {
+  const total = items.length;
+  const none  = items.filter(i=>i.status==='未調査').length;
+  const wip   = items.filter(i=>i.status==='調査中').length;
+  const done  = items.filter(i=>i.status==='完了').length;
+
+  document.getElementById('summary-top').innerHTML =
+    stat('全企業数', total, '') +
+    stat('未調査',   none,  'c-none') +
+    stat('調査中',   wip,   'c-wip') +
+    stat('完了',     done,  'c-done');
+
+  document.getElementById('summary-axis').innerHTML =
+    topAxis('🎵 音トップ5',       'score_audio',  'sp-audio') +
+    topAxis('👁 視覚トップ5',     'score_visual', 'sp-visual') +
+    topAxis('📣 SNSトップ5',      'score_sns',    'sp-sns') +
+    topAxis('📖 ストーリートップ5','score_story',  'sp-story');
+}
+
+function stat(label, val, cls) {
+  return `<div class="stat-card ${cls}">
+    <span class="stat-label">${label}</span>
+    <div class="stat-val">${val}<span class="stat-unit">社</span></div>
+  </div>`;
+}
+
+function topAxis(label, key, pillCls) {
+  const top = items.filter(i=>(i[key]||0)>0).sort((a,b)=>(b[key]||0)-(a[key]||0)).slice(0,5);
+  const ranks = ['🥇','🥈','🥉','4.','5.'];
+  const listHtml = top.length
+    ? `<ul class="top-list">${top.map((item,i)=>`<li>
+        <span class="rank">${ranks[i]}</span>
+        <span class="name">${item.company_name}</span>
+        <span class="score-pill ${pillCls}">${item[key]}</span>
+      </li>`).join('')}</ul>`
+    : `<p class="top-empty">スコア未入力</p>`;
+  return `<div class="axis-card">
+    <div class="axis-card-label">${label}</div>
+    ${listHtml}
+  </div>`;
+}
+
+// ── Table ─────────────────────────────────────
+function dots(val) {
+  const v = Math.round((val||0)/2);
+  return `<div class="score-dots">${[0,1,2,3,4].map(i=>`<div class="sd${i<v?' on':''}"></div>`).join('')}</div>`;
 }
 
 function fmtDate(dt) {
   if (!dt) return '—';
   const d = new Date(dt);
-  return `${d.getMonth()+1}/${d.getDate()}`;
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 function renderTable() {
-  const filtered = getFiltered();
-  const tbody = document.getElementById('table-body');
+  const list = getFiltered();
   document.getElementById('result-count').innerHTML =
-    `表示中 <span>${filtered.length}</span> 社 / 全50社`;
+    `<strong>${list.length}</strong> 社を表示 / 全50社`;
 
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;font-family:var(--mono);font-size:12px;">該当する企業がありません</td></tr>';
+  if (!list.length) {
+    document.getElementById('table-body').innerHTML =
+      '<tr class="loading-row"><td colspan="12">該当する企業がありません</td></tr>';
     return;
   }
 
-  tbody.innerHTML = filtered.map(item => {
-    const rowClass = item.status === '調査中' ? 'row-wip'
-                   : item.status === '完了'   ? 'row-done'
-                   : 'row-none';
-    const catClass = item.category === '大手' ? 'badge-大手' : 'badge-ベンチャー';
-    const stClass  = item.status === '調査中' ? 'badge-調査中'
-                   : item.status === '完了'   ? 'badge-完了'
-                   : 'badge-未調査';
-    const total = item.total_score || 0;
-    const totalClass = total >= 30 ? 'total-score high' : 'total-score';
-    return `<tr class="${rowClass}" onclick="openModal(${item.id})">
-      <td style="color:var(--text3);font-family:var(--mono);font-size:11px;">${item.id}</td>
-      <td style="font-weight:600;">${item.companyName}</td>
-      <td><span class="badge ${catClass}">${item.category === 'ベンチャー中小' ? 'VC/中小' : '大手'}</span></td>
-      <td><span class="badge ${stClass}">${item.status}</span></td>
-      <td>${scoreDots(item.score_audio)}</td>
-      <td>${scoreDots(item.score_visual)}</td>
-      <td>${scoreDots(item.score_sns)}</td>
-      <td>${scoreDots(item.score_story)}</td>
-      <td><span class="${totalClass}">${total > 0 ? total : '—'}</span></td>
-      <td style="color:var(--text3);font-family:var(--mono);font-size:10px;">${fmtDate(item.updatedAt)}</td>
+  const axisB = {
+    '音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー',
+    '':'badge-none'
+  };
+  const catB = { '大手':'badge-大手', 'vc':'badge-vc' };
+  const stB  = { '未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了' };
+  const rowC = { '未調査':'row-none','調査中':'row-wip','完了':'row-done' };
+
+  document.getElementById('table-body').innerHTML = list.map(item => {
+    const t = item.total_score || 0;
+    const tCls = t >= 30 ? 'high' : t >= 15 ? 'mid' : '';
+    return `<tr class="${rowC[item.status]||'row-none'}" onclick="openModal(${item.id})">
+      <td class="td-id">${item.id}</td>
+      <td class="td-name">${item.company_name}</td>
+      <td><span class="badge ${catB[item.category]||''}">${item.category==='vc'?'VC/中小':'大手'}</span></td>
+      <td><span class="badge ${axisB[item.main_axis]||'badge-none'}">${item.main_axis||'—'}</span></td>
+      <td><span class="badge ${stB[item.status]||''}">${item.status}</span></td>
+      <td class="td-summary">${item.summary||'<span style="color:var(--text3);font-size:11px;">—</span>'}</td>
+      <td class="td-score">${dots(item.score_audio)}</td>
+      <td class="td-score">${dots(item.score_visual)}</td>
+      <td class="td-score">${dots(item.score_sns)}</td>
+      <td class="td-score">${dots(item.score_story)}</td>
+      <td class="td-total ${tCls}">${t > 0 ? t : '—'}</td>
+      <td class="td-date">${fmtDate(item.updated_at)}</td>
     </tr>`;
   }).join('');
 }
 
-// ─────────────────────────────────────────
-//  RENDER SUMMARY
-// ─────────────────────────────────────────
-function renderSummary() {
-  const total   = items.length;
-  const none    = items.filter(i => i.status === '未調査').length;
-  const wip     = items.filter(i => i.status === '調査中').length;
-  const done    = items.filter(i => i.status === '完了').length;
-
-  const topN = (key, n=3) => items
-    .filter(i => (i[key] || 0) > 0)
-    .sort((a,b) => (b[key]||0) - (a[key]||0))
-    .slice(0, n);
-
-  function statCard(label, val, unit='社', cls='') {
-    return `<div class="stat-card status-card ${cls}">
-      <span class="stat-label">${label}</span>
-      <span class="stat-val">${val}<span class="stat-unit">${unit}</span></span>
-    </div>`;
-  }
-
-  function topCard(label, key, axisLabel) {
-    const top = topN(key, 3);
-    let listHtml = top.length
-      ? `<ul class="top-list">${top.map((i,idx) => `<li>
-          <span>${['🥇','🥈','🥉'][idx]||''}${i.companyName}</span>
-          <span class="score-badge">${i[key]}</span>
-        </li>`).join('')}</ul>`
-      : `<p style="font-size:11px;color:var(--text3);margin-top:8px;">スコア未入力</p>`;
-    return `<div class="stat-card">
-      <span class="stat-label">${label}</span>
-      ${listHtml}
-    </div>`;
-  }
-
-  document.getElementById('summary-grid').innerHTML =
-    statCard('全社数',  total,  '社') +
-    statCard('未調査',  none,   '社') +
-    statCard('調査中',  wip,    '社', 'wip') +
-    statCard('完了',    done,   '社', 'done') +
-    topCard('音 トップ3',       'score_audio',  '音') +
-    topCard('視覚 トップ3',     'score_visual', '視覚') +
-    topCard('SNS トップ3',      'score_sns',    'SNS') +
-    topCard('ストーリー トップ3','score_story',  'ストーリー');
-}
-
-// ─────────────────────────────────────────
-//  POSITION MAP
-// ─────────────────────────────────────────
-let mapTooltip = null;
-
-function drawMap() {
-  const canvas = document.getElementById('posmap');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const pad = 50;
-
-  const xKey = document.getElementById('axis-x').value;
-  const yKey = document.getElementById('axis-y').value;
-  const axisLabel = {
-    score_audio:'音', score_visual:'視覚',
-    score_sns:'SNS', score_story:'ストーリー'
-  };
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Background
-  ctx.fillStyle = '#0f2035';
-  ctx.fillRect(0, 0, W, H);
-
-  // Grid
-  ctx.strokeStyle = 'rgba(59,130,246,0.1)';
-  ctx.lineWidth = 1;
-  for (let i = 1; i < 5; i++) {
-    const x = pad + (W - pad*2) * i / 5;
-    const y = pad + (H - pad*2) * i / 5;
-    ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H-pad); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W-pad, y); ctx.stroke();
-  }
-
-  // Axes
-  ctx.strokeStyle = 'rgba(59,130,246,0.4)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(pad, H-pad); ctx.lineTo(W-pad, H-pad); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(pad, pad); ctx.lineTo(pad, H-pad); ctx.stroke();
-
-  // Axis labels
-  ctx.fillStyle = '#8fa8c4';
-  ctx.font = '12px DM Mono, monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(axisLabel[xKey] + ' →', W/2, H-10);
-  ctx.save();
-  ctx.translate(14, H/2);
-  ctx.rotate(-Math.PI/2);
-  ctx.fillText('↑ ' + axisLabel[yKey], 0, 0);
-  ctx.restore();
-
-  // Score labels on axes
-  ctx.fillStyle = '#4e6a88';
-  ctx.font = '10px DM Mono, monospace';
-  for (let i = 0; i <= 10; i += 2) {
-    const x = pad + (W - pad*2) * i / 10;
-    ctx.textAlign = 'center';
-    ctx.fillText(i, x, H-pad+16);
-    const y = H - pad - (H - pad*2) * i / 10;
-    ctx.textAlign = 'right';
-    ctx.fillText(i, pad-6, y+4);
-  }
-
-  // Points
-  const plotted = [];
-  items.forEach(item => {
-    const xv = item[xKey] || 0;
-    const yv = item[yKey] || 0;
-    if (xv === 0 && yv === 0) return;
-
-    const px = pad + (W - pad*2) * xv / 10;
-    const py = H - pad - (H - pad*2) * yv / 10;
-
-    const isLarge = item.category === '大手';
-    ctx.beginPath();
-    ctx.arc(px, py, isLarge ? 7 : 5, 0, Math.PI*2);
-    ctx.fillStyle = isLarge ? 'rgba(245,158,11,0.8)' : 'rgba(52,211,153,0.8)';
-    ctx.fill();
-    ctx.strokeStyle = isLarge ? '#f59e0b' : '#34d399';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    plotted.push({ item, px, py, r: isLarge ? 7 : 5 });
-  });
-
-  // Legend
-  ctx.font = '11px DM Mono, monospace';
-  ctx.fillStyle = '#f59e0b'; ctx.textAlign = 'left';
-  ctx.beginPath(); ctx.arc(W-120, pad+10, 6, 0, Math.PI*2); ctx.fillStyle='rgba(245,158,11,0.8)'; ctx.fill();
-  ctx.fillStyle = '#8fa8c4'; ctx.fillText('大手', W-110, pad+14);
-  ctx.beginPath(); ctx.arc(W-120, pad+30, 5, 0, Math.PI*2); ctx.fillStyle='rgba(52,211,153,0.8)'; ctx.fill();
-  ctx.fillStyle = '#8fa8c4'; ctx.fillText('VC/中小', W-110, pad+34);
-
-  // Tooltip on hover (mouse)
-  canvas._plotted = plotted;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('posmap');
-  let tip = document.createElement('div');
-  tip.style.cssText = 'position:fixed;background:#0c1b2e;border:1px solid rgba(59,130,246,0.4);border-radius:6px;padding:6px 12px;font-family:"DM Mono",monospace;font-size:11px;color:#dde6f0;pointer-events:none;display:none;z-index:999;';
-  document.body.appendChild(tip);
-
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const mx = (e.clientX - rect.left) * scaleX;
-    const my = (e.clientY - rect.top) * scaleY;
-    const plotted = canvas._plotted || [];
-    let found = null;
-    for (const p of plotted) {
-      const d = Math.sqrt((mx-p.px)**2 + (my-p.py)**2);
-      if (d <= p.r + 6) { found = p; break; }
-    }
-    if (found) {
-      tip.textContent = found.item.companyName + ' (合計:' + (found.item.total_score||0) + ')';
-      tip.style.display = 'block';
-      tip.style.left = (e.clientX + 12) + 'px';
-      tip.style.top  = (e.clientY - 10) + 'px';
-    } else {
-      tip.style.display = 'none';
-    }
-  });
-  canvas.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
-});
-
-// ─────────────────────────────────────────
-//  MODAL
-// ─────────────────────────────────────────
+/* ═══════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════ */
 function openModal(id) {
-  editingId = id;
-  const item = items.find(i => i.id === id);
+  editId = id;
+  const item = items.find(i=>i.id===id);
   if (!item) return;
-
-  document.getElementById('m-company').textContent = item.companyName;
-  document.getElementById('m-meta').innerHTML =
-    `<span class="badge ${item.category==='大手'?'badge-大手':'badge-ベンチャー'}">${item.category==='ベンチャー中小'?'ベンチャー/中小':'大手'}</span>
-     <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">ID: ${item.id}</span>`;
-
-  document.getElementById('m-status').value     = item.status;
-  document.getElementById('m-summary').value    = item.summary    || '';
-  document.getElementById('m-memo').value       = item.memo       || '';
-  document.getElementById('m-references').value = item.references || '';
-
-  const setSlider = (id, valId, val) => {
-    document.getElementById(id).value = val;
-    document.getElementById(valId).textContent = val;
-  };
-  setSlider('m-audio',  'sv-audio',  item.score_audio  || 0);
-  setSlider('m-visual', 'sv-visual', item.score_visual || 0);
-  setSlider('m-sns',    'sv-sns',    item.score_sns    || 0);
-  setSlider('m-story',  'sv-story',  item.score_story  || 0);
-  updateTotal();
-
-  document.getElementById('m-updated').textContent =
-    item.updatedAt ? '最終更新: ' + new Date(item.updatedAt).toLocaleString('ja-JP') : '';
-
-  document.getElementById('modal-overlay').classList.add('open');
+  // header
+  document.getElementById('m-name').textContent = item.company_name;
+  document.getElementById('m-badges').innerHTML =
+    `<span class="badge ${item.category==='vc'?'badge-vc':'badge-大手'}">${item.category==='vc'?'ベンチャー・中小':'大手'}</span>
+     <span class="badge ${{'未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了'}[item.status]||''}">${item.status}</span>
+     ${item.main_axis?`<span class="badge ${{'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'}[item.main_axis]||''}">${item.main_axis}</span>`:''}`;
+  fillView(item);
+  fillEdit(item);
+  switchTab('view', document.querySelector('.mtab'));
+  document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-  editingId = null;
+function fillView(item) {
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (!val || val.trim() === '') {
+      el.textContent = '（未入力）';
+      el.className = 'view-val empty';
+    } else {
+      el.textContent = val;
+      el.className = 'view-val';
+    }
+  };
+  set('v-industry',   item.industry);
+  set('v-summary',    item.summary);
+  set('v-why',        item.why_strong);
+  set('v-how',        item.how_built);
+  set('v-where',      item.where_embedded);
+  set('v-traction',   item.traction);
+  set('v-implication',item.implication);
+  set('v-memo',       item.memo);
+  set('v-refs',       item.references);
+
+  const axisEl = document.getElementById('v-main-axis');
+  const axisB = {'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'};
+  axisEl.innerHTML = item.main_axis
+    ? `<span class="badge ${axisB[item.main_axis]||''}">${item.main_axis}</span>`
+    : `<span class="view-val empty">（未設定）</span>`;
+
+  document.getElementById('vs-audio').textContent  = item.score_audio  || '—';
+  document.getElementById('vs-visual').textContent = item.score_visual || '—';
+  document.getElementById('vs-sns').textContent    = item.score_sns    || '—';
+  document.getElementById('vs-story').textContent  = item.score_story  || '—';
+  document.getElementById('v-updated').textContent =
+    item.updated_at ? '最終更新: ' + new Date(item.updated_at).toLocaleString('ja-JP') : '';
 }
 
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
+function fillEdit(item) {
+  document.getElementById('e-industry').value  = item.industry    || '';
+  document.getElementById('e-main-axis').value = item.main_axis   || '';
+  document.getElementById('e-status').value    = item.status      || '未調査';
+  document.getElementById('e-summary').value   = item.summary     || '';
+  document.getElementById('e-why').value       = item.why_strong  || '';
+  document.getElementById('e-how').value       = item.how_built   || '';
+  document.getElementById('e-where').value     = item.where_embedded || '';
+  document.getElementById('e-traction').value  = item.traction    || '';
+  document.getElementById('e-implication').value = item.implication || '';
+  document.getElementById('e-memo').value      = item.memo        || '';
+  document.getElementById('e-refs').value      = item.references  || '';
+  setSlider('e-audio',  'sv-audio',  item.score_audio  || 0);
+  setSlider('e-visual', 'sv-visual', item.score_visual || 0);
+  setSlider('e-sns',    'sv-sns',    item.score_sns    || 0);
+  setSlider('e-story',  'sv-story',  item.score_story  || 0);
+  calcTotal();
 }
 
-function updateTotal() {
-  const a = parseInt(document.getElementById('m-audio').value)  || 0;
-  const v = parseInt(document.getElementById('m-visual').value) || 0;
-  const s = parseInt(document.getElementById('m-sns').value)    || 0;
-  const t = parseInt(document.getElementById('m-story').value)  || 0;
-  document.getElementById('m-total').textContent = a + v + s + t;
+function setSlider(sid, vid, val) {
+  document.getElementById(sid).value = val;
+  document.getElementById(vid).textContent = val;
+}
+
+function calcTotal() {
+  const t = ['e-audio','e-visual','e-sns','e-story']
+    .reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0), 0);
+  document.getElementById('e-total').textContent = t;
+}
+
+function switchTab(name, el) {
+  currentTab = name;
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));
+  el && el.classList.add('active');
+  document.getElementById('tab-view').classList.toggle('active', name==='view');
+  document.getElementById('tab-edit').classList.toggle('active', name==='edit');
+  document.getElementById('btn-switch-edit').style.display = name==='view'?'':'none';
+  document.getElementById('btn-save-item').style.display   = name==='edit'?'':'none';
 }
 
 function saveItem() {
-  if (editingId === null) return;
-  const item = items.find(i => i.id === editingId);
+  const item = items.find(i=>i.id===editId);
   if (!item) return;
-
-  item.status     = document.getElementById('m-status').value;
-  item.summary    = document.getElementById('m-summary').value.trim();
-  item.memo       = document.getElementById('m-memo').value.trim();
-  item.references = document.getElementById('m-references').value.trim();
-  item.score_audio  = parseInt(document.getElementById('m-audio').value)  || 0;
-  item.score_visual = parseInt(document.getElementById('m-visual').value) || 0;
-  item.score_sns    = parseInt(document.getElementById('m-sns').value)    || 0;
-  item.score_story  = parseInt(document.getElementById('m-story').value)  || 0;
-  item.total_score  = item.score_audio + item.score_visual + item.score_sns + item.score_story;
-  item.updatedAt    = new Date().toISOString();
-
-  closeModal();
-  renderSummary();
-  renderTable();
-  drawMap();
-  setSaveStatus('変更あり — 保存してください');
+  item.industry         = document.getElementById('e-industry').value.trim();
+  item.main_axis        = document.getElementById('e-main-axis').value;
+  item.status           = document.getElementById('e-status').value;
+  item.summary          = document.getElementById('e-summary').value.trim();
+  item.why_strong       = document.getElementById('e-why').value.trim();
+  item.how_built        = document.getElementById('e-how').value.trim();
+  item.where_embedded   = document.getElementById('e-where').value.trim();
+  item.traction         = document.getElementById('e-traction').value.trim();
+  item.implication      = document.getElementById('e-implication').value.trim();
+  item.memo             = document.getElementById('e-memo').value.trim();
+  item.references       = document.getElementById('e-refs').value.trim();
+  item.score_audio      = parseInt(document.getElementById('e-audio').value)  || 0;
+  item.score_visual     = parseInt(document.getElementById('e-visual').value) || 0;
+  item.score_sns        = parseInt(document.getElementById('e-sns').value)    || 0;
+  item.score_story      = parseInt(document.getElementById('e-story').value)  || 0;
+  item.total_score      = item.score_audio + item.score_visual + item.score_sns + item.score_story;
+  item.updated_at       = new Date().toISOString();
+  // refresh view
+  fillView(item);
+  document.getElementById('m-badges').innerHTML =
+    `<span class="badge ${item.category==='vc'?'badge-vc':'badge-大手'}">${item.category==='vc'?'ベンチャー・中小':'大手'}</span>
+     <span class="badge ${{'未調査':'badge-未調査','調査中':'badge-調査中','完了':'badge-完了'}[item.status]||''}">${item.status}</span>
+     ${item.main_axis?`<span class="badge ${{'音':'badge-音','視覚':'badge-視覚','SNS':'badge-SNS','ストーリー':'badge-ストーリー'}[item.main_axis]||''}">${item.main_axis}</span>`:''}`;
+  switchTab('view', document.querySelector('.mtab'));
+  render();
+  setStatus('変更あり — 保存してください');
 }
 
-// ─────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  editId = null;
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
 loadData();
 </script>
 </body>
