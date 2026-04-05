@@ -279,6 +279,62 @@
     .upd { font-family:var(--mono); font-size:10px; color:var(--text3); margin-top:10px; text-align:right; padding:0 28px 6px; }
 
     .loading-r td { text-align:center; color:var(--text3); padding:48px; font-family:var(--mono); font-size:12px; }
+
+    /* ── CARD GRID ── */
+    .view-toggle { display:flex; gap:6px; align-items:center; }
+    .vtbtn { font-family:var(--mono); font-size:11px; letter-spacing:.06em; padding:5px 14px; border-radius:5px; border:1px solid var(--border2); background:transparent; color:var(--text3); cursor:pointer; transition:all .15s; }
+    .vtbtn.on { background:var(--blue-dim); border-color:var(--blue); color:var(--blue-lt); }
+    .card-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:48px; }
+    @media(max-width:900px){ .card-grid { grid-template-columns:1fr; } }
+    .ccard {
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .ccard.st-wip  { border-left:3px solid var(--amber); }
+    .ccard.st-done { border-left:3px solid var(--teal); }
+    .ccard.st-cmp  { border-left:3px solid var(--green); }
+    .ccard.st-none { border-left:3px solid transparent; }
+
+    /* Instagram visual area */
+    .c-ig {
+      background:#0a1628; border-bottom:1px solid var(--border);
+      padding:12px 16px; display:flex; align-items:center; gap:10px;
+    }
+    .c-ig-img { width:100%; max-height:220px; object-fit:cover; display:block; border-bottom:1px solid var(--border); }
+    .c-ig-ph {
+      height:44px; background:rgba(30,60,100,0.4); border-radius:6px;
+      display:flex; align-items:center; justify-content:center; flex:1;
+      font-family:var(--mono); font-size:11px; color:var(--text3); gap:8px;
+    }
+    .c-ig-icon { font-size:16px; flex-shrink:0; }
+    .c-ig-handle { font-family:var(--mono); font-size:12px; color:var(--blue-lt); text-decoration:none; }
+    .c-ig-handle:hover { text-decoration:underline; }
+    .c-ig-none { font-family:var(--mono); font-size:11px; color:var(--text3); font-style:italic; }
+
+    /* Card header */
+    .c-head { padding:14px 16px 10px; border-bottom:1px solid var(--border); }
+    .c-name { font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .c-bdgs { display:flex; flex-wrap:wrap; gap:4px; }
+
+    /* Card body */
+    .c-body { padding:14px 16px; flex:1; display:flex; flex-direction:column; gap:12px; }
+    .c-ol { font-size:13px; color:var(--text); line-height:1.7; background:rgba(59,130,246,0.06); border-left:3px solid var(--blue); padding:8px 12px; border-radius:4px; font-weight:500; }
+    .c-field {}
+    .c-flbl { font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); margin-bottom:4px; display:block; }
+    .c-fval { font-size:12.5px; color:var(--text2); line-height:1.75; }
+    .c-fval.imp { color:#a5f3fc; font-size:13px; }
+    .c-fval.emp { color:var(--text3); font-style:italic; font-size:12px; }
+
+    /* Card footer */
+    .c-foot { padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:var(--card2); }
+    .c-scores { display:flex; gap:10px; }
+    .c-sc { font-family:var(--mono); font-size:10px; color:var(--text3); display:flex; flex-direction:column; align-items:center; gap:1px; }
+    .c-sc strong { font-size:15px; }
+    .c-refs { display:flex; flex-wrap:wrap; gap:6px; padding:8px 16px; border-top:1px solid var(--border); }
+    .c-ref-a { font-size:11px; color:var(--blue-lt); text-decoration:none; border-bottom:1px solid rgba(96,165,250,0.3); }
+    .c-ref-a:hover { border-bottom-color:var(--blue-lt); }
+    .c-edit { font-family:var(--mono); font-size:10px; letter-spacing:.06em; padding:5px 14px; border-radius:4px; border:1px solid rgba(96,165,250,0.4); background:rgba(59,130,246,0.07); color:var(--blue-lt); cursor:pointer; transition:all .15s; }
+    .c-edit:hover { background:rgba(59,130,246,0.14); }
     @media(max-width:640px){ .wrap{padding:20px 14px 80px;} .nav{padding:8px 14px;} .mhd{padding:18px 18px 16px;} .mbody{padding:18px 18px 18px;} .mtabs{padding:0 18px;} .mact{padding:14px 18px 20px;} .upd{padding:0 18px 6px;} }
   </style>
 </head>
@@ -355,20 +411,28 @@
       <button class="fb"        data-g="ax" data-v="SNS"       onclick="sf('ax','SNS',this)">📣 SNS</button>
       <button class="fb"        data-g="ax" data-v="ストーリー" onclick="sf('ax','ストーリー',this)">📖 ストーリー</button>
       <span class="csep">|</span>
-      <input class="srch" id="srch" type="text" placeholder="企業名で検索" oninput="rt()" />
+      <input class="srch" id="srch" type="text" placeholder="企業名で検索" oninput="render()" />
       <span class="clabel">並び替え</span>
-      <select class="sortsel" id="srt" onchange="rt()">
+      <select class="sortsel" id="srt" onchange="render()">
         <option value="id">登録順</option>
         <option value="name">企業名順</option>
         <option value="score">スコア順</option>
         <option value="updated">更新日順</option>
       </select>
+      <span class="csep">|</span>
+      <div class="view-toggle">
+        <button class="vtbtn on" id="vt-card" onclick="setView('card')">🃏 カード</button>
+        <button class="vtbtn" id="vt-table" onclick="setView('table')">📋 テーブル</button>
+      </div>
     </div>
   </div>
   <div class="rcount" id="rcount"></div>
 
+  <!-- card grid -->
+  <div id="card-wrap"></div>
+
   <!-- table -->
-  <div class="tw">
+  <div class="tw" id="table-wrap">
     <table>
       <thead><tr>
         <th>#</th><th>企業名</th><th>区分</th><th>業界</th><th>主軸</th><th>ステータス</th>
@@ -450,6 +514,10 @@
         <div class="ef"><span class="elbl">成果の兆候</span><textarea class="etxt" id="e-tr" placeholder="売上・SNS反応・認知率・ファン数・受賞歴など"></textarea></div>
         <div class="ef"><span class="elbl">アイケアLaBoへの示唆</span><textarea class="etxt" id="e-imp" placeholder="アイケアLaBoが転用・参考にできることは何か"></textarea></div>
         <div class="ef"><span class="elbl">メモ</span><textarea class="etxt" id="e-memo"></textarea></div>
+        <div class="eg2">
+          <div class="ef"><span class="elbl">Instagram ハンドル</span><span class="ehint">@なし、ハンドル名のみ 例: bulkhomme</span><input class="einp" id="e-ig-h" type="text" placeholder="例: bulkhomme" /></div>
+          <div class="ef"><span class="elbl">Instagram 画像 URL</span><span class="ehint">投稿画像のURLを貼り付け（省略可）</span><input class="einp" id="e-ig-i" type="text" placeholder="https://..." /></div>
+        </div>
         <div class="ef">
           <span class="elbl">参考リンク</span>
           <span class="ehint">タイトルとURLをセットで追加</span>
@@ -536,7 +604,7 @@ const COS = [
 
 /* ── 13社シードデータ ── */
 const SEED = [
-  {name:'味の素',industry:'食品',axes:['音','視覚'],status:'調査済み',score_audio:5,score_visual:3,score_sns:1,score_story:2,
+  {name:'味の素',ig_handle:'ajinomoto_cook',industry:'食品',axes:['音','視覚'],status:'調査済み',score_audio:5,score_visual:3,score_sns:1,score_story:2,
    one_line:'1999年から使う『あ・じ・の・も・と』のサウンドロゴを2015年に音商標登録し、文字ブランドと音をセットで守りながら浸透させた事例。',
    why_strong:'ブランド名そのものを短いメロディと言葉で固定し、テレビCMなど反復接触の多い場で長年使い続けたことで、音だけでも企業名を想起しやすい。',
    how_built:'1999年以来テレビCMなどで『あ・じ・の・も・と』の歌詞とメロディを使用し、2015年に音商標として登録。音を単発演出ではなくコーポレートブランド資産として扱った。',
@@ -544,7 +612,7 @@ const SEED = [
    traction:'味の素自身が、文字だけでなく『音』としても商標権で保護し、コーポレートブランドの浸透と価値向上を目指すと明言。',
    implication:'短い音＋ブランド名を固定し、CM・SNS冒頭・イベント開幕・受付端末など反復接点で一貫使用する。音を早い段階で資産化する発想が参考になる。',
    references:[{title:'味の素(株)のサウンドロゴが新しいタイプの商標（音商標）として登録',url:'https://www.ajinomoto.co.jp/company/jp/presscenter/press/detail/2015_11_27.html'},{title:'味の素 公式サイト',url:'https://www.ajinomoto.co.jp/'}]},
-  {name:'カゴメ',industry:'食品',axes:['音','ストーリー'],status:'調査済み',score_audio:5,score_visual:2,score_sns:1,score_story:3,
+  {name:'カゴメ',ig_handle:'kagome_jp',industry:'食品',axes:['音','ストーリー'],status:'調査済み',score_audio:5,score_visual:2,score_sns:1,score_story:3,
    one_line:'『自然を、おいしく、楽しく。KAGOME』というサウンドロゴを、ユーザーアンケートの声も踏まえて決定した参加型の音資産事例。',
    why_strong:'企業メッセージをそのままメロディ化しており、言葉と音が一致する。さらに『みなさんのお声で決定』という参加プロセス自体が記憶を強めている。',
    how_built:'コミュニティ上で『カゴメを音にすると？』のアンケートを行い、その結果をもとに社内会議で決定。2017年に『自然を、おいしく、楽しく。KAGOME』を発表した。',
@@ -552,7 +620,7 @@ const SEED = [
    traction:'カゴメ公式コミュニティ上でサウンドロゴの決定経緯を公開。企業メッセージを耳からも感じ取れる状態を作った。',
    implication:'アイケアラボも、代表だけで決めるのではなく『候補音をチームや顧客接点でテストする』と、刷り込み前に共感の土台を作れる。',
    references:[{title:'みなさんのお声でカゴメ「サウンドロゴ」が決定しました！',url:'https://and.kagome.co.jp/article/blog/message/3086/'},{title:'サウンドロゴ決定',url:'https://and.kagome.co.jp/project/voices/1'}]},
-  {name:'TBSグループ',industry:'メディア',axes:['音','視覚'],status:'調査済み',score_audio:4,score_visual:5,score_sns:2,score_story:3,
+  {name:'TBSグループ',ig_handle:'tbs_official',industry:'メディア',axes:['音','視覚'],status:'調査済み',score_audio:4,score_visual:5,score_sns:2,score_story:3,
    one_line:'ロゴ、色、フォント、モーション、サウンドまでを統合し、『最高の"時"』をブランドデザインとして一体設計した事例。',
    why_strong:'単なるロゴ変更で終わらず、色・フォント・アニメーション・音をまとめて設計しているため、接点が変わっても同じブランド体験として感じやすい。',
    how_built:'ブランドプロミス『最高の"時"で、明日の世界をつくる。』を起点に新ロゴを開発。TBS BLUE、オリジナルフォント、モーショングラフィックス、オリジナルサウンドを順に整備した。',
@@ -560,7 +628,7 @@ const SEED = [
    traction:'公式ブランドデザインサイトで、ロゴ・色・フォント・モーション・サウンドの各設計意図を公開し、統一運用している。',
    implication:'アイケアラボも、ロゴだけでなく『色・書体・動画の動き・音』まで同時に設計すると、一気にブランドとして見えやすくなる。',
    references:[{title:'TBS Brand Design',url:'https://www.tbsholdings.co.jp/design/'}]},
-  {name:'ロート製薬',industry:'ヘルスケア・製薬',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:5,score_sns:2,score_story:5,
+  {name:'ロート製薬',ig_handle:'rohto_jp',industry:'ヘルスケア・製薬',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:5,score_sns:2,score_story:5,
    one_line:'2024年にスローガンとロゴを刷新し、『ロートは、ハートだ。』を中心に"人"起点の物語へブランドを再定義した事例。',
    why_strong:'企業の強みや歴史ではなく『人のハートを動かす』という感情軸に再編集し、ロゴの意味・色の意味まで言語化して公開している。',
    how_built:'125周年を機にコーポレートスローガンとロゴを刷新。『人』を起点にしたいという意思を掲げ、新ロゴではRを『人』に見立て、青を知性、赤を情熱として再設計した。',
@@ -568,7 +636,7 @@ const SEED = [
    traction:'公式に刷新理由・スローガン・ロゴの意味まで公開しており、ブランド再定義を社外に説明できる形にしている。',
    implication:'『眼から体を科学する』も、機能説明だけでなく『誰の何をどう動かしたいのか』まで言葉に落とし、ロゴと色の意味を説明可能にするべき。',
    references:[{title:'2024年、ロート製薬は、コーポレートスローガンとロゴデザインを一新します。',url:'https://www.shop.rohto.co.jp/column-list/column-niconico-0071.html'}]},
-  {name:'ヤンマー',industry:'産業機械',axes:['視覚','ストーリー'],status:'調査済み',score_audio:3,score_visual:5,score_sns:2,score_story:5,
+  {name:'ヤンマー',ig_handle:'yanmar_official',industry:'産業機械',axes:['視覚','ストーリー'],status:'調査済み',score_audio:3,score_visual:5,score_sns:2,score_story:5,
    one_line:'『A SUSTAINABLE FUTURE』と『HANASAKA』を軸に、ロゴ・活動・施設・アート・音楽まで広げている長期ブランド刷新事例。',
    why_strong:'BtoB寄りの企業でありながら、理念を『A SUSTAINABLE FUTURE』と『HANASAKA』に整理し、スポーツ・アート・施設・音楽まで一貫してつないでいる。',
    how_built:'2010年に『Solutioneering Together』を掲げた後、2012年以降プレミアムブランドプロジェクトで施設や接点を刷新。現在は『A SUSTAINABLE FUTURE』をブランドステートメントに置き、HANASAKAを価値観として展開。',
@@ -576,7 +644,7 @@ const SEED = [
    traction:'公式サイト上でブランド、理念、HANASAKA、施設刷新、応援ソングまで公開。ブランドを単なる見た目ではなく活動全体に広げている。',
    implication:'アイケアラボも『理念→象徴→活動→施設/イベント』まで通すべき。絵本やムービー、イベントを全部バラバラにせず、ひとつの価値観に結びつける設計が参考になる。',
    references:[{title:'企業情報｜ヤンマー',url:'https://www.yanmar.com/jp/about/'},{title:'Our Brand｜ヤンマー',url:'https://www.yanmar.com/jp/about/brand/'},{title:'HANASAKA｜ヤンマー',url:'https://www.yanmar.com/jp/about/hanasaka/'}]},
-  {name:'ユニクロ',industry:'アパレル',axes:['SNS','視覚'],status:'調査済み',score_audio:2,score_visual:4,score_sns:5,score_story:3,
+  {name:'ユニクロ',ig_handle:'uniqlo_jp',industry:'アパレル',axes:['SNS','視覚'],status:'調査済み',score_audio:2,score_visual:4,score_sns:5,score_story:3,
    one_line:'UTのTikTokハッシュタグチャレンジで約3.3億回視聴、約18.5万投稿を生み、SNS参加型でブランドを拡張した事例。',
    why_strong:'商品を一方的に見せるのではなく、UGC参加型のフォーマットに変えたことで、ブランド体験が『見る』から『参加する』に変わった。',
    how_built:'2019年、UTでTikTokグローバルハッシュタグチャレンジ『#UTPlayYourWorld』を実施。5市場で参加型施策を行い、受賞者はTVCMや店舗モニター、公式SNSにも出演。',
@@ -584,7 +652,7 @@ const SEED = [
    traction:'約3.3億回視聴、投稿数185,671、参加者95,641、総エンゲージメント数43,431,224。',
    implication:'音やフレーズを作ったら、単に配信するだけでなく『参加型チャレンジ』に変換すると、SNS上で記憶資産が広がりやすい。',
    references:[{title:'UT×TikTokグローバルハッシュタグチャレンジ 史上最高の約3.3億視聴数を記録',url:'https://www.uniqlo.com/jp/ja/contents/corp/press-release/2019/09/19091315_uttiktok.html'}]},
-  {name:'ニトリ',industry:'小売',axes:['SNS','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:5,score_story:2,
+  {name:'ニトリ',ig_handle:'nitori_official',industry:'小売',axes:['SNS','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:5,score_story:2,
    one_line:'TikTokで生活者目線のクリエイター動画とSpark Adsを組み合わせ、若年層来店率を施策前後比で2倍にした事例。',
    why_strong:'商品説明ではなく生活シーンを見せたこと、企業投稿だけでなくクリエイター起点にしたこと、そして来店アンケートで効果を検証したことが強い。',
    how_built:'新生活需要が高まる3月に合わせ、TikTokクリエイターが生活者目線で商品を紹介。投稿をSpark Adsでブーストし、来店促進につなげた。',
@@ -592,7 +660,7 @@ const SEED = [
    traction:'若年層のTikTokきっかけ来店率が施策前後比で2倍。コメント欄で商品への質問も増え、利用意向を高めたと分析。',
    implication:'『眼から体を科学する』も、専門説明だけでなく『生活者目線の困りごと→変化』を短尺動画に変換し、来店・体験への導線をつくるべき。',
    references:[{title:'ニトリ | TikTok for Business Case Study',url:'https://ads.tiktok.com/business/ja/inspiration/nitori'},{title:'ニトリが新生活者向けTikTok施策',url:'https://ads.tiktok.com/business/ja/blog/advertimes-nitori-casestudy'}]},
-  {name:'kay me',industry:'アパレル',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:5,
+  {name:'kay me',ig_handle:'kay.me.official',industry:'アパレル',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:5,
    one_line:'創業者自身の『忙しい女性の服の悩み』を起点に、『一瞬で華やか ずっとラク』な問題解決型ブランドへ落とし込んだ事例。',
    why_strong:'創業者課題がそのままブランドの中核課題になっており、便益が『忙しい人の時間・手間・不快の削減』として明確。',
    how_built:'戦略コンサルとして理想の仕事服が見つからなかった創業者が、快適さときちんと感を両立する服を構想。2011年創業後、100% Made in Japanやジャージー素材の技術課題を越えながらブランドを育てた。',
@@ -600,7 +668,7 @@ const SEED = [
    traction:'公式に『Problem-solving clothing』を掲げ、挑戦する人を応援するミッションと、日本製・洗える・ストレッチなどの具体便益を一貫して訴求。',
    implication:'アイケアラボも『眼の悩み』を一般論で語るより、誰のどんな不便をどう解決するかを問題解決型で言い切ると強い。',
    references:[{title:'About kay me',url:'https://gl.kayme.com/pages/about-kay-me'},{title:'Company – kay me',url:'https://gl.kayme.com/pages/company'}]},
-  {name:'FABRIC TOKYO',industry:'アパレル・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:4,
+  {name:'FABRIC TOKYO',ig_handle:'fabrictokyo',industry:'アパレル・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:4,
    one_line:'『洋服をもっと便利で楽しくかっこいい存在にしたい』を起点に、採寸×EC×機能性でオーダースーツ体験を再設計した事例。',
    why_strong:'プロダクトだけでなく購入体験そのものをブランド化している。店舗は採寸、ECは再購入と役割分担が明確。',
    how_built:'テクノロジーを使った新しい洋服D2Cとして立ち上げ、採寸データを起点に、オンラインで継続購入できる構造を作った。',
@@ -608,7 +676,7 @@ const SEED = [
    traction:'公式に10万人超の採寸実績を掲載し、体験データがブランド信頼の証拠になっている。',
    implication:'アイケアラボも、計測や診断を単なる前処理ではなく『ブランド体験の起点』として見せると強い。',
    references:[{title:'ABOUT US | 株式会社FABRIC TOKYO',url:'https://corp.fabric-tokyo.com/about'},{title:'FABRIC TOKYO 公式サイト',url:'https://fabric-tokyo.com/'}]},
-  {name:'BASE FOOD',industry:'フードテック',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:3,score_story:5,
+  {name:'BASE FOOD',ig_handle:'basefood_jp',industry:'フードテック',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:3,score_story:5,
    one_line:'100回以上の試作を経て『主食をイノベーションし、健康をあたりまえに』へたどり着いた、課題起点のブランド事例。',
    why_strong:'機能訴求だけでなく、『栄養のインフラ』という大きな物語に昇華しているため、商品群が増えてもブランドがぶれにくい。',
    how_built:'1年以上にわたり100種類以上の試作を繰り返し、最初の商品BASE PASTAを完成。そこから『主食をイノベーションし、健康をあたりまえに』というミッションを定義した。',
@@ -616,7 +684,7 @@ const SEED = [
    traction:'公式ストーリーで『栄養のインフラ』を明示。商品単体でなく生活の基盤価値としてブランドを位置づけている。',
    implication:'アイケアラボも単発メニューの話ではなく、『目から体を整えることを当たり前にする』レベルの大義に上げると、ブランドの伸びしろが広がる。',
    references:[{title:'STORY | BASE FOOD',url:'https://basefood.co.jp/brand/story'}]},
-  {name:'Mr. CHEESECAKE',industry:'食品・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+  {name:'Mr. CHEESECAKE',ig_handle:'mr.cheesecake',industry:'食品・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
    one_line:'『世界一じゃなく、あなたの人生最高に。』という言葉で、味ではなく"人生の記憶"に位置づけたブランド事例。',
    why_strong:'おいしさの説明を、香り・口溶け・温度変化・シェフの記憶という体験言語に変換している。商品説明がそのまま世界観になっている。',
    how_built:'シェフ田村浩二が幼少期の『おいしい記憶』を起点にブランドを構築。香り、食感、食べ方の変化を細かく体験価値として整理した。',
@@ -624,7 +692,7 @@ const SEED = [
    traction:'公式にブランドストーリー、香り設計、食感設計、食べ方の提案、旗艦店体験まで整備。',
    implication:'アイケアラボも『検査や施術の説明』ではなく、『体験した時の変化』を感覚言語で語れると、強いブランドになる。',
    references:[{title:'ブランド紹介 | Mr. CHEESECAKE',url:'https://mr-cheesecake.com/pages/about'}]},
-  {name:'GREEN SPOON',industry:'ウェルネス・食品',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+  {name:'GREEN SPOON',ig_handle:'greenspoon_jp',industry:'ウェルネス・食品',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
    one_line:'『たのしい食のセルフケア文化を創る』を軸に、商品・世界観・ポップアップまで一貫させているウェルネスブランド事例。',
    why_strong:'"健康"を我慢や正しさではなく"たのしいセルフケア"に再定義し、言葉・商品・ビジュアルのテンションを揃えている。',
    how_built:'MISSION・VISION・VALUESを明文化し、『自分を好きでいつづけられる人生を。』という感情価値まで接続。商品だけでなくブランド思想を組織にも共有している。',
@@ -632,7 +700,7 @@ const SEED = [
    traction:'公式ニュースでポップアップ『GREEN SCOOP by GREEN SPOON』の3日間来場1,200名超を掲載。',
    implication:'アイケアラボも『正しいケア』ではなく『続けたくなるセルフケア文化』に変換できると、365との接続が強くなる。',
    references:[{title:'株式会社Greenspoon',url:'https://greenspoon.co.jp/'},{title:'GREEN SPOON ニュース',url:'https://greenspoon.co.jp/archives/category/%E6%9C%AA%E5%88%86%E9%A1%9E'}]},
-  {name:'BULK HOMME',industry:'化粧品',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:4,
+  {name:'BULK HOMME',ig_handle:'bulkhomme',industry:'化粧品',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:4,
    one_line:'『メンズスキンケアブランド世界シェアNo.1』を掲げ、体験・デザイン・信頼を一体で設計しているブランド事例。',
    why_strong:'カテゴリ自体を更新する大きな目標を持ちつつ、白黒を基調とした視覚表現と体験価値を揃えている。',
    how_built:'『最も優れた化粧品は何か？』という創業問いから出発し、MISSIONを世界No.1シェア、VISIONを世界のメンズビューティをアップデートすると明確化。体験・デザイン・信頼を価値として整理した。',
@@ -654,7 +722,7 @@ function blankItem(c) {
     one_line:'', why_strong:'', how_built:'', where_embedded:'',
     traction:'', implication:'', memo:'', references:[],
     score_audio:0, score_visual:0, score_sns:0, score_story:0,
-    total_score:0, updated_at:null };
+    total_score:0, ig_handle:'', ig_image_url:'', updated_at:null };
 }
 
 /* ══════════════════════════════════════════════
@@ -663,6 +731,7 @@ function blankItem(c) {
 let items = [];
 let eid = null;
 let flt = { cat:'all', st:'all', ax:'all' };
+let viewMode = 'card';
 
 /* ══════════════════════════════════════════════
    STORAGE
@@ -724,6 +793,7 @@ function applySeed() {
     item.implication    = sd.implication;
     item.memo           = '';
     item.references     = sd.references || [];
+    item.ig_handle      = sd.ig_handle || '';
     item.score_audio    = sd.score_audio;
     item.score_visual   = sd.score_visual;
     item.score_sns      = sd.score_sns;
@@ -758,7 +828,7 @@ function sf(g, v, el) {
     g === 'st' ? {未調査:'a-s0',調査中:'a-s1',調査済み:'a-s2',完了:'a-s3'}[v]||'' :
     ('a-ax-'+v);
   el.className = 'fb ' + cls;
-  rt();
+  render();
 }
 
 function getList() {
@@ -783,7 +853,16 @@ function getList() {
 /* ══════════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════════ */
-function render() { rSummary(); rt(); }
+function render() { rSummary(); viewMode === 'card' ? renderCards() : rt(); }
+
+function setView(v) {
+  viewMode = v;
+  document.getElementById('vt-card').classList.toggle('on', v==='card');
+  document.getElementById('vt-table').classList.toggle('on', v==='table');
+  document.getElementById('card-wrap').style.display  = v==='card'  ? '' : 'none';
+  document.getElementById('table-wrap').style.display = v==='table' ? '' : 'none';
+  render();
+}
 
 function rSummary() {
   const n  = items.length;
@@ -856,6 +935,73 @@ function rt() {
 }
 function dots(v){const n=Math.round((v||0)/2);return `<div class="dots">${[0,1,2,3,4].map(i=>`<div class="dot${i<n?' on':''}"></div>`).join('')}</div>`;}
 function fmtDt(dt){if(!dt)return'—';const d=new Date(dt);return`${d.getMonth()+1}/${d.getDate()}`;}
+
+/* ══════════════════════════════════════════════
+   CARD VIEW
+══════════════════════════════════════════════ */
+function cField(lbl, val, cls) {
+  const v = (val||'').trim();
+  if (!v) return '';
+  return `<div class="c-field"><span class="c-flbl">${lbl}</span><div class="c-fval${cls?' '+cls:''}">${xe(v)}</div></div>`;
+}
+
+function renderCards() {
+  const list = getList();
+  document.getElementById('rcount').innerHTML = `<strong>${list.length}</strong> 社を表示 / 全50社`;
+  const axB = {'音':'b-ax-音','視覚':'b-ax-視覚','SNS':'b-ax-SNS','ストーリー':'b-ax-ストーリー'};
+  const catB = {'大手':'b-ote','ベンチャー・中小':'b-vc'};
+  const stB  = {'未調査':'b-s0','調査中':'b-s1','調査済み':'b-s2','完了':'b-s3'};
+  const stC  = {'未調査':'st-none','調査中':'st-wip','調査済み':'st-done','完了':'st-cmp'};
+  if (!list.length) {
+    document.getElementById('card-wrap').innerHTML = '<p style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:32px 0">該当する企業がありません</p>';
+    return;
+  }
+  document.getElementById('card-wrap').innerHTML = `<div class="card-grid">${list.map(it => {
+    const axes = (it.main_axis||[]).map(a=>`<span class="b ${axB[a]||'b-ax-none'}">${a}</span>`).join('');
+    // Instagram section
+    let igHtml = '';
+    if (it.ig_handle) {
+      const igUrl = `https://www.instagram.com/${it.ig_handle}/`;
+      const handleRow = `<div class="c-ig"><span class="c-ig-icon">📷</span><a href="${igUrl}" target="_blank" rel="noopener" class="c-ig-handle">@${xe(it.ig_handle)}</a></div>`;
+      igHtml = (it.ig_image_url ? `<img class="c-ig-img" src="${xe(it.ig_image_url)}" alt="${xe(it.company_name)}" loading="lazy">` : '') + handleRow;
+    } else {
+      igHtml = `<div class="c-ig"><div class="c-ig-ph"><span class="c-ig-icon">📷</span><span class="c-ig-none">Instagram未設定</span></div></div>`;
+    }
+    // References
+    const refs = (it.references||[]).filter(r=>r&&r.url);
+    const refsHtml = refs.length ? `<div class="c-refs">${refs.map(r=>`<a href="${xe(r.url)}" target="_blank" rel="noopener" class="c-ref-a">${xe(r.title||r.url)}</a>`).join('')}</div>` : '';
+    return `<div class="ccard ${stC[it.status]||'st-none'}">
+      ${igHtml}
+      <div class="c-head">
+        <div class="c-name">${xe(it.company_name)}</div>
+        <div class="c-bdgs">
+          <span class="b ${catB[it.category]||''}">${it.category==='大手'?'大手':'VC/中小'}</span>
+          <span class="b ${stB[it.status]||''}">${it.status}</span>
+          ${axes}
+          ${it.industry?`<span class="b b-ax-none">${xe(it.industry)}</span>`:''}
+        </div>
+      </div>
+      <div class="c-body">
+        ${it.one_line?`<div class="c-ol">${xe(it.one_line)}</div>`:''}
+        ${cField('なぜ強いのか',it.why_strong)}
+        ${cField('どうやってそうなったのか',it.how_built)}
+        ${cField('どこで刷り込んだのか',it.where_embedded)}
+        ${cField('成果の兆候',it.traction)}
+        ${cField('アイケアLaBoへの示唆',it.implication,'imp')}
+      </div>
+      ${refsHtml}
+      <div class="c-foot">
+        <div class="c-scores">
+          <div class="c-sc"><span>🎵 音</span><strong style="color:var(--blue-lt)">${it.score_audio||0}</strong></div>
+          <div class="c-sc"><span>👁 視覚</span><strong style="color:var(--purple)">${it.score_visual||0}</strong></div>
+          <div class="c-sc"><span>📣 SNS</span><strong style="color:var(--green-lt)">${it.score_sns||0}</strong></div>
+          <div class="c-sc"><span>📖 STR</span><strong style="color:var(--amber)">${it.score_story||0}</strong></div>
+        </div>
+        <button class="c-edit" onclick="openMod(${it.id})">✏️ 編集</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
 
 /* ══════════════════════════════════════════════
    EXPAND ROW
@@ -1000,6 +1146,8 @@ function fillEdit(it) {
   document.getElementById('e-tr').value  = it.traction||'';
   document.getElementById('e-imp').value = it.implication||'';
   document.getElementById('e-memo').value= it.memo||'';
+  document.getElementById('e-ig-h').value = it.ig_handle||'';
+  document.getElementById('e-ig-i').value = it.ig_image_url||'';
   // axes
   ['ax-a','ax-v','ax-s','ax-t'].forEach(id => { document.getElementById(id).checked = false; });
   (it.main_axis||[]).forEach(a => {
@@ -1056,6 +1204,8 @@ function saveItem() {
   it.traction       = document.getElementById('e-tr').value.trim();
   it.implication    = document.getElementById('e-imp').value.trim();
   it.memo           = document.getElementById('e-memo').value.trim();
+  it.ig_handle      = document.getElementById('e-ig-h').value.trim().replace(/^@/,'');
+  it.ig_image_url   = document.getElementById('e-ig-i').value.trim();
   it.references     = _refs.filter(r=>r.url.trim());
   it.main_axis      = ['ax-a','ax-v','ax-s','ax-t']
     .filter(id => document.getElementById(id).checked)
@@ -1089,6 +1239,8 @@ function ovClick(e){ if(e.target===document.getElementById('ov')) closeMod(); }
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
+// default card view: hide table
+document.getElementById('table-wrap').style.display = 'none';
 loadData();
 </script>
 </body>
