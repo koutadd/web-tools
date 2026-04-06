@@ -639,7 +639,8 @@ function showResult() {
   document.getElementById('result-type-name').textContent = `「${type.name}」の傾向があります`;
   document.getElementById('result-type-label').textContent = type.label;
   document.getElementById('result-desc').textContent = type.desc;
-  document.getElementById('icare-desc').textContent = type.icare;
+  const icareEl = document.getElementById('icare-desc');
+  if (icareEl) icareEl.textContent = type.icare;
   document.getElementById('result-action').textContent = type.action;
 
   // 背景の悩みリスト
