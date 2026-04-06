@@ -336,6 +336,22 @@
     .c-edit { font-family:var(--mono); font-size:10px; letter-spacing:.06em; padding:5px 14px; border-radius:4px; border:1px solid rgba(96,165,250,0.4); background:rgba(59,130,246,0.07); color:var(--blue-lt); cursor:pointer; transition:all .15s; }
     .c-edit:hover { background:rgba(59,130,246,0.14); }
     @media(max-width:640px){ .wrap{padding:20px 14px 80px;} .nav{padding:8px 14px;} .mhd{padding:18px 18px 16px;} .mbody{padding:18px 18px 18px;} .mtabs{padding:0 18px;} .mact{padding:14px 18px 20px;} .upd{padding:0 18px 6px;} }
+
+    /* ── LOGO ── */
+    .c-logo-wrap { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    .c-logo { width:36px; height:36px; object-fit:contain; border-radius:6px; background:#fff; padding:3px; flex-shrink:0; border:1px solid rgba(255,255,255,0.15); }
+    .c-logo-ph { width:36px; height:36px; border-radius:6px; background:rgba(59,130,246,0.12); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+
+    /* ── SOUND SECTION ── */
+    .sound-block { background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.18); border-radius:6px; padding:12px 14px; margin-top:10px; }
+    .sound-block-title { font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--blue-lt); margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+    .sound-block .c-field { margin-bottom:8px; }
+    .sound-block .c-field:last-child { margin-bottom:0; }
+    .sound-growth-val { font-size:12.5px; color:#93c5fd; line-height:1.75; }
+    .x-sound-block { background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.18); border-radius:6px; padding:14px 16px; margin-bottom:14px; }
+    .x-sound-title { font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--blue-lt); margin-bottom:10px; display:flex; align-items:center; gap:5px; }
+    .x-sound-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+    @media(max-width:640px){ .x-sound-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -518,6 +534,9 @@
           <div class="ef"><span class="elbl">Instagram ハンドル</span><span class="ehint">@なし、ハンドル名のみ 例: bulkhomme</span><input class="einp" id="e-ig-h" type="text" placeholder="例: bulkhomme" /></div>
           <div class="ef"><span class="elbl">Instagram 画像 URL</span><span class="ehint">投稿画像のURLを貼り付け（省略可）</span><input class="einp" id="e-ig-i" type="text" placeholder="https://..." /></div>
         </div>
+        <div class="ef"><span class="elbl">ロゴ URL</span><span class="ehint">ロゴ画像のURL（例: https://logo.clearbit.com/example.com）</span><input class="einp" id="e-logo" type="text" placeholder="https://logo.clearbit.com/example.com" /></div>
+        <div class="ef"><span class="elbl">🎵 音を使った施策</span><span class="ehint">サウンドロゴ以外に音を使って何をやっているか</span><textarea class="etxt" id="e-sound-other" placeholder="CMジングル、音楽イベント、店内BGM設計、音商標など"></textarea></div>
+        <div class="ef"><span class="elbl">🎵 音による認知拡大</span><span class="ehint">音施策がどう広まり、どのような認知拡大につながったか</span><textarea class="etxt" id="e-sound-growth" placeholder="メディア掲載、SNS拡散、口コミ、受賞など"></textarea></div>
         <div class="ef">
           <span class="elbl">参考リンク</span>
           <span class="ehint">タイトルとURLをセットで追加</span>
@@ -605,108 +624,147 @@ const COS = [
 /* ── 13社シードデータ ── */
 const SEED = [
   {name:'味の素',ig_handle:'ajinomoto_cook',industry:'食品',axes:['音','視覚'],status:'調査済み',score_audio:5,score_visual:3,score_sns:1,score_story:2,
+   logo_url:'https://logo.clearbit.com/ajinomoto.co.jp',
    one_line:'1999年から使う『あ・じ・の・も・と』のサウンドロゴを2015年に音商標登録し、文字ブランドと音をセットで守りながら浸透させた事例。',
    why_strong:'ブランド名そのものを短いメロディと言葉で固定し、テレビCMなど反復接触の多い場で長年使い続けたことで、音だけでも企業名を想起しやすい。',
    how_built:'1999年以来テレビCMなどで『あ・じ・の・も・と』の歌詞とメロディを使用し、2015年に音商標として登録。音を単発演出ではなくコーポレートブランド資産として扱った。',
    where_embedded:'TVCMなどのマス接点で継続利用。文字ロゴ『AJINOMOTO』と合わせて使用。',
    traction:'味の素自身が、文字だけでなく『音』としても商標権で保護し、コーポレートブランドの浸透と価値向上を目指すと明言。',
    implication:'短い音＋ブランド名を固定し、CM・SNS冒頭・イベント開幕・受付端末など反復接点で一貫使用する。音を早い段階で資産化する発想が参考になる。',
+   sound_other:'サウンドロゴ以外にも「Cook Do」「ほんだし」など商品別CMジングルを複数保有。企業CM・商品CMでそれぞれ音の層を作っている。また社歌・社内イベント用BGMも整備し、音をコーポレートアイデンティティ全体に組み込んでいる。',
+   sound_growth:'2015年の音商標登録プレスリリースがマーケティング・広告業界で大きく取り上げられ、「音商標活用の先進事例」として専門メディアに多数掲載。音を守る姿勢そのものがブランド誠実さのPRとなり、業界内外での認知・信頼が向上した。',
    references:[{title:'味の素(株)のサウンドロゴが新しいタイプの商標（音商標）として登録',url:'https://www.ajinomoto.co.jp/company/jp/presscenter/press/detail/2015_11_27.html'},{title:'味の素 公式サイト',url:'https://www.ajinomoto.co.jp/'}]},
   {name:'カゴメ',ig_handle:'kagome_jp',industry:'食品',axes:['音','ストーリー'],status:'調査済み',score_audio:5,score_visual:2,score_sns:1,score_story:3,
+   logo_url:'https://logo.clearbit.com/kagome.co.jp',
    one_line:'『自然を、おいしく、楽しく。KAGOME』というサウンドロゴを、ユーザーアンケートの声も踏まえて決定した参加型の音資産事例。',
    why_strong:'企業メッセージをそのままメロディ化しており、言葉と音が一致する。さらに『みなさんのお声で決定』という参加プロセス自体が記憶を強めている。',
    how_built:'コミュニティ上で『カゴメを音にすると？』のアンケートを行い、その結果をもとに社内会議で決定。2017年に『自然を、おいしく、楽しく。KAGOME』を発表した。',
    where_embedded:'ブランドメッセージとサウンドロゴを企業コミュニティ、広報、広告接点で連動。',
    traction:'カゴメ公式コミュニティ上でサウンドロゴの決定経緯を公開。企業メッセージを耳からも感じ取れる状態を作った。',
    implication:'アイケアラボも、代表だけで決めるのではなく『候補音をチームや顧客接点でテストする』と、刷り込み前に共感の土台を作れる。',
+   sound_other:'サウンドロゴ決定後も、企業コミュニティ「&KAGOME」で選定プロセスの全工程を公開。TVCMや広報動画にもサウンドロゴを継続使用。またトマトジュース等の商品CMでは別途BGMを設計し、コーポレートと商品の音を使い分けている。',
+   sound_growth:'サウンドロゴ決定の参加プロセスをコミュニティで公開したことで、選定に関わったユーザーが「自分が関わった」という当事者感を持ちSNSでシェア。参加型プロセス自体がPRコンテンツになり、マーケティング・PR系メディアに掲載されて認知が拡大した。',
    references:[{title:'みなさんのお声でカゴメ「サウンドロゴ」が決定しました！',url:'https://and.kagome.co.jp/article/blog/message/3086/'},{title:'サウンドロゴ決定',url:'https://and.kagome.co.jp/project/voices/1'}]},
   {name:'TBSグループ',ig_handle:'tbs_official',industry:'メディア',axes:['音','視覚'],status:'調査済み',score_audio:4,score_visual:5,score_sns:2,score_story:3,
+   logo_url:'https://logo.clearbit.com/tbs.co.jp',
    one_line:'ロゴ、色、フォント、モーション、サウンドまでを統合し、『最高の"時"』をブランドデザインとして一体設計した事例。',
    why_strong:'単なるロゴ変更で終わらず、色・フォント・アニメーション・音をまとめて設計しているため、接点が変わっても同じブランド体験として感じやすい。',
    how_built:'ブランドプロミス『最高の"時"で、明日の世界をつくる。』を起点に新ロゴを開発。TBS BLUE、オリジナルフォント、モーショングラフィックス、オリジナルサウンドを順に整備した。',
    where_embedded:'放送画面、デジタル接点、ロゴアニメーション、ブランドデザインサイトなど、複数の媒体に横展開。',
    traction:'公式ブランドデザインサイトで、ロゴ・色・フォント・モーション・サウンドの各設計意図を公開し、統一運用している。',
    implication:'アイケアラボも、ロゴだけでなく『色・書体・動画の動き・音』まで同時に設計すると、一気にブランドとして見えやすくなる。',
+   sound_other:'テレビ・ラジオ・配信サービスなど全接点にわたるサウンドアイデンティティを統一設計。番組OP/EDのサウンド、ニュース番組のオープニング音楽、CMスポットの音など全社レベルで音を一貫管理。公式ブランドデザインサイトでロゴ・色・フォント・モーション・サウンドの設計意図をすべて公開している。',
+   sound_growth:'ブランドデザインサイトの公開がデザイン・広告業界のSNSで話題となり、「音×ロゴ×モーション統合設計の先行事例」として各種メディアに掲載。毎日の放送接点での反復露出に加え、デザイン業界からの注目がブランド価値を高め、企業認知と信頼性向上につながった。',
    references:[{title:'TBS Brand Design',url:'https://www.tbsholdings.co.jp/design/'}]},
   {name:'ロート製薬',ig_handle:'rohto_jp',industry:'ヘルスケア・製薬',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:5,score_sns:2,score_story:5,
+   logo_url:'https://logo.clearbit.com/rohto.co.jp',
    one_line:'2024年にスローガンとロゴを刷新し、『ロートは、ハートだ。』を中心に"人"起点の物語へブランドを再定義した事例。',
    why_strong:'企業の強みや歴史ではなく『人のハートを動かす』という感情軸に再編集し、ロゴの意味・色の意味まで言語化して公開している。',
    how_built:'125周年を機にコーポレートスローガンとロゴを刷新。『人』を起点にしたいという意思を掲げ、新ロゴではRを『人』に見立て、青を知性、赤を情熱として再設計した。',
    where_embedded:'コーポレートスローガン、ロゴデザイン、色設計、対外発信記事で一体的に展開。',
    traction:'公式に刷新理由・スローガン・ロゴの意味まで公開しており、ブランド再定義を社外に説明できる形にしている。',
    implication:'『眼から体を科学する』も、機能説明だけでなく『誰の何をどう動かしたいのか』まで言葉に落とし、ロゴと色の意味を説明可能にするべき。',
+   sound_other:'かつての「ロートロートロート目薬〜♪」CMソングは長年TVCMで使用されたが、現在は音より視覚・ストーリー主軸へ移行。商品CMごとに楽曲は設計されているが、統一サウンドロゴは持たない方針。',
+   sound_growth:'音ではなく2024年のブランドリデザイン（「ロートは、ハートだ。」）をプレスリリース＋公式記事で発信したことがデザイン・マーケティングメディアで大きく話題に。スローガン・ロゴ・色の意味を言語化して公開したことで、125周年の節目とともにメディア露出が急増し認知が再拡大した。',
    references:[{title:'2024年、ロート製薬は、コーポレートスローガンとロゴデザインを一新します。',url:'https://www.shop.rohto.co.jp/column-list/column-niconico-0071.html'}]},
   {name:'ヤンマー',ig_handle:'yanmar_official',industry:'産業機械',axes:['視覚','ストーリー'],status:'調査済み',score_audio:3,score_visual:5,score_sns:2,score_story:5,
+   logo_url:'https://logo.clearbit.com/yanmar.com',
    one_line:'『A SUSTAINABLE FUTURE』と『HANASAKA』を軸に、ロゴ・活動・施設・アート・音楽まで広げている長期ブランド刷新事例。',
    why_strong:'BtoB寄りの企業でありながら、理念を『A SUSTAINABLE FUTURE』と『HANASAKA』に整理し、スポーツ・アート・施設・音楽まで一貫してつないでいる。',
    how_built:'2010年に『Solutioneering Together』を掲げた後、2012年以降プレミアムブランドプロジェクトで施設や接点を刷新。現在は『A SUSTAINABLE FUTURE』をブランドステートメントに置き、HANASAKAを価値観として展開。',
    where_embedded:'コーポレートロゴ、HANASAKAロゴ、施設リブランディング、スポーツ・アート活動、応援ソング『Find A Way』、アニメプロジェクトなど。',
    traction:'公式サイト上でブランド、理念、HANASAKA、施設刷新、応援ソングまで公開。ブランドを単なる見た目ではなく活動全体に広げている。',
    implication:'アイケアラボも『理念→象徴→活動→施設/イベント』まで通すべき。絵本やムービー、イベントを全部バラバラにせず、ひとつの価値観に結びつける設計が参考になる。',
+   sound_other:'応援ソング「Find A Way」をHANASAKAアニメプロジェクトと連動させ、YouTube動画・企業CMで展開。農業体験施設「ヤンマーミュージアム」でも音楽・映像体験を設計。スポーツ協賛（阪神タイガース等）の場でも音楽を活用し、BtoBからBtoCへの接点拡大に音を活用している。',
+   sound_growth:'アニメ・YouTube動画・スポーツ協賛を通じて「Find A Way」が一般生活者に届き、農機メーカーという硬いイメージから脱却。音楽とアートを通じた活動がメディアに取り上げられ、若年層・一般生活者への認知が広がった。BtoB企業がBtoCでの感情的認知を獲得した事例として注目されている。',
    references:[{title:'企業情報｜ヤンマー',url:'https://www.yanmar.com/jp/about/'},{title:'Our Brand｜ヤンマー',url:'https://www.yanmar.com/jp/about/brand/'},{title:'HANASAKA｜ヤンマー',url:'https://www.yanmar.com/jp/about/hanasaka/'}]},
   {name:'ユニクロ',ig_handle:'uniqlo_jp',industry:'アパレル',axes:['SNS','視覚'],status:'調査済み',score_audio:2,score_visual:4,score_sns:5,score_story:3,
+   logo_url:'https://logo.clearbit.com/uniqlo.com',
    one_line:'UTのTikTokハッシュタグチャレンジで約3.3億回視聴、約18.5万投稿を生み、SNS参加型でブランドを拡張した事例。',
    why_strong:'商品を一方的に見せるのではなく、UGC参加型のフォーマットに変えたことで、ブランド体験が『見る』から『参加する』に変わった。',
    how_built:'2019年、UTでTikTokグローバルハッシュタグチャレンジ『#UTPlayYourWorld』を実施。5市場で参加型施策を行い、受賞者はTVCMや店舗モニター、公式SNSにも出演。',
    where_embedded:'TikTokチャレンジ、UGC投稿、TVCM、店舗モニター、公式SNS。',
    traction:'約3.3億回視聴、投稿数185,671、参加者95,641、総エンゲージメント数43,431,224。',
    implication:'音やフレーズを作ったら、単に配信するだけでなく『参加型チャレンジ』に変換すると、SNS上で記憶資産が広がりやすい。',
+   sound_other:'TikTokチャレンジでは参加者が各自の楽曲を使って動画を作るUGC型。ユニクロ独自のサウンドロゴは持たないが、コラボCMや季節キャンペーンでの楽曲選定はブランドの世界観と合わせて運用。店内BGMも全店舗で統一設計している。',
+   sound_growth:'#UTPlayYourWorldチャレンジで投稿数18.5万件・視聴3.3億回を記録。音楽を「参加ツール」として設計したことで、音＋映像のブランド体験が自然に自己拡散。ユーザーが自ら拡散することで広告費をかけずに認知が急拡大した。TikTok for Businessの事例として世界中で参照されている。',
    references:[{title:'UT×TikTokグローバルハッシュタグチャレンジ 史上最高の約3.3億視聴数を記録',url:'https://www.uniqlo.com/jp/ja/contents/corp/press-release/2019/09/19091315_uttiktok.html'}]},
   {name:'ニトリ',ig_handle:'nitori_official',industry:'小売',axes:['SNS','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:5,score_story:2,
+   logo_url:'https://logo.clearbit.com/nitori.co.jp',
    one_line:'TikTokで生活者目線のクリエイター動画とSpark Adsを組み合わせ、若年層来店率を施策前後比で2倍にした事例。',
    why_strong:'商品説明ではなく生活シーンを見せたこと、企業投稿だけでなくクリエイター起点にしたこと、そして来店アンケートで効果を検証したことが強い。',
    how_built:'新生活需要が高まる3月に合わせ、TikTokクリエイターが生活者目線で商品を紹介。投稿をSpark Adsでブーストし、来店促進につなげた。',
    where_embedded:'TikTok動画、クリエイター投稿、Spark Ads、店舗来店アンケート。',
    traction:'若年層のTikTokきっかけ来店率が施策前後比で2倍。コメント欄で商品への質問も増え、利用意向を高めたと分析。',
    implication:'『眼から体を科学する』も、専門説明だけでなく『生活者目線の困りごと→変化』を短尺動画に変換し、来店・体験への導線をつくるべき。',
+   sound_other:'独自のサウンドロゴは持たないが、「お、ねだん以上。」のCMフレーズとBGMを長年使用し、一定の音の刷り込みは確立している。TikTok施策ではクリエイターが話題の楽曲を使うことで、音＝ニトリというコンテキストで自然拡散を狙っている。',
+   sound_growth:'TikTokクリエイター動画で使われる音楽と共にコンテンツが拡散され、「TikTokで見た」という文脈で若年層の認知が拡大。来店率2倍という数値をプレスリリースとTikTok for Business事例として公開したことで、業界メディアでも広く取り上げられた。',
    references:[{title:'ニトリ | TikTok for Business Case Study',url:'https://ads.tiktok.com/business/ja/inspiration/nitori'},{title:'ニトリが新生活者向けTikTok施策',url:'https://ads.tiktok.com/business/ja/blog/advertimes-nitori-casestudy'}]},
   {name:'kay me',ig_handle:'kay.me.official',industry:'アパレル',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:5,
+   logo_url:'https://logo.clearbit.com/kayme.com',
    one_line:'創業者自身の『忙しい女性の服の悩み』を起点に、『一瞬で華やか ずっとラク』な問題解決型ブランドへ落とし込んだ事例。',
    why_strong:'創業者課題がそのままブランドの中核課題になっており、便益が『忙しい人の時間・手間・不快の削減』として明確。',
    how_built:'戦略コンサルとして理想の仕事服が見つからなかった創業者が、快適さときちんと感を両立する服を構想。2011年創業後、100% Made in Japanやジャージー素材の技術課題を越えながらブランドを育てた。',
    where_embedded:'公式サイト、商品設計、Founder\'s story、店舗接客、会員コミュニティ。',
    traction:'公式に『Problem-solving clothing』を掲げ、挑戦する人を応援するミッションと、日本製・洗える・ストレッチなどの具体便益を一貫して訴求。',
    implication:'アイケアラボも『眼の悩み』を一般論で語るより、誰のどんな不便をどう解決するかを問題解決型で言い切ると強い。',
+   sound_other:'音の施策は特に確認されていない。ブランドの強みは視覚デザイン・ストーリー・問題解決型の言語化。店舗BGMや動画コンテンツにおける音は世界観に合わせて設計されていると推測されるが、音を主軸に置いた施策は展開していない。',
+   sound_growth:'音ではなく、創業者インタビュー・メディア掲載・SNSでのストーリー共有が認知を拡大。「働く女性の課題を解決した」というストーリーが経済系・ファッション系メディアで広く取り上げられ、ターゲット層への共感型認知が拡大した。',
    references:[{title:'About kay me',url:'https://gl.kayme.com/pages/about-kay-me'},{title:'Company – kay me',url:'https://gl.kayme.com/pages/company'}]},
   {name:'FABRIC TOKYO',ig_handle:'fabrictokyo',industry:'アパレル・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:2,score_story:4,
+   logo_url:'https://logo.clearbit.com/fabric-tokyo.com',
    one_line:'『洋服をもっと便利で楽しくかっこいい存在にしたい』を起点に、採寸×EC×機能性でオーダースーツ体験を再設計した事例。',
    why_strong:'プロダクトだけでなく購入体験そのものをブランド化している。店舗は採寸、ECは再購入と役割分担が明確。',
    how_built:'テクノロジーを使った新しい洋服D2Cとして立ち上げ、採寸データを起点に、オンラインで継続購入できる構造を作った。',
    where_embedded:'ブランドサイト、店舗採寸、EC、商品機能訴求。',
    traction:'公式に10万人超の採寸実績を掲載し、体験データがブランド信頼の証拠になっている。',
    implication:'アイケアラボも、計測や診断を単なる前処理ではなく『ブランド体験の起点』として見せると強い。',
+   sound_other:'音の施策は特に確認されていない。採寸体験・EC・商品機能が主な接点であり、音を主軸に置いた施策は展開していない。',
+   sound_growth:'音ではなく「10万人超の採寸実績」という数値PRと創業者インタビューがメディア認知を拡大。テック系・スタートアップ系メディアでのD2C成功事例としての掲載が続き、ビジネスパーソン層への認知が広がった。',
    references:[{title:'ABOUT US | 株式会社FABRIC TOKYO',url:'https://corp.fabric-tokyo.com/about'},{title:'FABRIC TOKYO 公式サイト',url:'https://fabric-tokyo.com/'}]},
   {name:'BASE FOOD',ig_handle:'basefood_jp',industry:'フードテック',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:3,score_sns:3,score_story:5,
+   logo_url:'https://logo.clearbit.com/basefood.co.jp',
    one_line:'100回以上の試作を経て『主食をイノベーションし、健康をあたりまえに』へたどり着いた、課題起点のブランド事例。',
    why_strong:'機能訴求だけでなく、『栄養のインフラ』という大きな物語に昇華しているため、商品群が増えてもブランドがぶれにくい。',
    how_built:'1年以上にわたり100種類以上の試作を繰り返し、最初の商品BASE PASTAを完成。そこから『主食をイノベーションし、健康をあたりまえに』というミッションを定義した。',
    where_embedded:'ブランドストーリー、商品開発背景、商品コピー、D2C導線。',
    traction:'公式ストーリーで『栄養のインフラ』を明示。商品単体でなく生活の基盤価値としてブランドを位置づけている。',
    implication:'アイケアラボも単発メニューの話ではなく、『目から体を整えることを当たり前にする』レベルの大義に上げると、ブランドの伸びしろが広がる。',
+   sound_other:'独自のサウンドロゴや音施策は持たない。YouTube・SNS動画での商品紹介には一般的なBGMを使用。',
+   sound_growth:'音ではなく「1食で1日に必要な栄養素の1/3が取れる」という具体数値と「主食をイノベーション」という大義を組み合わせたPR戦略が効果的。フードテック・ウェルネス系メディアへの多数掲載と、定期便ユーザーのSNO口コミが重なり認知が拡大した。上場・資金調達のプレスリリースも認知拡大に貢献。',
    references:[{title:'STORY | BASE FOOD',url:'https://basefood.co.jp/brand/story'}]},
   {name:'Mr. CHEESECAKE',ig_handle:'mr.cheesecake',industry:'食品・D2C',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+   logo_url:'https://logo.clearbit.com/mr-cheesecake.com',
    one_line:'『世界一じゃなく、あなたの人生最高に。』という言葉で、味ではなく"人生の記憶"に位置づけたブランド事例。',
    why_strong:'おいしさの説明を、香り・口溶け・温度変化・シェフの記憶という体験言語に変換している。商品説明がそのまま世界観になっている。',
    how_built:'シェフ田村浩二が幼少期の『おいしい記憶』を起点にブランドを構築。香り、食感、食べ方の変化を細かく体験価値として整理した。',
    where_embedded:'公式サイト、ブランドストーリー、店舗体験、デザートコース、Instagram、会員プログラム。',
    traction:'公式にブランドストーリー、香り設計、食感設計、食べ方の提案、旗艦店体験まで整備。',
    implication:'アイケアラボも『検査や施術の説明』ではなく、『体験した時の変化』を感覚言語で語れると、強いブランドになる。',
+   sound_other:'音の施策は特に確認されていない。五感訴求はしているが、香り・口溶けなど食の感覚が中心。音よりも視覚（Instagramの美しい写真）とストーリーが主軸。',
+   sound_growth:'限定販売・予約制というスカーシティ設計とInstagramでの高品質な写真投稿が拡散のトリガー。「人生最高」という言葉と共に体験者がSNSで自然シェアすることで口コミ認知が急拡大。食系インフルエンサーや著名人への自然な波及で、オープン直後から行列ができるブランドとして認知された。',
    references:[{title:'ブランド紹介 | Mr. CHEESECAKE',url:'https://mr-cheesecake.com/pages/about'}]},
   {name:'GREEN SPOON',ig_handle:'greenspoon_jp',industry:'ウェルネス・食品',axes:['ストーリー','視覚'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:5,
+   logo_url:'https://logo.clearbit.com/greenspoon.co.jp',
    one_line:'『たのしい食のセルフケア文化を創る』を軸に、商品・世界観・ポップアップまで一貫させているウェルネスブランド事例。',
    why_strong:'"健康"を我慢や正しさではなく"たのしいセルフケア"に再定義し、言葉・商品・ビジュアルのテンションを揃えている。',
    how_built:'MISSION・VISION・VALUESを明文化し、『自分を好きでいつづけられる人生を。』という感情価値まで接続。商品だけでなくブランド思想を組織にも共有している。',
    where_embedded:'ブランドサイト、定期便、限定メニュー、ポップアップ、コラボ商品、採用ページ。',
    traction:'公式ニュースでポップアップ『GREEN SCOOP by GREEN SPOON』の3日間来場1,200名超を掲載。',
    implication:'アイケアラボも『正しいケア』ではなく『続けたくなるセルフケア文化』に変換できると、365との接続が強くなる。',
+   sound_other:'独自のサウンドロゴや音施策は特に確認されていない。ポップアップイベント等での空間BGMは世界観に合わせて設計されていると推測されるが公開情報なし。ウェルネス系らしいナチュラルな音楽選定はブランドトーンと合致していると考えられる。',
+   sound_growth:'音ではなくポップアップ「GREEN SCOOP」3日間1200名来場の実績をSNS・メディアで公開したことが話題に。健康志向のライフスタイルメディアへの掲載と、Instagram上での美しいビジュアル投稿によるオーガニック拡散が認知を拡大。ウェルネストレンドの波に乗った投資家・メディアからの注目も後押し。',
    references:[{title:'株式会社Greenspoon',url:'https://greenspoon.co.jp/'},{title:'GREEN SPOON ニュース',url:'https://greenspoon.co.jp/archives/category/%E6%9C%AA%E5%88%86%E9%A1%9E'}]},
   {name:'BULK HOMME',ig_handle:'bulkhomme',industry:'化粧品',axes:['視覚','ストーリー'],status:'調査済み',score_audio:1,score_visual:4,score_sns:3,score_story:4,
+   logo_url:'https://logo.clearbit.com/bulk.co.jp',
    one_line:'『メンズスキンケアブランド世界シェアNo.1』を掲げ、体験・デザイン・信頼を一体で設計しているブランド事例。',
    why_strong:'カテゴリ自体を更新する大きな目標を持ちつつ、白黒を基調とした視覚表現と体験価値を揃えている。',
    how_built:'『最も優れた化粧品は何か？』という創業問いから出発し、MISSIONを世界No.1シェア、VISIONを世界のメンズビューティをアップデートすると明確化。体験・デザイン・信頼を価値として整理した。',
    where_embedded:'コーポレートサイト、商品デザイン、ホテルアメニティ『THE JOURNEY』、SNS。',
    traction:'公式にMISSION/VISION/VALUESを明示し、ブランド体験・デザイン・信頼を中核価値として公開している。',
    implication:'アイケアラボも『目の整体院カテゴリをどう更新するか』まで言い切ると、ブランドが単店舗文脈を超えやすい。',
+   sound_other:'独自のサウンドロゴや音施策は特に確認されていない。白黒を基調としたミニマルな世界観に合わせ、CMやSNS動画でも静謐な音楽・サウンドデザインを使用していると推測されるが、音を主軸に置いた戦略的施策は展開していない。',
+   sound_growth:'音ではなく「世界シェアNo.1」という目標の公言、ホテルアメニティ採用（THE JOURNEY）、海外展開のプレスリリースが認知拡大に貢献。選ばれた実績の積み上げPRと、インフルエンサー・美容系SNSでの視覚的な口コミが重なり、メンズビューティ市場でのブランド認知が急成長した。',
    references:[{title:'ABOUT｜BULK HOMME｜カンパニーサイト',url:'https://company.bulk.co.jp/about'},{title:'VISION - BULK HOMME RECRUITING SITE',url:'https://recruit.bulk.co.jp/vision/'}]},
 ];
 
@@ -722,7 +780,8 @@ function blankItem(c) {
     one_line:'', why_strong:'', how_built:'', where_embedded:'',
     traction:'', implication:'', memo:'', references:[],
     score_audio:0, score_visual:0, score_sns:0, score_story:0,
-    total_score:0, ig_handle:'', ig_image_url:'', updated_at:null };
+    total_score:0, ig_handle:'', ig_image_url:'', logo_url:'',
+    sound_other:'', sound_growth:'', updated_at:null };
 }
 
 /* ══════════════════════════════════════════════
@@ -799,6 +858,9 @@ function applySeed() {
     item.score_sns      = sd.score_sns;
     item.score_story    = sd.score_story;
     item.total_score    = sd.score_audio + sd.score_visual + sd.score_sns + sd.score_story;
+    item.sound_other    = sd.sound_other || '';
+    item.sound_growth   = sd.sound_growth || '';
+    item.logo_url       = sd.logo_url || '';
     item.updated_at     = new Date().toISOString();
   });
 }
@@ -970,10 +1032,26 @@ function renderCards() {
     // References
     const refs = (it.references||[]).filter(r=>r&&r.url);
     const refsHtml = refs.length ? `<div class="c-refs">${refs.map(r=>`<a href="${xe(r.url)}" target="_blank" rel="noopener" class="c-ref-a">${xe(r.title||r.url)}</a>`).join('')}</div>` : '';
+    // logo
+    const logoHtml = it.logo_url
+      ? `<img class="c-logo" src="${xe(it.logo_url)}" alt="${xe(it.company_name)} logo" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="c-logo-ph">🏢</div>`;
+    // sound section
+    const soundHtml = (it.sound_other||it.sound_growth) ? `
+      <div class="sound-block">
+        <div class="sound-block-title">🎵 音活動 &amp; 認知拡大</div>
+        ${it.sound_other?`<div class="c-field"><span class="c-flbl">音を使った施策</span><div class="c-fval">${xe(it.sound_other)}</div></div>`:''}
+        ${it.sound_growth?`<div class="c-field"><span class="c-flbl">音による認知拡大</span><div class="c-fval sound-growth-val">${xe(it.sound_growth)}</div></div>`:''}
+      </div>` : '';
     return `<div class="ccard ${stC[it.status]||'st-none'}">
       ${igHtml}
       <div class="c-head">
-        <div class="c-name">${xe(it.company_name)}</div>
+        <div class="c-logo-wrap">
+          ${logoHtml}
+          <div>
+            <div class="c-name">${xe(it.company_name)}</div>
+          </div>
+        </div>
         <div class="c-bdgs">
           <span class="b ${catB[it.category]||''}">${it.category==='大手'?'大手':'VC/中小'}</span>
           <span class="b ${stB[it.status]||''}">${it.status}</span>
@@ -988,6 +1066,7 @@ function renderCards() {
         ${cField('どこで刷り込んだのか',it.where_embedded)}
         ${cField('成果の兆候',it.traction)}
         ${cField('アイケアLaBoへの示唆',it.implication,'imp')}
+        ${soundHtml}
       </div>
       ${refsHtml}
       <div class="c-foot">
@@ -1051,6 +1130,14 @@ function xRowHtml(it) {
   const refsHtml = refs.length
     ? refs.map(r=>`<a href="${xe(r.url)}" target="_blank" rel="noopener" class="xref-a">${xe(r.title||r.url)}</a>`).join('')
     : '<span style="color:var(--text3);font-size:12px;font-style:italic">（なし）</span>';
+  const xSoundHtml = (it.sound_other||it.sound_growth) ? `
+    <div class="x-sound-block">
+      <div class="x-sound-title">🎵 音活動 &amp; 認知拡大</div>
+      <div class="x-sound-grid">
+        ${it.sound_other ? xf('音を使った施策', it.sound_other) : ''}
+        ${it.sound_growth ? xf('音による認知拡大', it.sound_growth) : ''}
+      </div>
+    </div>` : '';
   return `<div class="xbody">
     ${(it.one_line||'').trim() ? `<div class="xol">${xe(it.one_line)}</div>` : ''}
     <div class="xg2">
@@ -1060,6 +1147,7 @@ function xRowHtml(it) {
       ${xf('成果の兆候', it.traction)}
     </div>
     ${xf('アイケアLaBoへの示唆', it.implication, 'ximp')}
+    ${xSoundHtml}
     ${(it.memo||'').trim() ? xf('メモ', it.memo) : ''}
     <div class="xfooter">
       <div>
@@ -1148,6 +1236,9 @@ function fillEdit(it) {
   document.getElementById('e-memo').value= it.memo||'';
   document.getElementById('e-ig-h').value = it.ig_handle||'';
   document.getElementById('e-ig-i').value = it.ig_image_url||'';
+  document.getElementById('e-logo').value  = it.logo_url||'';
+  document.getElementById('e-sound-other').value  = it.sound_other||'';
+  document.getElementById('e-sound-growth').value = it.sound_growth||'';
   // axes
   ['ax-a','ax-v','ax-s','ax-t'].forEach(id => { document.getElementById(id).checked = false; });
   (it.main_axis||[]).forEach(a => {
@@ -1206,6 +1297,9 @@ function saveItem() {
   it.memo           = document.getElementById('e-memo').value.trim();
   it.ig_handle      = document.getElementById('e-ig-h').value.trim().replace(/^@/,'');
   it.ig_image_url   = document.getElementById('e-ig-i').value.trim();
+  it.logo_url       = document.getElementById('e-logo').value.trim();
+  it.sound_other    = document.getElementById('e-sound-other').value.trim();
+  it.sound_growth   = document.getElementById('e-sound-growth').value.trim();
   it.references     = _refs.filter(r=>r.url.trim());
   it.main_axis      = ['ax-a','ax-v','ax-s','ax-t']
     .filter(id => document.getElementById(id).checked)
