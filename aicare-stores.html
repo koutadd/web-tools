@@ -861,37 +861,56 @@
   .col-notes  { width: 18%; }
   .col-del    { width: 6%; }
 
-  /* ── フローティング一括操作バー（画面下部） ── */
-  .task-bulk-bar {
-    display: none;
+  /* ── タスク検索 + 上部全選択バー ── */
+  .task-select-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    padding: 8px 12px; background: #f5f5f2; border: 1px solid var(--border);
+    border-radius: 8px; flex-wrap: wrap;
   }
+  .task-selectall-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; font-weight: 700; color: #1e293b;
+    cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  #chk-select-all-top {
+    width: 15px; height: 15px; cursor: pointer; accent-color: #2563eb; flex-shrink: 0;
+  }
+  .task-search-input {
+    flex: 1; min-width: 160px; font-size: 0.78rem; padding: 5px 10px;
+    border: 1px solid var(--border); border-radius: 6px; outline: none;
+    background: #fff; color: var(--text);
+  }
+  .task-search-input:focus { border-color: #2563eb; }
+  .task-visible-count { font-size: 0.72rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+  /* ── フローティング一括操作バー（画面下部） ── */
   #task-float-bar {
     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
     background: #1e293b; color: #e2e8f0;
     border-radius: 12px; padding: 10px 20px;
-    display: none; align-items: center; gap: 12px;
+    display: none; align-items: center; gap: 10px;
     box-shadow: 0 8px 30px rgba(0,0,0,.35);
     z-index: 9000; white-space: nowrap;
     border: 1px solid rgba(255,255,255,.08);
   }
   #task-float-bar.show { display: flex; }
-  .fbar-select-all {
-    font-size: .78rem; font-weight: 700; padding: 6px 14px;
-    background: #14b8a6; color: #000; border: none; border-radius: 6px; cursor: pointer;
-  }
-  .fbar-select-all:hover { background: #0d9488; }
-  .fbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,.2); }
-  .fbar-count { font-size: .78rem; font-weight: 700; color: #94a3b8; }
-  .fbar-status-sel {
+  .fbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,.2); flex-shrink:0; }
+  .fbar-count { font-size: .82rem; font-weight: 700; color: #e2e8f0; }
+  .fbar-delete { font-size: .75rem; font-weight: 700; padding: 5px 14px; background: #dc2626; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  .fbar-delete:hover { background: #b91c1c; }
+  .fbar-cat-sel {
     font-size: .75rem; padding: 5px 10px; border: 1px solid #334155;
     border-radius: 6px; background: #273548; color: #e2e8f0; cursor: pointer; outline: none;
   }
-  .fbar-apply { font-size: .75rem; font-weight: 700; padding: 5px 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  .fbar-apply { font-size: .75rem; font-weight: 700; padding: 5px 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
   .fbar-apply:hover { background: #1d4ed8; }
   .fbar-clear  { font-size: .75rem; padding: 5px 10px; background: rgba(255,255,255,.08); color: #94a3b8; border: none; border-radius: 6px; cursor: pointer; }
   .fbar-clear:hover { background: rgba(255,255,255,.15); color: #e2e8f0; }
   /* 選択中の行をハイライト */
-  .task-table tr.row-selected td { background: #eff6ff; }
+  .task-table tr.row-selected > td { background: #dbeafe !important; }
+  .task-table tr.row-selected.completed > td { background: #dbeafe !important; opacity: 1; }
+  /* カテゴリヘッダーのチェックボックス */
+  .cat-chk { width: 15px; height: 15px; cursor: pointer; accent-color: #2563eb; }
 
   .status-select {
     font-size: 0.72rem; padding: 3px 6px; border: 1px solid var(--border);
@@ -1255,6 +1274,16 @@
       </div>
       <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
     </div>
+    <!-- 全選択 + 検索 -->
+    <div class="task-select-header">
+      <label class="task-selectall-label">
+        <input type="checkbox" id="chk-select-all-top" onchange="topSelectAllChange(this.checked)">
+        表示中をすべて選択
+      </label>
+      <input class="task-search-input" id="task-search" type="text" placeholder="タスク名で検索..."
+        oninput="onTaskSearch(this.value)">
+      <span class="task-visible-count" id="task-visible-count"></span>
+    </div>
     <div id="tasks-content"></div>
   </div>
 
@@ -1487,17 +1516,15 @@
 
 <!-- フローティング一括操作バー -->
 <div id="task-float-bar">
-  <button class="fbar-select-all" id="btn-select-all" onclick="selectAllTasks()">☑ 全選択</button>
+  <span class="fbar-count" id="fbar-count"></span>
   <div class="fbar-sep"></div>
-  <span class="fbar-count" id="fbar-count" style="display:none;"></span>
-  <select class="fbar-status-sel" id="bulk-status-sel">
-    <option value="">ステータス変更...</option>
-    <option>未着手</option>
-    <option>対応中</option>
-    <option>完了</option>
-    <option>保留</option>
+  <button class="fbar-delete" onclick="bulkDeleteTasks()">🗑 削除</button>
+  <div class="fbar-sep"></div>
+  <select class="fbar-cat-sel" id="bulk-cat-sel">
+    <option value="">カテゴリ変更...</option>
   </select>
-  <button class="fbar-apply" onclick="bulkApplyStatus()">適用</button>
+  <button class="fbar-apply" onclick="bulkChangeCategory()">変更</button>
+  <div class="fbar-sep"></div>
   <button class="fbar-clear" onclick="clearTaskSelection()">解除</button>
 </div>
 
@@ -1915,7 +1942,8 @@ let currentView    = 'list';
 let currentStoreId = null;
 let currentTab     = 'overview';
 let openCats       = {};   // category name → true/false
-let selectedTaskIds = new Set(); // 一括選択中のタスクID
+let selectedTaskIds = new Set(); // 一括選択中のタスクID（一元管理）
+let taskSearchQuery = '';        // タスク検索クエリ
 
 let filterState = { type: '', phase: '', status: '', person: '', area: '', query: '' };
 let sortState   = { field: '', dir: 'asc' };
@@ -2277,9 +2305,10 @@ function switchTab(tab) {
   if (tab === 'overview')    renderOverviewTab();
   if (tab === 'tasks') {
     selectedTaskIds.clear();
+    taskSearchQuery = '';
+    const searchEl = document.getElementById('task-search');
+    if (searchEl) searchEl.value = '';
     renderTasksTab();
-    const bar = document.getElementById('task-float-bar');
-    if (bar) bar.classList.add('show');
   } else {
     const bar = document.getElementById('task-float-bar');
     if (bar) bar.classList.remove('show');
@@ -2568,27 +2597,92 @@ function renderOverviewTab() {
 // ─────────────────────────────────────────────
 // TASKS TAB
 // ─────────────────────────────────────────────
-function renderTasksTab() {
+// ── 表示中タスクID計算（検索フィルタ適用） ────────────
+function getVisibleTaskIds() {
   const tasks = tasksData[currentStoreId] || [];
-  const today = todayStr();
+  const q = taskSearchQuery.toLowerCase().trim();
+  return new Set(
+    (q ? tasks.filter(t => t.task_name.toLowerCase().includes(q)) : tasks).map(t => t.id)
+  );
+}
 
-  // Group by category
+// ── 全チェックボックス状態を同期 ──────────────────────
+function syncCheckboxStates() {
+  // ① 上部「表示中をすべて選択」チェック
+  const topChk = document.getElementById('chk-select-all-top');
+  if (topChk) {
+    const visibleIds = getVisibleTaskIds();
+    if (visibleIds.size === 0) {
+      topChk.checked = false;
+      topChk.indeterminate = false;
+    } else {
+      const nSel = [...visibleIds].filter(id => selectedTaskIds.has(id)).length;
+      topChk.indeterminate = nSel > 0 && nSel < visibleIds.size;
+      topChk.checked = !topChk.indeterminate && nSel === visibleIds.size;
+    }
+  }
+
+  // ② カテゴリヘッダーチェックボックス（全タスク基準・indeterminate 付き）
+  const allTasks = tasksData[currentStoreId] || [];
+  const catMap = {};
+  allTasks.forEach(t => {
+    if (!catMap[t.category]) catMap[t.category] = [];
+    catMap[t.category].push(t.id);
+  });
+  Object.entries(catMap).forEach(([cat, ids]) => {
+    const catBody = document.getElementById('cat-body-' + cat);
+    if (!catBody) return;
+    const chk = catBody.querySelector('thead input.cat-chk');
+    if (!chk) return;
+    const nSel = ids.filter(id => selectedTaskIds.has(id)).length;
+    chk.indeterminate = nSel > 0 && nSel < ids.length;
+    chk.checked = nSel > 0 && nSel === ids.length;
+  });
+
+  // ③ 各タスク行のチェックボックスとハイライト
+  const allRows = document.querySelectorAll('.task-table tbody tr[id^="row-"]');
+  allRows.forEach(row => {
+    const id = row.id.replace('row-', '');
+    const cb = row.querySelector('td.col-chk input[type=checkbox]');
+    const selected = selectedTaskIds.has(id);
+    if (cb) cb.checked = selected;
+    row.classList.toggle('row-selected', selected);
+  });
+}
+
+// ── renderTasksTab ────────────────────────────────
+function renderTasksTab() {
+  const allTasks = tasksData[currentStoreId] || [];
+  const today    = todayStr();
+  const q        = taskSearchQuery.toLowerCase().trim();
+
+  // 検索フィルタ
+  const filtered = q ? allTasks.filter(t => t.task_name.toLowerCase().includes(q)) : allTasks;
+
+  // サマリー
+  const totalReq  = allTasks.filter(t => t.is_required).length;
+  const doneReq   = allTasks.filter(t => t.is_required && t.status === '完了').length;
+  const allDelays = allTasks.filter(t => t.status !== '完了' && t.due_date && t.due_date < today).length;
+  document.getElementById('tasks-summary').textContent =
+    `必須 ${doneReq}/${totalReq}件完了  遅延 ${allDelays}件`;
+
+  // 表示件数
+  const vcEl = document.getElementById('task-visible-count');
+  if (vcEl) vcEl.textContent = q ? `${filtered.length} / ${allTasks.length}件表示` : `全${allTasks.length}件`;
+
+  // カテゴリ別グループ
   const cats = {};
-  tasks.forEach(t => {
+  filtered.forEach(t => {
     if (!cats[t.category]) cats[t.category] = [];
     cats[t.category].push(t);
   });
 
-  const totalReq  = tasks.filter(t => t.is_required).length;
-  const doneReq   = tasks.filter(t => t.is_required && t.status === '完了').length;
-  const allDelays = tasks.filter(t => t.status !== '完了' && t.due_date && t.due_date < today).length;
-  document.getElementById('tasks-summary').textContent =
-    `必須 ${doneReq}/${totalReq}件完了  遅延 ${allDelays}件`;
-
   const html = Object.keys(cats).map(cat => {
     const catTasks = cats[cat].sort((a, b) => a.sort_order - b.sort_order);
-    const catDone  = catTasks.filter(t => t.status === '完了').length;
-    const isOpen   = openCats[cat] !== false; // default open
+    // catDone は全タスク（フィルタなし）基準
+    const allCatTasks = allTasks.filter(t => t.category === cat);
+    const catDone  = allCatTasks.filter(t => t.status === '完了').length;
+    const isOpen   = openCats[cat] !== false;
 
     const rows = catTasks.map(t => {
       const isOverdue   = t.status !== '完了' && t.due_date && t.due_date < today;
@@ -2644,7 +2738,7 @@ function renderTasksTab() {
           <div class="cat-header-left">
             <span class="cat-toggle ${isOpen ? 'open' : ''}">▶</span>
             <span class="cat-name">${esc(cat)}</span>
-            <span class="cat-progress-mini"><strong>${catDone}</strong>/${catTasks.length}完了</span>
+            <span class="cat-progress-mini"><strong>${catDone}</strong>/${allCatTasks.length}完了</span>
           </div>
         </div>
         <div class="task-table-wrap" id="cat-body-${esc(cat)}" style="display:${isOpen ? 'block' : 'none'}">
@@ -2652,7 +2746,7 @@ function renderTasksTab() {
             <thead>
               <tr>
                 <th class="col-chk">
-                  <input type="checkbox" title="カテゴリ内を全選択" style="cursor:pointer;width:14px;height:14px;"
+                  <input type="checkbox" class="cat-chk" title="カテゴリ内を全選択"
                     onchange="selectCategoryTasks('${esc(cat)}', this.checked)">
                 </th>
                 <th class="col-task">タスク名</th>
@@ -2671,21 +2765,34 @@ function renderTasksTab() {
       </div>`;
   }).join('');
 
-  document.getElementById('tasks-content').innerHTML = html || '<div class="empty-state">タスクがありません</div>';
+  document.getElementById('tasks-content').innerHTML =
+    html || '<div class="empty-state">タスクがありません</div>';
+
+  // カテゴリ選択プルダウンを現タスクデータで更新
+  _refreshBulkCatSelect(allTasks);
+
+  // チェックボックス状態を同期（indeterminate含む）
+  syncCheckboxStates();
+  updateBulkBar();
 }
 
 // ─────────────────────────────────────────────
-// 一括選択
+// 一括選択 — 状態管理は selectedTaskIds (Set) で一元管理
 // ─────────────────────────────────────────────
+
+// 単一タスクのON/OFF
 function toggleTaskSelection(taskId, checked) {
   if (checked) selectedTaskIds.add(taskId);
   else         selectedTaskIds.delete(taskId);
-  updateBulkBar();
-  // 行ハイライトを即時更新
+  // 行ハイライト即時更新
   const row = document.getElementById('row-' + taskId);
   if (row) row.classList.toggle('row-selected', checked);
+  // 親カテゴリ・上部チェックを同期
+  syncCheckboxStates();
+  updateBulkBar();
 }
 
+// カテゴリ内を一括ON/OFF（カテゴリ全タスク対象）
 function selectCategoryTasks(cat, checked) {
   const tasks = (tasksData[currentStoreId] || []).filter(t => t.category === cat);
   tasks.forEach(t => {
@@ -2694,41 +2801,51 @@ function selectCategoryTasks(cat, checked) {
     const row = document.getElementById('row-' + t.id);
     if (row) {
       row.classList.toggle('row-selected', checked);
-      const cb = row.querySelector('input[type=checkbox]');
+      const cb = row.querySelector('td.col-chk input[type=checkbox]');
       if (cb) cb.checked = checked;
     }
   });
+  syncCheckboxStates();
   updateBulkBar();
 }
 
-function selectAllTasks() {
-  const tasks = tasksData[currentStoreId] || [];
-  const allSelected = tasks.every(t => selectedTaskIds.has(t.id));
-  if (allSelected) {
-    // 全選択済み → 解除
-    clearTaskSelection();
-  } else {
-    // 全選択
-    tasks.forEach(t => {
-      selectedTaskIds.add(t.id);
-      const row = document.getElementById('row-' + t.id);
-      if (row) {
-        row.classList.add('row-selected');
-        const cb = row.querySelector('input[type=checkbox]');
-        if (cb) cb.checked = true;
-      }
-    });
-    updateBulkBar();
-  }
+// 上部「表示中をすべて選択」チェックボックス変更
+function topSelectAllChange(checked) {
+  const visibleIds = getVisibleTaskIds();
+  visibleIds.forEach(id => {
+    if (checked) selectedTaskIds.add(id);
+    else         selectedTaskIds.delete(id);
+    const row = document.getElementById('row-' + id);
+    if (row) {
+      row.classList.toggle('row-selected', checked);
+      const cb = row.querySelector('td.col-chk input[type=checkbox]');
+      if (cb) cb.checked = checked;
+    }
+  });
+  syncCheckboxStates();
+  updateBulkBar();
 }
 
+// 全解除
 function clearTaskSelection() {
   selectedTaskIds.clear();
-  document.querySelectorAll('.task-table input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.task-table input[type=checkbox]').forEach(cb => {
+    cb.checked = false;
+    cb.indeterminate = false;
+  });
   document.querySelectorAll('.task-table tr.row-selected').forEach(r => r.classList.remove('row-selected'));
+  const topChk = document.getElementById('chk-select-all-top');
+  if (topChk) { topChk.checked = false; topChk.indeterminate = false; }
   updateBulkBar();
 }
 
+// 検索入力
+function onTaskSearch(q) {
+  taskSearchQuery = q;
+  renderTasksTab(); // renderTasksTab 末尾で syncCheckboxStates + updateBulkBar 呼ぶ
+}
+
+// フローティングバー表示更新
 function updateBulkBar() {
   const bar   = document.getElementById('task-float-bar');
   const count = document.getElementById('fbar-count');
@@ -2736,41 +2853,68 @@ function updateBulkBar() {
   if (n > 0) {
     bar.classList.add('show');
     count.textContent = n + '件選択中';
-    count.style.display = '';
-    // 全選択ボタンラベル
-    const all = tasksData[currentStoreId] || [];
-    const btn = document.getElementById('btn-select-all');
-    if (btn) btn.textContent = n === all.length ? '☑ 全解除' : '☑ 全選択';
   } else {
     bar.classList.remove('show');
-    count.style.display = 'none';
-    document.getElementById('bulk-status-sel').value = '';
+    count.textContent = '';
   }
 }
 
-function bulkApplyStatus() {
-  const newStatus = document.getElementById('bulk-status-sel').value;
-  if (!newStatus) { showToast('ステータスを選択してください'); return; }
-  if (!selectedTaskIds.size) { showToast('タスクを選択してください'); return; }
+// カテゴリ変更セレクトを現データで更新
+function _refreshBulkCatSelect(allTasks) {
+  const sel = document.getElementById('bulk-cat-sel');
+  if (!sel) return;
+  const cats = [...new Set(allTasks.map(t => t.category).filter(Boolean))].sort();
+  const current = sel.value;
+  sel.innerHTML = '<option value="">カテゴリ変更...</option>' +
+    cats.map(c => `<option value="${esc(c)}"${c === current ? ' selected' : ''}>${esc(c)}</option>`).join('');
+}
+
+// 一括削除
+function bulkDeleteTasks() {
+  const n = selectedTaskIds.size;
+  if (!n) { showToast('タスクを選択してください'); return; }
+  if (!confirm(n + '件のタスクを削除しますか？')) return;
   const tasks = tasksData[currentStoreId];
   if (!tasks) return;
   const today = todayStr();
   selectedTaskIds.forEach(id => {
     const t = tasks.find(x => x.id === id);
-    if (!t || t.status === newStatus) return;
-    const old = t.status;
-    t.status = newStatus;
-    t.completed_at = newStatus === '完了' ? today : '';
-    addLog(currentStoreId, id, 'status_change', old, newStatus);
+    if (t) addLog(currentStoreId, id, 'task_delete', t.task_name, '');
+  });
+  tasksData[currentStoreId] = tasks.filter(t => !selectedTaskIds.has(t.id));
+  selectedTaskIds.clear();
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = today;
+  saveData();
+  updateDetailStats();
+  renderTasksTab();
+  showToast(n + '件のタスクを削除しました');
+}
+
+// 一括カテゴリ変更
+function bulkChangeCategory() {
+  const sel = document.getElementById('bulk-cat-sel');
+  const newCat = sel ? sel.value : '';
+  if (!newCat) { showToast('カテゴリを選択してください'); return; }
+  const n = selectedTaskIds.size;
+  if (!n) { showToast('タスクを選択してください'); return; }
+  const tasks = tasksData[currentStoreId];
+  if (!tasks) return;
+  const today = todayStr();
+  selectedTaskIds.forEach(id => {
+    const t = tasks.find(x => x.id === id);
+    if (t && t.category !== newCat) {
+      addLog(currentStoreId, id, 'category_change', t.category, newCat);
+      t.category = newCat;
+    }
   });
   const s = storesData.find(x => x.id === currentStoreId);
   if (s) s.updated_at = today;
   saveData();
   updateDetailStats();
-  const n = selectedTaskIds.size;
   clearTaskSelection();
   renderTasksTab();
-  showToast(`${n}件のステータスを「${newStatus}」に変更しました`);
+  showToast(n + '件のカテゴリを「' + newCat + '」に変更しました');
 }
 
 function toggleCategory(cat) {
