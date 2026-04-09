@@ -1235,7 +1235,6 @@
     <div class="tasks-toolbar">
       <div class="tasks-toolbar-left">
         <button class="add-task-btn" onclick="openAddTaskModal()">＋ タスク追加</button>
-        <button class="add-task-btn" id="btn-select-all" onclick="selectAllTasks()" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;">全選択</button>
         <!-- 一括操作バー: 選択時のみ表示 -->
         <div class="task-bulk-bar" id="task-bulk-bar">
           <span class="bulk-count" id="bulk-count-label">0件選択</span>
@@ -1250,7 +1249,13 @@
           <button class="bulk-clear-btn" onclick="clearTaskSelection()">選択解除</button>
         </div>
       </div>
-      <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button id="btn-select-all" onclick="selectAllTasks()"
+          style="font-size:0.75rem;font-weight:700;padding:7px 18px;background:#e8f5e9;color:#2e7d32;border:2px solid #2e7d32;border-radius:6px;cursor:pointer;">
+          ☑ 全選択
+        </button>
+        <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
+      </div>
     </div>
     <div id="tasks-content"></div>
   </div>
