@@ -851,28 +851,35 @@
   .col-notes  { width: 18%; }
   .col-del    { width: 6%; }
 
-  /* 一括選択バー */
+  /* ── フローティング一括操作バー（画面下部） ── */
   .task-bulk-bar {
-    display: none; align-items: center; gap: 8px; flex-wrap: wrap;
-    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px;
-    padding: 5px 12px; margin-left: 8px;
+    display: none;
   }
-  .task-bulk-bar.active { display: flex; }
-  .bulk-count { font-size: .75rem; font-weight: 700; color: #1e40af; white-space: nowrap; }
-  .bulk-status-sel {
-    font-size: .72rem; padding: 4px 8px; border: 1px solid #93c5fd;
-    border-radius: 4px; background: #fff; color: var(--text); cursor: pointer; outline: none;
+  #task-float-bar {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #e2e8f0;
+    border-radius: 12px; padding: 10px 20px;
+    display: none; align-items: center; gap: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+    z-index: 9000; white-space: nowrap;
+    border: 1px solid rgba(255,255,255,.08);
   }
-  .bulk-apply-btn {
-    font-size: .72rem; padding: 4px 12px; background: #2563eb; color: #fff;
-    border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
+  #task-float-bar.show { display: flex; }
+  .fbar-select-all {
+    font-size: .78rem; font-weight: 700; padding: 6px 14px;
+    background: #14b8a6; color: #000; border: none; border-radius: 6px; cursor: pointer;
   }
-  .bulk-apply-btn:hover { background: #1d4ed8; }
-  .bulk-clear-btn {
-    font-size: .72rem; padding: 4px 8px; background: none;
-    border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; color: #64748b;
+  .fbar-select-all:hover { background: #0d9488; }
+  .fbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,.2); }
+  .fbar-count { font-size: .78rem; font-weight: 700; color: #94a3b8; }
+  .fbar-status-sel {
+    font-size: .75rem; padding: 5px 10px; border: 1px solid #334155;
+    border-radius: 6px; background: #273548; color: #e2e8f0; cursor: pointer; outline: none;
   }
-  .bulk-clear-btn:hover { background: #f1f5f9; }
+  .fbar-apply { font-size: .75rem; font-weight: 700; padding: 5px 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  .fbar-apply:hover { background: #1d4ed8; }
+  .fbar-clear  { font-size: .75rem; padding: 5px 10px; background: rgba(255,255,255,.08); color: #94a3b8; border: none; border-radius: 6px; cursor: pointer; }
+  .fbar-clear:hover { background: rgba(255,255,255,.15); color: #e2e8f0; }
   /* 選択中の行をハイライト */
   .task-table tr.row-selected td { background: #eff6ff; }
 
@@ -1235,27 +1242,8 @@
     <div class="tasks-toolbar">
       <div class="tasks-toolbar-left">
         <button class="add-task-btn" onclick="openAddTaskModal()">＋ タスク追加</button>
-        <!-- 一括操作バー: 選択時のみ表示 -->
-        <div class="task-bulk-bar" id="task-bulk-bar">
-          <span class="bulk-count" id="bulk-count-label">0件選択</span>
-          <select class="bulk-status-sel" id="bulk-status-sel">
-            <option value="">ステータスを変更...</option>
-            <option>未着手</option>
-            <option>対応中</option>
-            <option>完了</option>
-            <option>保留</option>
-          </select>
-          <button class="bulk-apply-btn" onclick="bulkApplyStatus()">適用</button>
-          <button class="bulk-clear-btn" onclick="clearTaskSelection()">選択解除</button>
-        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button id="btn-select-all" onclick="selectAllTasks()"
-          style="font-size:0.75rem;font-weight:700;padding:7px 18px;background:#e8f5e9;color:#2e7d32;border:2px solid #2e7d32;border-radius:6px;cursor:pointer;">
-          ☑ 全選択
-        </button>
-        <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
-      </div>
+      <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
     </div>
     <div id="tasks-content"></div>
   </div>
@@ -1486,6 +1474,22 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- フローティング一括操作バー -->
+<div id="task-float-bar">
+  <button class="fbar-select-all" id="btn-select-all" onclick="selectAllTasks()">☑ 全選択</button>
+  <div class="fbar-sep"></div>
+  <span class="fbar-count" id="fbar-count" style="display:none;"></span>
+  <select class="fbar-status-sel" id="bulk-status-sel">
+    <option value="">ステータス変更...</option>
+    <option>未着手</option>
+    <option>対応中</option>
+    <option>完了</option>
+    <option>保留</option>
+  </select>
+  <button class="fbar-apply" onclick="bulkApplyStatus()">適用</button>
+  <button class="fbar-clear" onclick="clearTaskSelection()">解除</button>
+</div>
 
 <!-- ═══════════════════════════════════════════════
      DATA & SCRIPTS
@@ -2261,7 +2265,15 @@ function switchTab(tab) {
   });
   if (tab === 'dashboard')   renderDashboardTab();
   if (tab === 'overview')    renderOverviewTab();
-  if (tab === 'tasks')       { selectedTaskIds.clear(); renderTasksTab(); }
+  if (tab === 'tasks') {
+    selectedTaskIds.clear();
+    renderTasksTab();
+    const bar = document.getElementById('task-float-bar');
+    if (bar) bar.classList.add('show');
+  } else {
+    const bar = document.getElementById('task-float-bar');
+    if (bar) bar.classList.remove('show');
+  }
   if (tab === 'phasecheck')  { phaseCheckViewPhase = null; renderPhaseCheckTab(); }
   if (tab === 'gallery')     renderGalleryTab();
   if (tab === 'comment')     renderCommentTab();
@@ -2697,9 +2709,6 @@ function selectAllTasks() {
       }
     });
     updateBulkBar();
-    // ボタンラベルを切り替え
-    const btn = document.getElementById('btn-select-all');
-    if (btn) btn.textContent = '全解除';
   }
 }
 
@@ -2708,19 +2717,23 @@ function clearTaskSelection() {
   document.querySelectorAll('.task-table input[type=checkbox]').forEach(cb => cb.checked = false);
   document.querySelectorAll('.task-table tr.row-selected').forEach(r => r.classList.remove('row-selected'));
   updateBulkBar();
-  const btn = document.getElementById('btn-select-all');
-  if (btn) btn.textContent = '全選択';
 }
 
 function updateBulkBar() {
-  const bar   = document.getElementById('task-bulk-bar');
-  const label = document.getElementById('bulk-count-label');
+  const bar   = document.getElementById('task-float-bar');
+  const count = document.getElementById('fbar-count');
   const n = selectedTaskIds.size;
   if (n > 0) {
-    bar.classList.add('active');
-    label.textContent = n + '件選択中';
+    bar.classList.add('show');
+    count.textContent = n + '件選択中';
+    count.style.display = '';
+    // 全選択ボタンラベル
+    const all = tasksData[currentStoreId] || [];
+    const btn = document.getElementById('btn-select-all');
+    if (btn) btn.textContent = n === all.length ? '☑ 全解除' : '☑ 全選択';
   } else {
-    bar.classList.remove('active');
+    bar.classList.remove('show');
+    count.style.display = 'none';
     document.getElementById('bulk-status-sel').value = '';
   }
 }
