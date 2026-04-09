@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>オーナー専用 | 出店管理 | AICARE LAB</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ════════════════════════════════════════════
+   オーナー専用カラースキーム (紫・ウォームクリーム)
+   本部画面 (teal/ニュートラル) とは明確に別トーン
+════════════════════════════════════════════ */
+:root {
+  --bg: #fdf8f3;                  /* ウォームクリーム */
+  --surface: #ffffff;
+  --border: #e8ddd3;
+  --text: #1a1410;
+  --muted: #78716c;
+  --accent: #7c3aed;              /* 紫アクセント */
+  --accent-dark: #6d28d9;
+  --accent-bg: #f5f3ff;
+  --accent-border: #c4b5fd;
+  --orange: #ea580c;              /* 今やること */
+  --orange-bg: #fff7ed;
+  --orange-border: #fed7aa;
+  --status-good: #16a34a;
+  --status-good-bg: #dcfce7;
+  --status-warn: #d97706;
+  --status-warn-bg: #fef3c7;
+  --status-delay: #dc2626;
+  --status-delay-bg: #fee2e2;
+  --color-direct: #2563eb;
+  --color-direct-bg: #dbeafe;
+  --color-direct-text: #1e40af;
+  --color-fc: #db2777;
+  --color-fc-bg: #fce7f3;
+  --color-fc-text: #9d174d;
+  --pad: 16px;
+  --radius: 10px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ════════════════════════════════════════════
+   共通ヘッダー (HQ と同じ構造・高さ・配置)
+   ただし紫グラデーションバーで識別
+════════════════════════════════════════════ */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 42px; z-index: 200;
+}
+/* オーナーページ識別: 上部 3px 紫バー */
+.app-header::before {
+  content: '';
+  display: block; height: 3px;
+  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 50%, #c4b5fd 100%);
+}
+.app-header-inner {
+  max-width: 640px; margin: 0 auto;
+  padding: 0 var(--pad);
+  height: 52px;
+  display: flex; align-items: center; gap: 12px;
+}
+.app-logo-block { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.app-logo { font-size: 0.8rem; font-weight: 800; letter-spacing: .08em; color: var(--accent); }
+.app-logo-sep { color: var(--border); font-size: 1rem; }
+.app-title { font-size: 0.82rem; font-weight: 700; color: var(--accent); }
+.app-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; color: var(--muted); flex: 1; min-width: 0;
+}
+.app-breadcrumb-sep { color: var(--border); flex-shrink: 0; }
+.app-breadcrumb-current {
+  font-size: 0.72rem; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.app-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto; }
+.save-indicator {
+  font-size: 0.7rem; display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 12px; border: 1px solid transparent;
+}
+.save-indicator.saving { color: #d97706; border-color: #fde68a; background: #fef9c3; }
+.save-indicator.saved  { color: #16a34a; border-color: #bbf7d0; background: #f0fdf4; }
+.save-indicator.error  { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+.save-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.save-dot.saving { background: #d97706; animation: pulse-dot 1s ease-in-out infinite; }
+.save-dot.saved  { background: #16a34a; }
+.save-dot.error  { background: #dc2626; }
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+.owner-badge { font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: var(--accent); color: #fff; white-space: nowrap; }
+.hq-link-btn {
+  font-size: 0.68rem; font-weight: 700; padding: 4px 11px; border-radius: 6px;
+  border: 1.5px solid var(--accent-border); color: var(--accent);
+  background: var(--accent-bg); cursor: pointer; text-decoration: none;
+  transition: all .15s; white-space: nowrap; flex-shrink: 0;
+}
+.hq-link-btn:hover { background: #ede9fe; border-color: var(--accent); }
+
+/* ════════════════════════════════════════════
+   オーナーアプリ本体
+════════════════════════════════════════════ */
+.owner-app { max-width: 640px; margin: 0 auto; padding: 0 var(--pad) 100px; }
+
+/* いまの状況カード */
+.owner-situation-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
+  margin-top: 16px;
+}
+.owner-situation-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px; gap: 10px;
+}
+.owner-situation-left {}
+.owner-store-no { font-size: 0.65rem; font-weight: 700; color: var(--muted); letter-spacing: .06em; margin-bottom: 4px; }
+.owner-store-name { font-size: 1.1rem; font-weight: 800; line-height: 1.25; color: var(--text); }
+.owner-situation-right { text-align: right; flex-shrink: 0; }
+.owner-phase-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  background: var(--accent-bg); color: var(--accent); margin-bottom: 6px; display: inline-block;
+}
+.owner-status-badge-row { display: flex; gap: 6px; justify-content: flex-end; align-items: center; }
+.owner-progress-row { margin-bottom: 8px; }
+.owner-progress-nums {
+  display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px;
+}
+.owner-progress-big { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.owner-progress-big.good { color: var(--status-good); }
+.owner-progress-big.warn { color: var(--status-warn); }
+.owner-progress-big.delay { color: var(--status-delay); }
+.owner-progress-total { font-size: 0.82rem; color: var(--muted); }
+.owner-progress-bar-bg { height: 8px; background: #e8ddd3; border-radius: 4px; overflow: hidden; }
+.owner-progress-bar-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+.owner-progress-bar-fill.good { background: var(--status-good); }
+.owner-progress-bar-fill.warn { background: var(--status-warn); }
+.owner-progress-bar-fill.delay { background: var(--status-delay); }
+.owner-open-date {
+  font-size: 0.78rem; color: var(--muted); margin-top: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.owner-open-countdown {
+  font-weight: 700; color: var(--text);
+  background: var(--accent-bg); padding: 2px 8px; border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+/* ── セクションヘッダーストリップ ── */
+.owner-section-header-strip {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.owner-section-header-strip .osh-label {
+  font-size: 0.7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px;
+}
+.osh-label.now { background: #fef2f2; color: #dc2626; }
+.osh-label.next { background: #fff7ed; color: #c2410c; }
+.osh-label.future { background: #f0fdf4; color: #15803d; }
+.osh-count { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+
+/* ── 今やること: ヒーローカード ── */
+.owner-now-section { margin-bottom: 20px; }
+.owner-now-card {
+  background: linear-gradient(135deg, #fff7ed 0%, #fff 60%);
+  border: 2.5px solid #fb923c; border-radius: 14px; padding: 18px 18px 14px;
+}
+.owner-now-card-label {
+  font-size: 0.6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 8px;
+}
+.owner-now-card-cat { font-size: 0.7rem; font-weight: 800; color: var(--orange); margin-bottom: 4px; }
+.owner-now-card-task { font-size: 1.12rem; font-weight: 800; line-height: 1.35; color: var(--text); margin-bottom: 12px; }
+.owner-now-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.owner-action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 11px 0;
+  background: var(--orange); color: #fff; border: none; border-radius: 9px;
+  font-size: 0.88rem; font-weight: 800; cursor: pointer; letter-spacing: .03em; transition: background .15s;
+}
+.owner-action-btn:hover { background: #c2410c; }
+.owner-action-btn.done-state { background: var(--status-good); }
+
+/* 残りの今やること (コンパクト) */
+.owner-now-remaining { margin-top: 8px; }
+.owner-now-remain-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px; border-radius: 8px;
+  background: #fff8f4; border: 1px solid var(--orange-border); margin-bottom: 6px;
+}
+.onr-dot { width: 7px; height: 7px; border-radius: 50%; background: #fb923c; flex-shrink: 0; }
+.onr-body { flex: 1; min-width: 0; }
+.onr-name { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.onr-due { font-size: 0.72rem; margin-top: 2px; }
+
+/* ── 次にやること ── */
+.owner-next-section { margin-bottom: 20px; }
+.owner-task-compact {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 12px; border-radius: 9px;
+  background: var(--surface); border: 1px solid var(--border); margin-bottom: 7px;
+}
+.owner-task-compact-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.owner-task-compact-body { flex: 1; min-width: 0; }
+.owner-task-compact-cat { font-size: 0.65rem; font-weight: 800; color: var(--muted); letter-spacing: .04em; margin-bottom: 2px; }
+.owner-task-compact-name { font-size: 0.88rem; font-weight: 700; line-height: 1.3; }
+.owner-task-compact-due { font-size: 0.72rem; margin-top: 4px; }
+
+/* ── 今後やること ── */
+.owner-future-section { margin-bottom: 8px; }
+.owner-future-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.owner-future-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 13px; border-bottom: 1px solid var(--border); font-size: 0.82rem;
+}
+.owner-future-item:last-child { border-bottom: none; }
+.ofi-cat { font-size: 0.65rem; font-weight: 700; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.ofi-name { flex: 1; font-weight: 600; }
+.ofi-due { font-size: 0.72rem; flex-shrink: 0; }
+
+/* ── 全完了 ── */
+.owner-all-done {
+  text-align: center; padding: 28px 20px;
+  background: linear-gradient(135deg, #f0fdf4, #fff);
+  border: 2px solid #86efac; border-radius: 14px; margin-bottom: 16px;
+}
+.owner-all-done-icon { font-size: 2.2rem; margin-bottom: 8px; }
+.owner-all-done-title { font-size: 1rem; font-weight: 800; color: #15803d; margin-bottom: 4px; }
+.owner-all-done-sub { font-size: 0.8rem; color: var(--muted); }
+
+/* ── 本部からのメッセージ ── */
+.owner-hq-message {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px;
+  padding: 13px 14px; margin-bottom: 16px;
+}
+.owner-hq-message-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.owner-hq-message-body { flex: 1; }
+.owner-hq-message-from { font-size: 0.68rem; font-weight: 800; color: #1d4ed8; letter-spacing: .04em; margin-bottom: 4px; }
+.owner-hq-message-text { font-size: 0.82rem; line-height: 1.55; color: var(--text); }
+.owner-hq-message-link { display: inline-block; margin-top: 6px; font-size: 0.72rem; font-weight: 700; color: #1d4ed8; cursor: pointer; background: none; border: none; padding: 0; text-decoration: underline; }
+
+/* ── タスクアイテム (やることタブ用) ── */
+.owner-section {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 14px;
+}
+.owner-section-title { font-size: 0.78rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.owner-task {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid #f5f3f0;
+}
+.owner-task:last-child { border-bottom: none; }
+.owner-task-body { flex: 1; min-width: 0; }
+.owner-task-name { font-size: 0.85rem; font-weight: 600; }
+.owner-task-name.done { color: var(--muted); text-decoration: line-through; }
+.owner-task-category {
+  font-size: 0.6rem; color: var(--muted); background: #f3f4f6;
+  padding: 1px 6px; border-radius: 4px; margin-right: 4px;
+}
+.owner-task-btn {
+  font-size: 0.72rem; font-weight: 700; padding: 6px 14px;
+  border-radius: 8px; border: 1.5px solid var(--border); cursor: pointer;
+  white-space: nowrap; min-width: 70px; text-align: center;
+  background: #fff; transition: all .15s;
+}
+.owner-task-btn.s-pending { border-color: #d1d5db; color: var(--muted); }
+.owner-task-btn.s-active { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+.owner-task-btn.s-done { border-color: var(--status-good); color: var(--status-good); background: var(--status-good-bg); }
+
+/* ── 提出物 ── */
+.submission-item { padding: 12px 0; border-bottom: 1px solid #f0ece8; }
+.submission-item:last-child { border-bottom: none; }
+.submission-title { font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.submission-required { font-size: 0.6rem; background: var(--status-delay-bg); color: var(--status-delay); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.submission-optional { font-size: 0.6rem; background: #f3f4f6; color: var(--muted); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.submission-desc { font-size: 0.72rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.submission-note-input {
+  font-size: 0.72rem; padding: 6px 10px; border: 1px solid var(--border);
+  border-radius: 6px; width: 100%; margin-top: 6px; outline: none; font-family: inherit;
+}
+.submission-note-input:focus { border-color: var(--accent); }
+.submission-check-row { display: flex; gap: 12px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.submission-check-label { font-size: 0.72rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.submission-check-label input[type="checkbox"] { accent-color: var(--accent); }
+.submission-confirmed-badge { font-size: 0.62rem; background: var(--status-good-bg); color: var(--status-good); padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.submission-category-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; background: var(--accent-bg); color: var(--accent); }
+
+/* ── 写真 ── */
+.photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+@media (min-width: 480px) { .photo-grid { grid-template-columns: repeat(3, 1fr); } }
+.photo-item { position: relative; border-radius: 8px; overflow: hidden; background: #f0ece8; aspect-ratio: 4/3; }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; }
+.photo-item-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.6)); padding: 6px 8px; color: #fff; }
+.photo-item-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 4px; }
+.photo-item-btn { font-size: 0.6rem; background: rgba(0,0,0,.5); color: #fff; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; }
+.photo-item-btn:hover { background: rgba(0,0,0,.7); }
+.photo-item-btn.is-cover { background: var(--accent); }
+.photo-drop-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 24px; text-align: center; margin-bottom: 12px; transition: all .15s; cursor: pointer;
+}
+.photo-drop-zone.drag-over { border-color: var(--accent); background: var(--accent-bg); }
+.photo-drop-zone-text { font-size: 0.78rem; color: var(--muted); }
+.photo-drop-zone-btn {
+  font-size: 0.75rem; font-weight: 700; padding: 8px 20px;
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  cursor: pointer; margin-top: 8px;
+}
+.photo-meta-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.photo-category-select { font-size: 0.65rem; padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; outline: none; }
+.photo-memo-input { font-size: 0.68rem; padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; outline: none; flex: 1; font-family: inherit; }
+.photo-memo-input:focus, .photo-category-select:focus { border-color: var(--accent); }
+
+/* ── コメント ── */
+.comment-item { padding: 10px 0; border-bottom: 1px solid #f0ece8; }
+.comment-item:last-child { border-bottom: none; }
+.comment-hq { border-left: 3px solid #2563eb; padding-left: 10px; }
+.comment-owner { border-left: 3px solid var(--accent); padding-left: 10px; }
+.comment-author { font-size: 0.78rem; font-weight: 700; }
+.comment-date { font-size: 0.68rem; color: var(--muted); margin-left: 8px; }
+.comment-body { font-size: 0.82rem; margin-top: 4px; line-height: 1.55; white-space: pre-wrap; }
+.comment-input-wrap { display: flex; gap: 8px; margin-top: 12px; align-items: flex-end; }
+.comment-input {
+  flex: 1; font-size: 0.82rem; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 8px; outline: none;
+  font-family: inherit; resize: vertical; min-height: 40px;
+}
+.comment-input:focus { border-color: var(--accent); }
+.comment-submit {
+  font-size: 0.75rem; font-weight: 700; padding: 8px 16px;
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  cursor: pointer; white-space: nowrap; align-self: flex-end;
+}
+.comment-submit:hover { background: var(--accent-dark); }
+
+/* ── バッジ ── */
+.badge { font-size: 0.62rem; font-weight: 700; letter-spacing: .04em; padding: 2px 8px; border-radius: 10px; white-space: nowrap; display: inline-flex; align-items: center; }
+.badge-hq { background: #dbeafe; color: #1e40af; }
+.badge-owner { background: var(--accent-bg); color: var(--accent); }
+.badge-shared { background: #f3e8ff; color: #7c3aed; }
+.badge-direct { background: var(--color-direct-bg); color: var(--color-direct-text); }
+.badge-fc { background: var(--color-fc-bg); color: var(--color-fc-text); }
+.badge-good { background: var(--status-good-bg); color: var(--status-good); }
+.badge-warn { background: var(--status-warn-bg); color: var(--status-warn); }
+.badge-delay { background: var(--status-delay-bg); color: var(--status-delay); }
+
+/* ── 期限ラベル ── */
+.due-label { display: inline-flex; align-items: center; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 8px; white-space: nowrap; }
+.due-label.due-overdue  { background: var(--status-delay-bg); color: var(--status-delay); }
+.due-label.due-today    { background: var(--status-delay-bg); color: var(--status-delay); }
+.due-label.due-tomorrow { background: var(--status-warn-bg);  color: var(--status-warn); }
+.due-label.due-near     { background: var(--status-warn-bg);  color: var(--status-warn); }
+.due-label.due-week     { background: #fef9c3; color: #854d0e; }
+.due-label.due-normal   { background: none; color: var(--muted); font-weight: 400; padding: 0; }
+
+/* ── ボトムナビ ── */
+.owner-bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; justify-content: center; gap: 0;
+  padding: 6px 0; z-index: 200;
+  max-width: 640px; margin: 0 auto;
+}
+.owner-nav-btn {
+  flex: 1; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 0; font-size: 0.58rem; color: var(--muted); font-weight: 600;
+  position: relative;
+}
+.owner-nav-btn.active { color: var(--accent); }
+.owner-nav-icon { font-size: 1.1rem; }
+.owner-nav-badge {
+  position: absolute; top: 0; right: 50%; transform: translateX(14px);
+  font-size: 0.5rem; background: var(--status-delay); color: #fff;
+  min-width: 14px; height: 14px; line-height: 14px; text-align: center;
+  border-radius: 7px; padding: 0 3px; font-weight: 700;
+}
+.owner-link-btn {
+  display: block; width: 100%; text-align: center; padding: 8px;
+  font-size: 0.72rem; color: var(--accent); font-weight: 600;
+  cursor: pointer; background: none; border: none; margin-top: 4px;
+}
+.owner-link-btn:hover { text-decoration: underline; }
+
+/* ── アラート ── */
+.owner-alert-card { background: var(--status-delay-bg); border: 1px solid #fca5a5; border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+.owner-alert-title { font-size: 0.78rem; font-weight: 700; color: var(--status-delay); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+
+/* ── save retry ── */
+.save-retry-btn { font-size: 0.68rem; background: none; border: 1px solid #dc2626; color: #dc2626; border-radius: 4px; padding: 1px 6px; cursor: pointer; margin-left: 4px; }
+
+/* ── 〇〇様向けバナー ── */
+.owner-persona-banner {
+  background: linear-gradient(135deg, var(--accent-bg) 0%, #fff 100%);
+  border: 1.5px solid var(--accent-border);
+  border-radius: var(--radius);
+  padding: 14px 18px 12px;
+  margin: 16px 0 0;
+  text-align: center;
+}
+.owner-persona-greeting {
+  display: block;
+  font-size: 1.05rem; font-weight: 800; color: var(--accent);
+  margin-bottom: 4px; line-height: 1.3;
+}
+.owner-persona-sub { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+/* ── 404 / error ── */
+.owner-error { text-align: center; padding: 60px 20px; }
+.owner-error-icon { font-size: 3rem; margin-bottom: 16px; }
+.owner-error-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+.owner-error-sub { font-size: 0.82rem; color: var(--muted); }
+
+/* ── 人員編集 ── */
+.owner-pers-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #f5f3f0; }
+.owner-pers-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; min-width: 80px; flex-shrink: 0; }
+.owner-pers-input {
+  flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 0.82rem; font-family: inherit; outline: none;
+}
+.owner-pers-input:focus { border-color: var(--accent); }
+.owner-pers-select {
+  padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 0.78rem; font-family: inherit; outline: none; background: #fff;
+}
+.owner-pers-select:focus { border-color: var(--accent); }
+.owner-emp-row { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px solid #f8f7f5; }
+.owner-emp-row:last-child { border-bottom: none; }
+.owner-emp-idx { font-size: 0.68rem; color: var(--muted); min-width: 18px; text-align: right; }
+.owner-emp-input { flex: 1; padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 0.78rem; font-family: inherit; outline: none; }
+.owner-emp-input:focus { border-color: var(--accent); }
+.owner-emp-del { padding: 3px 7px; border: 1px solid #fecaca; border-radius: 5px; font-size: 0.68rem; cursor: pointer; background: #fff; color: #ef4444; }
+
+/* ── 店舗情報タブ ── */
+.owner-info-group { margin-bottom: 14px; }
+.owner-info-group-title { font-size: 0.68rem; font-weight: 800; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+.owner-info-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f5f3f0; }
+.owner-info-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; min-width: 90px; flex-shrink: 0; }
+.owner-info-input {
+  flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 0.82rem; font-family: inherit; outline: none;
+}
+.owner-info-input:focus { border-color: var(--accent); }
+.owner-secret-lock {
+  display: flex; align-items: center; gap: 8px; padding: 14px;
+  background: #f9fafb; border: 1px solid var(--border); border-radius: var(--radius);
+  margin-top: 14px;
+}
+.owner-secret-lock-icon { font-size: 1.2rem; }
+.owner-secret-lock-text { font-size: 0.82rem; color: var(--muted); font-weight: 600; flex: 1; }
+.owner-secret-unlock-btn {
+  font-size: 0.75rem; font-weight: 700; padding: 6px 14px;
+  border-radius: 8px; border: 1.5px solid var(--accent-border); cursor: pointer;
+  background: var(--accent-bg); color: var(--accent); transition: all .15s;
+}
+.owner-secret-unlock-btn:hover { background: #ede9fe; border-color: var(--accent); }
+.owner-secret-content { margin-top: 12px; }
+</style>
+</head>
+<body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-vision-check-site.html">視力チェック (サイト用)</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="weekly-reports.html">週報管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+<div id="app-root"></div>
+
+<script src="data/store-templates-v2.js"></script>
+<script src="data/store-model.js"></script>
+<script>
+'use strict';
+
+// ============================================================
+// APP STATE
+// ============================================================
+var APP = {
+  storeId: null,
+  ownerTab: 'dashboard',
+  rows: {},
+  _ownerSecretUnlocked: false,
+};
+
+var TODAY = new Date('2026-04-06');
+
+// ============================================================
+// ROW HELPERS
+// ============================================================
+function getRowTasks(sid)    { return JSON.parse(APP.rows[sid]?.tasks_json    || '[]'); }
+function getRowComments(sid) { return JSON.parse(APP.rows[sid]?.comments_json || '[]'); }
+function getRowGallery(sid)  { return JSON.parse(APP.rows[sid]?.gallery_json  || '[]'); }
+function getRowFiles(sid)    { return JSON.parse(APP.rows[sid]?.shared_files_json || '[]'); }
+function getRowAudit(sid)    { return JSON.parse(APP.rows[sid]?.audit_json    || '[]'); }
+
+// ============================================================
+// DATA MUTATION
+// ============================================================
+function patchRow(storeId, field, value) {
+  var row = APP.rows[storeId];
+  if (!row) return;
+  row[field] = value;
+  recomputeAggregates(row);
+  scheduleRowSave(storeId);
+}
+
+function patchTask(storeId, taskId, changes) {
+  var tasks = getRowTasks(storeId);
+  var idx = tasks.findIndex(function(t) { return t.id === taskId; });
+  if (idx < 0) return;
+  Object.assign(tasks[idx], changes, { updated_at: new Date().toISOString().slice(0,10), version: (tasks[idx].version||0)+1 });
+  addAuditEntry(storeId, { action: 'task_update', field: Object.keys(changes).join(','), new_value: JSON.stringify(changes), actor: APP.rows[storeId]?.owner_name || 'オーナー', actor_type: 'owner' });
+  patchRow(storeId, 'tasks_json', JSON.stringify(tasks));
+}
+
+function patchFile(storeId, fileId, changes) {
+  var files = getRowFiles(storeId);
+  var idx = files.findIndex(function(f) { return f.id === fileId; });
+  if (idx < 0) return;
+  Object.assign(files[idx], changes, { updated_at: new Date().toISOString().slice(0,10), version: (files[idx].version||0)+1 });
+  addAuditEntry(storeId, { action: 'doc_submit', field: fileId, new_value: JSON.stringify(changes), actor: APP.rows[storeId]?.owner_name||'オーナー', actor_type: 'owner' });
+  patchRow(storeId, 'shared_files_json', JSON.stringify(files));
+}
+
+function patchGallery(storeId, photoId, changes) {
+  var gallery = getRowGallery(storeId);
+  var idx = gallery.findIndex(function(g) { return g.id === photoId; });
+  if (idx < 0) return;
+  Object.assign(gallery[idx], changes, { updated_at: new Date().toISOString().slice(0,10) });
+  patchRow(storeId, 'gallery_json', JSON.stringify(gallery));
+}
+
+function addGalleryPhoto(storeId, photoObj) {
+  var gallery = getRowGallery(storeId);
+  gallery.push(photoObj);
+  addAuditEntry(storeId, { action: 'photo_upload', field: 'gallery_json', new_value: photoObj.title, actor: APP.rows[storeId]?.owner_name || 'オーナー', actor_type: 'owner' });
+  patchRow(storeId, 'gallery_json', JSON.stringify(gallery));
+}
+
+function addComment(storeId, body) {
+  var comments = getRowComments(storeId);
+  var entry = {
+    id: 'cmt-'+Date.now(),
+    author: APP.rows[storeId]?.owner_name || 'オーナー',
+    author_type: 'owner',
+    body: body,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    is_pinned: false
+  };
+  comments.unshift(entry);
+  addAuditEntry(storeId, { action: 'comment', field: 'comments_json', new_value: body.slice(0,50), actor: entry.author, actor_type: 'owner' });
+  patchRow(storeId, 'comments_json', JSON.stringify(comments));
+}
+
+function addAuditEntry(storeId, entry) {
+  var audit = getRowAudit(storeId);
+  audit.unshift({ id: 'aud-'+Date.now(), timestamp: new Date().toISOString(), action: entry.action||'', field: entry.field||'', old_value: entry.old_value||'', new_value: entry.new_value||'', actor: entry.actor||'', actor_type: entry.actor_type||'' });
+  if (audit.length > 100) audit.length = 100;
+  APP.rows[storeId].audit_json = JSON.stringify(audit);
+  APP.rows[storeId].last_owner_activity_at = new Date().toISOString();
+}
+
+// ============================================================
+// AUTOSAVE
+// ============================================================
+var AUTOSAVE = { dirty: new Set(), lastSaved: null };
+var _rowSaveTimers = {};
+
+function scheduleRowSave(storeId, immediate) {
+  AUTOSAVE.dirty.add(storeId);
+  updateSaveIndicator('saving');
+  if (immediate) {
+    clearTimeout(_rowSaveTimers[storeId]);
+    flushRowSave(storeId);
+    return;
+  }
+  clearTimeout(_rowSaveTimers[storeId]);
+  _rowSaveTimers[storeId] = setTimeout(function() { flushRowSave(storeId); }, 600);
+}
+
+function flushRowSave(storeId) {
+  try {
+    STORE_ADAPTER.save(APP.rows[storeId]);
+    AUTOSAVE.dirty.delete(storeId);
+    AUTOSAVE.lastSaved = new Date();
+    if (AUTOSAVE.dirty.size === 0) updateSaveIndicator('saved');
+  } catch(e) { updateSaveIndicator('error'); }
+}
+
+window.addEventListener('beforeunload', function() {
+  if (AUTOSAVE.dirty.size > 0) {
+    Object.keys(_rowSaveTimers).forEach(function(k) { clearTimeout(_rowSaveTimers[k]); });
+    if (APP.storeId && AUTOSAVE.dirty.has(APP.storeId)) {
+      try { STORE_ADAPTER.save(APP.rows[APP.storeId]); } catch(e) {}
+    }
+  }
+});
+
+function updateSaveIndicator(state) {
+  var el = document.getElementById('save-indicator');
+  if (!el) return;
+  var now = AUTOSAVE.lastSaved;
+  var t = now ? String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') : '';
+  if (state === 'saving') { el.innerHTML = '<span class="save-dot saving"></span>保存中...'; el.className = 'save-indicator saving'; }
+  else if (state === 'saved') { el.innerHTML = '<span class="save-dot saved"></span>保存済み' + (t ? ' ('+t+')' : ''); el.className = 'save-indicator saved'; }
+  else if (state === 'error') { el.innerHTML = '<span class="save-dot error"></span>保存失敗 <button onclick="retryAutosave()" class="save-retry-btn">再試行</button>'; el.className = 'save-indicator error'; }
+}
+
+function retryAutosave() {
+  try {
+    if (APP.storeId) STORE_ADAPTER.save(APP.rows[APP.storeId]);
+    AUTOSAVE.dirty.clear();
+    AUTOSAVE.lastSaved = new Date();
+    updateSaveIndicator('saved');
+  } catch(e) { updateSaveIndicator('error'); }
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(d) {
+  if (!d) return '-';
+  return String(d).slice(0, 10).replace(/-/g, '/');
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return 9999;
+  return Math.ceil((new Date(dateStr) - TODAY) / (1000 * 60 * 60 * 24));
+}
+
+function formatDueLabel(dateStr) {
+  if (!dateStr) return '';
+  var days = daysUntil(dateStr);
+  if (days < 0)   return '<span class="due-label due-overdue">期限超過 ' + Math.abs(days) + '日</span>';
+  if (days === 0) return '<span class="due-label due-today">今日まで</span>';
+  if (days === 1) return '<span class="due-label due-tomorrow">明日まで</span>';
+  if (days <= 3)  return '<span class="due-label due-near">あと' + days + '日</span>';
+  if (days <= 7)  return '<span class="due-label due-week">今週中</span>';
+  return '<span class="due-label due-normal">' + formatDate(dateStr) + '</span>';
+}
+
+function getProgressClass(pct) {
+  if (pct >= 70) return 'good';
+  if (pct >= 40) return 'warn';
+  return 'delay';
+}
+
+function getStatusLabel(s) {
+  if (s === 'good') return '順調';
+  if (s === 'warn') return '注意';
+  if (s === 'delay') return '遅延';
+  return s || '';
+}
+
+// ============================================================
+// PERSONNEL HELPERS
+// ============================================================
+function getRowPersonnel(sid) {
+  try { return JSON.parse(APP.rows[sid]?.personnel_json || '{}'); } catch(e) { return {}; }
+}
+
+function getRowSecretInfo(sid) {
+  try { return JSON.parse(APP.rows[sid]?.secret_info_json || '{}'); } catch(e) { return {}; }
+}
+
+// ============================================================
+// RENDER: 人員管理タブ
+// ============================================================
+function renderOwnerPersonnelTab(storeId) {
+  var p = getRowPersonnel(storeId);
+  var emp = p.employees || {};
+  var empList = emp.list || [];
+
+  var html = '<div class="owner-section"><div class="owner-section-title">&#128101; 人員管理</div>';
+
+  // 必要人数 / 採用済み
+  html += '<div class="owner-pers-row">' +
+    '<span class="owner-pers-label">必要人数</span>' +
+    '<input type="number" class="owner-pers-input" id="owner-empNeeded" style="width:70px;flex:none;" min="0" value="' + (emp.needed || 0) + '" />' +
+    '<span style="font-size:0.78rem;color:var(--muted);">名</span>' +
+  '</div>';
+  html += '<div class="owner-pers-row">' +
+    '<span class="owner-pers-label">採用済み</span>' +
+    '<input type="number" class="owner-pers-input" id="owner-empHired" style="width:70px;flex:none;" min="0" value="' + (emp.hired || 0) + '" />' +
+    '<span style="font-size:0.78rem;color:var(--muted);">名</span>' +
+  '</div>';
+
+  // 従業員リスト
+  html += '<div style="margin-top:12px;"><div style="font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:8px;">従業員リスト</div>';
+  html += '<div id="owner-emp-list">';
+  if (empList.length === 0) {
+    html += '<div style="font-size:0.78rem;color:var(--muted);padding:6px 0;">まだ登録されていません</div>';
+  } else {
+    var routeOpts = ['直営経由', '店舗経由'];
+    var statOpts = ['選考中', '採用済み', '研修中', '着任済み'];
+    empList.forEach(function(em, idx) {
+      html += '<div class="owner-emp-row">';
+      html += '<span class="owner-emp-idx">' + (idx + 1) + '</span>';
+      html += '<input class="owner-emp-input" data-emp-idx="' + idx + '" data-emp-field="name" value="' + escHtml(em.name || '') + '" placeholder="氏名">';
+      html += '<select class="owner-pers-select" data-emp-idx="' + idx + '" data-emp-field="route">';
+      routeOpts.forEach(function(o) { html += '<option' + (em.route === o ? ' selected' : '') + '>' + o + '</option>'; });
+      html += '</select>';
+      html += '<select class="owner-pers-select" data-emp-idx="' + idx + '" data-emp-field="status">';
+      statOpts.forEach(function(o) { html += '<option' + (em.status === o ? ' selected' : '') + '>' + o + '</option>'; });
+      html += '</select>';
+      html += '<button class="owner-emp-del" data-emp-idx="' + idx + '">✕</button>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+  html += '<button id="owner-add-emp-btn" style="margin-top:8px;padding:6px 14px;border:1px dashed var(--border);border-radius:6px;background:#fff;color:var(--muted);font-size:0.75rem;cursor:pointer;">＋ 従業員を追加</button>';
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+// ============================================================
+// RENDER: 店舗情報タブ
+// ============================================================
+function renderOwnerStoreInfoTab(storeId) {
+  var row = APP.rows[storeId];
+  var secret = getRowSecretInfo(storeId);
+
+  var html = '<div class="owner-section"><div class="owner-section-title">&#127970; 店舗情報</div>';
+
+  // 店舗基本情報
+  html += '<div class="owner-info-group"><div class="owner-info-group-title">店舗基本情報</div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">店舗名</span><input class="owner-info-input" data-field="store_name" value="' + escHtml(row.store_name || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">店舗番号</span><input class="owner-info-input" data-field="store_no" value="' + escHtml(row.store_no || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">エリア</span><input class="owner-info-input" data-field="area" value="' + escHtml(row.area || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">住所</span><input class="owner-info-input" data-field="address" value="' + escHtml(row.address || '') + '"></div>';
+  html += '</div>';
+
+  // オーナー情報
+  html += '<div class="owner-info-group"><div class="owner-info-group-title">オーナー情報</div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">オーナー名</span><input class="owner-info-input" data-field="owner_name" value="' + escHtml(row.owner_name || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">会社名</span><input class="owner-info-input" data-field="owner_company" value="' + escHtml(row.owner_company || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">メール</span><input class="owner-info-input" data-field="owner_email" type="email" value="' + escHtml(row.owner_email || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">電話</span><input class="owner-info-input" data-field="owner_phone" value="' + escHtml(row.owner_phone || '') + '"></div>';
+  html += '</div>';
+
+  // スケジュール
+  html += '<div class="owner-info-group"><div class="owner-info-group-title">スケジュール</div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">オープン日</span><input class="owner-info-input" data-field="open_date" type="date" value="' + escHtml(row.open_date || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">プレオープン日</span><input class="owner-info-input" data-field="pre_open_date" type="date" value="' + escHtml(row.pre_open_date || '') + '"></div>';
+  html += '<div class="owner-info-row"><span class="owner-info-label">現フェーズ</span><input class="owner-info-input" data-field="current_phase" value="' + escHtml(row.current_phase || '') + '"></div>';
+  html += '</div>';
+
+  // 機密情報
+  html += '<div class="owner-secret-lock" id="owner-secret-section">';
+  if (!APP._ownerSecretUnlocked) {
+    html += '<span class="owner-secret-lock-icon">&#128274;</span>' +
+      '<span class="owner-secret-lock-text">機密情報（ロック中）</span>' +
+      '<button class="owner-secret-unlock-btn" id="owner-secret-toggle">&#128273; 解錠する</button>';
+  } else {
+    html += '<span class="owner-secret-lock-icon">&#128275;</span>' +
+      '<span class="owner-secret-lock-text">機密情報</span>' +
+      '<button class="owner-secret-unlock-btn" id="owner-secret-toggle" style="border-color:#fca5a5;color:#dc2626;background:#fef2f2;">&#128274; ロックする</button>';
+  }
+  html += '</div>';
+
+  if (APP._ownerSecretUnlocked) {
+    html += '<div class="owner-secret-content">';
+    var secretInputStyle = 'border-color:#fbbf24;';
+    html += '<div class="owner-info-row"><span class="owner-info-label">初期費用</span><input class="owner-info-input" data-secret="initial_cost" value="' + escHtml(secret.initial_cost || '') + '" style="' + secretInputStyle + '"></div>';
+    html += '<div class="owner-info-row"><span class="owner-info-label">ロイヤリティ率</span><input class="owner-info-input" data-secret="royalty_rate" value="' + escHtml(secret.royalty_rate || '') + '" style="' + secretInputStyle + '"></div>';
+    html += '<div class="owner-info-row"><span class="owner-info-label">契約番号</span><input class="owner-info-input" data-secret="contract_no" value="' + escHtml(secret.contract_no || '') + '" style="' + secretInputStyle + '"></div>';
+    html += '<div class="owner-info-row"><span class="owner-info-label">保証金</span><input class="owner-info-input" data-secret="deposit" value="' + escHtml(secret.deposit || '') + '" style="' + secretInputStyle + '"></div>';
+    html += '<div class="owner-info-row"><span class="owner-info-label">銀行口座</span><input class="owner-info-input" data-secret="bank_account" value="' + escHtml(secret.bank_account || '') + '" style="' + secretInputStyle + '"></div>';
+    html += '<div class="owner-info-row"><span class="owner-info-label">機密メモ</span><textarea class="owner-info-input" data-secret="secret_note" style="resize:vertical;min-height:60px;' + secretInputStyle + '">' + escHtml(secret.secret_note || '') + '</textarea></div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ============================================================
+// TASK CLASSIFICATION
+// ============================================================
+function getPriorityTask(storeId) {
+  var tasks = getRowTasks(storeId);
+  var todayStr = TODAY.toISOString().slice(0, 10);
+  var sevenDays = new Date(TODAY.getTime() + 7 * 864e5).toISOString().slice(0, 10);
+  var pending = tasks.filter(function(t) { return t.status !== '完了'; });
+  if (!pending.length) return null;
+
+  function score(t) {
+    var s = 0;
+    var due = t.due_date || '9999';
+    if (due < todayStr) s += 1000;
+    else if (due <= sevenDays) s += 500;
+    if (t.role_bucket === 'owner') s += 100;
+    if (t.role_bucket === 'shared') s += 80;
+    var daysLeft = daysUntil(t.due_date);
+    if (daysLeft < 30) s += Math.max(0, 30 - daysLeft) * 5;
+    return s;
+  }
+
+  return pending.slice().sort(function(a, b) {
+    var diff = score(b) - score(a);
+    return diff !== 0 ? diff : (a.due_date || '9').localeCompare(b.due_date || '9');
+  })[0] || null;
+}
+
+function classifyOwnerTasks(storeId) {
+  var tasks = getRowTasks(storeId);
+  var sevenDays = new Date(TODAY.getTime() + 7 * 864e5).toISOString().slice(0, 10);
+  var twentyOneDays = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
+  var pending = tasks.filter(function(t) {
+    return t.status !== '完了' && (t.role_bucket === 'owner' || t.role_bucket === 'shared');
+  });
+  var byDue = function(a, b) { return (a.due_date || '9999').localeCompare(b.due_date || '9999'); };
+  return {
+    now:    pending.filter(function(t) { return !t.due_date || t.due_date <= sevenDays; }).sort(byDue),
+    next:   pending.filter(function(t) { return t.due_date && t.due_date > sevenDays && t.due_date <= twentyOneDays; }).sort(byDue),
+    future: pending.filter(function(t) { return t.due_date && t.due_date > twentyOneDays; }).sort(byDue),
+  };
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+function renderHeader(storeName) {
+  var hqHref = 'aicare-lab-app.html';
+  return '<header class="app-header">' +
+    '<div class="app-header-inner">' +
+      '<div class="app-logo-block">' +
+        '<span class="app-logo">AICARE LAB</span>' +
+        '<span class="app-logo-sep">|</span>' +
+        '<span class="app-title">出店管理</span>' +
+      '</div>' +
+      '<div class="app-breadcrumb">' +
+        '<span class="app-breadcrumb-sep">›</span>' +
+        '<span class="app-breadcrumb-current">' + escHtml(storeName || 'オーナー') + '</span>' +
+      '</div>' +
+      '<div class="app-header-right">' +
+        '<div id="save-indicator" class="save-indicator"></div>' +
+        '<a href="' + hqHref + '" class="hq-link-btn">本部へ ›</a>' +
+        '<span class="owner-badge">オーナー</span>' +
+      '</div>' +
+    '</div>' +
+  '</header>';
+}
+
+// ============================================================
+// RENDER: いまの状況
+// ============================================================
+function renderSituation(storeId) {
+  var row = APP.rows[storeId];
+  var pctClass = getProgressClass(row.progress_percent);
+  var daysLeft = daysUntil(row.open_date);
+  var storeTypeClass = row.store_type === 'direct' ? 'direct' : 'fc';
+  var storeTypeLabel = row.store_type === 'direct' ? '直営' : 'FC';
+
+  return '<div class="owner-situation-card">' +
+    '<div class="owner-situation-header">' +
+      '<div class="owner-situation-left">' +
+        '<div class="owner-store-no">' + escHtml(row.store_no || '') + '&ensp;·&ensp;' + escHtml(row.area || '') + '</div>' +
+        '<div class="owner-store-name">' + escHtml(row.store_name) + '</div>' +
+      '</div>' +
+      '<div class="owner-situation-right">' +
+        '<div class="owner-phase-badge">' + escHtml(row.current_phase) + '</div>' +
+        '<div class="owner-status-badge-row">' +
+          '<span class="badge badge-' + storeTypeClass + '">' + storeTypeLabel + '</span>' +
+          '<span class="badge badge-' + row.status + '">' + getStatusLabel(row.status) + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="owner-progress-row">' +
+      '<div class="owner-progress-nums">' +
+        '<span class="owner-progress-big ' + pctClass + '">' + row.completed_tasks + '</span>' +
+        '<span class="owner-progress-total">&nbsp;/ ' + row.total_tasks + '件完了&nbsp;(' + row.progress_percent + '%)</span>' +
+      '</div>' +
+      '<div class="owner-progress-bar-bg">' +
+        '<div class="owner-progress-bar-fill ' + pctClass + '" style="width:' + row.progress_percent + '%;"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="owner-open-date">' +
+      'オープン予定: ' + formatDate(row.open_date) +
+      (daysLeft >= 0 ? '<span class="owner-open-countdown">あと ' + daysLeft + ' 日</span>' : '<span class="owner-open-countdown" style="background:#fee2e2;color:#dc2626;">期限超過</span>') +
+    '</div>' +
+  '</div>';
+}
+
+// ============================================================
+// RENDER: ダッシュボード (3段階)
+// ============================================================
+function renderOwnerDashboard(storeId) {
+  var comments = getRowComments(storeId);
+  var classified = classifyOwnerTasks(storeId);
+  var nowTasks = classified.now;
+  var nextTasks = classified.next;
+  var futureTasks = classified.future;
+  var totalPending = nowTasks.length + nextTasks.length + futureTasks.length;
+  var hqComments = comments.filter(function(c) { return c.author_type === 'hq'; });
+  var latestHQComment = hqComments[0] || null;
+
+  var html = '';
+
+  // A: 本部からのメッセージ
+  if (latestHQComment) {
+    html += '<div class="owner-hq-message">' +
+      '<div class="owner-hq-message-icon">&#128172;</div>' +
+      '<div class="owner-hq-message-body">' +
+        '<div class="owner-hq-message-from">本部より&ensp;<span style="font-weight:400;color:var(--muted);">' + formatDate(latestHQComment.created_at) + '</span></div>' +
+        '<div class="owner-hq-message-text">' + escHtml(latestHQComment.body) + '</div>' +
+        '<button class="owner-hq-message-link" data-owner-tab="comments">すべての連絡を見る →</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // B: 今やること
+  html += '<div class="owner-now-section">';
+  html += '<div class="owner-section-header-strip">' +
+    '<span class="osh-label now">今やること</span>' +
+    '<span class="osh-count">' + nowTasks.length + '件</span>' +
+  '</div>';
+
+  if (totalPending === 0) {
+    html += '<div class="owner-all-done">' +
+      '<div class="owner-all-done-icon">&#127881;</div>' +
+      '<div class="owner-all-done-title">やることは全部終わっています！</div>' +
+      '<div class="owner-all-done-sub">お疲れさまです。次の連絡をお待ちください。</div>' +
+    '</div>';
+  } else if (nowTasks.length === 0) {
+    html += '<div style="padding:14px 16px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;font-size:0.85rem;color:#15803d;font-weight:700;">&#10003; 急ぎのタスクはありません</div>';
+  } else {
+    var hero = nowTasks[0];
+    html += '<div class="owner-now-card">' +
+      '<div class="owner-now-card-label">&#9889; 最優先でやること</div>' +
+      '<div class="owner-now-card-cat">' + escHtml(hero.major_category || '確認待ち') + '</div>' +
+      '<div class="owner-now-card-task">' + escHtml(hero.task_name) + '</div>' +
+      '<div class="owner-now-card-meta">' + formatDueLabel(hero.due_date) + '</div>' +
+      '<button class="owner-action-btn' + (hero.status === '完了' ? ' done-state' : '') + '" data-store="' + storeId + '" data-task="' + hero.id + '" data-action="cycle-status">' +
+        (hero.status === '完了' ? '&#10003; 完了済み' : '&#10003; 完了にする') +
+      '</button>' +
+    '</div>';
+
+    if (nowTasks.length > 1) {
+      html += '<div class="owner-now-remaining">';
+      for (var i = 1; i < nowTasks.length; i++) {
+        var t = nowTasks[i];
+        html += '<div class="owner-now-remain-item">' +
+          '<div class="onr-dot"></div>' +
+          '<div class="onr-body">' +
+            '<div class="onr-name">' + escHtml(t.task_name) + '</div>' +
+            '<div class="onr-due">' + formatDueLabel(t.due_date) + '</div>' +
+          '</div>' +
+          '<button class="owner-task-btn ' + (t.status === '完了' ? 's-done' : t.status === '対応中' ? 's-active' : 's-pending') + '" data-store="' + storeId + '" data-task="' + t.id + '" data-action="cycle-status" style="font-size:0.72rem;padding:5px 10px;white-space:nowrap;">' + t.status + '</button>' +
+        '</div>';
+      }
+      html += '</div>';
+    }
+  }
+  html += '</div>'; // owner-now-section
+
+  // C: 次にやること
+  if (nextTasks.length > 0) {
+    html += '<div class="owner-next-section">' +
+      '<div class="owner-section-header-strip">' +
+        '<span class="osh-label next">次にやること</span>' +
+        '<span class="osh-count">' + nextTasks.length + '件 (1〜3週間以内)</span>' +
+      '</div>';
+    html += nextTasks.map(function(t) {
+      return '<div class="owner-task-compact">' +
+        '<div class="owner-task-compact-icon">&#128197;</div>' +
+        '<div class="owner-task-compact-body">' +
+          '<div class="owner-task-compact-cat">' + escHtml(t.major_category || '') + '</div>' +
+          '<div class="owner-task-compact-name">' + escHtml(t.task_name) + '</div>' +
+          '<div class="owner-task-compact-due">' + formatDueLabel(t.due_date) + '</div>' +
+        '</div>' +
+        '<button class="owner-task-btn ' + (t.status === '完了' ? 's-done' : t.status === '対応中' ? 's-active' : 's-pending') + '" data-store="' + storeId + '" data-task="' + t.id + '" data-action="cycle-status" style="font-size:0.72rem;padding:5px 10px;white-space:nowrap;">' + t.status + '</button>' +
+      '</div>';
+    }).join('');
+    html += '</div>';
+  }
+
+  // D: 今後やること
+  if (futureTasks.length > 0) {
+    html += '<div class="owner-future-section">' +
+      '<div class="owner-section-header-strip">' +
+        '<span class="osh-label future">今後やること</span>' +
+        '<span class="osh-count">' + futureTasks.length + '件</span>' +
+      '</div>' +
+      '<div class="owner-future-list">';
+    html += futureTasks.map(function(t) {
+      return '<div class="owner-future-item">' +
+        '<span class="ofi-cat">' + escHtml(t.major_category || '—') + '</span>' +
+        '<span class="ofi-name">' + escHtml(t.task_name) + '</span>' +
+        '<span class="ofi-due">' + formatDueLabel(t.due_date) + '</span>' +
+      '</div>';
+    }).join('');
+    html += '</div></div>';
+  }
+
+  return html;
+}
+
+// ============================================================
+// RENDER: やることタブ (owner tasks)
+// ============================================================
+function renderOwnerTasksTab(storeId) {
+  var tasks = getRowTasks(storeId).filter(function(t) { return t.role_bucket === 'owner'; });
+  tasks.sort(function(a, b) {
+    if (a.status === '完了' && b.status !== '完了') return 1;
+    if (a.status !== '完了' && b.status === '完了') return -1;
+    return (a.due_date||'').localeCompare(b.due_date||'');
+  });
+  return '<div class="owner-section">' +
+    '<div class="owner-section-title">&#127919; あなたがやること</div>' +
+    (tasks.length === 0 ? '<div style="font-size:0.82rem;color:var(--muted);">オーナータスクはありません</div>' :
+      tasks.map(function(t) { return renderOwnerTaskItem(storeId, t); }).join('')) +
+  '</div>';
+}
+
+// ============================================================
+// RENDER: 本部依頼タブ (shared tasks)
+// ============================================================
+function renderOwnerSharedTab(storeId) {
+  var tasks = getRowTasks(storeId).filter(function(t) { return t.role_bucket === 'shared'; });
+  tasks.sort(function(a, b) {
+    if (a.status === '完了' && b.status !== '完了') return 1;
+    if (a.status !== '完了' && b.status === '完了') return -1;
+    return (a.due_date||'').localeCompare(b.due_date||'');
+  });
+  return '<div class="owner-section">' +
+    '<div class="owner-section-title">&#128230; 本部からの依頼</div>' +
+    (tasks.length === 0 ? '<div style="font-size:0.82rem;color:var(--muted);">依頼はありません</div>' :
+      tasks.map(function(t) { return renderOwnerTaskItem(storeId, t); }).join('')) +
+  '</div>';
+}
+
+function renderOwnerTaskItem(storeId, t) {
+  var btnClass = t.status === '完了' ? 's-done' : t.status === '対応中' ? 's-active' : 's-pending';
+  return '<div class="owner-task">' +
+    '<div class="owner-task-body">' +
+      '<span class="owner-task-category">' + escHtml(t.major_category || '') + '</span>' +
+      '<div class="owner-task-name ' + (t.status === '完了' ? 'done' : '') + '">' + escHtml(t.task_name) + '</div>' +
+      '<div style="margin-top:3px;">' + formatDueLabel(t.due_date) + '</div>' +
+    '</div>' +
+    '<button class="owner-task-btn ' + btnClass + '" data-store="' + storeId + '" data-task="' + t.id + '" data-action="cycle-status">' + t.status + '</button>' +
+  '</div>';
+}
+
+// ============================================================
+// RENDER: 提出物タブ
+// ============================================================
+function renderOwnerDocumentsTab(storeId) {
+  var submissions = getRowFiles(storeId);
+  var categories = {};
+  submissions.forEach(function(sub) {
+    if (!categories[sub.category]) categories[sub.category] = [];
+    categories[sub.category].push(sub);
+  });
+  var html = '';
+  for (var cat in categories) {
+    if (!categories.hasOwnProperty(cat)) continue;
+    html += '<div class="owner-section"><div class="owner-section-title"><span class="submission-category-badge">' + escHtml(cat) + '</span></div>';
+    html += categories[cat].map(function(sub) {
+      return '<div class="submission-item">' +
+        '<div class="submission-title">' + escHtml(sub.title) + ' ' +
+          (sub.is_required ? '<span class="submission-required">必須</span>' : '<span class="submission-optional">任意</span>') +
+        '</div>' +
+        '<div class="submission-desc">' + escHtml(sub.description) + '</div>' +
+        '<input type="text" class="submission-note-input" data-store="' + storeId + '" data-sub="' + sub.id + '" placeholder="メモ..." value="' + escHtml(sub.note) + '" />' +
+        '<div class="submission-check-row">' +
+          '<label class="submission-check-label">' +
+            '<input type="checkbox" data-store="' + storeId + '" data-sub="' + sub.id + '" data-field="submitted" ' + (sub.submitted ? 'checked' : '') + ' /> 提出済みにする' +
+          '</label>' +
+          (sub.confirmed ? '<span class="submission-confirmed-badge">&#10003; 本部確認済み</span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    html += '</div>';
+  }
+  if (!html) html = '<div class="owner-section"><div style="font-size:0.82rem;color:var(--muted);">提出物はありません</div></div>';
+  return html;
+}
+
+// ============================================================
+// RENDER: 写真タブ
+// ============================================================
+function renderOwnerPhotosTab(storeId) {
+  var photos = getRowGallery(storeId);
+  var PHOTO_CATEGORIES = ['外観', '内観', '看板', '施工中', '備品', 'その他'];
+  var html = '<div class="owner-section"><div class="owner-section-title">&#128247; 写真アップロード</div>' +
+    '<div class="photo-drop-zone" id="photo-drop-zone">' +
+      '<div class="photo-drop-zone-text">ここに画像をドラッグ&amp;ドロップ</div>' +
+      '<button class="photo-drop-zone-btn" id="photo-select-btn">ファイルを選択</button>' +
+      '<input type="file" id="photo-file-input" multiple accept="image/jpeg,image/png,image/webp" style="display:none;" />' +
+    '</div>' +
+    '<div class="photo-grid" id="photo-grid">';
+  html += photos.map(function(p) {
+    var src = p.thumb_data || p.image_data || '';
+    return '<div class="photo-item">' +
+      (src ? '<img src="' + src + '" alt="' + escHtml(p.title||'') + '" />' :
+        '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:2rem;color:#ccc;">&#128444;</div>') +
+      '<div class="photo-item-actions">' +
+        '<button class="photo-item-btn ' + (p.is_cover?'is-cover':'') + '" data-store="' + storeId + '" data-photo="' + p.id + '" data-action="set-cover">' + (p.is_cover?'&#9733;':'&#9734;') + '</button>' +
+        '<button class="photo-item-btn" data-store="' + storeId + '" data-photo="' + p.id + '" data-action="delete-photo">&#10005;</button>' +
+      '</div>' +
+      '<div class="photo-item-overlay"><div class="photo-meta-row">' +
+        '<select class="photo-category-select" data-store="' + storeId + '" data-photo="' + p.id + '" data-field="category">' +
+          PHOTO_CATEGORIES.map(function(c) { return '<option ' + (p.category===c?'selected':'') + '>' + c + '</option>'; }).join('') +
+        '</select>' +
+      '</div></div>' +
+    '</div>';
+  }).join('');
+  html += '</div>';
+  if (photos.length > 0) {
+    html += '<div style="margin-top:12px;">';
+    html += photos.map(function(p, i) {
+      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:0.72rem;">' +
+        '<span style="font-weight:600;min-width:60px;color:var(--muted);">#' + (i+1) + ' ' + escHtml(p.category||'') + '</span>' +
+        '<input type="text" class="photo-memo-input" data-store="' + storeId + '" data-photo="' + p.id + '" data-field="memo" placeholder="メモ..." value="' + escHtml(p.note||p.title||'') + '" />' +
+      '</div>';
+    }).join('');
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============================================================
+// RENDER: 連絡タブ (comments)
+// ============================================================
+function renderOwnerCommentsTab(storeId) {
+  var comments = getRowComments(storeId);
+  var draft = '';
+  try { draft = localStorage.getItem('owner_comment_draft_' + storeId) || ''; } catch(e) {}
+
+  var html = '<div class="owner-section"><div class="owner-section-title">&#128172; 連絡 / コメント</div>';
+  html += comments.map(function(c) {
+    var isHQ = c.author_type === 'hq';
+    return '<div class="comment-item ' + (isHQ ? 'comment-hq' : 'comment-owner') + '">' +
+      '<span class="comment-author">' + escHtml(c.author) + '</span>' +
+      '<span class="badge ' + (isHQ?'badge-hq':'badge-owner') + '" style="margin-left:6px;">' + (isHQ?'本部':'オーナー') + '</span>' +
+      '<span class="comment-date">' + formatDate(c.created_at) + '</span>' +
+      '<div class="comment-body">' + escHtml(c.body) + '</div>' +
+    '</div>';
+  }).join('');
+  html += '<div class="comment-input-wrap">' +
+    '<textarea class="comment-input" id="owner-comment-input" placeholder="本部へのメッセージを入力..." rows="3">' + escHtml(draft) + '</textarea>' +
+    '<button class="comment-submit" id="owner-comment-submit-btn">送信</button>' +
+  '</div></div>';
+  return html;
+}
+
+// ============================================================
+// RENDER: メインコンテンツ (タブルーター)
+// ============================================================
+function renderOwnerContent(storeId) {
+  var row = APP.rows[storeId];
+  if (!row) return '<div class="owner-error"><div class="owner-error-icon">&#128683;</div><div class="owner-error-title">店舗が見つかりません</div><div class="owner-error-sub">URLを確認してください</div></div>';
+
+  var tasks = getRowTasks(storeId);
+  var ownerPending = tasks.filter(function(t) { return t.role_bucket === 'owner' && t.status !== '完了'; }).length;
+  var sharedPending = tasks.filter(function(t) { return t.role_bucket === 'shared' && t.status !== '完了'; }).length;
+
+  var tabContent = '';
+  if (APP.ownerTab === 'dashboard') tabContent = renderOwnerDashboard(storeId);
+  else if (APP.ownerTab === 'tasks')     tabContent = renderOwnerTasksTab(storeId);
+  else if (APP.ownerTab === 'shared')    tabContent = renderOwnerSharedTab(storeId);
+  else if (APP.ownerTab === 'personnel') tabContent = renderOwnerPersonnelTab(storeId);
+  else if (APP.ownerTab === 'storeinfo') tabContent = renderOwnerStoreInfoTab(storeId);
+  else if (APP.ownerTab === 'documents') tabContent = renderOwnerDocumentsTab(storeId);
+  else if (APP.ownerTab === 'photos')    tabContent = renderOwnerPhotosTab(storeId);
+  else if (APP.ownerTab === 'comments')  tabContent = renderOwnerCommentsTab(storeId);
+
+  var ownerName = row.owner_name || 'オーナー';
+  var personaBanner = '<div class="owner-persona-banner">' +
+    '<span class="owner-persona-greeting">' + escHtml(ownerName) + '様の出店管理ページ</span>' +
+    '<span class="owner-persona-sub">' + escHtml(row.store_name) + '&ensp;|&ensp;' + escHtml(row.current_phase) + '<br>オープンまでのお手続きをサポートします</span>' +
+  '</div>';
+
+  return '<div class="owner-app">' +
+    personaBanner +
+    renderSituation(storeId) +
+    '<div id="owner-section-content">' + tabContent + '</div>' +
+    '<nav class="owner-bottom-nav">' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='dashboard'?'active':'') + '" data-owner-tab="dashboard"><span class="owner-nav-icon">&#127968;</span>ホーム</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='tasks'?'active':'') + '" data-owner-tab="tasks"><span class="owner-nav-icon">&#9776;</span>やること' + (ownerPending>0?'<span class="owner-nav-badge">'+ownerPending+'</span>':'') + '</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='shared'?'active':'') + '" data-owner-tab="shared"><span class="owner-nav-icon">&#128230;</span>本部依頼' + (sharedPending>0?'<span class="owner-nav-badge">'+sharedPending+'</span>':'') + '</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='personnel'?'active':'') + '" data-owner-tab="personnel"><span class="owner-nav-icon">&#128101;</span>人員</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='storeinfo'?'active':'') + '" data-owner-tab="storeinfo"><span class="owner-nav-icon">&#127970;</span>店舗情報</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='documents'?'active':'') + '" data-owner-tab="documents"><span class="owner-nav-icon">&#128196;</span>提出物</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='photos'?'active':'') + '" data-owner-tab="photos"><span class="owner-nav-icon">&#128247;</span>写真</button>' +
+      '<button class="owner-nav-btn ' + (APP.ownerTab==='comments'?'active':'') + '" data-owner-tab="comments"><span class="owner-nav-icon">&#128172;</span>連絡</button>' +
+    '</nav>' +
+  '</div>';
+}
+
+// ============================================================
+// RENDER ROOT
+// ============================================================
+function render() {
+  var root = document.getElementById('app-root');
+  var storeId = APP.storeId;
+  var row = storeId ? APP.rows[storeId] : null;
+
+  if (!row) {
+    root.innerHTML =
+      '<div class="app-header"><div class="app-header-inner"><div class="app-logo-block"><span class="app-logo">AICARE LAB</span><span class="app-logo-sep">|</span><span class="app-title">出店管理</span></div></div></div>' +
+      '<div style="text-align:center;padding:60px 20px;">' +
+        '<div style="font-size:3rem;margin-bottom:16px;">&#128683;</div>' +
+        '<div style="font-size:1.1rem;font-weight:800;margin-bottom:8px;">店舗が指定されていません</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;">URLに ?store=STORE_ID を付けてアクセスしてください</div>' +
+        '<a href="aicare-lab-app.html" style="font-size:0.88rem;font-weight:700;color:var(--accent);text-decoration:none;border:1.5px solid var(--accent-border);padding:8px 20px;border-radius:8px;background:var(--accent-bg);">本部画面へ</a>' +
+      '</div>';
+    return;
+  }
+
+  root.innerHTML = renderHeader(row.store_name) + renderOwnerContent(storeId);
+  bindEvents(storeId);
+}
+
+// ============================================================
+// EVENT BINDING
+// ============================================================
+function bindEvents(storeId) {
+  // ボトムナビ
+  document.querySelectorAll('.owner-nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      APP.ownerTab = btn.dataset.ownerTab;
+      render();
+    });
+  });
+
+  // リンクボタン (コメントへ等)
+  document.querySelectorAll('.owner-hq-message-link[data-owner-tab]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      APP.ownerTab = btn.dataset.ownerTab;
+      render();
+    });
+  });
+
+  // タスク状態サイクル
+  document.querySelectorAll('[data-action="cycle-status"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var sid = btn.dataset.store;
+      var taskId = btn.dataset.task;
+      var tasks = getRowTasks(sid);
+      var task = tasks.find(function(t) { return t.id === taskId; });
+      if (!task) return;
+      var cycle = { '未着手': '対応中', '対応中': '完了', '完了': '未着手', '保留': '対応中' };
+      var newStatus = cycle[task.status] || '対応中';
+      var changes = { status: newStatus };
+      if (newStatus === '完了') changes.completed_at = TODAY.toISOString().slice(0, 10);
+      else changes.completed_at = '';
+      patchTask(sid, taskId, changes);
+      render();
+    });
+  });
+
+  // 提出物チェックボックス
+  document.querySelectorAll('input[data-field="submitted"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      patchFile(cb.dataset.store, cb.dataset.sub, { submitted: cb.checked, submitted_at: cb.checked ? TODAY.toISOString().slice(0,10) : '' });
+    });
+  });
+
+  // 提出物メモ入力
+  document.querySelectorAll('.submission-note-input').forEach(function(inp) {
+    var timer;
+    inp.addEventListener('input', function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() { patchFile(inp.dataset.store, inp.dataset.sub, { note: inp.value }); }, 600);
+    });
+  });
+
+  // コメント送信
+  var commentBtn = document.getElementById('owner-comment-submit-btn');
+  if (commentBtn) {
+    commentBtn.addEventListener('click', function() {
+      var input = document.getElementById('owner-comment-input');
+      if (input && input.value.trim()) {
+        addComment(storeId, input.value.trim());
+        try { localStorage.removeItem('owner_comment_draft_' + storeId); } catch(e) {}
+        render();
+      }
+    });
+  }
+
+  // コメント下書き保存
+  var commentInput = document.getElementById('owner-comment-input');
+  if (commentInput) {
+    commentInput.addEventListener('input', function() {
+      try { localStorage.setItem('owner_comment_draft_' + storeId, commentInput.value); } catch(e) {}
+    });
+  }
+
+  // 写真アップロード
+  var dropZone = document.getElementById('photo-drop-zone');
+  var fileInput = document.getElementById('photo-file-input');
+  var selectBtn = document.getElementById('photo-select-btn');
+  if (dropZone) {
+    dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.classList.remove('drag-over'); handlePhotoUpload(e.dataTransfer.files, storeId); });
+  }
+  if (selectBtn && fileInput) {
+    selectBtn.addEventListener('click', function() { fileInput.click(); });
+    fileInput.addEventListener('change', function() { handlePhotoUpload(fileInput.files, storeId); fileInput.value = ''; });
+  }
+
+  // 写真カテゴリ変更
+  document.querySelectorAll('.photo-category-select').forEach(function(sel) {
+    sel.addEventListener('change', function() { patchGallery(sel.dataset.store, sel.dataset.photo, { category: sel.value }); });
+  });
+
+  // 写真メモ入力
+  document.querySelectorAll('.photo-memo-input').forEach(function(inp) {
+    var timer;
+    inp.addEventListener('input', function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() { patchGallery(inp.dataset.store, inp.dataset.photo, { note: inp.value }); }, 600);
+    });
+  });
+
+  // 写真アクション (代表・削除)
+  document.querySelectorAll('[data-action="set-cover"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var gallery = getRowGallery(btn.dataset.store);
+      gallery.forEach(function(p) { p.is_cover = p.id === btn.dataset.photo; });
+      patchRow(btn.dataset.store, 'gallery_json', JSON.stringify(gallery));
+      render();
+    });
+  });
+  document.querySelectorAll('[data-action="delete-photo"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var gallery = getRowGallery(btn.dataset.store).filter(function(p) { return p.id !== btn.dataset.photo; });
+      patchRow(btn.dataset.store, 'gallery_json', JSON.stringify(gallery));
+      render();
+    });
+  });
+
+  // ── 人員管理: 必要人数/採用済み ──
+  var empNeededEl = document.getElementById('owner-empNeeded');
+  var empHiredEl = document.getElementById('owner-empHired');
+  if (empNeededEl) {
+    empNeededEl.addEventListener('input', function() {
+      var p = getRowPersonnel(storeId);
+      if (!p.employees) p.employees = {};
+      p.employees.needed = parseInt(empNeededEl.value) || 0;
+      patchRow(storeId, 'personnel_json', JSON.stringify(p));
+    });
+  }
+  if (empHiredEl) {
+    empHiredEl.addEventListener('input', function() {
+      var p = getRowPersonnel(storeId);
+      if (!p.employees) p.employees = {};
+      p.employees.hired = parseInt(empHiredEl.value) || 0;
+      patchRow(storeId, 'personnel_json', JSON.stringify(p));
+    });
+  }
+
+  // 従業員リスト入力
+  document.querySelectorAll('[data-emp-field]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      var idx = parseInt(el.dataset.empIdx);
+      var field = el.dataset.empField;
+      var p = getRowPersonnel(storeId);
+      if (!p.employees) p.employees = {};
+      if (!p.employees.list) p.employees.list = [];
+      if (p.employees.list[idx]) {
+        p.employees.list[idx][field] = el.value;
+        patchRow(storeId, 'personnel_json', JSON.stringify(p));
+      }
+    });
+  });
+
+  // 従業員追加
+  var addEmpBtn = document.getElementById('owner-add-emp-btn');
+  if (addEmpBtn) {
+    addEmpBtn.addEventListener('click', function() {
+      var p = getRowPersonnel(storeId);
+      if (!p.employees) p.employees = {};
+      if (!p.employees.list) p.employees.list = [];
+      p.employees.list.push({ name: '', route: '直営経由', status: '選考中' });
+      patchRow(storeId, 'personnel_json', JSON.stringify(p));
+      render();
+    });
+  }
+
+  // 従業員削除
+  document.querySelectorAll('.owner-emp-del').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.dataset.empIdx);
+      var p = getRowPersonnel(storeId);
+      if (!p.employees || !p.employees.list) return;
+      p.employees.list.splice(idx, 1);
+      patchRow(storeId, 'personnel_json', JSON.stringify(p));
+      render();
+    });
+  });
+
+  // ── 店舗情報: フィールド auto-save ──
+  document.querySelectorAll('.owner-info-input[data-field]').forEach(function(inp) {
+    var timer;
+    inp.addEventListener('input', function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        patchRow(storeId, inp.dataset.field, inp.value);
+      }, 600);
+    });
+    inp.addEventListener('change', function() {
+      clearTimeout(timer);
+      patchRow(storeId, inp.dataset.field, inp.value);
+    });
+  });
+
+  // ── 機密情報: フィールド auto-save ──
+  document.querySelectorAll('.owner-info-input[data-secret]').forEach(function(inp) {
+    var timer;
+    inp.addEventListener('input', function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        var secret = getRowSecretInfo(storeId);
+        secret[inp.dataset.secret] = inp.value;
+        patchRow(storeId, 'secret_info_json', JSON.stringify(secret));
+      }, 600);
+    });
+    inp.addEventListener('change', function() {
+      clearTimeout(timer);
+      var secret = getRowSecretInfo(storeId);
+      secret[inp.dataset.secret] = inp.value;
+      patchRow(storeId, 'secret_info_json', JSON.stringify(secret));
+    });
+  });
+
+  // ── 機密情報: ロック切替 ──
+  var secretToggle = document.getElementById('owner-secret-toggle');
+  if (secretToggle) {
+    secretToggle.addEventListener('click', function() {
+      if (APP._ownerSecretUnlocked) {
+        // 施錠（閉じるたびにリセット）
+        APP._ownerSecretUnlocked = false;
+        render();
+        return;
+      }
+      // 解錠: パスワードダイアログ
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML = '<div style="background:#fff;border-radius:14px;padding:28px 30px;min-width:300px;box-shadow:0 8px 40px rgba(0,0,0,.18);">' +
+        '<div style="font-size:1.1rem;font-weight:800;margin-bottom:6px;">🔒 機密情報の解錠</div>' +
+        '<div style="font-size:0.78rem;color:#666;margin-bottom:16px;">パスワードを入力してください</div>' +
+        '<input id="owner-secret-pw-input" type="password" placeholder="パスワード" autocomplete="off" style="width:100%;font-size:0.9rem;padding:8px 12px;border:1.5px solid #d1d5db;border-radius:8px;outline:none;font-family:inherit;box-sizing:border-box;" />' +
+        '<div id="owner-secret-pw-err" style="font-size:0.72rem;color:#dc2626;margin-top:6px;min-height:18px;"></div>' +
+        '<div style="display:flex;gap:10px;margin-top:14px;">' +
+          '<button id="owner-secret-pw-cancel" style="flex:1;padding:9px;border:1px solid #d1d5db;border-radius:7px;background:#f9fafb;color:#374151;font-size:0.82rem;font-weight:700;cursor:pointer;">キャンセル</button>' +
+          '<button id="owner-secret-pw-ok" style="flex:1;padding:9px;border:none;border-radius:7px;background:#0d9488;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;">解錠する</button>' +
+        '</div>' +
+      '</div>';
+      document.body.appendChild(overlay);
+      var inp = overlay.querySelector('#owner-secret-pw-input');
+      var errEl = overlay.querySelector('#owner-secret-pw-err');
+      inp.focus();
+      function doUnlock() {
+        if (inp.value === 'aicare2026k') {
+          APP._ownerSecretUnlocked = true;
+          document.body.removeChild(overlay);
+          render();
+        } else {
+          errEl.textContent = 'パスワードが正しくありません';
+          inp.value = '';
+          inp.focus();
+        }
+      }
+      overlay.querySelector('#owner-secret-pw-ok').onclick = doUnlock;
+      overlay.querySelector('#owner-secret-pw-cancel').onclick = function() { document.body.removeChild(overlay); };
+      inp.onkeydown = function(e) { if (e.key === 'Enter') doUnlock(); if (e.key === 'Escape') document.body.removeChild(overlay); };
+      overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
+    });
+  }
+}
+
+// ============================================================
+// PHOTO UPLOAD
+// ============================================================
+function handlePhotoUpload(files, storeId) {
+  if (!files || !files.length) return;
+  var processed = 0;
+  var total = files.length;
+  Array.from(files).forEach(function(file) {
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) { processed++; return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      resizeImage(e.target.result, 1200, 900, 0.85, function(fullData) {
+        resizeImage(e.target.result, 400, 300, 0.8, function(thumbData) {
+          addGalleryPhoto(storeId, {
+            id: 'gal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+            title: file.name.replace(/\.[^.]+$/, ''),
+            category: '外観', note: '',
+            thumb_data: thumbData, image_data: fullData,
+            is_cover: getRowGallery(storeId).length === 0,
+            shot_date: TODAY.toISOString().slice(0, 10),
+            uploaded_by: APP.rows[storeId]?.owner_name || 'オーナー',
+            uploaded_at: TODAY.toISOString().slice(0, 10),
+            updated_at: TODAY.toISOString().slice(0, 10),
+          });
+          processed++;
+          if (processed === total) render();
+        });
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function resizeImage(dataUrl, maxW, maxH, quality, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var w = img.width, h = img.height;
+    if (w > maxW || h > maxH) { var r = Math.min(maxW/w, maxH/h); w = Math.round(w*r); h = Math.round(h*r); }
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  var params = new URLSearchParams(location.search);
+  APP.storeId = params.get('store') || null;
+
+  var loaded = STORE_ADAPTER.loadAll();
+  STORE_ADAPTER._cache = loaded;
+  APP.rows = {};
+  loaded.forEach(function(row) { APP.rows[row.store_id] = row; });
+
+  render();
+}
+
+init();
+</script>
+</body>
+</html>

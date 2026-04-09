@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DB確認 | 出店管理 | アイケアラボ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ===== COMMON NAV ===== */
+#aicare-common-nav{
+  position:sticky;top:0;z-index:99999;
+  background:#040c18;border-bottom:1px solid rgba(245,158,11,.18);
+  display:flex;align-items:center;gap:6px;
+  padding:0 20px;height:42px;min-height:42px;max-height:42px;
+  overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;white-space:nowrap;
+  scrollbar-width:none;-ms-overflow-style:none;
+  font-family:'DM Mono','SF Mono',monospace;font-size:11px;letter-spacing:.05em;
+}
+#aicare-common-nav::-webkit-scrollbar{display:none;}
+#aicare-common-nav>*{flex-shrink:0;}
+#aicare-common-nav .cn-label{color:rgba(255,255,255,.25);font-size:10px;letter-spacing:.1em;padding-right:4px;}
+#aicare-common-nav .cn-sep{color:rgba(255,255,255,.15);padding:0 2px;user-select:none;}
+#aicare-common-nav a{color:rgba(148,163,184,.85);text-decoration:none;padding:3px 10px;border-radius:4px;border:1px solid rgba(148,163,184,.12);transition:color .15s,background .15s;white-space:nowrap;}
+#aicare-common-nav a:hover{color:#e2eaf4;background:rgba(255,255,255,.06);}
+#aicare-common-nav a.cn-active{color:#f59e0b!important;border-color:rgba(245,158,11,.35)!important;background:rgba(245,158,11,.08)!important;}
+#aicare-common-nav .cn-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+#aicare-common-nav .cn-btn-back{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3)!important;color:#a5b4fc!important;padding:3px 10px;border-radius:4px;}
+#aicare-common-nav .cn-user{color:rgba(255,255,255,.45);font-size:10px;padding:0 4px;}
+
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface2:#273344;--border:#334155;--border2:#475569;
+  --text:#e2e8f0;--muted:#94a3b8;--muted2:#64748b;
+  --teal:#2dd4bf;--teal-dim:#0d9488;
+  --pink:#f472b6;--blue:#60a5fa;--green:#4ade80;--amber:#fbbf24;--red:#f87171;
+  --indigo:#818cf8;
+  --radius:8px;--radius-sm:5px;
+  --font-mono:'DM Mono','SF Mono',monospace;
+}
+
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;font-size:13px;line-height:1.6;min-height:100vh;}
+
+/* ===== DB HEADER ===== */
+.db-header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;height:52px;display:flex;align-items:center;gap:12px;
+  position:sticky;top:42px;z-index:200;
+}
+.db-header-badge{background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4);color:var(--indigo);padding:3px 10px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.08em;font-family:var(--font-mono);}
+.db-header-title{font-size:.95rem;font-weight:800;color:var(--text);}
+.db-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--radius-sm);font-size:.75rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--teal-dim);color:#fff;}
+.btn-primary:hover{background:#0f766e;}
+.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);}
+.btn-danger:hover{background:rgba(239,68,68,.25);}
+.btn-secondary{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal);}
+.btn-sm{padding:4px 10px;font-size:.7rem;}
+
+/* ===== TABS ===== */
+.db-tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto;position:sticky;top:94px;z-index:100;}
+.db-tab{padding:10px 18px;font-size:.75rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-family:var(--font-mono);}
+.db-tab:hover{color:var(--text);}
+.db-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+
+/* ===== MAIN ===== */
+.main-wrap{max-width:1400px;margin:0 auto;padding:20px 24px 80px;}
+
+/* ===== STATS BAR ===== */
+.stats-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:900px){.stats-bar{grid-template-columns:repeat(3,1fr);}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;}
+.stat-num{font-size:1.6rem;font-weight:900;line-height:1;margin-bottom:3px;font-family:var(--font-mono);}
+.stat-label{font-size:.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;}
+
+/* ===== TABLE ===== */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+.table-toolbar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface2);}
+.table-title{font-size:.72rem;font-weight:700;color:var(--muted);font-family:var(--font-mono);letter-spacing:.08em;}
+.table-count{font-size:.65rem;color:var(--muted2);background:rgba(255,255,255,.05);padding:2px 8px;border-radius:10px;}
+.db-table{width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--font-mono);}
+.db-table th{padding:8px 12px;text-align:left;font-size:.6rem;font-weight:700;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;}
+.db-table td{padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.5);vertical-align:top;word-break:break-word;max-width:200px;}
+.db-table tr:last-child td{border-bottom:none;}
+.db-table tr:hover td{background:rgba(255,255,255,.03);}
+.db-table .null-val{color:var(--muted2);font-style:italic;}
+.db-table .bool-true{color:var(--green);}
+.db-table .bool-false{color:var(--red);}
+.badge-small{display:inline-block;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:4px;white-space:nowrap;}
+.badge-active{background:rgba(74,222,128,.15);color:var(--green);}
+.badge-completed{background:rgba(96,165,250,.15);color:var(--blue);}
+.badge-cancelled{background:rgba(248,113,113,.15);color:var(--red);}
+.badge-suspended{background:rgba(251,191,36,.15);color:var(--amber);}
+.badge-fc{background:rgba(244,114,182,.12);color:var(--pink);}
+.badge-direct{background:rgba(96,165,250,.12);color:var(--blue);}
+
+/* ===== JSON VIEWER ===== */
+.json-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;}
+.json-toolbar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;}
+.json-key-name{font-size:.7rem;font-weight:700;color:var(--indigo);font-family:var(--font-mono);}
+.json-bytes{font-size:.62rem;color:var(--muted2);}
+.json-pre{padding:16px;font-size:.68rem;font-family:var(--font-mono);color:var(--muted);overflow-x:auto;max-height:300px;overflow-y:auto;line-height:1.7;}
+.json-pre .k{color:var(--indigo);}
+.json-pre .str{color:var(--green);}
+.json-pre .num{color:var(--amber);}
+.json-pre .bool{color:var(--pink);}
+.json-pre .null{color:var(--muted2);}
+
+/* ===== KEY LIST ===== */
+.key-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:20px;}
+.key-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:border-color .15s;}
+.key-card:hover{border-color:var(--teal);}
+.key-card.selected{border-color:var(--teal);background:rgba(13,148,136,.06);}
+.key-name{font-size:.72rem;font-weight:700;color:var(--indigo);font-family:var(--font-mono);margin-bottom:3px;}
+.key-meta{font-size:.62rem;color:var(--muted2);}
+.key-size{font-size:.85rem;font-weight:900;color:var(--text);font-family:var(--font-mono);}
+
+/* ===== DANGER ZONE ===== */
+.danger-zone{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:16px 20px;margin-top:20px;}
+.danger-title{font-size:.75rem;font-weight:800;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.danger-action{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(239,68,68,.1);}
+.danger-action:last-child{border-bottom:none;}
+.danger-desc{font-size:.72rem;color:var(--muted);}
+
+/* ===== SEARCH ===== */
+.search-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:.72rem;color:var(--text);outline:none;font-family:var(--font-mono);width:220px;}
+.search-box:focus{border-color:var(--teal);}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:.78rem;font-weight:700;z-index:10000;display:none;box-shadow:0 4px 16px rgba(0,0,0,.4);}
+
+@media(max-width:700px){.main-wrap{padding:12px 12px 60px;}.db-header{padding:0 14px;}.db-tabs{padding:0 14px;}}
+</style>
+</head>
+<body>
+
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-stores.html">出店管理（本部）</a>
+  <a href="aicare-stores-owner.html">オーナー画面</a>
+  <a href="aicare-stores-db.html" class="cn-active">DB確認</a>
+  <div class="cn-right">
+    <a href="aicare-stores.html" class="cn-btn-back">← 本部ページ</a>
+    <span class="cn-user">管理者</span>
+  </div>
+</nav>
+
+<div class="db-header">
+  <span class="db-header-badge">DB ADMIN</span>
+  <span class="db-header-title">出店管理 データベース確認</span>
+  <div class="db-header-right">
+    <button class="btn btn-secondary btn-sm" onclick="refreshAll()">↻ 再読み込み</button>
+    <button class="btn btn-primary btn-sm" onclick="exportAll()">⬇ 全エクスポート</button>
+  </div>
+</div>
+
+<div class="db-tabs">
+  <div class="db-tab active" data-tab="overview" onclick="switchTab('overview')">📊 概要</div>
+  <div class="db-tab" data-tab="stores" onclick="switchTab('stores')">🏪 店舗マスター</div>
+  <div class="db-tab" data-tab="tasks" onclick="switchTab('tasks')">✅ タスク</div>
+  <div class="db-tab" data-tab="comments" onclick="switchTab('comments')">💬 コメント</div>
+  <div class="db-tab" data-tab="logs" onclick="switchTab('logs')">📋 ログ</div>
+  <div class="db-tab" data-tab="raw" onclick="switchTab('raw')">🔧 RAW JSON</div>
+  <div class="db-tab" data-tab="danger" onclick="switchTab('danger')">⚠️ 危険操作</div>
+</div>
+
+<div class="main-wrap" id="app-root"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+const DB_KEYS = {
+  STORES:      'aicare_stores_v1',
+  TASKS:       'aicare_store_tasks_v1',
+  PERSONNEL:   'aicare_store_personnel_v1',
+  STATUS_HIST: 'aicare_store_logs_v1',
+  TASK_HIST:   'aicare_store_task_hist_v1',
+  COMMENTS:    'aicare_store_comments_v1',
+  GALLERY:     'aicare_store_gallery_v1',
+  ANALYTICS:   'aicare_store_analytics_v1',
+  DRIVE_INFO:  'aicare_store_drive_v1',
+};
+
+const DRIVE_PARENT_FOLDER_URL = 'https://drive.google.com/drive/folders/1_Hh2-OkgI_X72wmNgta5wtwOm_Tg6NmF';
+
+let APP = { tab: 'overview', selectedKey: null, searchQuery: '' };
+
+function loadDB(key, fb) {
+  try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : fb; } catch(e) { return fb; }
+}
+function saveDB(key, data) {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+}
+function esc(s) {
+  if (s === null || s === undefined) return '<span class="null-val">null</span>';
+  if (s === true) return '<span class="bool-true">true</span>';
+  if (s === false) return '<span class="bool-false">false</span>';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  return (n/1024/1024).toFixed(2) + ' MB';
+}
+function totalLS() {
+  let total = 0;
+  Object.values(DB_KEYS).forEach(k => { const v = localStorage.getItem(k); if (v) total += v.length * 2; });
+  return total;
+}
+
+function switchTab(tab) {
+  APP.tab = tab;
+  document.querySelectorAll('.db-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+  render();
+}
+
+function refreshAll() { render(); showToast('再読み込み完了'); }
+
+function exportAll() {
+  const data = {};
+  Object.entries(DB_KEYS).forEach(([k, v]) => {
+    const raw = localStorage.getItem(v);
+    data[k] = raw ? JSON.parse(raw) : null;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aicare_stores_db_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('エクスポートしました');
+}
+
+function importJSON() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        let count = 0;
+        Object.entries(DB_KEYS).forEach(([k, v]) => {
+          if (data[k] !== undefined) { saveDB(v, data[k]); count++; }
+        });
+        render();
+        showToast(`${count} テーブルをインポートしました`);
+      } catch(e) { alert('JSONの解析に失敗しました: ' + e.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const root = document.getElementById('app-root');
+  switch (APP.tab) {
+    case 'overview':  root.innerHTML = renderOverview();  break;
+    case 'stores':    root.innerHTML = renderStores();    break;
+    case 'tasks':     root.innerHTML = renderTasks();     break;
+    case 'comments':  root.innerHTML = renderComments();  break;
+    case 'logs':      root.innerHTML = renderLogs();      break;
+    case 'raw':       root.innerHTML = renderRaw();       break;
+    case 'danger':    root.innerHTML = renderDanger();    break;
+    default:          root.innerHTML = '';
+  }
+}
+
+// ===== OVERVIEW =====
+function renderOverview() {
+  const stores = loadDB(DB_KEYS.STORES, []);
+  const tasks = loadDB(DB_KEYS.TASKS, {});
+  const comments = loadDB(DB_KEYS.COMMENTS, {});
+  const logs = loadDB(DB_KEYS.STATUS_HIST, {});
+
+  const active = stores.filter(s => s.status === 'active').length;
+  const archived = stores.filter(s => s.archive).length;
+  const taskCount = Object.values(tasks).reduce((a,b) => a + (b||[]).length, 0);
+  const doneCount = Object.values(tasks).reduce((a,b) => a + (b||[]).filter(t => t.status === '完了').length, 0);
+  const commentCount = Object.values(comments).reduce((a,b) => a + (b||[]).filter(c => !c.deleted).length, 0);
+  const logCount = Object.values(logs).reduce((a,b) => a + (Array.isArray(b) ? b.length : 0), 0);
+
+  const keyData = Object.entries(DB_KEYS).map(([k, v]) => {
+    const raw = localStorage.getItem(v);
+    const bytes = raw ? raw.length * 2 : 0;
+    const parsed = raw ? JSON.parse(raw) : null;
+    const count = Array.isArray(parsed) ? parsed.length : (parsed && typeof parsed === 'object' ? Object.keys(parsed).length : 0);
+    return { k, v, bytes, count, exists: !!raw };
+  });
+
+  return `
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--teal);">${stores.length}</div>
+        <div class="stat-label">総店舗数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--green);">${active}</div>
+        <div class="stat-label">現行店舗</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--muted)">${archived}</div>
+        <div class="stat-label">過去店舗</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--amber);">${taskCount}</div>
+        <div class="stat-label">総タスク数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--blue);">${commentCount}</div>
+        <div class="stat-label">コメント数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--muted);">${fmtBytes(totalLS())}</div>
+        <div class="stat-label">総ストレージ</div>
+      </div>
+    </div>
+
+    <!-- Drive 親フォルダ情報 -->
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <div class="table-toolbar">
+        <span class="json-key-name">🗂 出店管理 Drive 親フォルダ</span>
+      </div>
+      <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);">
+        <div style="flex:1;">
+          <div style="font-size:.68rem;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono);">DRIVE_PARENT_FOLDER_ID</div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--indigo);font-family:var(--font-mono);">1_Hh2-OkgI_X72wmNgta5wtwOm_Tg6NmF</div>
+        </div>
+        <a href="${DRIVE_PARENT_FOLDER_URL}" target="_blank" class="btn btn-primary btn-sm">📁 親フォルダを開く</a>
+      </div>
+      <div style="padding:10px 16px;font-size:.68rem;color:var(--muted);">各店舗フォルダ・DBスプレッドシートはこの親フォルダ直下に作成してください</div>
+    </div>
+
+    <!-- ストレージキー一覧 -->
+    <div style="margin-bottom:12px;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;">LocalStorage キー一覧</div>
+    <div class="key-grid">
+      ${keyData.map(d => `
+        <div class="key-card ${d.exists?'':''}">
+          <div class="key-name">${esc(d.v)}</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:4px;">
+            <div class="key-size" style="color:${d.exists?'var(--teal)':'var(--muted2)'};">${d.exists ? (d.count + '件') : '—'}</div>
+            <div class="key-meta">${d.exists ? fmtBytes(d.bytes) : '未初期化'}</div>
+          </div>
+          <div class="key-meta" style="margin-top:3px;">${d.k}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ===== STORES TABLE =====
+function renderStores() {
+  const stores = loadDB(DB_KEYS.STORES, []);
+  const q = APP.searchQuery.toLowerCase();
+  const filtered = q ? stores.filter(s =>
+    (s.store_name||'').toLowerCase().includes(q) ||
+    (s.store_no||'').toLowerCase().includes(q) ||
+    (s.area||'').toLowerCase().includes(q)
+  ) : stores;
+
+  const statusBadge = s => {
+    const m = {active:'badge-active 準備中',completed:'badge-completed 完了',cancelled:'badge-cancelled 中止',suspended:'badge-suspended 中断',deleted:'badge-cancelled 削除'};
+    const [cls, label] = (m[s.status]||'badge-small 不明').split(' ');
+    return `<span class="badge-small ${cls}">${label}</span>`;
+  };
+  const typeBadge = s => s.store_type === 'fc'
+    ? `<span class="badge-small badge-fc">FC</span>`
+    : `<span class="badge-small badge-direct">直営</span>`;
+
+  return `
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span class="table-title">STORES</span>
+        <span class="table-count">${filtered.length} / ${stores.length}</span>
+        <input class="search-box" placeholder="検索 (店舗名/番号/エリア)…" value="${esc(APP.searchQuery)}" oninput="APP.searchQuery=this.value;render();" style="margin-left:auto;">
+        <button class="btn btn-secondary btn-sm" onclick="APP.searchQuery='';render();">✕</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table">
+          <thead><tr>
+            <th>ID</th><th>店舗番号</th><th>店舗名</th><th>種別</th><th>ステータス</th>
+            <th>フェーズ</th><th>オープン予定</th><th>Drive</th><th>作成日</th><th>更新日</th>
+          </tr></thead>
+          <tbody>
+            ${filtered.length === 0 ? `<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--muted);">データなし</td></tr>` :
+              filtered.map(s => `<tr>
+                <td style="font-size:.6rem;color:var(--muted2);">${esc(s.id)}</td>
+                <td style="white-space:nowrap;">${esc(s.store_no||'—')}</td>
+                <td style="font-weight:700;white-space:nowrap;">${esc(s.store_name)}</td>
+                <td>${typeBadge(s)}</td>
+                <td>${statusBadge(s)}</td>
+                <td style="color:var(--teal);font-size:.68rem;">${esc(s.current_phase||'—')}</td>
+                <td style="white-space:nowrap;">${esc(s.open_date||'未定')}</td>
+                <td>${s.drive_created ? '<span class="bool-true">✓ 作成済み</span>' : '<span class="bool-false">✗ 未作成</span>'}</td>
+                <td style="white-space:nowrap;font-size:.6rem;color:var(--muted2);">${esc((s.created_at||'').slice(0,10))}</td>
+                <td style="white-space:nowrap;font-size:.6rem;color:var(--muted2);">${esc((s.updated_at||'').slice(0,10))}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== TASKS =====
+function renderTasks() {
+  const stores = loadDB(DB_KEYS.STORES, []);
+  const allTasks = loadDB(DB_KEYS.TASKS, {});
+  const q = APP.searchQuery.toLowerCase();
+
+  let rows = [];
+  stores.forEach(s => {
+    const tasks = allTasks[s.id] || [];
+    tasks.forEach(t => {
+      if (!q || (t.task_name||'').toLowerCase().includes(q) || (t.major_category||'').toLowerCase().includes(q)) {
+        rows.push({ ...t, _store_name: s.store_name, _store_no: s.store_no });
+      }
+    });
+  });
+  const total = Object.values(allTasks).reduce((a,b) => a + (b||[]).length, 0);
+  const done = Object.values(allTasks).reduce((a,b) => a + (b||[]).filter(t => t.status==='完了').length, 0);
+
+  const statusColor = s => ({完了:'var(--green)',未着手:'var(--muted)',進行中:'var(--blue)',遅延:'var(--red)',保留:'var(--amber)'})[s] || 'var(--muted)';
+
+  return `
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span class="table-title">TASKS</span>
+        <span class="table-count">${rows.length} / ${total} (完了: ${done})</span>
+        <input class="search-box" placeholder="タスク名/カテゴリ検索…" value="${esc(APP.searchQuery)}" oninput="APP.searchQuery=this.value;render();" style="margin-left:auto;">
+        <button class="btn btn-secondary btn-sm" onclick="APP.searchQuery='';render();">✕</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table">
+          <thead><tr>
+            <th>店舗</th><th>カテゴリ</th><th>タスク名</th><th>ステータス</th><th>担当区分</th><th>期限</th><th>完了日</th>
+          </tr></thead>
+          <tbody>
+            ${rows.length === 0 ? `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">データなし</td></tr>` :
+              rows.slice(0, 200).map(t => `<tr>
+                <td style="white-space:nowrap;"><div style="font-size:.65rem;color:var(--muted2);">${esc(t._store_no)}</div><div style="font-weight:700;">${esc(t._store_name)}</div></td>
+                <td style="font-size:.65rem;color:var(--teal);white-space:nowrap;">${esc(t.major_category||t.category||'—')}</td>
+                <td>${esc(t.task_name)}</td>
+                <td style="white-space:nowrap;color:${statusColor(t.status)};">${esc(t.status)}</td>
+                <td style="font-size:.65rem;">${esc(t.actor_type||'hq')}</td>
+                <td style="white-space:nowrap;font-size:.65rem;">${esc(t.due_date||'—')}</td>
+                <td style="white-space:nowrap;font-size:.6rem;color:var(--muted2);">${esc((t.completed_at||'').slice(0,10)||'—')}</td>
+              </tr>`).join('')}
+            ${rows.length > 200 ? `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted2);">... さらに ${rows.length-200} 件（検索で絞り込んでください）</td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== COMMENTS =====
+function renderComments() {
+  const stores = loadDB(DB_KEYS.STORES, []);
+  const allComments = loadDB(DB_KEYS.COMMENTS, {});
+  let rows = [];
+  stores.forEach(s => {
+    (allComments[s.id] || []).filter(c => !c.deleted).forEach(c => {
+      rows.push({ ...c, _store_name: s.store_name, _store_no: s.store_no });
+    });
+  });
+  rows.sort((a,b) => (b.created_at||'').localeCompare(a.created_at||''));
+
+  return `
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span class="table-title">COMMENTS</span>
+        <span class="table-count">${rows.length} 件</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table">
+          <thead><tr><th>店舗</th><th>投稿者</th><th>種別</th><th>内容</th><th>スコープ</th><th>投稿日時</th></tr></thead>
+          <tbody>
+            ${rows.length === 0 ? `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">コメントなし</td></tr>` :
+              rows.map(c => `<tr>
+                <td style="white-space:nowrap;">${esc(c._store_no)} ${esc(c._store_name)}</td>
+                <td style="white-space:nowrap;">${esc(c.author||'—')}</td>
+                <td><span style="font-size:.6rem;padding:1px 6px;border-radius:4px;background:${c.author_type==='owner'?'rgba(244,114,182,.15)':'rgba(96,165,250,.15)'};color:${c.author_type==='owner'?'var(--pink)':'var(--blue)'};">${c.author_type==='owner'?'オーナー':'本部'}</span></td>
+                <td style="max-width:300px;">${esc(c.text)}</td>
+                <td style="font-size:.6rem;color:var(--muted2);">${esc(c.scope||'all')}</td>
+                <td style="white-space:nowrap;font-size:.6rem;color:var(--muted2);">${esc((c.created_at||'').replace('T',' ').slice(0,16))}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== LOGS =====
+function renderLogs() {
+  const stores = loadDB(DB_KEYS.STORES, []);
+  const allLogs = loadDB(DB_KEYS.STATUS_HIST, {});
+  let rows = [];
+  stores.forEach(s => {
+    (allLogs[s.id] || []).forEach(l => rows.push({ ...l, _store_name: s.store_name, _store_no: s.store_no }));
+  });
+  rows.sort((a,b) => (b.at||'').localeCompare(a.at||''));
+
+  return `
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <span class="table-title">LOGS</span>
+        <span class="table-count">${rows.length} 件</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table">
+          <thead><tr><th>日時</th><th>店舗</th><th>種別</th><th>内容</th></tr></thead>
+          <tbody>
+            ${rows.length === 0 ? `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">ログなし</td></tr>` :
+              rows.slice(0,300).map(l => `<tr>
+                <td style="white-space:nowrap;font-size:.6rem;color:var(--muted2);">${esc((l.at||'').replace('T',' ').slice(0,16))}</td>
+                <td style="white-space:nowrap;font-size:.68rem;">${esc(l._store_name||'—')}</td>
+                <td><span style="font-size:.58rem;padding:1px 5px;border-radius:3px;background:rgba(45,212,191,.1);color:var(--teal);">${esc(l.type||'info')}</span></td>
+                <td>${esc(l.text)}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== RAW JSON =====
+function renderRaw() {
+  const selected = APP.selectedKey;
+  return `
+    <div style="margin-bottom:12px;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.08em;">RAW JSON ビューア — キーを選択</div>
+    <div class="key-grid">
+      ${Object.entries(DB_KEYS).map(([k, v]) => {
+        const raw = localStorage.getItem(v);
+        const bytes = raw ? raw.length * 2 : 0;
+        return `<div class="key-card ${selected===v?'selected':''}" onclick="APP.selectedKey='${v}';render();">
+          <div class="key-name">${esc(v)}</div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <div class="key-meta">${k}</div>
+            <div class="key-meta" style="color:${raw?'var(--teal)':'var(--muted2)'};">${raw?fmtBytes(bytes):'空'}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${selected ? (() => {
+      const raw = localStorage.getItem(selected) || 'null';
+      let formatted = '';
+      try {
+        formatted = JSON.stringify(JSON.parse(raw), null, 2)
+          .replace(/("[\w_-]+")\s*:/g, '<span class="k">$1</span>:')
+          .replace(/:\s*(".*?")/g, ': <span class="str">$1</span>')
+          .replace(/:\s*(\d+(\.\d+)?)/g, ': <span class="num">$1</span>')
+          .replace(/:\s*(true|false)/g, ': <span class="bool">$1</span>')
+          .replace(/:\s*null/g, ': <span class="null">null</span>');
+      } catch(e) { formatted = esc(raw); }
+      return `
+        <div class="json-section">
+          <div class="json-toolbar">
+            <span class="json-key-name">${esc(selected)}</span>
+            <span class="json-bytes">${fmtBytes(raw.length*2)}</span>
+            <button class="btn btn-secondary btn-sm" style="margin-left:auto;" onclick="navigator.clipboard.writeText(localStorage.getItem('${selected}')||'').then(()=>showToast('コピーしました'))">📋 コピー</button>
+          </div>
+          <pre class="json-pre">${formatted}</pre>
+        </div>`;
+    })() : ''}
+  `;
+}
+
+// ===== DANGER ZONE =====
+function renderDanger() {
+  return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;">
+      <div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:8px;">インポート / エクスポート</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="exportAll()">⬇ 全データをエクスポート (.json)</button>
+        <button class="btn btn-secondary btn-sm" onclick="importJSON()">⬆ JSONからインポート</button>
+      </div>
+    </div>
+
+    <div class="danger-zone">
+      <div class="danger-title">⚠️ 危険操作 — 取り消しできません</div>
+      ${Object.entries(DB_KEYS).map(([k, v]) => `
+        <div class="danger-action">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;color:var(--text);">${k} を削除</div>
+            <div class="danger-desc">localStorage から <code style="color:var(--indigo);">${v}</code> を削除します</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('${k}','${v}')">削除</button>
+        </div>`).join('')}
+      <div class="danger-action" style="margin-top:8px;">
+        <div>
+          <div style="font-size:.72rem;font-weight:800;color:var(--red);">全データを完全リセット</div>
+          <div class="danger-desc">上記全キーを削除し、アプリを初期状態（シードデータ）に戻します</div>
+        </div>
+        <button class="btn btn-danger btn-sm" style="background:rgba(239,68,68,.3);" onclick="confirmFullReset()">完全リセット</button>
+      </div>
+    </div>
+  `;
+}
+
+function confirmDelete(label, key) {
+  if (!confirm(`「${label}」のデータを削除してよいですか？\n(localStorage キー: ${key})\n\nこの操作は元に戻せません。`)) return;
+  localStorage.removeItem(key);
+  showToast(`${label} を削除しました`);
+  render();
+}
+
+function confirmFullReset() {
+  if (!confirm('全データを完全リセットしてよいですか？\n全ての店舗・タスク・コメント・ログが削除され、シードデータに戻ります。\n\n【この操作は元に戻せません】')) return;
+  if (!confirm('本当によいですか？（2回目の確認）')) return;
+  Object.values(DB_KEYS).forEach(v => localStorage.removeItem(v));
+  showToast('完全リセットしました。ページをリロードしてください。');
+  setTimeout(() => location.reload(), 1500);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>

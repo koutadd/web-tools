@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新規店舗作成 | アイケアラボ出店管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="data/store-templates-v2.js"></script>
+<script src="data/store-model.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #0d9488;
+  --teal-light: #14b8a6;
+  --border: #e5e0d8;
+  --muted: #6b7280;
+  --bg: #f8f7f5;
+  --text: #1a1a1a;
+  --nav-bg: #040c18;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── Common Nav ── */
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono','SF Mono',monospace; font-size: 11px; letter-spacing: 0.05em;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep  { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: all 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+
+/* ── App Header ── */
+#app-header {
+  position: sticky; top: 42px; z-index: 9999;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 52px;
+}
+.app-header-left { display: flex; align-items: center; gap: 16px; }
+.back-link { color: var(--muted); text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.back-link:hover { color: var(--teal); }
+.app-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.save-btn {
+  padding: 8px 20px; background: var(--teal); color: #fff;
+  border: none; border-radius: 7px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s;
+}
+.save-btn:hover { background: var(--teal-light); }
+.save-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+/* ── Tabs ── */
+#tab-bar {
+  background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; padding: 0 24px; gap: 0;
+}
+.tab-btn {
+  padding: 12px 20px; font-size: 13px; font-weight: 600;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; color: var(--muted); transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+/* ── Content ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 28px 24px; }
+
+/* ── Section Card ── */
+.section-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; margin-bottom: 16px;
+}
+.section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+
+/* ── Form ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.form-label .req { color: #ef4444; margin-left: 3px; }
+.form-input, .form-select {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px;
+  font-size: 14px; color: var(--text); background: #fff;
+  transition: border-color 0.15s; outline: none;
+  font-family: inherit;
+}
+.form-input:focus, .form-select:focus { border-color: var(--teal); }
+.form-input.error { border-color: #ef4444; }
+
+/* ── Store Type Toggle ── */
+.type-toggle { display: flex; gap: 8px; }
+.type-btn {
+  flex: 1; padding: 9px 0; border: 2px solid var(--border); border-radius: 8px;
+  background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.15s; color: var(--muted); text-align: center;
+}
+.type-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(13,148,136,0.05); }
+
+/* ── Task Tree ── */
+#task-area { margin-top: 8px; }
+.task-category-group { margin-bottom: 8px; }
+.task-category-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; background: #f8f7f5; border-radius: 6px; margin-bottom: 4px;
+  cursor: pointer; user-select: none; font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.task-category-header:hover { background: #f0ede8; }
+.cat-badge {
+  display: inline-block; padding: 1px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; background: #e2e8f0; color: #475569;
+}
+.cat-name-input {
+  padding: 1px 8px; border-radius: 10px; border: 1px solid transparent;
+  font-size: 11px; font-weight: 700; background: #e2e8f0; color: #475569;
+  font-family: inherit; cursor: text; min-width: 60px; max-width: 200px;
+}
+.cat-name-input:hover { border-color: var(--border); background: #fff; }
+.cat-name-input:focus { border-color: var(--teal); background: #fff; outline: none; }
+.task-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px; border-bottom: 1px solid #f5f3f0;
+  background: #fff;
+}
+.task-row.dnd-over { border-top: 2px solid #0d9488; }
+.task-row.dnd-dragging { opacity: 0.4; }
+.nst-drag-handle { color: #ccc; cursor: grab; font-size: 0.8rem; flex-shrink: 0; user-select: none; }
+.nst-drag-handle:hover { color: #0d9488; }
+.task-row:last-child { border-bottom: none; }
+.task-row.child-row { margin-left: 24px; border-left: 2px solid #e2e8f0; padding-left: 12px; }
+.task-row.grandchild-row { margin-left: 48px; border-left: 2px solid #e2e8f0; padding-left: 12px; }
+.task-expand-btn {
+  width: 18px; height: 18px; border: none; background: none; cursor: pointer;
+  color: var(--muted); font-size: 11px; flex-shrink: 0; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-name-input {
+  flex: 1; min-width: 0; padding: 4px 8px; border: 1px solid transparent;
+  border-radius: 5px; font-size: 13px; background: transparent; font-family: inherit;
+}
+.task-name-input:hover, .task-name-input:focus { border-color: var(--border); background: #fff; outline: none; }
+.task-dept-input, .task-date-input, .task-status-select {
+  padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px;
+  font-size: 12px; background: #fff; font-family: inherit;
+}
+.task-dept-input { width: 90px; }
+.task-date-input { width: 120px; }
+.task-status-select { width: 90px; }
+.task-action-btn {
+  padding: 3px 8px; border: 1px solid var(--border); border-radius: 5px;
+  font-size: 11px; cursor: pointer; background: #fff; color: var(--muted);
+  white-space: nowrap; transition: all 0.12s;
+}
+.task-action-btn:hover { border-color: var(--teal); color: var(--teal); }
+.task-delete-btn {
+  padding: 3px 7px; border: 1px solid #fecaca; border-radius: 5px;
+  font-size: 11px; cursor: pointer; background: #fff; color: #ef4444;
+  transition: all 0.12s;
+}
+.task-delete-btn:hover { background: #fef2f2; }
+.add-task-bar { padding: 12px 0 0; }
+.add-task-bar button {
+  padding: 8px 16px; border: 1px dashed var(--border); border-radius: 7px;
+  background: #fff; color: var(--muted); font-size: 13px; cursor: pointer;
+  transition: all 0.15s;
+}
+.add-task-bar button:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ── Options ── */
+.option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .option-grid { grid-template-columns: 1fr; } }
+.option-card {
+  background: #f8f7f5; border-radius: 8px; padding: 16px;
+  border: 2px solid transparent; transition: border-color 0.15s;
+  cursor: pointer;
+}
+.option-card.enabled { border-color: var(--teal); background: rgba(13,148,136,0.04); }
+.option-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.option-checkbox { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; }
+.option-title { font-size: 14px; font-weight: 700; }
+.option-tasks { list-style: none; padding: 0; margin: 0; }
+.option-tasks li {
+  font-size: 12px; color: var(--muted); padding: 2px 0;
+  padding-left: 12px; position: relative;
+}
+.option-tasks li::before { content: '・'; position: absolute; left: 0; }
+
+/* ── Template Edit ── */
+.tpl-type-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+.tpl-type-btn {
+  padding: 7px 20px; border: 2px solid var(--border); border-radius: 7px;
+  background: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--muted); transition: all 0.15s;
+}
+.tpl-type-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(13,148,136,0.05); }
+.tpl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tpl-table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 2px solid var(--border); }
+.tpl-table td { padding: 5px 4px; border-bottom: 1px solid #f5f3f0; vertical-align: middle; }
+.tpl-input {
+  width: 100%; padding: 4px 7px; border: 1px solid var(--border); border-radius: 5px;
+  font-size: 12px; font-family: inherit;
+}
+.tpl-input:focus { outline: none; border-color: var(--teal); }
+.tpl-actions { display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
+.tpl-save-btn {
+  padding: 8px 18px; background: var(--teal); color: #fff;
+  border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.tpl-save-btn:hover { background: var(--teal-light); }
+.tpl-reset-btn {
+  padding: 8px 18px; background: #fff; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 7px; font-size: 13px; cursor: pointer;
+}
+.tpl-reset-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+/* ── Template Category Group (drag) ── */
+.tpl-cat-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.tpl-cat-group.tpl-cat-dnd-over { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(13,148,136,0.2); }
+.tpl-cat-group.tpl-cat-dnd-dragging { opacity: 0.4; }
+.tpl-cat-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; cursor: pointer; user-select: none;
+  font-size: 13px; font-weight: 700;
+}
+.tpl-cat-header:hover { filter: brightness(0.97); }
+.tpl-cat-drag { color: #aaa; cursor: grab; font-size: 0.8rem; flex-shrink: 0; user-select: none; }
+.tpl-cat-drag:hover { color: var(--teal); }
+.tpl-cat-name { flex: 1; }
+.tpl-cat-count { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+/* ── Toast ── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+  background: #1a1a1a; color: #fff; padding: 12px 20px;
+  border-radius: 9px; font-size: 13px; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+#toast.show { opacity: 1; }
+
+/* ── Confirm Modal ── */
+#confirm-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100000;
+  background: rgba(4,12,24,0.55); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+#confirm-modal-overlay.show { display: flex; }
+#confirm-modal {
+  background: #fff; border-radius: 14px; padding: 0;
+  width: min(560px, 94vw); max-height: 88vh; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,.25);
+}
+.cm-header {
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+}
+.cm-title { font-size: 16px; font-weight: 800; color: var(--text); }
+.cm-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.cm-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.cm-section-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.cm-info-grid { display: grid; grid-template-columns: 110px 1fr; gap: 8px 12px; margin-bottom: 18px; }
+.cm-info-key { font-size: 12px; color: var(--muted); font-weight: 600; align-self: center; }
+.cm-info-val { font-size: 13px; font-weight: 600; color: var(--text); align-self: center; word-break: break-all; }
+.cm-task-summary { background: #f8f7f5; border-radius: 8px; padding: 12px 14px; font-size: 13px; }
+.cm-task-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #ede9e3; }
+.cm-task-row:last-child { border-bottom: none; }
+.cm-task-cat { color: var(--muted); font-size: 12px; }
+.cm-task-cnt { font-weight: 700; color: var(--text); font-size: 12px; }
+.cm-footer {
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; justify-content: flex-end; align-items: center;
+}
+.cm-btn-back {
+  padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px;
+  background: #fff; color: var(--muted); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; margin-right: auto;
+}
+.cm-btn-back:hover { border-color: var(--text); color: var(--text); }
+.cm-btn-cancel {
+  padding: 9px 18px; border: 1px solid #fecaca; border-radius: 8px;
+  background: #fff; color: #dc2626; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.cm-btn-cancel:hover { background: #fef2f2; }
+.cm-btn-register {
+  padding: 9px 22px; border: none; border-radius: 8px;
+  background: var(--teal); color: #fff; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: background 0.15s;
+}
+.cm-btn-register:hover { background: var(--teal-light); }
+
+/* ── Autosave indicator ── */
+#autosave-indicator {
+  font-size: 11px; color: var(--teal); opacity: 0;
+  transition: opacity 0.4s; white-space: nowrap;
+}
+
+/* ── Task Column Header ── */
+.task-col-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 8px;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: .05em; text-transform: uppercase;
+  background: #faf9f7; border-bottom: 1px solid #f0ede8;
+  border-radius: 0 0 0 0;
+}
+.tch-name { flex: 1; min-width: 0; padding-left: 8px; }
+.tch-dept { width: 90px; flex-shrink: 0; }
+.tch-date { width: 120px; flex-shrink: 0; }
+.tch-status { width: 90px; flex-shrink: 0; }
+
+/* ── Personnel Section ── */
+.pers-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid #f5f3f0;
+}
+.pers-label { font-size: 12px; color: var(--muted); font-weight: 600; min-width: 100px; }
+.pers-input {
+  flex: 1; padding: 5px 9px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; font-family: inherit; outline: none;
+}
+.pers-input:focus { border-color: var(--teal); }
+.pers-select {
+  padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 12px; font-family: inherit; outline: none; background: #fff;
+}
+.pers-select:focus { border-color: var(--teal); }
+.emp-list-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid #f8f7f5;
+}
+.emp-list-row:last-child { border-bottom: none; }
+.emp-idx { font-size: 11px; color: var(--muted); min-width: 18px; text-align: right; }
+.emp-name-f { flex: 1; padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; font-family: inherit; outline: none; }
+.emp-name-f:focus { border-color: var(--teal); }
+.emp-small-select { padding: 4px 6px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; font-family: inherit; outline: none; background: #fff; }
+.emp-del { padding: 3px 7px; border: 1px solid #fecaca; border-radius: 5px; font-size: 11px; cursor: pointer; background: #fff; color: #ef4444; }
+</style>
+</head>
+<body>
+
+<!-- Common Nav -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="weekly-reports.html">週報管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+</nav>
+
+<!-- App Header -->
+<header id="app-header">
+  <div class="app-header-left">
+    <a href="aicare-lab-app.html" class="back-link">← 出店管理</a>
+    <span style="color:var(--border)">|</span>
+    <span class="app-title">＋ 新規店舗作成</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span id="autosave-indicator">下書き保存しました</span>
+    <button class="save-btn" onclick="showConfirmModal()" id="save-btn">出店登録する</button>
+  </div>
+</header>
+
+<!-- Tab Bar -->
+<div id="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('main', this)">新規店舗作成</button>
+  <button class="tab-btn" onclick="switchTab('options', this)" style="display:none;">オプション</button>
+  <button class="tab-btn" onclick="switchTab('template', this)">タスクテンプレート編集</button>
+</div>
+
+<!-- ===================== TAB MAIN: 基本情報 + タスク設定 ===================== -->
+<div class="tab-content active" id="tab-main">
+  <div class="wrap">
+    <div class="section-card" id="tab-basic">
+      <div class="section-title">店舗情報</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">店舗名 <span class="req">*</span></label>
+          <div style="display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:#fff;" id="f-name-wrap">
+            <span style="padding:8px 14px;background:#f4f7f6;color:var(--teal);font-weight:700;font-size:14px;border-right:1px solid var(--border);white-space:nowrap;flex-shrink:0;">アイケアLaBo</span>
+            <input type="text" id="f-name" style="flex:1;padding:8px 12px;border:none;outline:none;font-size:14px;font-family:inherit;" placeholder="例: 渋谷店" oninput="NST.storeInfo.nameSuffix=this.value;NST.storeInfo.name='アイケアLaBo '+this.value;scheduleSave()">
+          </div>
+          <div id="f-name-preview" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">店舗種別</label>
+          <div class="type-toggle">
+            <button class="type-btn active" id="type-fc" onclick="setStoreType('fc')">FC</button>
+            <button class="type-btn" id="type-direct" onclick="setStoreType('direct')">直営</button>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">エリア</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="f-pref" class="form-select" style="width:140px;flex-shrink:0;" onchange="onPrefChange(this.value)">
+              <option value="">— 都道府県 —</option>
+            </select>
+            <select id="f-city" class="form-select" style="flex:1;" onchange="NST.storeInfo.city=this.value;NST.storeInfo.area=NST.storeInfo.pref+(this.value?'・'+this.value:'');scheduleSave()">
+              <option value="">— 市区町村 —</option>
+            </select>
+            <button type="button" onclick="addCity()" style="padding:8px 12px;border:1px dashed var(--border);border-radius:7px;background:#fff;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">＋ 追加</button>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">住所</label>
+          <input type="text" id="f-address" class="form-input" placeholder="例: 東京都渋谷区渋谷2-21-1" oninput="NST.storeInfo.address=this.value;scheduleSave()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">電話番号</label>
+          <input type="text" id="f-tel" class="form-input" placeholder="例: 03-1234-5678" oninput="NST.storeInfo.tel=this.value;scheduleSave()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">目標開店日</label>
+          <input type="date" id="f-opendate" class="form-input" onchange="onOpenDateChange(this.value);scheduleSave()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">現フェーズ</label>
+          <select id="f-phase" class="form-select" onchange="NST.storeInfo.phase=this.value;scheduleSave()">
+            <option value="打診・検討">打診・検討</option>
+            <option value="契約交渉">契約交渉</option>
+            <option value="契約締結">契約締結</option>
+            <option value="物件・設計">物件・設計</option>
+            <option value="施工">施工</option>
+            <option value="人材採用">人材採用</option>
+            <option value="研修">研修</option>
+            <option value="開店準備">開店準備</option>
+            <option value="開店済み">開店済み</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">主担当者（本部）</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="f-lead" class="form-select" style="flex:1;" onchange="NST.storeInfo.leadPerson=this.value;scheduleSave()">
+              <option value="">— 選択 —</option>
+            </select>
+            <button type="button" onclick="addLeadPerson()" style="padding:8px 12px;border:1px dashed var(--border);border-radius:7px;background:#fff;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">＋ 追加</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">店舗番号</label>
+          <input type="text" id="f-storeNo" class="form-input" placeholder="例: F005" oninput="NST.storeInfo.storeNo=this.value;scheduleSave()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 人員状況 -->
+    <div class="section-card" id="tab-personnel" style="margin-top:16px;">
+      <div class="section-title">人員状況</div>
+      <!-- オーナー -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px;">オーナー情報</div>
+        <div class="pers-row">
+          <span class="pers-label">オーナー名</span>
+          <input type="text" id="f-owner" class="pers-input" placeholder="例: 山田 太郎" oninput="NST.storeInfo.owner=this.value;scheduleSave()">
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">会社名</span>
+          <input type="text" id="f-ownerCompany" class="pers-input" placeholder="例: 株式会社〇〇" oninput="NST.storeInfo.ownerCompany=this.value;scheduleSave()">
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">メールアドレス</span>
+          <input type="email" id="f-ownerEmail" class="pers-input" placeholder="例: owner@example.com" oninput="NST.storeInfo.ownerEmail=this.value;scheduleSave()">
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">電話番号</span>
+          <input type="text" id="f-ownerPhone" class="pers-input" placeholder="例: 090-0000-0000" oninput="NST.storeInfo.ownerPhone=this.value;scheduleSave()">
+        </div>
+      </div>
+      <!-- 店長 -->
+      <div style="margin-bottom:14px;padding-top:10px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px;">店長情報</div>
+        <div class="pers-row">
+          <span class="pers-label">店長名</span>
+          <input type="text" id="f-mgrName" class="pers-input" placeholder="例: 佐藤 次郎" oninput="NST.personnel.mgrName=this.value;scheduleSave()">
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">配属状況</span>
+          <select id="f-mgrStatus" class="pers-select" onchange="NST.personnel.mgrStatus=this.value;scheduleSave()">
+            <option value="未定">未定</option>
+            <option value="選考中">選考中</option>
+            <option value="決定済み">決定済み</option>
+            <option value="着任済み">着任済み</option>
+          </select>
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">着任予定日</span>
+          <input type="date" id="f-mgrStart" class="pers-input" onchange="NST.personnel.mgrStart=this.value;scheduleSave()">
+        </div>
+      </div>
+      <!-- 従業員 -->
+      <div style="padding-top:10px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px;">従業員状況</div>
+        <div class="pers-row">
+          <span class="pers-label">必要人数</span>
+          <input type="number" id="f-empNeeded" class="pers-input" style="width:70px;flex:none;" min="0" value="0" oninput="NST.personnel.empNeeded=parseInt(this.value)||0;scheduleSave()">
+          <span style="font-size:12px;color:var(--muted);">名</span>
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">採用済み</span>
+          <input type="number" id="f-empHired" class="pers-input" style="width:70px;flex:none;" min="0" value="0" oninput="NST.personnel.empHired=parseInt(this.value)||0;scheduleSave()">
+          <span style="font-size:12px;color:var(--muted);">名</span>
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">募集状況</span>
+          <select id="f-empStatus" class="pers-select" onchange="NST.personnel.empStatus=this.value;scheduleSave()">
+            <option value="未着手">未着手</option>
+            <option value="募集中">募集中</option>
+            <option value="面接中">面接中</option>
+            <option value="充足済み">充足済み</option>
+          </select>
+        </div>
+        <div class="pers-row">
+          <span class="pers-label">研修状況</span>
+          <select id="f-empTraining" class="pers-select" onchange="NST.personnel.empTraining=this.value;scheduleSave()">
+            <option value="未着手">未着手</option>
+            <option value="準備中">準備中</option>
+            <option value="研修中">研修中</option>
+            <option value="完了">完了</option>
+          </select>
+        </div>
+        <div style="padding-top:8px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.04em;">従業員リスト</div>
+          <div id="emp-list-wrap"></div>
+          <button onclick="addEmployee()" style="margin-top:8px;padding:6px 14px;border:1px dashed var(--border);border-radius:6px;background:#fff;color:var(--muted);font-size:12px;cursor:pointer;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">＋ 従業員を追加</button>
+          <button onclick="saveEmployeeInfo(this)" style="margin-top:8px;margin-left:8px;padding:6px 14px;border:none;border-radius:6px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='var(--teal)'">&#128190; 従業員情報を保存する</button>
+        </div>
+        <div class="pers-row" style="margin-top:8px;">
+          <span class="pers-label">メモ</span>
+          <textarea id="f-empMemo" class="pers-input" placeholder="課題・不足点など..." style="resize:vertical;min-height:60px;" oninput="NST.personnel.empMemo=this.value;scheduleSave()"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="section-card" id="tab-tasks" style="margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="section-title" style="margin-bottom:0;">タスク一覧</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="task-action-btn" onclick="showOptPkgPicker()" style="font-size:12px;color:#6366f1;border-color:#6366f1;">⊕ オプション追加</button>
+          <button class="task-action-btn" onclick="showAutoDeadlineModal()" style="font-size:12px;color:#0d9488;border-color:#0d9488;">⏰ 締切の自動設定</button>
+          <button class="task-action-btn" onclick="confirmResetTasks()" style="font-size:12px;color:#dc2626;border-color:#dc2626;">↺ タスクをリセットする</button>
+        </div>
+      </div>
+      <!-- スティッキーツールバー：スクロール時に表示 -->
+      <div id="task-sticky-bar" style="display:none;position:sticky;top:42px;z-index:998;background:#fff;border-bottom:1px solid var(--border);margin:0 -18px 10px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,.08);flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;">
+        <button class="task-action-btn" onclick="showOptPkgPicker()" style="font-size:11px;color:#6366f1;border-color:#6366f1;">⊕ オプション追加</button>
+        <button class="task-action-btn" onclick="showAutoDeadlineModal()" style="font-size:11px;color:#0d9488;border-color:#0d9488;">⏰ 締切の自動設定</button>
+        <button class="task-action-btn" onclick="confirmResetTasks()" style="font-size:11px;color:#dc2626;border-color:#dc2626;">↺ リセット</button>
+      </div>
+      <div id="task-area"></div>
+      <div class="add-task-bar" style="position:relative;">
+        <button onclick="toggleAddTaskMenu(event)">＋ タスクを追加 ▾</button>
+        <div id="add-task-menu" style="display:none;position:absolute;left:0;top:100%;z-index:999;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:220px;overflow:hidden;margin-top:4px;">
+          <div onclick="addRootTask();closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;font-weight:600;border-bottom:1px solid #f5f3f0;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">通常タスク</div>
+          <div onclick="addPresetTasks('satto');closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">
+            <div style="font-weight:600;">SATTO（予約システム）プリセット</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">11タスクを一括追加</div>
+          </div>
+          <div onclick="addPresetTasks('square');closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;border-top:1px solid #f5f3f0;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">
+            <div style="font-weight:600;">Square（決済端末）プリセット</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">6タスクを一括追加</div>
+          </div>
+          <div style="padding:6px 16px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;background:#f8f7f5;border-top:1px solid #f5f3f0;">オプション</div>
+          <div onclick="addOptionTasks('sns');closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">
+            <div style="font-weight:600;">SNS運用開始</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">3タスクを一括追加</div>
+          </div>
+          <div onclick="addOptionTasks('ec');closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;border-top:1px solid #f5f3f0;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">
+            <div style="font-weight:600;">EC・オンライン連携</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">3タスクを一括追加</div>
+          </div>
+          <div onclick="addOptionTasks('medical');closeAddTaskMenu();" style="padding:10px 16px;cursor:pointer;font-size:13px;border-top:1px solid #f5f3f0;" onmouseover="this.style.background='#f8f7f5'" onmouseout="this.style.background=''">
+            <div style="font-weight:600;">医療機器管理</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">3タスクを一括追加</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB 3 (hidden): オプション ===================== -->
+<div class="tab-content" id="tab-options">
+  <div class="wrap">
+    <div class="section-card">
+      <div class="section-title">追加オプション（チェックで関連タスクを追加）</div>
+      <div class="option-grid">
+        <!-- SATTO -->
+        <div class="option-card" id="opt-satto" onclick="toggleOption('satto', event)">
+          <div class="option-card-header">
+            <input type="checkbox" class="option-checkbox" id="chk-satto" onchange="toggleOption('satto', event)" onclick="event.stopPropagation()">
+            <span class="option-title">SATTO導入（予約システム）</span>
+          </div>
+          <ul class="option-tasks">
+            <li>SATTO申込み手続き</li>
+            <li>SATTO設定・カスタマイズ</li>
+            <li>SATTO操作研修（スタッフ向け）</li>
+            <li>SATTO動作確認テスト</li>
+            <li>SATTO本番運用開始</li>
+          </ul>
+        </div>
+        <!-- SNS -->
+        <div class="option-card" id="opt-sns" onclick="toggleOption('sns', event)">
+          <div class="option-card-header">
+            <input type="checkbox" class="option-checkbox" id="chk-sns" onchange="toggleOption('sns', event)" onclick="event.stopPropagation()">
+            <span class="option-title">SNS運用開始</span>
+          </div>
+          <ul class="option-tasks">
+            <li>Instagram開設・設定</li>
+            <li>開店告知投稿</li>
+            <li>フォロワー獲得施策</li>
+          </ul>
+        </div>
+        <!-- EC -->
+        <div class="option-card" id="opt-ec" onclick="toggleOption('ec', event)">
+          <div class="option-card-header">
+            <input type="checkbox" class="option-checkbox" id="chk-ec" onchange="toggleOption('ec', event)" onclick="event.stopPropagation()">
+            <span class="option-title">EC・オンライン連携</span>
+          </div>
+          <ul class="option-tasks">
+            <li>オンラインショップ設定</li>
+            <li>商品ページ作成</li>
+            <li>決済テスト</li>
+          </ul>
+        </div>
+        <!-- Medical -->
+        <div class="option-card" id="opt-medical" onclick="toggleOption('medical', event)">
+          <div class="option-card-header">
+            <input type="checkbox" class="option-checkbox" id="chk-medical" onchange="toggleOption('medical', event)" onclick="event.stopPropagation()">
+            <span class="option-title">医療機器管理</span>
+          </div>
+          <ul class="option-tasks">
+            <li>機器リスト作成</li>
+            <li>メーカー連絡・手配</li>
+            <li>機器設置・動作確認</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB 4: テンプレート編集 ===================== -->
+<div class="tab-content" id="tab-template">
+  <div class="wrap">
+    <!-- ベーステンプレート -->
+    <div class="section-card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0;">📋 ベーステンプレート編集</div>
+        <button onclick="addTplRow()" style="padding:6px 14px;border:none;border-radius:7px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">＋ タスク追加</button>
+      </div>
+      <div class="tpl-type-toggle">
+        <button class="tpl-type-btn active" id="tpl-btn-fc" onclick="switchTplType('fc')">FCテンプレ</button>
+        <button class="tpl-type-btn" id="tpl-btn-direct" onclick="switchTplType('direct')">直営テンプレ</button>
+      </div>
+      <div id="tpl-table-wrap"></div>
+      <div class="tpl-actions">
+        <button class="tpl-save-btn" onclick="saveTpl()">💾 保存</button>
+        <button class="tpl-reset-btn" onclick="resetTpl()">↺ デフォルトに戻す</button>
+        <span id="tpl-status" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+    </div>
+    <!-- オプションパッケージ -->
+    <div class="section-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0;">⚙️ オプションパッケージ</div>
+        <button onclick="addOptionPkg()" style="padding:6px 14px;border:1.5px solid var(--teal);border-radius:7px;background:#fff;color:var(--teal);font-size:12px;font-weight:700;cursor:pointer;">＋ 新規作成</button>
+      </div>
+      <div id="opt-pkg-btns" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+      <div id="opt-pkg-edit-wrap" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div id="opt-pkg-edit-title" style="font-size:0.85rem;font-weight:700;color:var(--text);"></div>
+          <div style="display:flex;gap:6px;">
+            <button onclick="addOptPkgRow()" style="padding:4px 12px;border:none;border-radius:6px;background:var(--teal);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">＋ タスク追加</button>
+            <button onclick="deleteOptPkg(NST.optPkgEditKey)" style="padding:4px 12px;border:1px solid #fca5a5;border-radius:6px;background:#fff5f5;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">🗑 削除</button>
+          </div>
+        </div>
+        <div id="opt-pkg-table-wrap"></div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:10px;">
+          <button onclick="saveOptPkg()" style="padding:6px 18px;border:none;border-radius:7px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">💾 保存</button>
+          <span id="opt-pkg-status" style="font-size:12px;color:var(--muted);"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal-overlay">
+  <div id="confirm-modal">
+    <div class="cm-header">
+      <div class="cm-title">この内容で登録しますか？</div>
+      <div class="cm-subtitle">登録後も詳細画面から編集できます</div>
+    </div>
+    <div class="cm-body" id="cm-body-content">
+      <!-- rendered by JS -->
+    </div>
+    <div class="cm-footer">
+      <button class="cm-btn-back" onclick="closeConfirmModal()">← 編集に戻る</button>
+      <button class="cm-btn-cancel" onclick="cancelNewStore()">キャンセル</button>
+      <button class="cm-btn-register" onclick="saveStore()">登録する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auto Deadline Modal -->
+<div id="auto-deadline-overlay" style="display:none;position:fixed;inset:0;z-index:100001;background:rgba(4,12,24,.55);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto;">
+  <div style="background:#fff;border-radius:14px;width:min(560px,94vw);margin-bottom:40px;box-shadow:0 24px 60px rgba(0,0,0,.25);overflow:hidden;">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);">
+      <div style="font-size:15px;font-weight:800;">⏰ 締切の自動設定</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px;">目標開店日を入力すると、カテゴリ別の日程テンプレートを基に締切が自動設定されます。</div>
+    </div>
+    <div style="padding:20px 24px 0;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;">目標開店日（お尻の日程）</div>
+      <input type="date" id="adl-opendate" class="form-input" style="width:100%;" oninput="updateAutoDeadlinePreview()">
+    </div>
+    <!-- カテゴリ別オフセット編集 -->
+    <div style="padding:16px 24px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);">カテゴリ別日程テンプレート</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="saveAdlOffsets()" style="padding:4px 10px;border:1px solid var(--teal);border-radius:5px;background:#fff;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;">保存</button>
+          <button onclick="resetAdlOffsets()" style="padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:#fff;color:var(--muted);font-size:11px;cursor:pointer;">リセット</button>
+        </div>
+      </div>
+      <div id="adl-offset-table" style="max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;font-size:12px;">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+    <div style="padding:12px 24px;">
+      <div id="adl-preview" style="padding:10px 14px;background:#f8f7f5;border-radius:8px;font-size:12px;color:var(--muted);min-height:40px;">日付を入力するとプレビューが表示されます</div>
+    </div>
+    <div style="padding:4px 24px 20px;display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeAutoDeadlineModal()" style="padding:9px 18px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;">キャンセル</button>
+      <button onclick="applyAutoDeadlines()" style="padding:9px 22px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-size:13px;font-weight:800;cursor:pointer;">自動設定する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ================================================================
+// Helpers
+// ================================================================
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function showToast(msg, dur) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, dur || 2500);
+}
+
+function calcDueDate(offsetDays) {
+  if (!NST.storeInfo.openDate) return '';
+  var d = new Date(NST.storeInfo.openDate);
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
+// ================================================================
+// Global State
+// ================================================================
+var NST = {
+  activeTab: 'main',
+  storeInfo: {
+    nameSuffix: '', name: '', type: 'fc',
+    pref: '', city: '', area: '', address: '', tel: '',
+    owner: '', ownerCompany: '', ownerEmail: '', ownerPhone: '',
+    openDate: '', phase: '打診・検討', leadPerson: '', storeNo: ''
+  },
+  personnel: {
+    mgrName: '', mgrStatus: '未定', mgrStart: '',
+    empNeeded: 0, empHired: 0, empStatus: '未着手', empTraining: '未着手', empMemo: '',
+    empList: []
+  },
+  tasks: [],
+  optionsEnabled: { satto: false, sns: false, ec: false, medical: false },
+  templateEditType: 'fc',
+  templates: null,
+  optionPkgs: null,   // { key: {name, tasks:[]} }
+  optPkgEditKey: null,
+  taskExpanded: {}
+};
+
+// ================================================================
+// Option Task Definitions
+// ================================================================
+var OPTION_TASKS = {
+  satto: [
+    { task_name: 'SATTO申込み手続き',         category: 'システム', department: 'システム', due_offset_days: -45 },
+    { task_name: 'SATTO設定・カスタマイズ',   category: 'システム', department: 'システム', due_offset_days: -35 },
+    { task_name: 'SATTO操作研修（スタッフ向け）', category: 'システム', department: 'システム', due_offset_days: -21 },
+    { task_name: 'SATTO動作確認テスト',       category: 'システム', department: 'システム', due_offset_days: -14 },
+    { task_name: 'SATTO本番運用開始',         category: 'システム', department: 'システム', due_offset_days: -3  },
+  ],
+  sns: [
+    { task_name: 'Instagram開設・設定',   category: 'クリエイティブ', department: 'クリエイティブ', due_offset_days: -30 },
+    { task_name: '開店告知投稿',          category: 'クリエイティブ', department: 'クリエイティブ', due_offset_days: -14 },
+    { task_name: 'フォロワー獲得施策',    category: 'クリエイティブ', department: 'クリエイティブ', due_offset_days: -7  },
+  ],
+  ec: [
+    { task_name: 'オンラインショップ設定', category: 'システム', department: 'システム', due_offset_days: -30 },
+    { task_name: '商品ページ作成',        category: 'システム', department: 'システム', due_offset_days: -20 },
+    { task_name: '決済テスト',            category: 'システム', department: 'システム', due_offset_days: -10 },
+  ],
+  medical: [
+    { task_name: '機器リスト作成',       category: '管理', department: '管理', due_offset_days: -45 },
+    { task_name: 'メーカー連絡・手配',   category: '管理', department: '管理', due_offset_days: -35 },
+    { task_name: '機器設置・動作確認',   category: '管理', department: '管理', due_offset_days: -14 },
+  ]
+};
+
+// ================================================================
+// Lead Person (主担当者) - dropdown with add/delete
+// ================================================================
+// ── Prefecture / City cascade ──
+var PREF_CITIES = {
+  '北海道': ['札幌市中央区','札幌市北区','札幌市豊平区','函館市','旭川市'],
+  '宮城県': ['仙台市青葉区','仙台市宮城野区','仙台市太白区'],
+  '埼玉県': ['さいたま市大宮区','さいたま市浦和区','川越市','川口市','所沢市'],
+  '千葉県': ['千葉市中央区','船橋市','柏市','松戸市','市川市'],
+  '東京都': ['渋谷区','新宿区','港区','中央区','千代田区','品川区','目黒区','世田谷区','杉並区','豊島区','台東区','墨田区','江東区','板橋区','練馬区','北区','荒川区','足立区','葛飾区','江戸川区','文京区','新宿区','立川市','町田市','八王子市'],
+  '神奈川県': ['横浜市西区','横浜市中区','横浜市港北区','横浜市鶴見区','川崎市川崎区','川崎市中原区','相模原市','藤沢市','横須賀市'],
+  '愛知県': ['名古屋市中区','名古屋市千種区','名古屋市東区','名古屋市中村区','名古屋市西区','岡崎市','豊田市'],
+  '大阪府': ['大阪市北区','大阪市中央区','大阪市浪速区','大阪市天王寺区','大阪市西区','堺市','豊中市','吹田市'],
+  '京都府': ['京都市中京区','京都市下京区','京都市上京区','京都市左京区','京都市右京区','京都市伏見区'],
+  '兵庫県': ['神戸市中央区','神戸市灘区','神戸市兵庫区','尼崎市','西宮市'],
+  '広島県': ['広島市中区','広島市南区','広島市西区','広島市東区','福山市'],
+  '福岡県': ['福岡市中央区','福岡市博多区','福岡市東区','福岡市南区','北九州市小倉北区'],
+  '沖縄県': ['那覇市','沖縄市','浦添市','宜野湾市'],
+};
+
+// Custom cities added by user (saved per pref)
+var CUSTOM_CITIES = {};
+
+function loadCustomCities() {
+  try {
+    var s = localStorage.getItem('aicare_custom_cities');
+    if (s) CUSTOM_CITIES = JSON.parse(s);
+  } catch(e) {}
+}
+
+function saveCustomCities() {
+  try { localStorage.setItem('aicare_custom_cities', JSON.stringify(CUSTOM_CITIES)); } catch(e) {}
+}
+
+function renderPrefSelect() {
+  var sel = document.getElementById('f-pref');
+  if (!sel) return;
+  var cur = NST.storeInfo.pref || '';
+  sel.innerHTML = '<option value="">— 都道府県 —</option>' +
+    Object.keys(PREF_CITIES).map(function(p) {
+      return '<option value="' + escHtml(p) + '"' + (p === cur ? ' selected' : '') + '>' + escHtml(p) + '</option>';
+    }).join('');
+}
+
+function renderCitySelect(pref) {
+  var sel = document.getElementById('f-city');
+  if (!sel) return;
+  if (!pref) { sel.innerHTML = '<option value="">— 市区町村 —</option>'; return; }
+  var cities = (PREF_CITIES[pref] || []).concat(CUSTOM_CITIES[pref] || []);
+  var cur = NST.storeInfo.city || '';
+  sel.innerHTML = '<option value="">— 市区町村 —</option>' +
+    cities.map(function(c) {
+      return '<option value="' + escHtml(c) + '"' + (c === cur ? ' selected' : '') + '>' + escHtml(c) + '</option>';
+    }).join('');
+}
+
+function onPrefChange(pref) {
+  NST.storeInfo.pref = pref;
+  NST.storeInfo.city = '';
+  NST.storeInfo.area = pref;
+  renderCitySelect(pref);
+  scheduleSave();
+}
+
+function addCity() {
+  var pref = NST.storeInfo.pref;
+  if (!pref) { alert('先に都道府県を選択してください'); return; }
+  var name = prompt('追加する市区町村を入力');
+  if (!name || !name.trim()) return;
+  name = name.trim();
+  if (!CUSTOM_CITIES[pref]) CUSTOM_CITIES[pref] = [];
+  if (CUSTOM_CITIES[pref].indexOf(name) < 0 && (PREF_CITIES[pref]||[]).indexOf(name) < 0) {
+    CUSTOM_CITIES[pref].push(name);
+    saveCustomCities();
+  }
+  NST.storeInfo.city = name;
+  NST.storeInfo.area = pref + '・' + name;
+  renderCitySelect(pref);
+  document.getElementById('f-city').value = name;
+  scheduleSave();
+}
+
+var DEFAULT_LEAD_PERSONS = ['山田 花子', '田中 太郎', '佐藤 健一', '伊藤 美咲', '中村 誠', '高橋 浩二'];
+var NST_LEAD_PERSONS = [];
+
+var DEFAULT_DEPARTMENTS = ['本部', '出店管理', '不動産', '内装', '採用・HR', '経理', 'FC', 'システム', '広告', '総務'];
+var NST_DEPARTMENTS = [];
+var DEPT_STORAGE_KEY = 'aicare_dept_list';
+
+function loadDepartments() {
+  try {
+    var s = localStorage.getItem(DEPT_STORAGE_KEY);
+    if (s) { NST_DEPARTMENTS = JSON.parse(s); return; }
+  } catch(e) {}
+  NST_DEPARTMENTS = DEFAULT_DEPARTMENTS.slice();
+}
+function saveDepartments() {
+  try { localStorage.setItem(DEPT_STORAGE_KEY, JSON.stringify(NST_DEPARTMENTS)); } catch(e) {}
+}
+function renderDeptOptions(current) {
+  return '<option value="">— 部署 —</option>' +
+    NST_DEPARTMENTS.map(function(d) {
+      return '<option value="' + escHtml(d) + '"' + (current === d ? ' selected' : '') + '>' + escHtml(d) + '</option>';
+    }).join('') +
+    (current && NST_DEPARTMENTS.indexOf(current) < 0 ? '<option value="' + escHtml(current) + '" selected>' + escHtml(current) + '</option>' : '') +
+    '<option value="__add__">＋ 追加...</option>';
+}
+function onDeptSelectChange(el, taskId) {
+  if (el.value === '__add__') {
+    var name = prompt('担当部署名を入力してください');
+    if (name && name.trim()) {
+      name = name.trim();
+      if (NST_DEPARTMENTS.indexOf(name) < 0) { NST_DEPARTMENTS.push(name); saveDepartments(); }
+      el.value = name;
+    } else { el.value = ''; return; }
+  }
+  updateTask(taskId, 'dept', el.value);
+}
+
+function loadLeadPersons() {
+  try {
+    var saved = localStorage.getItem('aicare_lead_persons');
+    if (saved) {
+      NST_LEAD_PERSONS = JSON.parse(saved);
+      return;
+    }
+  } catch(e) {}
+  NST_LEAD_PERSONS = DEFAULT_LEAD_PERSONS.slice();
+}
+
+function saveLeadPersons() {
+  try { localStorage.setItem('aicare_lead_persons', JSON.stringify(NST_LEAD_PERSONS)); } catch(e) {}
+}
+
+function renderLeadSelect() {
+  var sel = document.getElementById('f-lead');
+  if (!sel) return;
+  var current = NST.storeInfo.leadPerson || '';
+  sel.innerHTML = '<option value="">— 選択 —</option>' +
+    NST_LEAD_PERSONS.map(function(p) {
+      return '<option value="' + escHtml(p) + '"' + (p === current ? ' selected' : '') + '>' + escHtml(p) + '</option>';
+    }).join('') +
+    (current && NST_LEAD_PERSONS.indexOf(current) < 0 ? '<option value="' + escHtml(current) + '" selected>' + escHtml(current) + '</option>' : '');
+}
+
+function addLeadPerson() {
+  var name = prompt('担当者名を入力してください');
+  if (!name || !name.trim()) return;
+  name = name.trim();
+  if (NST_LEAD_PERSONS.indexOf(name) < 0) {
+    NST_LEAD_PERSONS.push(name);
+    saveLeadPersons();
+  }
+  NST.storeInfo.leadPerson = name;
+  renderLeadSelect();
+  scheduleSave();
+}
+
+// ================================================================
+// Employee List
+// ================================================================
+function renderEmployeeList() {
+  var wrap = document.getElementById('emp-list-wrap');
+  if (!wrap) return;
+  var list = NST.personnel.empList;
+  if (!list || list.length === 0) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">まだ登録されていません</div>';
+    return;
+  }
+  var routeOpts = ['直営経由', '店舗経由'];
+  var statOpts = ['選考中', '採用済み', '研修中', '着任済み'];
+  var html = '';
+  list.forEach(function(em, idx) {
+    html += '<div class="emp-list-row">';
+    html += '<span class="emp-idx">' + (idx + 1) + '</span>';
+    html += '<input class="emp-name-f" value="' + escHtml(em.name || '') + '" placeholder="氏名" onchange="NST.personnel.empList[' + idx + '].name=this.value;scheduleSave()">';
+    html += '<select class="emp-small-select" onchange="NST.personnel.empList[' + idx + '].route=this.value;scheduleSave()">';
+    routeOpts.forEach(function(o) { html += '<option' + (em.route === o ? ' selected' : '') + '>' + o + '</option>'; });
+    html += '</select>';
+    html += '<select class="emp-small-select" onchange="NST.personnel.empList[' + idx + '].status=this.value;scheduleSave()">';
+    statOpts.forEach(function(o) { html += '<option' + (em.status === o ? ' selected' : '') + '>' + o + '</option>'; });
+    html += '</select>';
+    html += '<button class="emp-del" onclick="removeEmployee(' + idx + ')">✕</button>';
+    html += '</div>';
+  });
+  wrap.innerHTML = html;
+}
+
+function addEmployee() {
+  NST.personnel.empList.push({ name: '', route: '直営経由', status: '選考中' });
+  renderEmployeeList();
+  scheduleSave();
+}
+
+function removeEmployee(idx) {
+  NST.personnel.empList.splice(idx, 1);
+  renderEmployeeList();
+  scheduleSave();
+}
+
+function saveEmployeeInfo(btn) {
+  // Collect all current employee form values from DOM
+  var wrap = document.getElementById('emp-list-wrap');
+  if (wrap) {
+    wrap.querySelectorAll('.emp-list-row').forEach(function(row, idx) {
+      if (!NST.personnel.empList[idx]) return;
+      var nameEl = row.querySelector('.emp-name-f');
+      var selects = row.querySelectorAll('.emp-small-select');
+      if (nameEl) NST.personnel.empList[idx].name = nameEl.value;
+      if (selects[0]) NST.personnel.empList[idx].route = selects[0].value;
+      if (selects[1]) NST.personnel.empList[idx].status = selects[1].value;
+    });
+  }
+  scheduleSave();
+  if (btn) {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '&#10003; 保存しました';
+    btn.style.background = '#059669';
+    setTimeout(function() { btn.innerHTML = orig; btn.style.background = ''; }, 1500);
+  }
+  showToast('従業員情報を保存しました');
+}
+
+// ================================================================
+// Tab switching
+// ================================================================
+function switchTab(name, btn) {
+  NST.activeTab = name;
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'main' || name === 'tasks') renderTasks();
+  if (name === 'template') { renderTplTable(); renderOptionPkgBtns(); }
+}
+
+// ================================================================
+// Store Type
+// ================================================================
+function setStoreType(type) {
+  var prevType = NST.storeInfo.type;
+  NST.storeInfo.type = type;
+  document.getElementById('type-fc').classList.toggle('active', type === 'fc');
+  document.getElementById('type-direct').classList.toggle('active', type === 'direct');
+  // Apply corresponding task template when type changes
+  if (prevType !== type) {
+    var hasExisting = NST.tasks.filter(function(t) { return !t.option_pkg; }).length > 0;
+    if (hasExisting) {
+      if (confirm('店舗種別を「' + (type === 'fc' ? 'FC' : '直営') + '」に変更しました。\n対応するタスクテンプレートを適用しますか？\n（現在のタスクは置き換えられます）')) {
+        reloadTaskPreset();
+      }
+    } else {
+      reloadTaskPreset();
+    }
+  }
+  scheduleSave();
+}
+
+// ================================================================
+// Open Date
+// ================================================================
+function onOpenDateChange(val) {
+  NST.storeInfo.openDate = val;
+  // Recalculate due dates for template tasks
+  NST.tasks.forEach(function(t) {
+    if (t.due_offset_days !== undefined && t.due_offset_days !== null) {
+      t.due_date = calcDueDate(t.due_offset_days);
+    }
+  });
+  if (NST.activeTab === 'tasks' || NST.activeTab === 'main') renderTasks();
+}
+
+// ================================================================
+// Load Templates from localStorage or fallback
+// ================================================================
+function loadTemplates() {
+  try {
+    var saved = localStorage.getItem('aicare_task_templates_custom');
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      if (parsed && parsed.fc && parsed.direct) {
+        NST.templates = parsed;
+        return;
+      }
+    }
+  } catch(e) {}
+  // Fallback to TASK_TEMPLATES_V2
+  NST.templates = {
+    fc: JSON.parse(JSON.stringify(TASK_TEMPLATES_V2['fc'] || [])),
+    direct: JSON.parse(JSON.stringify(TASK_TEMPLATES_V2['direct'] || []))
+  };
+}
+
+// ================================================================
+// Option Packages (オプションパッケージ)
+// ================================================================
+var DEFAULT_OPTION_PKGS = {
+  sattou: {
+    name: '予約システム（SATTOU）',
+    tasks: [
+      {task_name:'＞＞EPARK非公開　中嶋さん（既存店舗への案内）', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞店舗マスター確認（HPBあれば）', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞店舗マスター＞営業／休日【入力】押す', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞スタッフ登録＞基本シフト【入力】押す', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞ベッドマスター', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞店舗スタッフマスター設定（ログイン用、HPBID）', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞強制リンク発行', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞デイレポにURL記載', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞シフト・営業時間の登録方法や操作マニュアルを共有', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞管理者グループに追加（スタッフ名）', category:'予約システム（SATTOU）', department:'総務システム'},
+      {task_name:'＞＞HP、公式LINEの予約URL追加', category:'予約システム（SATTOU）', department:'総務システム'},
+    ]
+  },
+  hpb: {
+    name: '予約システム（HPB）',
+    tasks: [
+      {task_name:'SV主導　お繋ぎ完了（森川さんorリクルート）', category:'予約システム（HPB）', department:'出店管理'},
+      {task_name:'ログイン情報共有いただいたら、通知先にeyecare.reserve.cancel@gmail.comを追加', category:'予約システム（HPB）', department:'システム'},
+      {task_name:'ホットペッパー掲載内容確認', category:'予約システム（HPB）', department:'出店管理'},
+    ]
+  },
+  square: {
+    name: '決済端末（Square）',
+    tasks: [
+      {task_name:'決済端末の購入（オーナーさんに案内）', category:'決済端末（Square）', department:'総務システム'},
+      {task_name:'本部作成', category:'決済端末（Square）', department:'総務システム'},
+      {task_name:'スタッフアカウント作成完了', category:'決済端末（Square）', department:'総務システム'},
+      {task_name:'予備アカウントの作成', category:'決済端末（Square）', department:'総務システム'},
+      {task_name:'予備アカウントの支払いブランドの申請/後日電子マネーを有効化', category:'決済端末（Square）', department:'総務システム'},
+      {task_name:'（本部でのアカウント作成だった場合）引き継ぎ日設定', category:'決済端末（Square）', department:'総務システム'},
+    ]
+  }
+};
+
+function loadOptionPkgs() {
+  try {
+    var saved = localStorage.getItem('aicare_option_pkgs');
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object') {
+        NST.optionPkgs = parsed;
+        return;
+      }
+    }
+  } catch(e) {}
+  NST.optionPkgs = JSON.parse(JSON.stringify(DEFAULT_OPTION_PKGS));
+}
+
+function saveOptionPkgs() {
+  try {
+    localStorage.setItem('aicare_option_pkgs', JSON.stringify(NST.optionPkgs));
+  } catch(e) {}
+}
+
+function renderOptionPkgBtns() {
+  if (!NST.optionPkgs) loadOptionPkgs();
+  var wrap = document.getElementById('opt-pkg-btns');
+  if (!wrap) return;
+  var html = '';
+  Object.keys(NST.optionPkgs).forEach(function(key) {
+    var pkg = NST.optionPkgs[key];
+    var active = NST.optPkgEditKey === key;
+    html += '<button onclick="switchOptPkg(\'' + key + '\')" style="padding:5px 14px;border:1.5px solid ' + (active ? 'var(--teal)' : 'var(--border)') + ';border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:' + (active ? 'var(--teal)' : '#fff') + ';color:' + (active ? '#fff' : 'var(--muted)') + ';">' +
+      pkg.name + ' (' + (pkg.tasks || []).length + '件)</button>';
+  });
+  wrap.innerHTML = html;
+}
+
+function switchOptPkg(key) {
+  NST.optPkgEditKey = key;
+  renderOptionPkgBtns();
+  renderOptPkgTable();
+  var wrap = document.getElementById('opt-pkg-edit-wrap');
+  if (wrap) wrap.style.display = 'block';
+  var title = document.getElementById('opt-pkg-edit-title');
+  if (title) title.textContent = NST.optionPkgs[key] ? NST.optionPkgs[key].name : key;
+}
+
+function addOptionPkg() {
+  var name = prompt('新しいオプションパッケージ名を入力:');
+  if (!name || !name.trim()) return;
+  if (!NST.optionPkgs) loadOptionPkgs();
+  var key = 'custom_' + Date.now();
+  NST.optionPkgs[key] = { name: name.trim(), tasks: [] };
+  saveOptionPkgs();
+  renderOptionPkgBtns();
+  switchOptPkg(key);
+}
+
+function deleteOptPkg(key) {
+  if (!key || !NST.optionPkgs || !NST.optionPkgs[key]) return;
+  if (!confirm('「' + NST.optionPkgs[key].name + '」を削除しますか？')) return;
+  delete NST.optionPkgs[key];
+  saveOptionPkgs();
+  NST.optPkgEditKey = null;
+  var editWrap = document.getElementById('opt-pkg-edit-wrap');
+  if (editWrap) editWrap.style.display = 'none';
+  renderOptionPkgBtns();
+}
+
+function renderOptPkgTable() {
+  if (!NST.optionPkgs || !NST.optPkgEditKey) return;
+  var pkg = NST.optionPkgs[NST.optPkgEditKey];
+  var wrap = document.getElementById('opt-pkg-table-wrap');
+  if (!wrap || !pkg) return;
+  var tasks = pkg.tasks || [];
+  if (tasks.length === 0) {
+    wrap.innerHTML = '<div style="font-size:0.78rem;color:var(--muted);padding:12px 0;">タスクがありません。上の「＋ タスク追加」で追加してください。</div>';
+    return;
+  }
+  var html = '<table class="tpl-table"><thead><tr><th>カテゴリ</th><th>タスク名</th><th>担当部署</th><th></th></tr></thead><tbody>';
+  tasks.forEach(function(t, idx) {
+    html += '<tr data-opt-idx="' + idx + '">' +
+      '<td><input type="text" value="' + escHtmlNST(t.category||'') + '" data-opt-field="category" data-opt-idx="' + idx + '" style="width:100%;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:3px;" /></td>' +
+      '<td><input type="text" value="' + escHtmlNST(t.task_name||'') + '" data-opt-field="task_name" data-opt-idx="' + idx + '" style="width:100%;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:3px;" /></td>' +
+      '<td><input type="text" value="' + escHtmlNST(t.department||'') + '" data-opt-field="department" data-opt-idx="' + idx + '" style="width:100%;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:3px;" /></td>' +
+      '<td><button onclick="deleteOptPkgRow(' + idx + ')" style="color:#ef4444;background:none;border:none;cursor:pointer;font-size:12px;">✕</button></td>' +
+    '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+  // Bind input events
+  wrap.querySelectorAll('[data-opt-field]').forEach(function(inp) {
+    inp.addEventListener('input', function() {
+      var idx2 = parseInt(inp.dataset.optIdx);
+      var field = inp.dataset.optField;
+      if (!isNaN(idx2) && NST.optionPkgs[NST.optPkgEditKey]) {
+        NST.optionPkgs[NST.optPkgEditKey].tasks[idx2][field] = inp.value;
+      }
+    });
+  });
+}
+
+function addOptPkgRow() {
+  if (!NST.optPkgEditKey || !NST.optionPkgs) return;
+  var pkg = NST.optionPkgs[NST.optPkgEditKey];
+  if (!pkg) return;
+  if (!pkg.tasks) pkg.tasks = [];
+  pkg.tasks.push({ task_name: '', category: '', department: '' });
+  renderOptPkgTable();
+  renderOptionPkgBtns();
+}
+
+function deleteOptPkgRow(idx) {
+  if (!NST.optPkgEditKey || !NST.optionPkgs) return;
+  var pkg = NST.optionPkgs[NST.optPkgEditKey];
+  if (!pkg || !pkg.tasks) return;
+  pkg.tasks.splice(idx, 1);
+  saveOptionPkgs();
+  renderOptPkgTable();
+  renderOptionPkgBtns();
+}
+
+function saveOptPkg() {
+  saveOptionPkgs();
+  var el = document.getElementById('opt-pkg-status');
+  if (el) { el.textContent = '保存しました'; setTimeout(function(){el.textContent='';}, 2000); }
+  renderOptionPkgBtns();
+}
+
+function applyOptionPkg(key) {
+  if (!NST.optionPkgs || !NST.optionPkgs[key]) return;
+  var pkg = NST.optionPkgs[key];
+  var tasks = pkg.tasks || [];
+  var idx = NST.tasks.length;
+  tasks.forEach(function(t) {
+    idx++;
+    NST.tasks.push({
+      id: 'task_' + Date.now() + '_' + idx,
+      parent_id: null,
+      category: t.category || '',
+      task_name: t.task_name || '',
+      department: t.department || '',
+      due_date: '',
+      status: '未着手',
+      assignee: '',
+      is_required: true,
+      option_pkg: key,
+    });
+  });
+  scheduleSave();
+  renderTaskList();
+  showToast('「' + pkg.name + '」を追加しました（' + tasks.length + '件）');
+}
+
+function escHtmlNST(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showOptPkgPicker() {
+  if (!NST.optionPkgs) loadOptionPkgs();
+  var keys = Object.keys(NST.optionPkgs);
+  if (keys.length === 0) { showToast('オプションパッケージがありません。テンプレートタブから作成してください。'); return; }
+  var html = '<div id="opt-picker-overlay" onclick="if(event.target===this)closeOptPicker()" style="position:fixed;inset:0;z-index:10010;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;">' +
+    '<div style="background:#fff;border-radius:12px;padding:24px;width:min(400px,94vw);max-height:80vh;overflow-y:auto;">' +
+      '<div style="font-size:1rem;font-weight:800;margin-bottom:14px;">⊕ オプションパッケージを追加</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">';
+  keys.forEach(function(key) {
+    var pkg = NST.optionPkgs[key];
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border);border-radius:8px;">' +
+      '<div><div style="font-size:0.85rem;font-weight:700;">' + escHtmlNST(pkg.name) + '</div>' +
+      '<div style="font-size:0.72rem;color:var(--muted);">' + (pkg.tasks||[]).length + '件のタスク</div></div>' +
+      '<button onclick="applyOptionPkg(\'' + key + '\');closeOptPicker();" style="padding:5px 14px;border:none;border-radius:6px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">追加</button>' +
+    '</div>';
+  });
+  html += '</div>' +
+    '<button onclick="closeOptPicker()" style="margin-top:14px;width:100%;padding:8px;border:1px solid var(--border);border-radius:7px;background:#fff;font-size:13px;cursor:pointer;">キャンセル</button>' +
+  '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+function closeOptPicker() {
+  var el = document.getElementById('opt-picker-overlay');
+  if (el) el.remove();
+}
+
+function renderTaskList() { renderTasks(); }
+
+// ================================================================
+// Reload task preset from templates
+// ================================================================
+function confirmResetTasks() {
+  if (confirm('タスクをリセットしますか？\n現在編集中のタスクは全て削除され、プリセットに戻ります。')) {
+    reloadTaskPreset();
+  }
+}
+
+function reloadTaskPreset() {
+  loadTemplates();
+  var type = NST.storeInfo.type;
+  var tpls = NST.templates[type] || [];
+  var idx = 0;
+  // Keep option tasks; remove template tasks
+  var optTasks = NST.tasks.filter(function(t) { return t.option_pkg; });
+  var newTasks = tpls.map(function(t) {
+    idx++;
+    return {
+      id: 'task_' + Date.now() + '_' + idx,
+      parent_id: null,
+      category: t.category,
+      task_name: t.task_name,
+      department: t.department,
+      due_date: calcDueDate(t.due_offset_days),
+      due_offset_days: t.due_offset_days,
+      status: '未着手',
+      assignee: '',
+      is_required: t.is_required !== false,
+      template_id: t.id,
+      option_pkg: null
+    };
+  });
+  NST.tasks = newTasks.concat(optTasks);
+  NST.taskExpanded = {};
+  if (NST.activeTab === 'tasks' || NST.activeTab === 'main') renderTasks();
+}
+
+// ================================================================
+// Task CRUD
+// ================================================================
+function makeTaskId(i) {
+  return 'task_' + Date.now() + '_' + (i || Math.floor(Math.random() * 9999));
+}
+
+var ADD_PRESET_TASKS = {
+  satto: [
+    { task_name: '>>EPARK非公開　中嶋さん（既存店舗への案内）',   category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>店舗マスター確認（HPBあれば）',               category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>店舗マスター>営業／休日【入力】押す',         category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>スタッフ登録>基本シフト【入力】押す',         category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>ベッドマスター',                              category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>店舗スタッフマスター設定（ログイン用、HPBID）',category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>強制リンク発行',                              category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>デイレポにURL記載',                           category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>シフト・営業時間の登録方法や操作マニュアルを共有', category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>管理者グループに追加（スタッフ名）',           category: '予約システム(SATTO)', department: 'システム' },
+    { task_name: '>>HP、公式LINEの予約URL追加',                   category: '予約システム(SATTO)', department: 'システム' },
+  ],
+  square: [
+    { task_name: '決済端末の購入（オーナーさんに案内）※引き継ぎ日程調整の際に購入したか確認', category: '決済端末(Square)', department: 'システム' },
+    { task_name: '本部作成',                                       category: '決済端末(Square)', department: 'システム' },
+    { task_name: 'スタッフアカウント作成完了',                     category: '決済端末(Square)', department: 'システム' },
+    { task_name: '予備アカウントの作成',                           category: '決済端末(Square)', department: 'システム' },
+    { task_name: '予備アカウントの支払いブランドの申請/後日電子マネーを有効化', category: '決済端末(Square)', department: 'システム' },
+    { task_name: '（本部でのアカウント作成だった場合）引き継ぎ日設定', category: '決済端末(Square)', department: 'システム' },
+  ]
+};
+
+function toggleAddTaskMenu(e) {
+  e.stopPropagation();
+  var menu = document.getElementById('add-task-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+function closeAddTaskMenu() {
+  var menu = document.getElementById('add-task-menu');
+  if (menu) menu.style.display = 'none';
+}
+document.addEventListener('click', function() { closeAddTaskMenu(); });
+
+function addOptionTasks(key) {
+  var list = OPTION_TASKS[key];
+  if (!list) return;
+  var baseIdx = NST.tasks.length;
+  list.forEach(function(t, i) {
+    NST.tasks.push({
+      id: makeTaskId() + '_opt_' + (baseIdx + i),
+      parent_id: null,
+      category: t.category,
+      task_name: t.task_name,
+      department: t.department || '',
+      due_date: '',
+      due_offset_days: t.due_offset_days || null,
+      status: '未着手',
+      assignee: '',
+      is_required: false,
+      template_id: null,
+      option_pkg: key
+    });
+  });
+  renderTasks();
+}
+
+function addPresetTasks(key) {
+  var list = ADD_PRESET_TASKS[key];
+  if (!list) return;
+  var baseIdx = NST.tasks.length;
+  list.forEach(function(t, i) {
+    NST.tasks.push({
+      id: makeTaskId() + '_' + (baseIdx + i),
+      parent_id: null,
+      category: t.category,
+      task_name: t.task_name,
+      department: t.department || '',
+      due_date: '',
+      due_offset_days: null,
+      status: '未着手',
+      assignee: '',
+      is_required: false,
+      template_id: null,
+      option_pkg: key
+    });
+  });
+  renderTasks();
+}
+
+function addRootTask() {
+  NST.tasks.push({
+    id: makeTaskId(),
+    parent_id: null,
+    category: '管理',
+    task_name: '',
+    department: '',
+    due_date: '',
+    due_offset_days: null,
+    status: '未着手',
+    assignee: '',
+    is_required: false,
+    template_id: null,
+    option_pkg: null
+  });
+  renderTasks();
+}
+
+function addChildTask(parentId) {
+  NST.tasks.push({
+    id: makeTaskId(),
+    parent_id: parentId,
+    category: '',
+    task_name: '',
+    department: '',
+    due_date: '',
+    due_offset_days: null,
+    status: '未着手',
+    assignee: '',
+    is_required: false,
+    template_id: null,
+    option_pkg: null
+  });
+  NST.taskExpanded[parentId] = true;
+  renderTasks();
+}
+
+function renameCategoryTasks(oldCat, newCat) {
+  newCat = newCat.trim();
+  if (!newCat || newCat === oldCat) return;
+  NST.tasks.forEach(function(t) {
+    if (t.category === oldCat) t.category = newCat;
+  });
+  scheduleSave();
+  renderTasks();
+}
+
+function deleteCategoryTasks(cat) {
+  // Delete all root tasks in this category (and their children)
+  var rootIds = NST.tasks
+    .filter(function(t) { return !t.parent_id && t.category === cat; })
+    .map(function(t) { return t.id; });
+  rootIds.forEach(function(id) { deleteTask(id); });
+}
+
+function deleteTask(id) {
+  // Delete task and all children
+  var toDelete = [id];
+  function collectChildren(pid) {
+    NST.tasks.forEach(function(t) {
+      if (t.parent_id === pid) { toDelete.push(t.id); collectChildren(t.id); }
+    });
+  }
+  collectChildren(id);
+  NST.tasks = NST.tasks.filter(function(t) { return toDelete.indexOf(t.id) < 0; });
+  renderTasks();
+}
+
+function toggleChildDone(id, checked) {
+  updateTask(id, 'status', checked ? '完了' : '未着手');
+}
+
+// ── Drag & Drop ──────────────────────────────────
+var _nstDndId = null;
+function nstDndStart(e, taskId) {
+  _nstDndId = taskId;
+  e.currentTarget.classList.add('dnd-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function nstDndOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('dnd-over');
+}
+function nstDndLeave(e) {
+  e.currentTarget.classList.remove('dnd-over');
+}
+function nstDndDrop(e, targetId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dnd-over');
+  if (!_nstDndId || _nstDndId === targetId) return;
+  var fromIdx = NST.tasks.findIndex(function(t) { return t.id === _nstDndId; });
+  var toIdx   = NST.tasks.findIndex(function(t) { return t.id === targetId; });
+  if (fromIdx < 0 || toIdx < 0) return;
+  var moved = NST.tasks.splice(fromIdx, 1)[0];
+  NST.tasks.splice(toIdx, 0, moved);
+  renderTasks();
+}
+function nstDndEnd(e) {
+  document.querySelectorAll('.dnd-dragging,.dnd-over').forEach(function(el) {
+    el.classList.remove('dnd-dragging', 'dnd-over');
+  });
+  _nstDndId = null;
+}
+
+function updateTask(id, field, value) {
+  var t = NST.tasks.find(function(x) { return x.id === id; });
+  if (t) t[field] = value;
+  scheduleSave();
+}
+
+function toggleExpand(id) {
+  NST.taskExpanded[id] = !NST.taskExpanded[id];
+  renderTasks();
+}
+
+// ================================================================
+// Render Tasks
+// ================================================================
+function renderTasks() {
+  var area = document.getElementById('task-area');
+  if (!area) return;
+
+  // Group root tasks by category
+  var roots = NST.tasks.filter(function(t) { return !t.parent_id; });
+  // Category order
+  var catOrder = [];
+  roots.forEach(function(t) {
+    if (catOrder.indexOf(t.category) < 0) catOrder.push(t.category);
+  });
+
+  var html = '';
+  var TASK_CAT_COLORS = ['#e0f2fe','#fce7f3','#dcfce7','#fef3c7','#ede9fe','#fce4ec','#e8f5e9','#fff3e0','#e3f2fd','#f3e5f5','#e0e7ff','#fef9c3'];
+  catOrder.forEach(function(cat, catColorIdx) {
+    var catRoots = roots.filter(function(t) { return t.category === cat; });
+    var catBgColor = TASK_CAT_COLORS[catColorIdx % TASK_CAT_COLORS.length];
+    html += '<div class="task-category-group">';
+    var catEsc = escHtml(cat || '未分類').replace(/'/g, "\\'");
+    html += '<div class="task-category-header" onclick="toggleCategoryGroup(this)" style="justify-content:space-between;background:' + catBgColor + ';">';
+    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    html += '<span style="font-size:10px;color:var(--muted)">▾</span>';
+    html += '<input class="cat-name-input" value="' + escHtml(cat || '未分類') + '" onclick="event.stopPropagation()" onchange="renameCategoryTasks(\'' + catEsc + '\',this.value)">';
+    html += '<span style="color:var(--muted);font-size:11px;">' + catRoots.length + 'タスク</span>';
+    html += '</div>';
+    html += '<button onclick="event.stopPropagation();deleteCategoryTasks(\'' + catEsc + '\')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;line-height:1;" title="このカテゴリのタスクを全て削除">✕</button>';
+    html += '</div>';
+    html += '<div class="task-col-header">';
+    html += '<span style="width:18px;flex-shrink:0;"></span>';
+    html += '<span class="tch-name">タスク名</span>';
+    html += '<span class="tch-dept">担当部署</span>';
+    html += '<span class="tch-dept">担当</span>';
+    html += '<span class="tch-date">期日</span>';
+    html += '<span class="tch-status">ステータス</span>';
+    html += '<span style="width:68px;flex-shrink:0;"></span>';
+    html += '<span style="width:26px;flex-shrink:0;"></span>';
+    html += '</div>';
+    html += '<div class="task-category-rows">';
+    catRoots.forEach(function(t) {
+      html += renderTaskRow(t, 0);
+    });
+    html += '</div></div>';
+  });
+
+  area.innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">タスクがありません。プリセットをロードするか手動で追加してください。</div>';
+}
+
+function toggleCategoryGroup(header) {
+  var parent = header.parentElement;
+  var colHeader = parent.querySelector('.task-col-header');
+  var rows = parent.querySelector('.task-category-rows');
+  var arrow = header.querySelector('span');
+  if (!rows) return;
+  if (rows.style.display === 'none') {
+    rows.style.display = '';
+    if (colHeader) colHeader.style.display = '';
+    arrow.textContent = '▾';
+  } else {
+    rows.style.display = 'none';
+    if (colHeader) colHeader.style.display = 'none';
+    arrow.textContent = '▸';
+  }
+}
+
+function renderTaskRow(task, depth) {
+  var children = NST.tasks.filter(function(t) { return t.parent_id === task.id; });
+  var hasChildren = children.length > 0;
+  var isExpanded = NST.taskExpanded[task.id] !== false && hasChildren;
+  var depthClass = depth === 0 ? 'task-row' : (depth === 1 ? 'task-row child-row' : 'task-row grandchild-row');
+  var eid = escHtml(task.id);
+
+  var statusOptions = ['未着手','対応中','完了','保留'].map(function(s) {
+    return '<option value="' + escHtml(s) + '"' + (task.status === s ? ' selected' : '') + '>' + escHtml(s) + '</option>';
+  }).join('');
+
+  var isDone = task.status === '完了';
+  var dndAttrs = depth === 0
+    ? ' draggable="true"' +
+      ' ondragstart="nstDndStart(event,\'' + eid + '\')"' +
+      ' ondragover="nstDndOver(event)"' +
+      ' ondragleave="nstDndLeave(event)"' +
+      ' ondrop="nstDndDrop(event,\'' + eid + '\')"' +
+      ' ondragend="nstDndEnd(event)"'
+    : '';
+  var html = '<div class="' + depthClass + '" data-task-id="' + eid + '"' + dndAttrs + (isDone ? ' style="opacity:0.45;"' : '') + '>';
+  // Child checkbox (depth > 0)
+  if (depth > 0) {
+    html += '<input type="checkbox"' + (isDone ? ' checked' : '') + ' onclick="toggleChildDone(\'' + eid + '\',this.checked)" style="width:14px;height:14px;margin-right:2px;flex-shrink:0;cursor:pointer;accent-color:var(--teal);">';
+  }
+  // Drag handle (depth=0 only)
+  if (depth === 0) {
+    html += '<span class="nst-drag-handle" title="ドラッグで並び替え">⠿</span>';
+  }
+  // Expand button
+  html += '<button class="task-expand-btn" onclick="toggleExpand(\'' + eid + '\')">';
+  html += hasChildren ? (isExpanded ? '▾' : '▸') : '&nbsp;';
+  html += '</button>';
+  // 担当部署 - dropdown (左端)
+  html += '<select class="task-dept-input" onchange="onDeptSelectChange(this,\'' + eid + '\')">' + renderDeptOptions(task.dept || '') + '</select>';
+  // Task name
+  html += '<input class="task-name-input" value="' + escHtml(task.task_name) + '" placeholder="タスク名"';
+  html += ' onchange="updateTask(\'' + eid + '\',\'task_name\',this.value)">';
+  // Department (担当者) - dropdown
+  var deptOptions = '<option value="">— 担当 —</option>' +
+    NST_LEAD_PERSONS.map(function(p) {
+      return '<option value="' + escHtml(p) + '"' + (task.department === p ? ' selected' : '') + '>' + escHtml(p) + '</option>';
+    }).join('');
+  if (task.department && NST_LEAD_PERSONS.indexOf(task.department) < 0) {
+    deptOptions += '<option value="' + escHtml(task.department) + '" selected>' + escHtml(task.department) + '</option>';
+  }
+  html += '<select class="task-dept-input" onchange="updateTask(\'' + eid + '\',\'department\',this.value)">' + deptOptions + '</select>';
+  // Due date
+  html += '<input type="date" class="task-date-input" value="' + escHtml(task.due_date) + '"';
+  html += ' onchange="updateTask(\'' + eid + '\',\'due_date\',this.value)">';
+  // Status
+  html += '<select class="task-status-select" onchange="updateTask(\'' + eid + '\',\'status\',this.value)">';
+  html += statusOptions;
+  html += '</select>';
+  // Add child
+  html += '<button class="task-action-btn" onclick="addChildTask(\'' + eid + '\')">＋子タスク</button>';
+  // Delete
+  html += '<button class="task-delete-btn" onclick="deleteTask(\'' + eid + '\')">✕</button>';
+  html += '</div>';
+
+  // Render children
+  if (isExpanded) {
+    children.forEach(function(child) {
+      html += renderTaskRow(child, depth + 1);
+    });
+  }
+  return html;
+}
+
+// ================================================================
+// Options
+// ================================================================
+function toggleOption(key, event) {
+  if (event && event.target && event.target.tagName === 'INPUT') {
+    // called from checkbox change - use checkbox state
+    NST.optionsEnabled[key] = event.target.checked;
+  } else {
+    // called from card click - toggle
+    NST.optionsEnabled[key] = !NST.optionsEnabled[key];
+    var chk = document.getElementById('chk-' + key);
+    if (chk) chk.checked = NST.optionsEnabled[key];
+  }
+  var card = document.getElementById('opt-' + key);
+  if (card) card.classList.toggle('enabled', NST.optionsEnabled[key]);
+
+  if (NST.optionsEnabled[key]) {
+    // Add option tasks
+    var defs = OPTION_TASKS[key] || [];
+    var idx = 0;
+    defs.forEach(function(def) {
+      idx++;
+      NST.tasks.push({
+        id: makeTaskId(idx),
+        parent_id: null,
+        category: def.category,
+        task_name: def.task_name,
+        department: def.department,
+        due_date: calcDueDate(def.due_offset_days),
+        due_offset_days: def.due_offset_days,
+        status: '未着手',
+        assignee: '',
+        is_required: false,
+        template_id: null,
+        option_pkg: key
+      });
+    });
+  } else {
+    // Remove option tasks for this key
+    NST.tasks = NST.tasks.filter(function(t) { return t.option_pkg !== key; });
+  }
+  if (NST.activeTab === 'tasks' || NST.activeTab === 'main') renderTasks();
+}
+
+// ================================================================
+// Template Edit
+// ================================================================
+function switchTplType(type) {
+  NST.templateEditType = type;
+  document.getElementById('tpl-btn-fc').classList.toggle('active', type === 'fc');
+  document.getElementById('tpl-btn-direct').classList.toggle('active', type === 'direct');
+  renderTplTable();
+}
+
+var TPL_CAT_COLORS = [
+  '#e0f2fe', '#fce7f3', '#dcfce7', '#fef3c7', '#ede9fe',
+  '#fce4ec', '#e8f5e9', '#fff3e0', '#e3f2fd', '#f3e5f5',
+  '#e0e7ff', '#fef9c3'
+];
+
+var _tplCatDndSrc = null;
+
+function tplCatDndStart(e, catName) {
+  _tplCatDndSrc = catName;
+  e.currentTarget.classList.add('tpl-cat-dnd-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function tplCatDndOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('tpl-cat-dnd-over');
+  e.dataTransfer.dropEffect = 'move';
+}
+function tplCatDndLeave(e) {
+  e.currentTarget.classList.remove('tpl-cat-dnd-over');
+}
+function tplCatDndDrop(e, catName) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('tpl-cat-dnd-over');
+  if (!_tplCatDndSrc || _tplCatDndSrc === catName) return;
+  // Reorder categories in the template array
+  var tpls = NST.templates[NST.templateEditType];
+  // Get category order
+  var catOrder = [];
+  tpls.forEach(function(t) { if (catOrder.indexOf(t.category) < 0) catOrder.push(t.category); });
+  var fromIdx = catOrder.indexOf(_tplCatDndSrc);
+  var toIdx = catOrder.indexOf(catName);
+  if (fromIdx < 0 || toIdx < 0) return;
+  catOrder.splice(fromIdx, 1);
+  catOrder.splice(toIdx, 0, _tplCatDndSrc);
+  // Rebuild tpls array in new category order
+  var newTpls = [];
+  catOrder.forEach(function(cat) {
+    tpls.forEach(function(t) { if (t.category === cat) newTpls.push(t); });
+  });
+  NST.templates[NST.templateEditType] = newTpls;
+  renderTplTable();
+}
+function tplCatDndEnd(e) {
+  document.querySelectorAll('.tpl-cat-dnd-dragging,.tpl-cat-dnd-over').forEach(function(el) {
+    el.classList.remove('tpl-cat-dnd-dragging', 'tpl-cat-dnd-over');
+  });
+  _tplCatDndSrc = null;
+}
+
+function renderTplTable() {
+  if (!NST.templates) loadTemplates();
+  var tpls = NST.templates[NST.templateEditType] || [];
+  var wrap = document.getElementById('tpl-table-wrap');
+  if (!wrap) return;
+
+  // Group by category
+  var catOrder = [];
+  var catMap = {};
+  tpls.forEach(function(t, i) {
+    var cat = t.category || '未分類';
+    if (!catMap[cat]) { catMap[cat] = []; catOrder.push(cat); }
+    catMap[cat].push({ task: t, idx: i });
+  });
+
+  var html = '';
+  catOrder.forEach(function(cat, catIdx) {
+    var items = catMap[cat];
+    var catColor = TPL_CAT_COLORS[catIdx % TPL_CAT_COLORS.length];
+    var catEsc = escHtml(cat).replace(/'/g, "\\'");
+    html += '<div class="tpl-cat-group" draggable="true"' +
+      ' ondragstart="tplCatDndStart(event,\'' + catEsc + '\')"' +
+      ' ondragover="tplCatDndOver(event)"' +
+      ' ondragleave="tplCatDndLeave(event)"' +
+      ' ondrop="tplCatDndDrop(event,\'' + catEsc + '\')"' +
+      ' ondragend="tplCatDndEnd(event)">';
+    html += '<div class="tpl-cat-header" style="background:' + catColor + ';">';
+    html += '<span class="tpl-cat-drag" title="ドラッグで並び替え">⠿</span>';
+    html += '<span class="tpl-cat-name">' + escHtml(cat) + '</span>';
+    html += '<span class="tpl-cat-count">' + items.length + '件</span>';
+    html += '</div>';
+    html += '<table class="tpl-table"><thead><tr>';
+    html += '<th>タスク名</th>';
+    html += '<th style="width:100px">担当部署</th>';
+    html += '<th style="width:70px">オフセット(日)</th>';
+    html += '<th style="width:48px">必須</th>';
+    html += '<th style="width:40px"></th>';
+    html += '</tr></thead><tbody>';
+    items.forEach(function(item) {
+      var t = item.task;
+      var i = item.idx;
+      html += '<tr data-tpl-idx="' + i + '">';
+      html += '<td><input class="tpl-input" data-field="task_name" value="' + escHtml(t.task_name) + '"></td>';
+      html += '<td><input class="tpl-input" data-field="department" value="' + escHtml(t.department) + '"></td>';
+      html += '<td><input class="tpl-input" type="number" data-field="due_offset_days" value="' + (t.due_offset_days || 0) + '" style="width:60px"></td>';
+      html += '<td style="text-align:center"><input type="checkbox" ' + (t.is_required ? 'checked' : '') + ' data-field="is_required" style="accent-color:var(--teal);width:16px;height:16px;"></td>';
+      html += '<td><button class="task-delete-btn" onclick="deleteTplRow(' + i + ')">✕</button></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+
+  if (!html) html = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">テンプレートが空です</div>';
+  wrap.innerHTML = html;
+
+  // Attach change listeners
+  wrap.querySelectorAll('tr[data-tpl-idx]').forEach(function(row) {
+    var idx = parseInt(row.getAttribute('data-tpl-idx'), 10);
+    row.querySelectorAll('[data-field]').forEach(function(inp) {
+      var field = inp.getAttribute('data-field');
+      inp.addEventListener('change', function() {
+        var val = inp.type === 'checkbox' ? inp.checked : (inp.type === 'number' ? parseInt(inp.value, 10) : inp.value);
+        NST.templates[NST.templateEditType][idx][field] = val;
+      });
+    });
+  });
+}
+
+function deleteTplRow(idx) {
+  NST.templates[NST.templateEditType].splice(idx, 1);
+  renderTplTable();
+}
+
+function addTplRow() {
+  if (!NST.templates) loadTemplates();
+  NST.templates[NST.templateEditType].push({
+    id: 'custom_' + Date.now(),
+    category: '',
+    task_name: '',
+    department: '',
+    due_offset_days: -30,
+    is_required: false,
+    actor_type: 'hq',
+    phase_group: 'オープン準備',
+    sort_order: 999
+  });
+  renderTplTable();
+  // Scroll to bottom of table
+  var wrap = document.getElementById('tpl-table-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+}
+
+function saveTpl() {
+  // Sync current edits from DOM before saving
+  var tbody = document.getElementById('tpl-tbody');
+  if (tbody) {
+    tbody.querySelectorAll('tr[data-tpl-idx]').forEach(function(row) {
+      var idx = parseInt(row.getAttribute('data-tpl-idx'), 10);
+      row.querySelectorAll('[data-field]').forEach(function(inp) {
+        var field = inp.getAttribute('data-field');
+        var val = inp.type === 'checkbox' ? inp.checked : (inp.type === 'number' ? parseInt(inp.value, 10) : inp.value);
+        if (NST.templates[NST.templateEditType][idx]) {
+          NST.templates[NST.templateEditType][idx][field] = val;
+        }
+      });
+    });
+  }
+  try {
+    localStorage.setItem('aicare_task_templates_custom', JSON.stringify(NST.templates));
+    document.getElementById('tpl-status').textContent = '保存しました';
+    setTimeout(function() { document.getElementById('tpl-status').textContent = ''; }, 3000);
+    showToast('テンプレートを保存しました');
+  } catch(e) {
+    showToast('保存に失敗しました: ' + e.message);
+  }
+}
+
+function resetTpl() {
+  if (!confirm('デフォルトに戻しますか？カスタムテンプレートは削除されます。')) return;
+  localStorage.removeItem('aicare_task_templates_custom');
+  NST.templates = {
+    fc: JSON.parse(JSON.stringify(TASK_TEMPLATES_V2['fc'] || [])),
+    direct: JSON.parse(JSON.stringify(TASK_TEMPLATES_V2['direct'] || []))
+  };
+  renderTplTable();
+  showToast('デフォルトに戻しました');
+}
+
+// ================================================================
+// Autosave Draft
+// ================================================================
+var _autosaveTimer = null;
+function scheduleSave() {
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(function() {
+    try {
+      localStorage.setItem('aicare_new_store_draft', JSON.stringify({
+        storeInfo: NST.storeInfo,
+        personnel: NST.personnel,
+        tasks: NST.tasks,
+        savedAt: new Date().toISOString()
+      }));
+      var ind = document.getElementById('autosave-indicator');
+      if (ind) {
+        ind.style.opacity = '1';
+        clearTimeout(ind._hideTimer);
+        ind._hideTimer = setTimeout(function() { ind.style.opacity = '0'; }, 2000);
+      }
+    } catch(e) {}
+  }, 600);
+}
+
+function loadDraft() {
+  try {
+    var saved = localStorage.getItem('aicare_new_store_draft');
+    if (!saved) return;
+    var draft = JSON.parse(saved);
+    if (!draft || !draft.storeInfo) return;
+    NST.storeInfo = Object.assign(NST.storeInfo, draft.storeInfo);
+    NST.personnel = Object.assign(NST.personnel, draft.personnel || {});
+    NST.tasks = draft.tasks || [];
+
+    // Sync form fields
+    var fn = document.getElementById('f-name');
+    if (fn) fn.value = NST.storeInfo.nameSuffix || '';
+    var fo = document.getElementById('f-owner');
+    if (fo) fo.value = NST.storeInfo.owner || '';
+    var fd = document.getElementById('f-opendate');
+    if (fd) fd.value = NST.storeInfo.openDate || '';
+    var fp = document.getElementById('f-phase');
+    if (fp) fp.value = NST.storeInfo.phase || '打診・検討';
+    var fad = document.getElementById('f-address');
+    if (fad) fad.value = NST.storeInfo.address || '';
+    var ftel = document.getElementById('f-tel');
+    if (ftel) ftel.value = NST.storeInfo.tel || '';
+    var fsn = document.getElementById('f-storeNo');
+    if (fsn) fsn.value = NST.storeInfo.storeNo || '';
+    var foc = document.getElementById('f-ownerCompany');
+    if (foc) foc.value = NST.storeInfo.ownerCompany || '';
+    var foe = document.getElementById('f-ownerEmail');
+    if (foe) foe.value = NST.storeInfo.ownerEmail || '';
+    var fop = document.getElementById('f-ownerPhone');
+    if (fop) fop.value = NST.storeInfo.ownerPhone || '';
+    var fmn = document.getElementById('f-mgrName');
+    if (fmn) fmn.value = NST.personnel.mgrName || '';
+    var fms = document.getElementById('f-mgrStatus');
+    if (fms) fms.value = NST.personnel.mgrStatus || '未定';
+    var fmst = document.getElementById('f-mgrStart');
+    if (fmst) fmst.value = NST.personnel.mgrStart || '';
+    var fen = document.getElementById('f-empNeeded');
+    if (fen) fen.value = NST.personnel.empNeeded || 0;
+    var feh = document.getElementById('f-empHired');
+    if (feh) feh.value = NST.personnel.empHired || 0;
+    var fes = document.getElementById('f-empStatus');
+    if (fes) fes.value = NST.personnel.empStatus || '未着手';
+    var fet = document.getElementById('f-empTraining');
+    if (fet) fet.value = NST.personnel.empTraining || '未着手';
+    var fem = document.getElementById('f-empMemo');
+    if (fem) fem.value = NST.personnel.empMemo || '';
+
+    var type = NST.storeInfo.type || 'fc';
+    document.getElementById('type-fc').classList.toggle('active', type === 'fc');
+    document.getElementById('type-direct').classList.toggle('active', type === 'direct');
+
+    // Pref/city
+    renderPrefSelect();
+    if (NST.storeInfo.pref) {
+      document.getElementById('f-pref').value = NST.storeInfo.pref;
+      renderCitySelect(NST.storeInfo.pref);
+      if (NST.storeInfo.city) document.getElementById('f-city').value = NST.storeInfo.city;
+    }
+    renderLeadSelect();
+    renderEmployeeList();
+  } catch(e) {}
+}
+
+// ================================================================
+// Auto Deadline Modal (新規店舗)
+// ================================================================
+var _adlOffsets = null; // 現在編集中のオフセット
+
+function showAutoDeadlineModal() {
+  _adlOffsets = loadDeadlineOffsets();
+  var ov = document.getElementById('auto-deadline-overlay');
+  ov.style.display = 'flex';
+  var inp = document.getElementById('adl-opendate');
+  if (NST.storeInfo.openDate) inp.value = NST.storeInfo.openDate;
+  renderAdlOffsetTable();
+  updateAutoDeadlinePreview();
+}
+
+function closeAutoDeadlineModal() {
+  document.getElementById('auto-deadline-overlay').style.display = 'none';
+}
+
+function renderAdlOffsetTable() {
+  var wrap = document.getElementById('adl-offset-table');
+  if (!wrap) return;
+  // Collect categories actually used in current tasks
+  var usedCats = {};
+  NST.tasks.forEach(function(t) { if (t.category) usedCats[t.category] = true; });
+  // Merge with default offsets
+  var allCats = Object.keys(_adlOffsets).filter(function(c) { return usedCats[c]; });
+  // Add any task cats not in offsets
+  Object.keys(usedCats).forEach(function(c) { if (allCats.indexOf(c) < 0) allCats.push(c); });
+  if (allCats.length === 0) allCats = Object.keys(_adlOffsets);
+
+  var html = '<table style="width:100%;border-collapse:collapse;">';
+  html += '<thead><tr style="background:#f8f7f5;"><th style="text-align:left;padding:7px 12px;font-size:11px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">カテゴリ</th><th style="text-align:right;padding:7px 12px;font-size:11px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);width:110px;">開店何日前</th></tr></thead>';
+  html += '<tbody>';
+  allCats.forEach(function(cat) {
+    var offset = _adlOffsets[cat] !== undefined ? _adlOffsets[cat] : 0;
+    var days = Math.abs(offset);
+    html += '<tr style="border-bottom:1px solid #f5f3f0;">';
+    html += '<td style="padding:6px 12px;font-size:12px;">' + escHtml(cat) + '</td>';
+    html += '<td style="padding:4px 8px;text-align:right;">';
+    html += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;">';
+    html += '<input type="number" min="0" max="365" value="' + days + '" data-cat="' + escHtml(cat) + '" style="width:60px;text-align:right;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;" onchange="onAdlOffsetChange(this)">';
+    html += '<span style="font-size:11px;color:var(--muted);">日前</span>';
+    html += '</div></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function onAdlOffsetChange(inp) {
+  var cat = inp.getAttribute('data-cat');
+  var val = parseInt(inp.value, 10);
+  if (isNaN(val) || val < 0) val = 0;
+  _adlOffsets[cat] = -Math.abs(val);
+  updateAutoDeadlinePreview();
+}
+
+function saveAdlOffsets() {
+  saveDeadlineOffsets(_adlOffsets);
+  showToast('日程テンプレートを保存しました');
+}
+
+function resetAdlOffsets() {
+  if (!confirm('日程テンプレートをデフォルトに戻しますか？')) return;
+  try { localStorage.removeItem(DEADLINE_OFFSETS_STORAGE_KEY); } catch(e) {}
+  _adlOffsets = Object.assign({}, CATEGORY_DEADLINE_OFFSETS);
+  renderAdlOffsetTable();
+  updateAutoDeadlinePreview();
+}
+
+function updateAutoDeadlinePreview() {
+  var dateVal = document.getElementById('adl-opendate').value;
+  var prev = document.getElementById('adl-preview');
+  if (!dateVal) { prev.innerHTML = '日付を入力するとプレビューが表示されます'; return; }
+  var openDate = new Date(dateVal);
+  var offsets = _adlOffsets || loadDeadlineOffsets();
+
+  // カテゴリ別にグループ化してサンプル計算
+  var roots = NST.tasks.filter(function(t) { return !t.parent_id && t.category && offsets[t.category] !== undefined; });
+  var unmatched = NST.tasks.filter(function(t) { return !t.parent_id && (!t.category || offsets[t.category] === undefined); });
+  var catMap = {};
+  roots.forEach(function(t) {
+    if (!catMap[t.category]) catMap[t.category] = [];
+    catMap[t.category].push(t);
+  });
+
+  var lines = [];
+  var catKeys = Object.keys(catMap);
+  catKeys.forEach(function(cat) {
+    var catTasks = catMap[cat];
+    var catOffset = offsets[cat];
+    var count = catTasks.length;
+    var spacing = count <= 1 ? 0 : Math.max(1, Math.min(4, Math.floor(14 / count)));
+    if (count === 1) {
+      var d = new Date(openDate.getTime() + catOffset * 864e5);
+      lines.push('<b>' + escHtml(cat) + '</b>（1件）→ ' + (d.getMonth()+1) + '/' + d.getDate());
+    } else {
+      var d0 = new Date(openDate.getTime() + (catOffset - (count-1)*spacing) * 864e5);
+      var d1 = new Date(openDate.getTime() + catOffset * 864e5);
+      lines.push('<b>' + escHtml(cat) + '</b>（' + count + '件）→ ' + (d0.getMonth()+1) + '/' + d0.getDate() + '〜' + (d1.getMonth()+1) + '/' + d1.getDate());
+    }
+  });
+  var totalMatched = NST.tasks.filter(function(t) { return t.category && offsets[t.category] !== undefined; }).length;
+  prev.innerHTML =
+    '<div style="color:var(--text);font-weight:600;margin-bottom:5px;">' + totalMatched + '件に締切を自動設定' + (unmatched.length ? '（' + unmatched.length + '件スキップ）' : '') + '</div>' +
+    (lines.length ? '<div style="color:var(--muted);line-height:1.9;">' + lines.join('<br>') + '</div>' : '');
+}
+
+function applyAutoDeadlines() {
+  var dateVal = document.getElementById('adl-opendate').value;
+  if (!dateVal) { showToast('日付を入力してください'); return; }
+  var openDate = new Date(dateVal);
+  var offsets = _adlOffsets || loadDeadlineOffsets();
+
+  // ── root tasks をカテゴリ別にグループ化 ──
+  var roots = NST.tasks.filter(function(t) { return !t.parent_id; });
+  var catMap = {};
+  roots.forEach(function(t) {
+    var cat = t.category || '';
+    if (!catMap[cat]) catMap[cat] = [];
+    catMap[cat].push(t);
+  });
+
+  // ── カテゴリ内タスクを等間隔で割り付け ──
+  // spacing: タスク数が少ないほど余裕を持ち、多いほど詰める
+  function calcTaskDate(catOffset, idx, total) {
+    var spacing = total <= 1 ? 0 : Math.max(1, Math.min(4, Math.floor(14 / total)));
+    // 最後のタスクがcatOffset、最初のタスクが最も前
+    return catOffset - (total - 1 - idx) * spacing;
+  }
+
+  function assignChildDates(parentId, parentOffset, depth) {
+    var children = NST.tasks.filter(function(t) { return t.parent_id === parentId; });
+    if (!children.length) return;
+    children.forEach(function(child, cidx) {
+      var childOffset = parentOffset + 1 + cidx; // 親の翌日以降に1日ずつ
+      var d = new Date(openDate.getTime() + childOffset * 864e5);
+      child.due_date = d.toISOString().slice(0, 10);
+      child.due_offset_days = childOffset;
+      if (depth < 3) assignChildDates(child.id, childOffset, depth + 1);
+    });
+  }
+
+  Object.keys(catMap).forEach(function(cat) {
+    var catTasks = catMap[cat];
+    var catOffset = offsets[cat] !== undefined ? offsets[cat] : 0;
+    catTasks.forEach(function(t, idx) {
+      var taskOffset = calcTaskDate(catOffset, idx, catTasks.length);
+      var d = new Date(openDate.getTime() + taskOffset * 864e5);
+      t.due_date = d.toISOString().slice(0, 10);
+      t.due_offset_days = taskOffset;
+      assignChildDates(t.id, taskOffset, 1);
+    });
+  });
+
+  NST.storeInfo.openDate = dateVal;
+  var fd = document.getElementById('f-opendate');
+  if (fd) fd.value = dateVal;
+  renderTasks();
+  scheduleSave();
+  closeAutoDeadlineModal();
+  showToast('締切日を自動設定しました（' + NST.tasks.length + '件）');
+}
+
+// ================================================================
+// Confirm Modal
+// ================================================================
+function showConfirmModal() {
+  var nameEl = document.getElementById('f-name');
+  var nameWrap = document.getElementById('f-name-wrap');
+  if (!NST.storeInfo.nameSuffix || !NST.storeInfo.nameSuffix.trim()) {
+    if (nameEl) nameEl.focus();
+    if (nameWrap) nameWrap.style.borderColor = '#ef4444';
+    showToast('店舗名（○○店）を入力してください');
+    return;
+  }
+  if (nameWrap) nameWrap.style.borderColor = '';
+
+  // Build summary
+  var typeLabel = NST.storeInfo.type === 'fc' ? 'FC' : '直営';
+  var catCounts = {};
+  NST.tasks.forEach(function(t) {
+    if (t.parent_id) return;
+    var cat = t.category || '未分類';
+    catCounts[cat] = (catCounts[cat] || 0) + 1;
+  });
+
+  var infoHtml = '<div class="cm-section-label">店舗情報</div>';
+  infoHtml += '<div class="cm-info-grid">';
+  infoHtml += '<span class="cm-info-key">店舗名</span><span class="cm-info-val">' + escHtml(NST.storeInfo.name) + '</span>';
+  infoHtml += '<span class="cm-info-key">種別</span><span class="cm-info-val">' + typeLabel + '</span>';
+  infoHtml += '<span class="cm-info-key">エリア</span><span class="cm-info-val">' + (escHtml(NST.storeInfo.area) || '—') + '</span>';
+  infoHtml += '<span class="cm-info-key">オーナー</span><span class="cm-info-val">' + (escHtml(NST.storeInfo.owner) || '—') + '</span>';
+  infoHtml += '<span class="cm-info-key">開店日</span><span class="cm-info-val">' + (escHtml(NST.storeInfo.openDate) || '—') + '</span>';
+  infoHtml += '<span class="cm-info-key">フェーズ</span><span class="cm-info-val">' + (escHtml(NST.storeInfo.phase) || '—') + '</span>';
+  infoHtml += '</div>';
+
+  var taskHtml = '<div class="cm-section-label" style="margin-top:4px;">タスク（' + NST.tasks.filter(function(t){return !t.parent_id;}).length + '件）</div>';
+  taskHtml += '<div class="cm-task-summary">';
+  var cats = Object.keys(catCounts);
+  if (cats.length === 0) {
+    taskHtml += '<div style="color:var(--muted);font-size:12px;">タスクなし</div>';
+  } else {
+    cats.forEach(function(cat) {
+      taskHtml += '<div class="cm-task-row"><span class="cm-task-cat">' + escHtml(cat) + '</span><span class="cm-task-cnt">' + catCounts[cat] + '件</span></div>';
+    });
+  }
+  taskHtml += '</div>';
+
+  document.getElementById('cm-body-content').innerHTML = infoHtml + taskHtml;
+  document.getElementById('confirm-modal-overlay').classList.add('show');
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirm-modal-overlay').classList.remove('show');
+}
+
+function cancelNewStore() {
+  if (!confirm('新規店舗作成をキャンセルしますか？入力内容は下書きとして保存されます。')) return;
+  closeConfirmModal();
+  window.location.href = 'aicare-lab-app.html';
+}
+
+// ================================================================
+// Save Store
+// ================================================================
+function saveStore() {
+  // Validate
+  if (!NST.storeInfo.nameSuffix || !NST.storeInfo.nameSuffix.trim()) {
+    showToast('店舗名（○○店）を入力してください');
+    return;
+  }
+  // Ensure full name is set
+  NST.storeInfo.name = 'アイケアLaBo ' + NST.storeInfo.nameSuffix.trim();
+
+  var storeId = 'store_' + Date.now();
+  var typeLabel = NST.storeInfo.type === 'fc' ? 'fc' : 'direct';
+  // Build personnel_json
+  var personnelJson = JSON.stringify({
+    manager: { name: NST.personnel.mgrName, status: NST.personnel.mgrStatus, planned_start: NST.personnel.mgrStart },
+    employees: {
+      hired: NST.personnel.empHired, needed: NST.personnel.empNeeded,
+      status: NST.personnel.empStatus, training: NST.personnel.empTraining,
+      memo: NST.personnel.empMemo, list: NST.personnel.empList || []
+    }
+  });
+
+  // Build tasks JSON in store-model format
+  var tasksJson = NST.tasks.map(function(t) {
+    return {
+      id: storeId + '-' + t.id,
+      template_id: t.template_id || t.id,
+      template_type: typeLabel,
+      major_category: t.category,
+      task_name: t.task_name,
+      department: t.department,
+      assignee: t.assignee || '',
+      role_bucket: 'hq',
+      status: t.status || '未着手',
+      is_required: !!t.is_required,
+      due_date: t.due_date || '',
+      completed_at: '',
+      note: '',
+      sort_order: 999,
+      phase_group: t.category,
+      updated_at: new Date().toISOString().slice(0, 10),
+      version: 1
+    };
+  });
+
+  // Build row
+  var row = {
+    store_id: storeId,
+    store_no: 'NEW-' + Date.now(),
+    store_name: NST.storeInfo.name.trim(),
+    store_type: typeLabel,
+    area: NST.storeInfo.area || '',
+    owner_name: NST.storeInfo.owner || '',
+    owner_company: NST.storeInfo.ownerCompany || '',
+    owner_email: NST.storeInfo.ownerEmail || '',
+    owner_phone: NST.storeInfo.ownerPhone || '',
+    address: NST.storeInfo.address || '',
+    open_date: NST.storeInfo.openDate || '',
+    pre_open_date: '',
+    current_phase: NST.storeInfo.phase || '打診・検討',
+    status: 'good',
+    progress_percent: 0,
+    lead_person_name: NST.storeInfo.leadPerson || '',
+    lead_person_icon_url: '',
+    total_tasks: tasksJson.length,
+    completed_tasks: 0,
+    pending_tasks: tasksJson.length,
+    delayed_tasks: 0,
+    needs_confirmation_count: 0,
+    missing_documents_count: 0,
+    owner_action_count: 0,
+    hq_action_count: tasksJson.length,
+    next_action: tasksJson.length > 0 ? tasksJson[0].task_name : '',
+    blocking_point: '',
+    nearest_due_date: '',
+    latest_comment_summary: '',
+    hero_image_url: '',
+    gallery_count: 0,
+    last_owner_activity_at: new Date().toISOString(),
+    last_hq_activity_at: new Date().toISOString(),
+    last_saved_at: new Date().toISOString(),
+    version: 1,
+    tasks_json: JSON.stringify(tasksJson),
+    comments_json: JSON.stringify([]),
+    gallery_json: JSON.stringify([]),
+    shared_files_json: JSON.stringify([]),
+    owner_ui_json: JSON.stringify({}),
+    hq_ui_json: JSON.stringify({}),
+    audit_json: JSON.stringify([]),
+    personnel_json: personnelJson
+  };
+
+  // Save via STORE_ADAPTER
+  try {
+    var allData = STORE_ADAPTER.loadAll();
+    STORE_ADAPTER._cache = allData;
+    STORE_ADAPTER.save(row);
+    // Clear draft
+    try { localStorage.removeItem('aicare_new_store_draft'); } catch(e) {}
+    closeConfirmModal();
+    showToast('店舗を登録しました');
+    setTimeout(function() {
+      window.location.href = 'aicare-lab-app.html?newStore=' + storeId;
+    }, 600);
+  } catch(e) {
+    showToast('保存エラー: ' + e.message);
+  }
+}
+
+// ================================================================
+// Init
+// ================================================================
+(function init() {
+  loadTemplates();
+  loadCustomCities();
+  loadLeadPersons();
+  loadDepartments();
+
+  // Init selects
+  renderPrefSelect();
+  renderLeadSelect();
+  renderEmployeeList();
+
+  // Try to restore draft, otherwise load preset
+  var hasDraft = false;
+  try {
+    var draftRaw = localStorage.getItem('aicare_new_store_draft');
+    if (draftRaw) {
+      var draft = JSON.parse(draftRaw);
+      if (draft && draft.storeInfo && (draft.storeInfo.nameSuffix || (draft.tasks && draft.tasks.length))) {
+        hasDraft = true;
+      }
+    }
+  } catch(e) {}
+
+  if (hasDraft) {
+    loadDraft();
+    renderTasks();
+  } else {
+    reloadTaskPreset();
+  }
+
+  // Sticky task toolbar: show when task header scrolls out of view
+  var taskHeaderEl = document.querySelector('#tab-tasks .section-title');
+  var stickyBar = document.getElementById('task-sticky-bar');
+  if (taskHeaderEl && stickyBar) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        stickyBar.style.display = entry.isIntersecting ? 'none' : 'flex';
+      });
+    }, { threshold: 0, rootMargin: '-50px 0px 0px 0px' });
+    observer.observe(taskHeaderEl);
+  }
+
+  // Close modals when clicking overlay background
+  document.getElementById('confirm-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirmModal();
+  });
+  document.getElementById('auto-deadline-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeAutoDeadlineModal();
+  });
+
+  // Template tab add-row button injection
+  document.querySelector('#tab-template .wrap').insertAdjacentHTML('beforeend',
+    '<div style="padding:0 0 0 0;margin-top:-10px;"><button class="task-action-btn" style="margin-top:8px;" onclick="addTplRow()">＋ タスクを追加</button></div>');
+})();
+</script>
+</body>
+</html>

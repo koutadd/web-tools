@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>オーナー専用ページ | アイケアラボ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ===== COMMON NAV ===== */
+#aicare-common-nav{
+  position:sticky;top:0;z-index:99999;
+  background:#040c18;border-bottom:1px solid rgba(245,158,11,.18);
+  display:flex;align-items:center;gap:6px;
+  padding:0 20px;height:42px;min-height:42px;max-height:42px;
+  overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;white-space:nowrap;
+  scrollbar-width:none;-ms-overflow-style:none;
+  font-family:'DM Mono','SF Mono',monospace;font-size:11px;letter-spacing:.05em;
+}
+#aicare-common-nav::-webkit-scrollbar{display:none;}
+#aicare-common-nav>*{flex-shrink:0;}
+#aicare-common-nav .cn-label{color:rgba(255,255,255,.25);font-size:10px;letter-spacing:.1em;padding-right:4px;}
+#aicare-common-nav .cn-sep{color:rgba(255,255,255,.15);padding:0 2px;user-select:none;}
+#aicare-common-nav a{color:rgba(148,163,184,.85);text-decoration:none;padding:3px 10px;border-radius:4px;border:1px solid rgba(148,163,184,.12);transition:color .15s,background .15s;white-space:nowrap;}
+#aicare-common-nav a:hover{color:#e2eaf4;background:rgba(255,255,255,.06);}
+#aicare-common-nav a.cn-active{color:#f59e0b!important;border-color:rgba(245,158,11,.35)!important;background:rgba(245,158,11,.08)!important;}
+#aicare-common-nav .cn-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+#aicare-common-nav .cn-btn-hq{background:rgba(13,148,136,.15);border:1px solid rgba(13,148,136,.35)!important;color:#5eead4!important;padding:3px 10px;border-radius:4px;}
+#aicare-common-nav .cn-user{color:rgba(255,255,255,.45);font-size:10px;padding:0 4px;}
+
+:root{
+  --bg:#f9fafb;--surface:#fff;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--muted2:#9ca3af;
+  --teal:#0d9488;--teal-bg:#f0fdfa;
+  --pink:#db2777;--pink-bg:#fdf2f8;--pink-border:#fbcfe8;
+  --blue:#2563eb;--blue-bg:#eff6ff;
+  --green:#059669;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fff1f2;--red-border:#fecaca;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+  --radius:10px;--radius-sm:6px;
+}
+
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* ===== OWNER HEADER ===== */
+.owner-header{
+  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);
+  padding:32px 24px 28px;text-align:center;color:#fff;
+  position:relative;overflow:hidden;
+}
+.owner-header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.owner-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(236,72,153,.25);border:1px solid rgba(236,72,153,.5);color:#f9a8d4;padding:4px 14px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.06em;margin-bottom:12px;}
+.owner-title{font-size:1.5rem;font-weight:900;letter-spacing:.03em;margin-bottom:6px;}
+.owner-sub{font-size:.82rem;color:rgba(255,255,255,.6);margin-bottom:16px;}
+
+/* store selector */
+.store-selector-wrap{max-width:360px;margin:0 auto;position:relative;}
+.store-selector{width:100%;padding:10px 16px;border:2px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.1);color:#fff;font-size:.88rem;font-weight:600;outline:none;cursor:pointer;appearance:none;}
+.store-selector option{color:#111;background:#fff;}
+.store-selector-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);pointer-events:none;}
+
+/* ===== MAIN ===== */
+.main-wrap{max-width:860px;margin:0 auto;padding:24px 20px 80px;}
+
+/* ===== STATUS HERO ===== */
+.status-hero{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;margin-bottom:20px;border-left:4px solid var(--teal);
+}
+.sh-label{font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.sh-phase{font-size:1.4rem;font-weight:900;color:var(--teal);margin-bottom:6px;}
+.sh-progress-bg{height:10px;background:#e5e7eb;border-radius:5px;overflow:hidden;margin-bottom:6px;}
+.sh-progress-fill{height:100%;border-radius:5px;background:var(--teal);transition:width .5s;}
+.sh-progress-text{font-size:.75rem;color:var(--muted);}
+.sh-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.sh-meta-item{text-align:center;padding:10px;background:#f8fafc;border-radius:8px;}
+.sh-meta-num{font-size:1.3rem;font-weight:900;color:var(--text);}
+.sh-meta-lab{font-size:.62rem;color:var(--muted);font-weight:600;}
+
+/* ===== SECTION ===== */
+.section{background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.section-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fafbfc;}
+.section-icon{font-size:1rem;}
+.section-title{font-size:.85rem;font-weight:800;color:var(--text);}
+.section-body{padding:16px 18px;}
+
+/* ===== TASK SECTION ===== */
+.owner-task-group{margin-bottom:14px;}
+.task-group-name{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.task-group-name::before{content:'';flex:1;height:1px;background:var(--border);}
+.task-group-name::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.owner-task{
+  display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+  border:1px solid var(--border);border-radius:8px;margin-bottom:8px;
+  transition:background .12s;
+}
+.owner-task:hover{background:#fafbfc;}
+.owner-task.done{background:#f8fafc;opacity:.65;}
+.task-check{width:18px;height:18px;cursor:pointer;accent-color:var(--teal);flex-shrink:0;margin-top:1px;}
+.owner-task-body{flex:1;min-width:0;}
+.owner-task-name{font-size:.82rem;font-weight:600;margin-bottom:2px;}
+.owner-task-name.done{color:var(--muted2);text-decoration:line-through;}
+.owner-task-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.task-due{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;}
+.task-due.ok{background:var(--green-bg);color:var(--green);}
+.task-due.near{background:var(--amber-bg);color:var(--amber);}
+.task-due.over{background:var(--red-bg);color:var(--red);}
+.task-due.none{background:#f1f5f9;color:var(--muted);}
+
+/* ===== COMMENT ===== */
+.comment-item{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+.comment-meta{font-size:.65rem;color:var(--muted);margin-bottom:5px;}
+.comment-text{font-size:.8rem;line-height:1.65;white-space:pre-wrap;}
+.comment-form-wrap{border:1px solid var(--border);border-radius:8px;padding:12px;}
+.comment-textarea{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:.8rem;font-family:inherit;resize:vertical;min-height:80px;outline:none;}
+.comment-textarea:focus{border-color:var(--teal);}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:var(--radius-sm);font-size:.78rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-primary:hover{background:#0f766e;}
+.btn-sm{padding:5px 12px;font-size:.72rem;}
+
+/* ===== INFO ===== */
+.info-field{display:flex;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f3f4f6;}
+.info-field:last-child{border-bottom:none;}
+.info-label{font-size:.68rem;color:var(--muted);font-weight:600;min-width:120px;padding-top:2px;}
+.info-value{font-size:.82rem;font-weight:600;color:var(--text);}
+
+/* ===== DRIVE ===== */
+.drive-link-card{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  border:1px solid var(--border);border-radius:8px;background:#fafbfc;
+  text-decoration:none;color:var(--text);transition:background .12s;
+  margin-bottom:10px;
+}
+.drive-link-card:hover{background:#f0fdfa;border-color:var(--teal);}
+.drive-icon-big{font-size:1.5rem;}
+.drive-link-body{flex:1;}
+.drive-link-name{font-size:.85rem;font-weight:700;}
+.drive-link-url{font-size:.65rem;color:var(--teal);word-break:break-all;}
+
+/* ===== EMPTY ===== */
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:.82rem;}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:.78rem;font-weight:700;z-index:10000;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+
+/* ===== AUTOSAVE ===== */
+#autosave-ind{position:fixed;bottom:20px;right:20px;z-index:9000;background:#1e293b;color:#fff;border-radius:8px;padding:8px 14px;font-size:.72rem;font-weight:700;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+
+/* ===== NOTICE BANNER ===== */
+.notice-banner{background:linear-gradient(90deg,#fdf4ff,#fce7f3);border:1px solid var(--pink-border);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.notice-icon{font-size:1.4rem;}
+.notice-text{font-size:.78rem;color:#831843;line-height:1.6;}
+.notice-text strong{font-weight:800;}
+
+@media(max-width:600px){.sh-meta{grid-template-columns:repeat(2,1fr);}.main-wrap{padding:16px 14px 80px;}}
+</style>
+</head>
+<body>
+
+<!-- ===== 共通ナビ ===== -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-stores.html">出店管理（本部）</a>
+  <a href="aicare-stores-owner.html" class="cn-active">オーナー画面</a>
+  <div class="cn-right">
+    <a href="aicare-stores.html" class="cn-btn-hq">本部ページ ↗</a>
+    <span class="cn-user" id="nav-user">オーナー</span>
+  </div>
+</nav>
+
+<!-- ===== オーナーヘッダー ===== -->
+<div class="owner-header">
+  <div class="owner-badge">👤 オーナー専用ページ</div>
+  <div class="owner-title">出店進捗 確認ページ</div>
+  <div class="owner-sub">あなたの店舗の準備状況をリアルタイムで確認できます</div>
+  <div class="store-selector-wrap">
+    <select class="store-selector" id="store-select" onchange="onStoreChange(this.value)">
+      <option value="">── 店舗を選択してください ──</option>
+    </select>
+    <span class="store-selector-icon">▼</span>
+  </div>
+</div>
+
+<!-- ===== メインコンテンツ ===== -->
+<div class="main-wrap">
+  <div id="app-root">
+    <div class="empty-state" style="padding:60px 24px;">
+      <div style="font-size:2rem;margin-bottom:12px;">🏪</div>
+      <div style="font-size:.95rem;font-weight:700;margin-bottom:6px;">店舗を選択してください</div>
+      <div style="font-size:.78rem;">上のプルダウンから確認したい店舗を選んでください</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="autosave-ind">💾 保存済み ✓</div>
+
+<script src="data/store-templates-v2.js"></script>
+<script>
+'use strict';
+
+// ============================================================
+// DB KEYS (aicare-stores.html と共通)
+// ============================================================
+const DB = {
+  STORES:      'aicare_stores_v1',
+  TASKS:       'aicare_store_tasks_v1',
+  PERSONNEL:   'aicare_store_personnel_v1',
+  COMMENTS:    'aicare_store_comments_v1',
+  STATUS_HIST: 'aicare_store_logs_v1',
+  TASK_HIST:   'aicare_store_task_hist_v1',
+};
+const DRIVE_PARENT_FOLDER_URL = 'https://drive.google.com/drive/folders/1_Hh2-OkgI_X72wmNgta5wtwOm_Tg6NmF';
+
+// ============================================================
+// DATA ACCESS
+// ============================================================
+function loadDB(key, fb) {
+  try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : fb; } catch(e) { return fb; }
+}
+function saveDB(key, data) {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+}
+
+function getAllStores() { return loadDB(DB.STORES, []); }
+function getStore(id) { return getAllStores().find(s => s.id === id); }
+function getStoreTasks(storeId) {
+  const all = loadDB(DB.TASKS, {});
+  return all[storeId] || [];
+}
+function getComments(storeId) {
+  const all = loadDB(DB.COMMENTS, {});
+  return (all[storeId] || []).filter(c => !c.deleted);
+}
+function addComment(storeId, text) {
+  const all = loadDB(DB.COMMENTS, {});
+  if (!all[storeId]) all[storeId] = [];
+  all[storeId].push({
+    id: 'c-' + Date.now(), store_id: storeId,
+    author: '(オーナー)', author_type: 'owner',
+    text, scope: 'hq', deleted: false, created_at: new Date().toISOString()
+  });
+  saveDB(DB.COMMENTS, all);
+}
+function markTaskDone(storeId, taskId, done) {
+  const all = loadDB(DB.TASKS, {});
+  const tasks = all[storeId] || [];
+  const t = tasks.find(x => x.id === taskId);
+  if (!t) return;
+  t.status = done ? '完了' : '未着手';
+  t.completed_at = done ? new Date().toISOString() : '';
+  t.updated_at = new Date().toISOString();
+  all[storeId] = tasks;
+  saveDB(DB.TASKS, all);
+  // ログ
+  const hist = loadDB(DB.TASK_HIST, {});
+  if (!hist[storeId]) hist[storeId] = [];
+  hist[storeId].unshift({ id:'th-'+Date.now(), task_id:taskId, task_name:t.task_name, status:t.status, at:new Date().toISOString() });
+  saveDB(DB.TASK_HIST, hist);
+}
+function addLog(storeId, text) {
+  const all = loadDB(DB.STATUS_HIST, {});
+  if (!all[storeId]) all[storeId] = [];
+  all[storeId].unshift({ id:'l-'+Date.now(), text, type:'owner', at:new Date().toISOString() });
+  all[storeId] = all[storeId].slice(0, 100);
+  saveDB(DB.STATUS_HIST, all);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,dd] = d.split('-');
+  return `${y}年${parseInt(m)}月${parseInt(dd)}日`;
+}
+function fmtDateTime(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function dueClass(due) {
+  if (!due) return 'none';
+  const today = todayStr();
+  const diff = (new Date(due) - new Date(today)) / 86400000;
+  if (diff < 0) return 'over';
+  if (diff <= 3) return 'near';
+  return 'ok';
+}
+function dueLabel(due) {
+  if (!due) return '期限なし';
+  const today = todayStr();
+  const diff = Math.round((new Date(due) - new Date(today)) / 86400000);
+  if (diff < 0) return `${Math.abs(diff)}日超過`;
+  if (diff === 0) return '今日まで';
+  if (diff === 1) return '明日まで';
+  return `あと${diff}日`;
+}
+
+let APP = { storeId: null };
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  // URLパラメータから店舗ID取得
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('store');
+
+  // ストアセレクター構築
+  const stores = getAllStores().filter(s => !s.archive && s.is_current && s.status === 'active');
+  const sel = document.getElementById('store-select');
+  stores.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.store_no}｜${s.store_name}`;
+    sel.appendChild(opt);
+  });
+
+  if (sid && stores.find(s => s.id === sid)) {
+    sel.value = sid;
+    APP.storeId = sid;
+    render();
+  }
+}
+
+function onStoreChange(id) {
+  APP.storeId = id || null;
+  // URLパラメータ更新（ページリロードなし）
+  if (id) {
+    const url = new URL(location.href);
+    url.searchParams.set('store', id);
+    history.replaceState(null, '', url.toString());
+    const s = getStore(id);
+    if (s) document.getElementById('nav-user').textContent = s.owner_name || 'オーナー';
+  } else {
+    history.replaceState(null, '', location.pathname);
+  }
+  render();
+}
+
+function render() {
+  const root = document.getElementById('app-root');
+  if (!APP.storeId) {
+    root.innerHTML = `<div class="empty-state" style="padding:60px 24px;"><div style="font-size:2rem;margin-bottom:12px;">🏪</div><div>店舗を選択してください</div></div>`;
+    return;
+  }
+  const s = getStore(APP.storeId);
+  if (!s) { root.innerHTML = '<div class="empty-state">店舗が見つかりません</div>'; return; }
+  const tasks = getStoreTasks(s.id);
+  const ownerTasks = tasks.filter(t => t.actor_type === 'owner');
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === '完了').length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  const ownerDone = ownerTasks.filter(t => t.status === '完了').length;
+  const ownerPending = ownerTasks.filter(t => t.status !== '完了').length;
+  const pctColor = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--teal)' : 'var(--amber)';
+
+  // オーナータスクをカテゴリ別にグループ化
+  const catMap = {};
+  ownerTasks.forEach(t => {
+    const cat = t.major_category || t.category || 'その他';
+    if (!catMap[cat]) catMap[cat] = [];
+    catMap[cat].push(t);
+  });
+  const pendingFirst = Object.entries(catMap).sort((a,b) => {
+    const ap = a[1].filter(t => t.status !== '完了').length;
+    const bp = b[1].filter(t => t.status !== '完了').length;
+    return bp - ap;
+  });
+
+  const ownerTasksHTML = pendingFirst.length > 0
+    ? pendingFirst.map(([cat, items]) => `
+      <div class="owner-task-group">
+        <div class="task-group-name">${esc(cat)}</div>
+        ${items.map(t => {
+          const done = t.status === '完了';
+          const dc = dueClass(t.due_date);
+          return `<div class="owner-task ${done?'done':''}">
+            <input type="checkbox" class="task-check" ${done?'checked':''} onchange="onTaskCheck('${s.id}','${t.id}',this.checked)">
+            <div class="owner-task-body">
+              <div class="owner-task-name ${done?'done':''}">${esc(t.task_name)}</div>
+              <div class="owner-task-meta">
+                ${t.due_date ? `<span class="task-due ${dc}">${dueLabel(t.due_date)}</span>` : ''}
+                ${t.memo ? `<span style="font-size:.65rem;color:var(--muted);">${esc(t.memo)}</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('')
+    : '<div class="empty-state">オーナー担当タスクはありません</div>';
+
+  const comments = getComments(s.id);
+  const commentsHTML = comments.length > 0
+    ? comments.slice().reverse().slice(0,10).map(c => `
+      <div class="comment-item">
+        <div class="comment-meta">${esc(c.author)} &nbsp;·&nbsp; ${fmtDateTime(c.created_at)}</div>
+        <div class="comment-text">${esc(c.text)}</div>
+      </div>`).join('')
+    : '<div class="empty-state" style="padding:20px;">コメントはまだありません</div>';
+
+  const typeLabel = s.store_type === 'fc' ? 'FC加盟店' : '直営店';
+  const typeBadgeBg = s.store_type === 'fc' ? 'var(--pink-bg)' : 'var(--blue-bg)';
+  const typeBadgeColor = s.store_type === 'fc' ? 'var(--pink)' : 'var(--blue)';
+
+  root.innerHTML = `
+    <!-- 注意バナー -->
+    <div class="notice-banner">
+      <div class="notice-icon">📋</div>
+      <div class="notice-text">
+        <strong>${esc(s.store_name)}</strong> の出店準備ページです。<br>
+        「オーナー担当タスク」にチェックを入れると本部にリアルタイムで反映されます。
+      </div>
+    </div>
+
+    <!-- 進捗ヒーロー -->
+    <div class="status-hero" style="border-left-color:${typeBadgeColor};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:10px;background:${typeBadgeBg};color:${typeBadgeColor};">${typeLabel}</span>
+        <span style="font-size:.65rem;font-weight:700;color:var(--muted);">${esc(s.store_no)}</span>
+      </div>
+      <div class="sh-label">現在のフェーズ</div>
+      <div class="sh-phase">${esc(s.current_phase || '—')}</div>
+      <div class="sh-progress-bg"><div class="sh-progress-fill" style="width:${pct}%;background:${pctColor};"></div></div>
+      <div class="sh-progress-text">全体進捗 ${done}/${total} タスク完了（${pct}%）</div>
+      <div class="sh-meta">
+        <div class="sh-meta-item">
+          <div class="sh-meta-num" style="color:var(--teal);">${ownerPending}</div>
+          <div class="sh-meta-lab">オーナー対応中</div>
+        </div>
+        <div class="sh-meta-item">
+          <div class="sh-meta-num" style="color:var(--green);">${ownerDone}</div>
+          <div class="sh-meta-lab">オーナー完了</div>
+        </div>
+        <div class="sh-meta-item">
+          <div class="sh-meta-num">${s.open_date ? fmtDate(s.open_date) : '未定'}</div>
+          <div class="sh-meta-lab">オープン予定</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- オーナー担当タスク -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">✅</span>
+        <span class="section-title">オーナー担当タスク</span>
+        <span style="margin-left:auto;font-size:.65rem;color:var(--muted);">残り ${ownerPending} 件</span>
+      </div>
+      <div class="section-body">${ownerTasksHTML}</div>
+    </div>
+
+    <!-- 本部へのコメント -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💬</span>
+        <span class="section-title">本部へのコメント・質問</span>
+      </div>
+      <div class="section-body">
+        ${commentsHTML}
+        <div class="comment-form-wrap" style="margin-top:14px;">
+          <textarea id="comment-text" class="comment-textarea" placeholder="本部への質問や連絡事項を入力…"></textarea>
+          <div style="text-align:right;margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="postComment()">送信する</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 店舗基本情報（read only） -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🏪</span>
+        <span class="section-title">店舗基本情報</span>
+      </div>
+      <div class="section-body">
+        <div class="info-field"><span class="info-label">店舗番号</span><span class="info-value">${esc(s.store_no)}</span></div>
+        <div class="info-field"><span class="info-label">店舗名</span><span class="info-value">${esc(s.store_name)}</span></div>
+        <div class="info-field"><span class="info-label">エリア</span><span class="info-value">${esc(s.area||'—')}</span></div>
+        <div class="info-field"><span class="info-label">オープン予定日</span><span class="info-value">${s.open_date ? fmtDate(s.open_date) : '未定'}</span></div>
+        <div class="info-field"><span class="info-label">担当者</span><span class="info-value">${esc(s.lead_person||'—')}</span></div>
+        <div class="info-field"><span class="info-label">現在のフェーズ</span><span class="info-value" style="color:var(--teal);">${esc(s.current_phase||'—')}</span></div>
+      </div>
+    </div>
+
+    <!-- 資料フォルダ -->
+    ${(s.drive_folder_url || s.ref_folder_url) ? `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📁</span>
+        <span class="section-title">資料・ドライブ</span>
+      </div>
+      <div class="section-body">
+        ${s.drive_folder_url ? `
+        <a href="${esc(s.drive_folder_url)}" target="_blank" class="drive-link-card">
+          <span class="drive-icon-big">📁</span>
+          <div class="drive-link-body">
+            <div class="drive-link-name">${esc(s.drive_folder_name || s.store_name + ' フォルダ')}</div>
+            <div class="drive-link-url">${esc(s.drive_folder_url)}</div>
+          </div>
+          <span style="font-size:.75rem;color:var(--teal);">開く →</span>
+        </a>` : ''}
+        ${s.ref_folder_url ? `
+        <a href="${esc(s.ref_folder_url)}" target="_blank" class="drive-link-card">
+          <span class="drive-icon-big">📂</span>
+          <div class="drive-link-body">
+            <div class="drive-link-name">参考資料フォルダ</div>
+            <div class="drive-link-url">${esc(s.ref_folder_url)}</div>
+          </div>
+          <span style="font-size:.75rem;color:var(--teal);">開く →</span>
+        </a>` : ''}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function onTaskCheck(storeId, taskId, checked) {
+  markTaskDone(storeId, taskId, checked);
+  addLog(storeId, `オーナーがタスクを${checked?'完了':'未着手に戻し'}ました`);
+  showAutosave();
+  // 該当タスクのDOMだけ更新（フル再描画は重いため）
+  const wrapper = event.target.closest('.owner-task');
+  if (wrapper) {
+    wrapper.classList.toggle('done', checked);
+    const nameEl = wrapper.querySelector('.owner-task-name');
+    if (nameEl) nameEl.classList.toggle('done', checked);
+  }
+}
+
+function postComment() {
+  const txt = document.getElementById('comment-text')?.value.trim();
+  if (!txt || !APP.storeId) return;
+  addComment(APP.storeId, txt);
+  addLog(APP.storeId, 'オーナーがコメントを投稿しました');
+  document.getElementById('comment-text').value = '';
+  showToast('コメントを送信しました');
+  render();
+}
+
+function showAutosave() {
+  const el = document.getElementById('autosave-ind');
+  if (!el) return;
+  el.style.display = 'block';
+  clearTimeout(APP._t);
+  APP._t = setTimeout(() => { el.style.display = 'none'; }, 2000);
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(APP._tt);
+  APP._tt = setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>セルフ視界チェック | アイケアラボ 眼の整体院</title>
+  <!-- パスワード保護なし (サイト公開用) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      color: #1a1a2e;
+      line-height: 1.75;
+      background: #F5F6FA;
+    }
+    .btn-navy { background:#0D2B5E; color:white; transition:all 0.2s; }
+    .btn-navy:hover { opacity:0.88; }
+    .btn-outline { border:1.5px solid #0D2B5E; color:#0D2B5E; transition:all 0.2s; }
+    .btn-outline:hover { background:#0D2B5E; color:white; }
+
+    /* スクリーン切り替え */
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    /* 設問ボタン */
+    .answer-btn {
+      width:100%;
+      padding: 14px 20px;
+      border: 1.5px solid #C7D5EE;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #1a1a2e;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .answer-btn:hover { border-color:#0D2B5E; background:#EEF2FF; }
+    .answer-btn.selected { border-color:#0D2B5E; background:#0D2B5E; color:white; }
+    .answer-btn .score-dot {
+      width:10px; height:10px; border-radius:50%;
+      border: 2px solid #C7D5EE;
+      flex-shrink:0; transition: all 0.15s;
+    }
+    .answer-btn:hover .score-dot { border-color:#0D2B5E; }
+    .answer-btn.selected .score-dot { background:white; border-color:white; }
+
+    /* プログレスバー */
+    .progress-bar { height:3px; background:#EEF2FF; border-radius:2px; overflow:hidden; }
+    .progress-fill { height:100%; background:#0D2B5E; border-radius:2px; transition:width 0.4s ease; }
+
+    /* 結果表示アニメーション */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.5s ease both; }
+    .delay-1 { animation-delay: 0.15s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.45s; }
+    .delay-4 { animation-delay: 0.6s; }
+    .delay-5 { animation-delay: 0.75s; }
+
+    /* 問題切り替えアニメ */
+    @keyframes slideIn {
+      from { opacity:0; transform:translateX(30px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    .slide-in { animation: slideIn 0.35s ease both; }
+
+    /* ローディングスピナー */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 1.2s linear infinite; }
+
+    /* タイプバッジ */
+    .type-badge {
+      display:inline-block;
+      padding:4px 14px; border-radius:2px;
+      font-size:0.72rem; font-weight:600; letter-spacing:0.08em;
+      margin-bottom:8px;
+    }
+
+    /* SP対応 */
+    @media (max-width:767px) { body { padding-bottom:0; } }
+  </style>
+</head>
+<body>
+
+<!-- ================================================
+  HEADER
+================================================ -->
+<header id="header" class="sticky top-0 z-50 bg-white border-b border-gray-200" style="transition:box-shadow 0.3s;">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center flex-shrink-0">
+        <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-9 w-auto">
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+
+<!-- ================================================
+  メインコンテナ
+================================================ -->
+<main class="max-w-2xl mx-auto px-4 sm:px-6 py-10 md:py-14">
+
+  <!-- ===== SCREEN 0: 導入 ===== -->
+  <div id="screen-intro" class="screen active">
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+
+      <!-- ヘッダービジュアル -->
+      <div class="py-12 px-8 text-center" style="background:linear-gradient(135deg,#0D2B5E 0%,#1a3d7a 100%);">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5" style="background:rgba(255,255,255,0.12);">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M3 16C3 16 7 7 16 7C25 7 29 16 29 16C29 16 25 25 16 25C7 25 3 16 3 16Z" stroke="white" stroke-width="1.5" fill="none"/>
+            <circle cx="16" cy="16" r="6" stroke="white" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="3" fill="white" fill-opacity="0.8"/>
+            <circle cx="17.5" cy="14.5" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        <div class="text-xs font-medium tracking-[0.4em] text-blue-300 mb-3">SELF CHECK</div>
+        <h1 class="text-2xl md:text-3xl font-bold text-white mb-3" style="letter-spacing:0.06em;">セルフ視界チェック</h1>
+        <p class="text-blue-200 text-sm leading-relaxed">
+          10の質問に答えるだけで、<br>
+          今の視界や目の使い方の傾向を確認できます。
+        </p>
+      </div>
+
+      <div class="p-7 md:p-10">
+        <!-- 説明 -->
+        <div class="mb-8">
+          <h2 class="text-base font-bold mb-3" style="color:#0D2B5E;">こんな方におすすめです</h2>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-2.5 text-sm text-gray-600">
+              <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2.5 2.5L11 5.5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              最近、目の疲れや視界の不快感が気になっている
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-600">
+              <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2.5 2.5L11 5.5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              以前と比べて目の使い方が変わってきた気がする
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-600">
+              <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2.5 2.5L11 5.5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              自分の視界の状態を客観的に把握してみたい
+            </li>
+            <li class="flex items-start gap-2.5 text-sm text-gray-600">
+              <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2.5 2.5L11 5.5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              日常のケアを見直すきっかけを探している
+            </li>
+          </ul>
+        </div>
+
+        <!-- 所要時間 -->
+        <div class="flex items-center gap-4 py-4 mb-8 border-y border-gray-100">
+          <div class="text-center flex-1">
+            <div class="text-2xl font-bold" style="color:#0D2B5E;">10</div>
+            <div class="text-xs text-gray-400">問</div>
+          </div>
+          <div class="w-px h-8 bg-gray-200"></div>
+          <div class="text-center flex-1">
+            <div class="text-2xl font-bold" style="color:#0D2B5E;">約3分</div>
+            <div class="text-xs text-gray-400">所要時間</div>
+          </div>
+          <div class="w-px h-8 bg-gray-200"></div>
+          <div class="text-center flex-1">
+            <div class="text-2xl font-bold" style="color:#0D2B5E;">5</div>
+            <div class="text-xs text-gray-400">タイプ</div>
+          </div>
+        </div>
+
+        <!-- 免責 -->
+        <div class="rounded p-4 mb-8 text-xs text-gray-500 leading-relaxed" style="background:#F5F6FA; border-left:3px solid #C7D5EE;">
+          ※ 本チェックは医療診断ではありません。現在の視界の状態や目の使い方の傾向を把握するための簡易チェックです。<br>
+          ※ 結果はあくまで目安であり、医学的な診断・治療の代替にはなりません。<br>
+          ※ 気になる症状がある場合は、専門の医療機関にご相談ください。
+        </div>
+
+        <!-- スタートボタン -->
+        <button onclick="startCheck()" class="btn-navy w-full py-4 rounded-sm text-sm font-medium flex items-center justify-center gap-2">
+          チェックをはじめる
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== SCREEN 1: 質問 ===== -->
+  <div id="screen-question" class="screen">
+    <!-- プログレス -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-gray-400" id="q-progress-text">質問 1 / 10</span>
+        <span class="text-xs font-medium" style="color:#0D2B5E;" id="q-progress-pct">10%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:10%;"></div>
+      </div>
+    </div>
+
+    <!-- 質問カード -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+      <div class="p-7 md:p-10">
+        <div id="q-category-badge" class="type-badge mb-4" style="background:#EEF2FF; color:#0D2B5E;"></div>
+        <p class="text-lg md:text-xl font-bold mb-8 leading-snug slide-in" id="q-text" style="color:#0D2B5E;"></p>
+
+        <div class="space-y-3" id="q-answers">
+          <button class="answer-btn" onclick="recordAnswer(3)">
+            <span class="score-dot"></span>
+            <span>よくある</span>
+            <span class="ml-auto text-xs opacity-60">ほぼ毎日のように感じる</span>
+          </button>
+          <button class="answer-btn" onclick="recordAnswer(2)">
+            <span class="score-dot"></span>
+            <span>ときどきある</span>
+            <span class="ml-auto text-xs opacity-60">週に数回は感じる</span>
+          </button>
+          <button class="answer-btn" onclick="recordAnswer(1)">
+            <span class="score-dot"></span>
+            <span>あまりない</span>
+            <span class="ml-auto text-xs opacity-60">月に1〜2回程度</span>
+          </button>
+          <button class="answer-btn" onclick="recordAnswer(0)">
+            <span class="score-dot"></span>
+            <span>ない</span>
+            <span class="ml-auto text-xs opacity-60">ほとんど感じない</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 戻るボタン -->
+      <div class="px-7 md:px-10 pb-6">
+        <button onclick="goBack()" id="back-btn" class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors" style="display:none;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          前の質問に戻る
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== SCREEN 2: 解析中 ===== -->
+  <div id="screen-loading" class="screen">
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style="background:#EEF2FF;">
+        <svg class="spinner" width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="16" stroke="#C7D5EE" stroke-width="3"/>
+          <path d="M20 4C11.16 4 4 11.16 4 20" stroke="#0D2B5E" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="text-sm font-medium mb-2" style="color:#0D2B5E;">回答を解析しています</div>
+      <div class="text-xs text-gray-400">あなたの視界の傾向を確認しています...</div>
+    </div>
+  </div>
+
+
+  <!-- ===== SCREEN 3: 結果 ===== -->
+  <div id="screen-result" class="screen">
+
+    <!-- 結果ヘッダー -->
+    <div class="rounded overflow-hidden mb-5 fade-up" id="result-header" style="background:linear-gradient(135deg,#0D2B5E 0%,#1a3d7a 100%);">
+      <div class="p-8 md:p-10 text-center">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4" style="background:rgba(255,255,255,0.12);">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <path d="M3 16C3 16 7 7 16 7C25 7 29 16 29 16C29 16 25 25 16 25C7 25 3 16 3 16Z" stroke="white" stroke-width="1.5" fill="none"/>
+            <circle cx="16" cy="16" r="5" stroke="white" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="2.5" fill="white" fill-opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="text-xs text-blue-300 tracking-[0.3em] mb-3">RESULT</div>
+        <p class="text-sm text-blue-200 mb-2">あなたの視界の傾向は...</p>
+        <div id="result-type-name" class="text-2xl md:text-3xl font-bold text-white mb-1" style="letter-spacing:0.06em;"></div>
+        <div id="result-type-label" class="text-sm text-blue-300 mb-0"></div>
+      </div>
+      <!-- スコアバー -->
+      <div class="px-8 pb-7">
+        <div class="grid grid-cols-2 gap-3 text-xs text-blue-200" id="score-bars"></div>
+      </div>
+    </div>
+
+    <!-- 状態説明 -->
+    <div class="bg-white rounded border border-gray-200 p-7 md:p-8 mb-4 fade-up delay-1">
+      <h3 class="text-sm font-bold mb-3 flex items-center gap-2" style="color:#0D2B5E;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#0D2B5E" stroke-width="1.2"/><path d="M8 5v4M8 11v.5" stroke="#0D2B5E" stroke-width="1.3" stroke-linecap="round"/></svg>
+        今の状態の傾向
+      </h3>
+      <p id="result-desc" class="text-sm text-gray-600 leading-relaxed"></p>
+    </div>
+
+    <!-- 背景にある悩み -->
+    <div class="bg-white rounded border border-gray-200 p-7 md:p-8 mb-4 fade-up delay-2">
+      <h3 class="text-sm font-bold mb-3 flex items-center gap-2" style="color:#0D2B5E;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 10.5L4 13L5 9L2 6H6L8 2Z" stroke="#0D2B5E" stroke-width="1.2" fill="none"/></svg>
+        背景にある可能性のある悩み
+      </h3>
+      <ul id="result-issues" class="space-y-2"></ul>
+    </div>
+
+    <!-- おすすめアクション -->
+    <div class="rounded p-5 mb-5 fade-up delay-3" style="background:#EEF2FF; border:1px solid #C7D5EE;">
+      <h3 class="text-sm font-bold mb-2" style="color:#0D2B5E;">アイケアラボからのご提案</h3>
+      <p id="result-action" class="text-sm" style="color:#1a3d7a;"></p>
+    </div>
+
+
+    <!-- ===== CTA ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 fade-up delay-4">
+
+      <!-- A: 実店舗導線 (主CTA) -->
+      <div class="rounded overflow-hidden border-2" style="border-color:#0D2B5E;">
+        <div class="py-3 px-5 text-center text-white text-xs font-bold tracking-wider" style="background:#0D2B5E;">
+          まずは実店舗でチェック
+        </div>
+        <div class="bg-white p-5">
+          <p class="text-xs text-gray-500 leading-relaxed mb-4">今の状態を実際に確認したい方へ。専任スタッフが丁寧にカウンセリングします。強引な勧誘は一切ありません。</p>
+          <div class="space-y-2">
+            <span class="btn-navy w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.3 1.5 2.5 3.3 2.5 5.5c0 3.2 4 7.5 4 7.5s4-4.3 4-7.5C10.5 3.3 8.7 1.5 6.5 1.5Z" stroke="white" stroke-width="1.2"/><circle cx="6.5" cy="5.5" r="1.5" stroke="white" stroke-width="1.2"/></svg>
+              近くの店舗を探す
+            </span>
+            <span class="btn-outline w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1.5" width="11" height="10" rx="1.5" stroke="#0D2B5E" stroke-width="1.1"/><path d="M3.5 1v1.5M9.5 1v1.5M1 5.5h11" stroke="#0D2B5E" stroke-width="1.1" stroke-linecap="round"/></svg>
+              無料カウンセリングを予約する
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- B: iCare365導線 (副CTA) -->
+      <div class="rounded overflow-hidden border" style="border-color:#C7D5EE;">
+        <div class="py-3 px-5 text-center text-xs font-bold tracking-wider" style="background:#EEF2FF; color:#0D2B5E;">
+          原因・整え方をもっと学ぶ
+        </div>
+        <div class="bg-white p-5">
+          <p class="text-xs text-gray-500 leading-relaxed mb-4" id="icare-desc">今回の結果に近い悩みの背景や日常の整え方は、iCare365でも詳しく学べます。</p>
+          <div class="space-y-2">
+            <span class="w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;background:#EEF2FF; color:#0D2B5E; border:1.5px solid #C7D5EE;">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5h5M4 4.5h5M4 8.5h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+              iCare365 でもっと学ぶ
+            </span>
+            <span class="w-full py-3 rounded-sm text-xs text-gray-500 flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.1"/><path d="M6.5 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+              日常ケアの習慣化を始める
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- もう一度チェック -->
+    <div class="text-center fade-up delay-5">
+      <button onclick="resetCheck()" class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1.5 mx-auto transition-colors">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 6A4 4 0 1 1 2.5 3.5M2 1v3h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        もう一度チェックする
+      </button>
+    </div>
+  </div>
+
+</main>
+
+
+<!-- ================================================
+  FOOTER
+================================================ -->
+<footer class="pt-10 pb-8 mt-6" style="background:#0D2B5E;">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-7 border-b border-white border-opacity-10">
+      <div class="flex items-center gap-2.5">
+        <svg width="28" height="28" viewBox="0 0 38 38" fill="none">
+          <circle cx="19" cy="19" r="17.5" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+          <circle cx="19" cy="19" r="5" fill="#4A6FA5"/>
+          <circle cx="19" cy="19" r="3" fill="white" fill-opacity="0.9"/>
+        </svg>
+        <div>
+          <div class="text-sm font-bold text-white tracking-wider">アイケアラボ</div>
+          <div class="text-xs text-blue-300">眼の整体院</div>
+        </div>
+      </div>
+    </div>
+    <div class="pt-5 text-xs text-blue-400 text-center">© 2024 アイケアラボ All Rights Reserved.</div>
+  </div>
+</footer>
+
+
+<!-- ================================================
+  JavaScript — チェックロジック
+================================================ -->
+<script>
+// ===== 設問定義 =====
+const QUESTIONS = [
+  {
+    text: '夕方になると、目の奥が重く感じることがある',
+    category: '疲労の感じやすさ',
+    axis: 'fatigue'
+  },
+  {
+    text: 'スマホやPCを長時間見たあと、ピントが合いにくいと感じることがある',
+    category: 'ピント調整',
+    axis: 'focus'
+  },
+  {
+    text: '目を使ったあと、頭がぼんやりしたり重くなることがある',
+    category: '疲労の感じやすさ',
+    axis: 'fatigue'
+  },
+  {
+    text: '遠くから近く（または近くから遠く）に視線を移したとき、違和感を感じることがある',
+    category: 'ピント調整',
+    axis: 'focus'
+  },
+  {
+    text: '目の疲れと一緒に、肩や首まわりの重さも感じることがある',
+    category: '身体との連動',
+    axis: 'body'
+  },
+  {
+    text: '寝ても目の疲れが抜けにくいと感じることがある',
+    category: '疲労の感じやすさ',
+    axis: 'fatigue'
+  },
+  {
+    text: '文字を読み続けると、集中しづらくなることがある',
+    category: 'ピント調整',
+    axis: 'focus'
+  },
+  {
+    text: 'まぶしさを強く感じたり、光が気になることがある',
+    category: '疲労の感じやすさ',
+    axis: 'fatigue'
+  },
+  {
+    text: '視界が狭く感じたり、見え方に余裕がないと感じることがある',
+    category: '身体との連動',
+    axis: 'body'
+  },
+  {
+    text: '以前と比べて、見え方の快適さが落ちたと感じることがある',
+    category: 'ケア習慣',
+    axis: 'habit'
+  }
+];
+
+// ===== 結果タイプ定義 =====
+const TYPES = {
+  fatigue: {
+    id: 'fatigue',
+    name: '視界疲労蓄積タイプ',
+    label: '目が「頑張りすぎ」の状態かもしれません',
+    color: '#1a3d7a',
+    desc: '日常の中で目を酷使することが続いている可能性があります。夕方に感じる目の奥の重さや、寝ても取れにくい疲れは、眼の筋肉や神経に蓄積した負荷のサインのひとつです。こうした状態が続くと、視界の快適さが少しずつ落ちていく場合があります。',
+    issues: [
+      '目の奥の疲れ・重だるさ',
+      '夕方以降に強まるぼんやり感',
+      '睡眠後も残る目の疲労感',
+      'まぶしさへの感度の高まり',
+      '頭の重さやぼんやりした感覚'
+    ],
+    action: 'まずは眼の状態を丁寧に確認してみることをおすすめします。蓄積した疲労を放置すると、視界の快適さにじわじわと影響が出ることがあります。一度、実店舗で今の目の状態をチェックしてみるのがおすすめです。',
+    icare: '視界疲労の背景や、日常でできる目の「ほぐし方」についてはiCare365でも詳しく解説しています。'
+  },
+  focus: {
+    id: 'focus',
+    name: 'ピント切替負担タイプ',
+    label: '目の「調整機能」に負担がかかっている可能性があります',
+    color: '#1a3d7a',
+    desc: 'スマホやPCなど、近距離の画面を長時間見続ける生活の中で、目のピント調整機能に負担がかかっている可能性があります。遠くと近くの切り替えに違和感があったり、画面を見たあとにぼやけを感じたりするのは、こうした状態が背景にあるケースがあります。',
+    issues: [
+      'スマホ・PC使用後のピントのぼやけ',
+      '遠近切り替えの違和感・時間のかかり',
+      '文字を読み続けるときの集中しづらさ',
+      '細かいものを見たあとの目の重さ',
+      '近距離作業後の視界の疲れ'
+    ],
+    action: '目のピント調整を担う眼内の筋肉（毛様体筋）は、酷使が続くと緊張状態が固まりやすくなる場合があります。早めに状態を整えることで、快適な視界を取り戻しやすくなります。一度、専門スタッフに状態を見てもらうことをおすすめします。',
+    icare: 'ピント調整の仕組みや、日常でのケア方法についてはiCare365でも詳しく学べます。'
+  },
+  body: {
+    id: 'body',
+    name: '目と身体の連動見直しタイプ',
+    label: '目の使い方が、身体全体に影響しているかもしれません',
+    color: '#1a3d7a',
+    desc: '眼の疲れと肩・首の緊張、視界の余裕のなさには、深いつながりがある場合があります。眼周囲の筋肉の緊張が首や肩に連動していたり、逆に姿勢の偏りが目の使い方に影響していたりするケースがあります。身体全体の状態から視界を整えるアプローチが、こうした傾向のある方に合っている可能性があります。',
+    issues: [
+      '目の疲れと同時に起こる肩・首の重さ',
+      '視界が狭い・詰まった感じがする',
+      '長時間同じ姿勢で作業すると目が疲れやすい',
+      '頭部・目の周辺の緊張感',
+      '姿勢を変えると目の状態も変わる感覚'
+    ],
+    action: 'アイケアラボでは、眼周囲の筋肉だけでなく骨格バランスや姿勢との連動にもアプローチします。こうした状態は、眼だけを見るのではなく身体全体から整えることで改善の傾向が見られるケースがあります。一度、実店舗で状態を確認してみることをおすすめします。',
+    icare: '目と身体のつながり、姿勢と視界の関係については、iCare365でも詳しく解説しています。'
+  },
+  habit: {
+    id: 'habit',
+    name: '視界メンテナンス不足タイプ',
+    label: '視界の「じわじわ」とした変化に気づき始めているかもしれません',
+    color: '#1a3d7a',
+    desc: '以前と比べて見え方の快適さが落ちてきたという感覚は、視界のメンテナンスを始めるサインかもしれません。急激な変化ではなく、じわじわと進む違和感は、見過ごされやすいものです。早めに状態を把握して、日常のケアを見直すことで、快適な視界を取り戻しやすくなる場合があります。',
+    issues: [
+      '以前より見え方の快適さが落ちた感覚',
+      '特定の状況で感じる見えにくさや不快感',
+      '目のケアを後回しにしがちな習慣',
+      'デジタル機器使用時間が増えた生活環境',
+      '目の状態を客観的に把握する機会がない'
+    ],
+    action: '視界の変化は、定期的なメンテナンスで整えることができる場合があります。今の状態を一度確認して、適切なケアの方法を知ることが大切です。まずは実店舗で今の視界の状態をチェックしてみることをおすすめします。',
+    icare: '視界の変化の背景や、日常でのケア習慣の作り方についてはiCare365でも詳しく学べます。'
+  },
+  good: {
+    id: 'good',
+    name: '視界ケア意識タイプ',
+    label: '目の状態は比較的整っている可能性があります',
+    color: '#1a3d7a',
+    desc: '現時点では、視界に大きな不調のサインは少ない傾向があります。ただし、目の疲れは蓄積しやすいもの。今の快適な状態を維持するためにも、定期的なケアを習慣にすることが大切です。日常のなかで少しずつ取り入れられるセルフケアで、視界の状態をキープしていきましょう。',
+    issues: [
+      '急激な変化ではなく、蓄積による疲れのリスク',
+      'デジタル機器の長時間使用による将来的な影響',
+      '定期的なケアの不足による状態の変化'
+    ],
+    action: '今の快適な視界を維持するために、定期的なメンテナンスをおすすめします。状態が良い今こそ、ケアを始める良いタイミングです。気になることがあれば、お気軽に実店舗でご相談ください。',
+    icare: '快適な視界を長く維持するためのセルフケア習慣や目の使い方についてはiCare365でも詳しく学べます。'
+  }
+};
+
+// ===== 状態変数 =====
+let currentQ = 0;
+let answers = [];
+
+// ===== スクリーン切り替え =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== チェック開始 =====
+function startCheck() {
+  currentQ = 0;
+  answers = [];
+  showScreen('question');
+  renderQuestion();
+}
+
+// ===== 質問表示 =====
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const total = QUESTIONS.length;
+  const pct = Math.round(((currentQ + 1) / total) * 100);
+
+  document.getElementById('q-progress-text').textContent = `質問 ${currentQ + 1} / ${total}`;
+  document.getElementById('q-progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-category-badge').textContent = q.category;
+
+  const textEl = document.getElementById('q-text');
+  textEl.classList.remove('slide-in');
+  void textEl.offsetWidth;
+  textEl.textContent = q.text;
+  textEl.classList.add('slide-in');
+
+  // 戻るボタン
+  const backBtn = document.getElementById('back-btn');
+  backBtn.style.display = currentQ > 0 ? 'flex' : 'none';
+
+  // 選択状態リセット
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+}
+
+// ===== 回答記録 =====
+function recordAnswer(score) {
+  // 選択アニメ
+  const buttons = document.querySelectorAll('.answer-btn');
+  const labels = ['よくある', 'ときどきある', 'あまりない', 'ない'];
+  const scoreMap = [3, 2, 1, 0];
+  buttons.forEach((b, i) => {
+    if (scoreMap[i] === score) b.classList.add('selected');
+  });
+
+  answers[currentQ] = { score, axis: QUESTIONS[currentQ].axis };
+
+  setTimeout(() => {
+    currentQ++;
+    if (currentQ < QUESTIONS.length) {
+      renderQuestion();
+    } else {
+      showScreen('loading');
+      setTimeout(showResult, 1800);
+    }
+  }, 280);
+}
+
+// ===== 戻る =====
+function goBack() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+// ===== 結果計算 =====
+function calcResult() {
+  const axisScores = { fatigue: 0, focus: 0, body: 0, habit: 0 };
+  const axisCount  = { fatigue: 0, focus: 0, body: 0, habit: 0 };
+
+  answers.forEach(a => {
+    if (a) {
+      axisScores[a.axis] += a.score;
+      axisCount[a.axis]++;
+    }
+  });
+
+  // 正規化（各軸の最大スコアで割る → 0〜1）
+  const normalized = {};
+  Object.keys(axisScores).forEach(k => {
+    const max = axisCount[k] * 3;
+    normalized[k] = max > 0 ? axisScores[k] / max : 0;
+  });
+
+  // 総合スコア
+  const totalScore = answers.reduce((s, a) => s + (a ? a.score : 0), 0);
+  const totalMax = QUESTIONS.length * 3;
+  const totalPct = totalScore / totalMax;
+
+  // 低スコア → good タイプ
+  if (totalPct < 0.3) return { type: TYPES.good, normalized, totalPct };
+
+  // 最も高い軸を特定
+  let dominant = 'fatigue';
+  let maxVal = 0;
+  Object.keys(normalized).forEach(k => {
+    if (normalized[k] > maxVal) {
+      maxVal = normalized[k];
+      dominant = k;
+    }
+  });
+
+  return { type: TYPES[dominant], normalized, totalPct };
+}
+
+// ===== 結果表示 =====
+function showResult() {
+  const { type, normalized, totalPct } = calcResult();
+
+  document.getElementById('result-type-name').textContent = `「${type.name}」の傾向があります`;
+  document.getElementById('result-type-label').textContent = type.label;
+  document.getElementById('result-desc').textContent = type.desc;
+  const icareEl = document.getElementById('icare-desc');
+  if (icareEl) icareEl.textContent = type.icare;
+  document.getElementById('result-action').textContent = type.action;
+
+  // 背景の悩みリスト
+  const issuesEl = document.getElementById('result-issues');
+  issuesEl.innerHTML = type.issues.map(issue => `
+    <li class="flex items-start gap-2 text-sm text-gray-600">
+      <svg class="flex-shrink-0 mt-0.5" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="#EEF2FF"/><path d="M4.5 7l2 2L9.5 5" stroke="#0D2B5E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ${issue}
+    </li>
+  `).join('');
+
+  // スコアバー
+  const axisLabels = { fatigue:'疲労', focus:'ピント調整', body:'身体連動', habit:'ケア習慣' };
+  const scoreBarsEl = document.getElementById('score-bars');
+  scoreBarsEl.innerHTML = Object.keys(normalized).map(k => {
+    const pct = Math.round(normalized[k] * 100);
+    return `
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-blue-300">${axisLabels[k]}</span>
+          <span class="text-blue-200 font-medium">${pct}%</span>
+        </div>
+        <div class="h-1.5 rounded-full" style="background:rgba(255,255,255,0.15);">
+          <div class="h-1.5 rounded-full transition-all" style="width:${pct}%; background:rgba(255,255,255,0.7);"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  showScreen('result');
+}
+
+// ===== リセット =====
+function resetCheck() {
+  currentQ = 0;
+  answers = [];
+  showScreen('intro');
+}
+
+// ===== スクロール影 =====
+window.addEventListener('scroll', () => {
+  const h = document.getElementById('header');
+  h.style.boxShadow = window.scrollY > 8 ? '0 2px 24px rgba(0,0,0,0.08)' : '';
+}, { passive: true });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週報管理 | eye care lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===================== COMMON NAV ===================== */
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(0,0,0,0.3); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(0,0,0,0.2); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: #4b6080; text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #1a2535; background: rgba(0,0,0,0.05); }
+#aicare-common-nav a.cn-active { color: #2563eb !important; border-color: rgba(37,99,235,0.35) !important; background: rgba(37,99,235,0.08) !important; }
+
+/* ===================== DESIGN SYSTEM ===================== */
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #e8edf3;
+  --border: #d1dae6;
+  --text: #1a2535;
+  --muted: #6b7c93;
+  --accent: #2563eb;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.page-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 32px 80px;
+}
+@media (max-width: 768px) {
+  .page-container { padding: 20px 16px 60px; }
+}
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid transparent; padding: 5px 10px; }
+.btn-ghost:hover { color: var(--text); background: var(--surface2); }
+.btn-danger { background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.btn-danger:hover { background: rgba(239,68,68,0.1); }
+.btn-sm { padding: 4px 11px; font-size: 12px; }
+
+/* ===================== BADGES ===================== */
+.badge {
+  display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
+}
+.badge-draft { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.3); }
+.badge-published { background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3); }
+.badge-archived { background: rgba(109,40,217,0.1); color: #6d28d9; border: 1px solid rgba(109,40,217,0.3); }
+
+/* ===================== CARD ===================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+/* ===================== WEEKLY REPORT LIST ===================== */
+.wr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  margin-bottom: 12px;
+}
+.wr-card:hover { border-color: rgba(37,99,235,0.4); transform: translateY(-1px); }
+.wr-card .wr-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.wr-card .wr-summary { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+.wr-card .wr-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); align-items: center; }
+
+/* ===================== FORM ===================== */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text);
+  transition: border-color 0.15s; line-height: 1.6;
+}
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+.form-group textarea { min-height: 120px; resize: vertical; }
+.form-group textarea.large { min-height: 180px; }
+
+/* ===================== FILTER BAR ===================== */
+.filter-bar {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;
+}
+.filter-btn {
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { background: var(--surface2); color: var(--text); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.search-input {
+  padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px;
+  background: var(--surface); color: var(--text); min-width: 200px; margin-left: auto;
+}
+.search-input:focus { outline: none; border-color: var(--accent); }
+@media (max-width: 768px) {
+  .search-input { min-width: 100%; margin-left: 0; }
+}
+
+/* ===================== VIEW ===================== */
+.view-section { margin-bottom: 24px; }
+.view-section h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.04em; }
+.view-section .content {
+  background: var(--surface2); border-radius: 10px; padding: 16px 18px;
+  font-size: 14px; line-height: 1.8; white-space: pre-wrap;
+}
+
+/* ===================== MARKDOWN VIEW ===================== */
+.md-view {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 24px; font-size: 14px; line-height: 1.8; white-space: pre-wrap;
+  font-family: 'SF Mono', 'DM Mono', monospace; font-size: 13px;
+}
+
+/* ===================== SAVE INDICATOR ===================== */
+#saveIndicator {
+  position: fixed; bottom: 20px; right: 20px; padding: 8px 16px;
+  border-radius: 8px; font-size: 12px; font-weight: 600; z-index: 9999;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+
+/* ===================== CONFIRM DIALOG ===================== */
+.dialog-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center;
+}
+.dialog-overlay.active { display: flex; }
+.dialog-box {
+  background: var(--surface); border-radius: 14px; padding: 28px; max-width: 420px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.dialog-box h3 { font-size: 16px; margin-bottom: 12px; }
+.dialog-box p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<!-- Common Nav -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="persona-dashboard.html">ペルソナ / ブランド</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="weekly-reports.html" class="cn-active">週報管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
+  <span class="cn-sep">|</span>
+  
+</nav>
+
+<!-- Main App -->
+<div id="app"></div>
+<div id="saveIndicator"></div>
+
+<!-- Confirm Dialog -->
+<div class="dialog-overlay" id="confirmDialog">
+  <div class="dialog-box">
+    <h3 id="dialogTitle"></h3>
+    <p id="dialogMsg"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" onclick="closeDialog()">キャンセル</button>
+      <button class="btn btn-primary" id="dialogOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+const API_URL = '/api/data';
+const STORAGE_KEY = 'aicare-projects-v3';
+
+let APP = null;
+let currentFilter = 'all';
+let searchQuery = '';
+
+// ===================== DATA LAYER =====================
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function getWeeklyReports() {
+  return (APP && APP.weekly_reports) ? APP.weekly_reports : [];
+}
+
+function saveData(data) {
+  data.updatedAt = Date.now();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  showSave('保存中…', '#facc15');
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.ok ? showSave('保存済み', '#4ade80') : showSave('保存失敗', '#f87171'))
+    .catch(() => showSave('保存失敗', '#f87171'));
+}
+
+function showSave(msg, color) {
+  const el = document.getElementById('saveIndicator');
+  el.textContent = msg;
+  el.style.background = color + '22';
+  el.style.color = color;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
+
+// ===================== INIT =====================
+async function initApp() {
+  APP = loadLocal();
+  if (!APP) {
+    // Fetch from cloud
+    try {
+      const res = await fetch(API_URL + '?t=' + Date.now());
+      if (res.ok) {
+        APP = await res.json();
+        if (APP) localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+      }
+    } catch {}
+  }
+  if (!APP) APP = { projects: [], roles: [], categories: [], weekly_reports: [], updatedAt: 0 };
+  if (!APP.weekly_reports) APP.weekly_reports = [];
+  render();
+  // Background sync
+  syncFromCloud();
+}
+
+async function syncFromCloud() {
+  try {
+    const res = await fetch(API_URL + '?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data) return;
+    const cloudTs = data.updatedAt || 0;
+    const localTs = APP.updatedAt || 0;
+    if (cloudTs <= localTs) return;
+    if (!data.weekly_reports) data.weekly_reports = [];
+    APP = data;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    render();
+  } catch {}
+}
+
+// ===================== ROUTING =====================
+function getHash() {
+  return window.location.hash || '#/';
+}
+
+function navigate(hash) {
+  window.location.hash = hash;
+}
+
+function render() {
+  const hash = getHash();
+  const app = document.getElementById('app');
+  if (hash === '#/new') {
+    app.innerHTML = renderNewReport();
+  } else if (hash.startsWith('#/edit/')) {
+    const id = hash.replace('#/edit/', '');
+    app.innerHTML = renderEditReport(id);
+  } else if (hash.startsWith('#/view/')) {
+    const id = hash.replace('#/view/', '');
+    app.innerHTML = renderViewReport(id);
+  } else {
+    app.innerHTML = renderList();
+  }
+}
+
+window.addEventListener('hashchange', render);
+
+// ===================== DATE HELPERS =====================
+function getWeekRange(date) {
+  // Monday-Sunday week containing `date`
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const mon = new Date(d);
+  mon.setDate(d.getDate() + diffToMon);
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  return { start: mon, end: sun };
+}
+
+function getCurrentWeekRange() {
+  return getWeekRange(new Date());
+}
+
+function getLastWeekRange() {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  return getWeekRange(d);
+}
+
+function formatDate(d) {
+  const dt = new Date(d);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+function formatDateJP(d) {
+  const dt = new Date(d);
+  return `${dt.getFullYear()}/${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  return Math.ceil((d - now) / 86400000);
+}
+
+function isSameWeek(start1, start2) {
+  return formatDate(start1) === formatDate(start2);
+}
+
+// ===================== REPORT GENERATION =====================
+function generateReport() {
+  const projects = (APP.projects || []);
+  const week = getCurrentWeekRange();
+  const weekStart = formatDate(week.start);
+  const weekEnd = formatDate(week.end);
+
+  const active = projects.filter(p => p.status !== '保留');
+  const completed = projects.filter(p => p.status === '完了');
+  const inProgress = projects.filter(p => p.status === '進行中');
+  const needsReview = projects.filter(p => p.status === '要確認');
+  const notStarted = projects.filter(p => p.status === '未着手');
+
+  // completedThisWeek: completed tasks + newly in-progress items
+  let completedLines = [];
+  projects.forEach(p => {
+    function collectDone(tasks) {
+      (tasks || []).forEach(t => {
+        if (t.status === '完了') completedLines.push(`- [${p.name}] ${t.name}`);
+        if (t.children) collectDone(t.children);
+      });
+    }
+    collectDone(p.tasks);
+  });
+  if (completed.length) {
+    completedLines.push(...completed.map(p => `- ${p.name}：プロジェクト完了`));
+  }
+  if (inProgress.length) {
+    completedLines.push(...inProgress.map(p => `- ${p.name}：進行中`));
+  }
+  const completedThisWeek = completedLines.length ? completedLines.join('\n') : '特になし';
+
+  // currentStatus
+  const totalCount = projects.length;
+  const statusLines = [
+    `全体：${totalCount}件（完了${completed.length}件 / 進行中${inProgress.length}件 / 要確認${needsReview.length}件 / 未着手${notStarted.length}件）`
+  ];
+  // Nearest deadlines
+  const withDeadline = active.filter(p => p.deadline).sort((a, b) => new Date(a.deadline) - new Date(b.deadline)).slice(0, 3);
+  if (withDeadline.length) {
+    statusLines.push('');
+    statusLines.push('直近の期限：');
+    withDeadline.forEach(p => {
+      const d = daysUntil(p.deadline);
+      const label = d < 0 ? `${Math.abs(d)}日超過` : d === 0 ? '本日' : `あと${d}日`;
+      statusLines.push(`- ${p.name}（${p.deadline} / ${label}）`);
+    });
+  }
+  const currentStatus = statusLines.join('\n');
+
+  // nextWeekPlan
+  const upcoming = active.filter(p => p.status !== '完了' && p.deadline).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+  let nextLines = [];
+  upcoming.slice(0, 5).forEach(p => {
+    nextLines.push(`- ${p.name}（期限：${p.deadline}）`);
+  });
+  // Also include tasks with near deadlines
+  projects.forEach(p => {
+    function collectUpcoming(tasks) {
+      (tasks || []).forEach(t => {
+        if (t.status !== '完了' && t.deadline) {
+          const d = daysUntil(t.deadline);
+          if (d !== null && d >= 0 && d <= 14) {
+            nextLines.push(`- [${p.name}] ${t.name}（期限：${t.deadline}）`);
+          }
+        }
+        if (t.children) collectUpcoming(t.children);
+      });
+    }
+    collectUpcoming(p.tasks);
+  });
+  const nextWeekPlan = nextLines.length ? nextLines.join('\n') : '特になし';
+
+  // risks
+  let riskLines = [];
+  projects.forEach(p => {
+    if (p.deadline) {
+      const d = daysUntil(p.deadline);
+      if (d !== null && d < 0) riskLines.push(`- ${p.name}：期限超過（${Math.abs(d)}日）`);
+    }
+    if (p.status === '未着手' && p.deadline) {
+      const d = daysUntil(p.deadline);
+      if (d !== null && d <= 7) riskLines.push(`- ${p.name}：未着手で期限${d}日以内`);
+    }
+  });
+  const risks = riskLines.length ? riskLines.join('\n') : '特になし';
+
+  // summary
+  const summaryParts = [];
+  if (completed.length) summaryParts.push(`${completed.length}件完了`);
+  if (inProgress.length) summaryParts.push(`${inProgress.length}件進行中`);
+  if (riskLines.length) summaryParts.push(`懸念${riskLines.length}件あり`);
+  const summary = summaryParts.length ? summaryParts.join('、') + '。' : `${totalCount}件のプロジェクトを管理中。`;
+
+  return {
+    id: 'wr_' + Date.now(),
+    title: `${formatDateJP(week.start)}〜${formatDateJP(week.end)} 週報`,
+    weekStart,
+    weekEnd,
+    summary,
+    completedThisWeek,
+    currentStatus,
+    nextWeekPlan,
+    risks,
+    status: 'draft',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+// ===================== DIALOG =====================
+let _dialogResolve = null;
+function showConfirm(title, msg) {
+  return new Promise(resolve => {
+    _dialogResolve = resolve;
+    document.getElementById('dialogTitle').textContent = title;
+    document.getElementById('dialogMsg').textContent = msg;
+    document.getElementById('dialogOk').onclick = () => { closeDialog(); resolve(true); };
+    document.getElementById('confirmDialog').classList.add('active');
+  });
+}
+function closeDialog() {
+  document.getElementById('confirmDialog').classList.remove('active');
+  if (_dialogResolve) { _dialogResolve(false); _dialogResolve = null; }
+}
+
+// ===================== RENDER LIST =====================
+function renderList() {
+  const reports = getWeeklyReports().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const week = getCurrentWeekRange();
+  const lastWeek = getLastWeekRange();
+
+  let filtered = reports;
+  if (currentFilter === 'thisweek') {
+    filtered = reports.filter(r => isSameWeek(r.weekStart, formatDate(week.start)));
+  } else if (currentFilter === 'lastweek') {
+    filtered = reports.filter(r => isSameWeek(r.weekStart, formatDate(lastWeek.start)));
+  } else if (currentFilter === 'archived') {
+    filtered = reports.filter(r => r.status === 'archived');
+  }
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(r =>
+      (r.title || '').toLowerCase().includes(q) ||
+      (r.summary || '').toLowerCase().includes(q) ||
+      (r.completedThisWeek || '').toLowerCase().includes(q)
+    );
+  }
+
+  const statusLabel = { draft: '下書き', published: '公開済み', archived: 'アーカイブ' };
+  const statusClass = { draft: 'badge-draft', published: 'badge-published', archived: 'badge-archived' };
+
+  const cards = filtered.map(r => `
+    <div class="wr-card" onclick="navigate('#/view/${r.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+        <div class="wr-title">${escHtml(r.title)}</div>
+        <span class="badge ${statusClass[r.status] || 'badge-draft'}">${statusLabel[r.status] || r.status}</span>
+      </div>
+      <div class="wr-summary">${escHtml((r.summary || '').slice(0, 80))}${(r.summary || '').length > 80 ? '…' : ''}</div>
+      <div class="wr-meta">
+        <span>${r.weekStart} 〜 ${r.weekEnd}</span>
+        <span>更新: ${new Date(r.updatedAt).toLocaleDateString('ja-JP')}</span>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+  <div class="page-container">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+      <div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.3px;">週報管理</h1>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">アイケアラボ — ${reports.length}件の週報</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="handleNewReport()">＋ 週報を生成</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/new')">手動作成</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">すべて</button>
+      <button class="filter-btn ${currentFilter==='thisweek'?'active':''}" onclick="setFilter('thisweek')">今週</button>
+      <button class="filter-btn ${currentFilter==='lastweek'?'active':''}" onclick="setFilter('lastweek')">先週</button>
+      <button class="filter-btn ${currentFilter==='archived'?'active':''}" onclick="setFilter('archived')">アーカイブ</button>
+      <input type="text" class="search-input" placeholder="検索…" value="${escHtml(searchQuery)}" oninput="setSearch(this.value)">
+    </div>
+
+    ${filtered.length ? cards : `
+      <div style="text-align:center;padding:60px 20px;color:var(--muted);">
+        <div style="font-size:48px;margin-bottom:16px;">📋</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px;">まだ週報はありません</div>
+        <div style="font-size:13px;margin-bottom:20px;">プロジェクトデータから自動生成できます</div>
+        <button class="btn btn-primary" onclick="handleNewReport()">週報を生成する</button>
+      </div>
+    `}
+  </div>`;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  render();
+}
+
+function setSearch(q) {
+  searchQuery = q;
+  render();
+  // Restore focus
+  setTimeout(() => {
+    const input = document.querySelector('.search-input');
+    if (input) { input.focus(); input.selectionStart = input.selectionEnd = input.value.length; }
+  }, 0);
+}
+
+// ===================== NEW REPORT (auto-generate) =====================
+async function handleNewReport() {
+  const report = generateReport();
+  // Check if same week exists
+  const existing = getWeeklyReports().find(r => r.weekStart === report.weekStart);
+  if (existing) {
+    const ok = await showConfirm('上書き確認', `${existing.title} が既に存在します。上書きしますか？`);
+    if (!ok) return;
+    // Remove existing
+    APP.weekly_reports = APP.weekly_reports.filter(r => r.id !== existing.id);
+  }
+  APP.weekly_reports.push(report);
+  saveData(APP);
+  navigate('#/edit/' + report.id);
+}
+
+// ===================== RENDER NEW (manual) =====================
+function renderNewReport() {
+  const week = getCurrentWeekRange();
+  return `
+  <div class="page-container">
+    <button class="btn btn-ghost" onclick="navigate('#/')" style="margin-bottom:16px;">← 一覧へ戻る</button>
+    <h1 style="font-size:20px;font-weight:800;margin-bottom:24px;">新規週報作成</h1>
+    <div id="editForm">
+      <div class="form-group">
+        <label>タイトル</label>
+        <input type="text" id="f-title" value="${formatDateJP(week.start)}〜${formatDateJP(week.end)} 週報">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label>開始日</label>
+          <input type="date" id="f-weekStart" value="${formatDate(week.start)}">
+        </div>
+        <div class="form-group">
+          <label>終了日</label>
+          <input type="date" id="f-weekEnd" value="${formatDate(week.end)}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>全体一言</label>
+        <textarea id="f-summary" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>先週やったこと</label>
+        <textarea id="f-completedThisWeek" class="large"></textarea>
+      </div>
+      <div class="form-group">
+        <label>現状</label>
+        <textarea id="f-currentStatus" class="large"></textarea>
+      </div>
+      <div class="form-group">
+        <label>来週やること</label>
+        <textarea id="f-nextWeekPlan" class="large"></textarea>
+      </div>
+      <div class="form-group">
+        <label>懸念事項</label>
+        <textarea id="f-risks" class="large"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveNewReport('published')">保存</button>
+        <button class="btn btn-secondary" onclick="saveNewReport('draft')">下書き保存</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveNewReport(status) {
+  const report = {
+    id: 'wr_' + Date.now(),
+    title: document.getElementById('f-title').value,
+    weekStart: document.getElementById('f-weekStart').value,
+    weekEnd: document.getElementById('f-weekEnd').value,
+    summary: document.getElementById('f-summary').value,
+    completedThisWeek: document.getElementById('f-completedThisWeek').value,
+    currentStatus: document.getElementById('f-currentStatus').value,
+    nextWeekPlan: document.getElementById('f-nextWeekPlan').value,
+    risks: document.getElementById('f-risks').value,
+    status: status,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  if (!APP.weekly_reports) APP.weekly_reports = [];
+  APP.weekly_reports.push(report);
+  saveData(APP);
+  navigate('#/view/' + report.id);
+}
+
+// ===================== RENDER EDIT =====================
+function renderEditReport(id) {
+  const report = getWeeklyReports().find(r => r.id === id);
+  if (!report) return `<div class="page-container"><p>週報が見つかりません。</p><button class="btn btn-secondary" onclick="navigate('#/')">一覧へ戻る</button></div>`;
+
+  return `
+  <div class="page-container">
+    <button class="btn btn-ghost" onclick="navigate('#/')" style="margin-bottom:16px;">← 一覧へ戻る</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
+      <h1 style="font-size:20px;font-weight:800;">週報編集</h1>
+      <span id="autoSaveLabel" style="font-size:11px;color:var(--muted);"></span>
+    </div>
+    <div id="editForm">
+      <div class="form-group">
+        <label>タイトル</label>
+        <input type="text" id="f-title" value="${escHtml(report.title)}" oninput="scheduleAutoSave('${id}')">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label>開始日</label>
+          <input type="date" id="f-weekStart" value="${report.weekStart}" oninput="scheduleAutoSave('${id}')">
+        </div>
+        <div class="form-group">
+          <label>終了日</label>
+          <input type="date" id="f-weekEnd" value="${report.weekEnd}" oninput="scheduleAutoSave('${id}')">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>全体一言</label>
+        <textarea id="f-summary" rows="2" oninput="scheduleAutoSave('${id}')">${escHtml(report.summary)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>先週やったこと</label>
+        <textarea id="f-completedThisWeek" class="large" oninput="scheduleAutoSave('${id}')">${escHtml(report.completedThisWeek)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>現状</label>
+        <textarea id="f-currentStatus" class="large" oninput="scheduleAutoSave('${id}')">${escHtml(report.currentStatus)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>来週やること</label>
+        <textarea id="f-nextWeekPlan" class="large" oninput="scheduleAutoSave('${id}')">${escHtml(report.nextWeekPlan)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>懸念事項</label>
+        <textarea id="f-risks" class="large" oninput="scheduleAutoSave('${id}')">${escHtml(report.risks)}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveEditReport('${id}','published')">保存（公開）</button>
+        <button class="btn btn-secondary" onclick="saveEditReport('${id}','draft')">下書き保存</button>
+        <button class="btn btn-secondary" onclick="duplicateReport('${id}')">複製</button>
+        <button class="btn btn-secondary" onclick="copyToClipboard('${id}')">クリップボードにコピー</button>
+        <button class="btn btn-secondary" onclick="toggleMarkdown('${id}')">Markdown表示</button>
+        <button class="btn btn-danger" onclick="deleteReport('${id}')">削除</button>
+      </div>
+      <div id="mdPreview" style="margin-top:20px;display:none;"></div>
+    </div>
+  </div>`;
+}
+
+let _autoSaveTimer = null;
+function scheduleAutoSave(id) {
+  const label = document.getElementById('autoSaveLabel');
+  if (label) label.textContent = '編集中…';
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(() => {
+    doSaveEdit(id);
+    if (label) label.textContent = '自動保存済み';
+  }, 2000);
+}
+
+function doSaveEdit(id, newStatus) {
+  const report = getWeeklyReports().find(r => r.id === id);
+  if (!report) return;
+  report.title = document.getElementById('f-title').value;
+  report.weekStart = document.getElementById('f-weekStart').value;
+  report.weekEnd = document.getElementById('f-weekEnd').value;
+  report.summary = document.getElementById('f-summary').value;
+  report.completedThisWeek = document.getElementById('f-completedThisWeek').value;
+  report.currentStatus = document.getElementById('f-currentStatus').value;
+  report.nextWeekPlan = document.getElementById('f-nextWeekPlan').value;
+  report.risks = document.getElementById('f-risks').value;
+  if (newStatus) report.status = newStatus;
+  report.updatedAt = new Date().toISOString();
+  saveData(APP);
+}
+
+function saveEditReport(id, status) {
+  doSaveEdit(id, status);
+  navigate('#/view/' + id);
+}
+
+function duplicateReport(id) {
+  const orig = getWeeklyReports().find(r => r.id === id);
+  if (!orig) return;
+  // Read current form values
+  const dup = {
+    id: 'wr_' + Date.now(),
+    title: document.getElementById('f-title').value + '（コピー）',
+    weekStart: document.getElementById('f-weekStart').value,
+    weekEnd: document.getElementById('f-weekEnd').value,
+    summary: document.getElementById('f-summary').value,
+    completedThisWeek: document.getElementById('f-completedThisWeek').value,
+    currentStatus: document.getElementById('f-currentStatus').value,
+    nextWeekPlan: document.getElementById('f-nextWeekPlan').value,
+    risks: document.getElementById('f-risks').value,
+    status: 'draft',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  APP.weekly_reports.push(dup);
+  saveData(APP);
+  navigate('#/edit/' + dup.id);
+}
+
+function reportToText(r) {
+  return `# ${r.title}\n\n` +
+    `## 全体一言\n${r.summary}\n\n` +
+    `## 先週やったこと\n${r.completedThisWeek}\n\n` +
+    `## 現状\n${r.currentStatus}\n\n` +
+    `## 来週やること\n${r.nextWeekPlan}\n\n` +
+    `## 懸念事項\n${r.risks}`;
+}
+
+function reportToTextFromForm(id) {
+  return `# ${document.getElementById('f-title').value}\n\n` +
+    `## 全体一言\n${document.getElementById('f-summary').value}\n\n` +
+    `## 先週やったこと\n${document.getElementById('f-completedThisWeek').value}\n\n` +
+    `## 現状\n${document.getElementById('f-currentStatus').value}\n\n` +
+    `## 来週やること\n${document.getElementById('f-nextWeekPlan').value}\n\n` +
+    `## 懸念事項\n${document.getElementById('f-risks').value}`;
+}
+
+function copyToClipboard(id) {
+  const text = reportToTextFromForm(id);
+  navigator.clipboard.writeText(text).then(() => showSave('コピーしました', '#4ade80'));
+}
+
+let _mdVisible = false;
+function toggleMarkdown(id) {
+  _mdVisible = !_mdVisible;
+  const el = document.getElementById('mdPreview');
+  if (!el) return;
+  if (_mdVisible) {
+    el.style.display = 'block';
+    el.innerHTML = `<div class="md-view">${escHtml(reportToTextFromForm(id))}</div>`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+async function deleteReport(id) {
+  const ok = await showConfirm('削除確認', 'この週報を削除しますか？');
+  if (!ok) return;
+  APP.weekly_reports = APP.weekly_reports.filter(r => r.id !== id);
+  saveData(APP);
+  navigate('#/');
+}
+
+// ===================== RENDER VIEW =====================
+function renderViewReport(id) {
+  const report = getWeeklyReports().find(r => r.id === id);
+  if (!report) return `<div class="page-container"><p>週報が見つかりません。</p><button class="btn btn-secondary" onclick="navigate('#/')">一覧へ戻る</button></div>`;
+
+  const statusLabel = { draft: '下書き', published: '公開済み', archived: 'アーカイブ' };
+  const statusClass = { draft: 'badge-draft', published: 'badge-published', archived: 'badge-archived' };
+
+  function section(title, content) {
+    if (!content) return '';
+    return `<div class="view-section"><h3>${title}</h3><div class="content">${escHtml(content)}</div></div>`;
+  }
+
+  return `
+  <div class="page-container">
+    <button class="btn btn-ghost" onclick="navigate('#/')" style="margin-bottom:16px;">← 一覧へ戻る</button>
+    <div class="card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div>
+          <h1 style="font-size:20px;font-weight:800;">${escHtml(report.title)}</h1>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">${report.weekStart} 〜 ${report.weekEnd}</div>
+        </div>
+        <span class="badge ${statusClass[report.status] || 'badge-draft'}">${statusLabel[report.status] || report.status}</span>
+      </div>
+
+      ${section('全体一言', report.summary)}
+      ${section('先週やったこと', report.completedThisWeek)}
+      ${section('現状', report.currentStatus)}
+      ${section('来週やること', report.nextWeekPlan)}
+      ${section('懸念事項', report.risks)}
+
+      <div style="font-size:11px;color:var(--muted);margin-top:20px;padding-top:12px;border-top:1px solid var(--border);">
+        作成: ${new Date(report.createdAt).toLocaleString('ja-JP')} / 更新: ${new Date(report.updatedAt).toLocaleString('ja-JP')}
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="navigate('#/edit/${report.id}')">編集</button>
+      <button class="btn btn-secondary" onclick="copyReportToClipboard('${report.id}')">クリップボードにコピー</button>
+      <button class="btn btn-secondary" onclick="archiveReport('${report.id}')">アーカイブ${report.status === 'archived' ? '解除' : ''}</button>
+      <button class="btn btn-danger" onclick="deleteReport('${report.id}')">削除</button>
+    </div>
+  </div>`;
+}
+
+function copyReportToClipboard(id) {
+  const r = getWeeklyReports().find(x => x.id === id);
+  if (!r) return;
+  navigator.clipboard.writeText(reportToText(r)).then(() => showSave('コピーしました', '#4ade80'));
+}
+
+function archiveReport(id) {
+  const r = getWeeklyReports().find(x => x.id === id);
+  if (!r) return;
+  r.status = r.status === 'archived' ? 'published' : 'archived';
+  r.updatedAt = new Date().toISOString();
+  saveData(APP);
+  render();
+}
+
+// ===================== UTILS =====================
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ===================== START =====================
+initApp();
+</script>
+
+</body>
+</html>

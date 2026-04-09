@@ -31,16 +31,16 @@
 
 /* ===================== DESIGN TOKENS ===================== */
 :root {
-  --sidebar-bg: #1a1f36;
-  --sidebar-text: rgba(255,255,255,0.7);
+  --sidebar-bg: #1e1e1e;
+  --sidebar-text: rgba(255,255,255,0.75);
   --sidebar-active: #3d5afe;
   --accent: #3d5afe;
   --accent2: #00b8a9;
-  --main-bg: #f7f8fa;
-  --card-bg: #ffffff;
-  --text: #1a1a2e;
-  --muted: #6b7280;
-  --border: #e5e7eb;
+  --main-bg: #161616;
+  --card-bg: #242424;
+  --text: rgba(255,255,255,0.9);
+  --muted: rgba(255,255,255,0.45);
+  --border: rgba(255,255,255,0.1);
   --sidebar-width: 240px;
   --nav-height: 42px;
 }
@@ -219,11 +219,16 @@ body {
 /* ===================== MAIN AREA ===================== */
 #main-area {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  background: var(--main-bg);
+}
+#main-content {
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--main-bg);
 }
 
 /* Top bar */
@@ -300,15 +305,15 @@ body {
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
-.status-未着手 { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.3); }
-.status-進行中 { background: rgba(61,90,254,0.1);   color: #3d5afe; border: 1px solid rgba(61,90,254,0.3); }
-.status-完了   { background: rgba(0,184,169,0.12); color: #00897b; border: 1px solid rgba(0,184,169,0.3); }
-.status-要確認 { background: rgba(217,119,6,0.12);  color: #b45309; border: 1px solid rgba(217,119,6,0.3); }
-.status-保留   { background: rgba(109,40,217,0.1);  color: #6d28d9; border: 1px solid rgba(109,40,217,0.3); }
-.priority-最優先 { background: rgba(220,38,38,0.1);  color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
-.priority-高     { background: rgba(234,88,12,0.1);  color: #ea580c; border: 1px solid rgba(234,88,12,0.3); }
-.priority-中     { background: rgba(202,138,4,0.1);  color: #a16207; border: 1px solid rgba(202,138,4,0.3); }
-.priority-低     { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.25); }
+.status-未着手 { background: rgba(107,114,128,0.2); color: #9ca3af; border: 1px solid rgba(107,114,128,0.35); }
+.status-進行中 { background: rgba(61,90,254,0.2); color: #818cf8; border: 1px solid rgba(61,90,254,0.4); }
+.status-完了   { background: rgba(0,184,169,0.2); color: #34d399; border: 1px solid rgba(0,184,169,0.35); }
+.status-要確認 { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.35); }
+.status-保留   { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.35); }
+.priority-最優先 { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.35); }
+.priority-高     { background: rgba(249,115,22,0.2); color: #fb923c; border: 1px solid rgba(249,115,22,0.35); }
+.priority-中     { background: rgba(234,179,8,0.2); color: #fbbf24; border: 1px solid rgba(234,179,8,0.35); }
+.priority-低     { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
 
 /* ===================== CARDS ===================== */
 .card {
@@ -448,6 +453,8 @@ body {
   cursor: pointer;
 }
 .resource-link:hover { background: var(--main-bg); }
+.rl-copy-hint { font-size: 10px; color: var(--muted); opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+.resource-link:hover .rl-copy-hint { opacity: 1; }
 
 .detail-row {
   display: flex;
@@ -502,7 +509,7 @@ body {
   cursor: pointer;
 }
 .task-row:last-child { border-radius: 0 0 8px 8px; }
-.task-row:hover { background: #f0f3ff; }
+.task-row:hover { background: rgba(255,255,255,0.04); }
 .task-row .tr-name {
   display: flex;
   align-items: center;
@@ -587,7 +594,7 @@ body {
   font-size: 11px;
   padding: 2px 7px;
   border-radius: 10px;
-  background: rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.08);
   font-weight: 600;
 }
 .board-cards { padding: 8px; min-height: 80px; }
@@ -597,10 +604,10 @@ body {
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 6px;
-  cursor: grab;
+  cursor: pointer;
   transition: box-shadow 0.15s, transform 0.1s;
 }
-.board-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.board-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); transform: translateY(-1px); }
 .board-card .bc-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
 .board-card .bc-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .bc-date-chip {
@@ -674,6 +681,102 @@ body {
 .empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
 .empty-state p { font-size: 14px; }
 
+/* ===================== TASK DETAIL PANEL ===================== */
+#task-detail-panel {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--card-bg);
+  border-left: 1px solid var(--border);
+  transition: width 0.25s ease, min-width 0.25s ease;
+  flex-shrink: 0;
+  height: 100%;
+}
+#task-detail-panel.tdp-open {
+  width: 380px;
+  min-width: 380px;
+}
+#tdp-inner {
+  width: 380px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+}
+.tdp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.tdp-task-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.tdp-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.tdp-field:last-of-type { border-bottom: none; }
+.tdp-field-label {
+  color: var(--muted);
+  font-size: 12px;
+  width: 70px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.tdp-field-value { color: var(--text); flex: 1; }
+.tdp-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.tdp-comment-area {
+  width: 100%;
+  padding: 10px;
+  background: var(--main-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  outline: none;
+  min-height: 70px;
+  transition: border-color 0.15s;
+}
+.tdp-comment-area:focus { border-color: var(--accent); }
+.mt-section {
+  margin-bottom: 24px;
+}
+.mt-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+.mt-section-header:hover { color: var(--text); }
+.mt-section-toggle { font-size: 10px; transition: transform 0.15s; }
+.mt-section-toggle.collapsed { transform: rotate(-90deg); }
+
 /* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -704,7 +807,7 @@ body {
   <span class="cn-sep">|</span>
   <a href="aicare-top-prototype.html">サイト TOP</a>
   <a href="aicare-sitemap.html">サイト制作</a>
-  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-lab-app.html">出店管理</a>
   <a href="aicare-vision-check.html">視力チェック</a>
   <a href="persona-dashboard.html">ペルソナ / ブランド</a>
   <a href="aicare-brand-overview.html">ブランドマップ</a>
@@ -714,7 +817,8 @@ body {
   <span class="cn-sep">|</span>
   <a href="aicare-schedule.html">全体スケジュール</a>
   <a href="aicare-projects.html">プロジェクト管理</a>
-  <a href="project-mgmt-v2.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">🆕 管理仮</a>
+  <a href="weekly-reports.html">週報管理</a>
+  
   <a href="project-mgmt-v2.html" class="cn-active">プロジェクト v2</a>
 </nav>
 
@@ -742,39 +846,63 @@ body {
     </div>
 
     <div class="sb-divider"></div>
+    <div class="sb-section-label">インサイト</div>
+    <div class="sb-nav">
+      <div class="sb-nav-item" data-nav="report" onclick="navTo('report')">
+        <span class="sb-icon">📊</span> レポート
+      </div>
+      <div class="sb-nav-item" data-nav="portfolio" onclick="navTo('portfolio')">
+        <span class="sb-icon">📁</span> ポートフォリオ
+      </div>
+      <div class="sb-nav-item" data-nav="goals" onclick="navTo('goals')">
+        <span class="sb-icon">🎯</span> ゴール
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
     <div class="sb-section-label">プロジェクト</div>
 
     <!-- Project list -->
     <div class="sb-projects" id="sb-projects"></div>
 
     <!-- User -->
-    <div class="sb-user">
-      <div class="sb-user-avatar">こ</div>
-      <div class="sb-user-name">こうた</div>
-    </div>
+    <div class="sb-user" style="position:relative;" id="sb-user-area"></div>
   </aside>
 
   <!-- Main area -->
   <div id="main-area">
-    <!-- Top bar -->
-    <div id="top-bar">
-      <button class="tb-hamburger" onclick="toggleSidebar()" title="サイドバー切り替え">☰</button>
-      <div class="tb-project-name" id="tb-title">プロジェクトを選択</div>
-      <div class="tb-tabs" id="tb-tabs" style="display:none;">
-        <button class="tb-tab active" data-tab="home" onclick="switchTab('home')">ホーム</button>
-        <button class="tb-tab" data-tab="list" onclick="switchTab('list')">リスト</button>
-        <button class="tb-tab" data-tab="board" onclick="switchTab('board')">ボード</button>
+    <div id="main-content">
+      <!-- Top bar -->
+      <div id="top-bar">
+        <button class="tb-hamburger" onclick="toggleSidebar()" title="サイドバー切り替え">☰</button>
+        <div class="tb-project-name" id="tb-title">プロジェクトを選択</div>
+        <div class="tb-tabs" id="tb-tabs" style="display:none;">
+          <button class="tb-tab active" data-tab="home" onclick="switchTab('home')">ホーム</button>
+          <button class="tb-tab" data-tab="list" onclick="switchTab('list')">リスト</button>
+          <button class="tb-tab" data-tab="board" onclick="switchTab('board')">ボード</button>
+        </div>
+        <div class="tb-actions">
+          <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" title="新しいタスク (N)">＋ タスク</button>
+        </div>
       </div>
-      <div class="tb-actions">
-        <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" title="新しいタスク (N)">＋ タスク</button>
+
+      <!-- Content -->
+      <div id="content-area">
+        <div class="empty-state">
+          <div class="es-icon">📋</div>
+          <p>左のサイドバーからプロジェクトを選んでください</p>
+        </div>
       </div>
     </div>
-
-    <!-- Content -->
-    <div id="content-area">
-      <div class="empty-state">
-        <div class="es-icon">📋</div>
-        <p>左のサイドバーからプロジェクトを選んでください</p>
+    <div id="task-detail-panel">
+      <div id="tdp-inner">
+        <div class="tdp-topbar">
+          <button class="btn btn-teal btn-sm" id="tdp-complete-btn" onclick="tdpToggleComplete()">完了にする</button>
+          <div style="display:flex;gap:6px;margin-left:auto;">
+            <button class="btn btn-ghost btn-sm" onclick="closeTaskDetail()" style="font-size:16px;">✕</button>
+          </div>
+        </div>
+        <div id="tdp-body"></div>
       </div>
     </div>
   </div>
@@ -991,6 +1119,51 @@ function avatarHtml(name, size) {
 let currentProjectId = null;
 let currentTab = 'home';
 let sidebarCollapsed = false;
+let currentUser = localStorage.getItem('v2_currentUser') || 'こうた';
+
+function switchUser(name) {
+  currentUser = name;
+  localStorage.setItem('v2_currentUser', name);
+  document.getElementById('user-switcher-menu').style.display = 'none';
+  renderSidebarUser();
+  // Re-render current view
+  if (currentProjectId) renderProjectView(currentTab);
+  else {
+    const activeNav = document.querySelector('.sb-nav-item.active');
+    const page = activeNav ? activeNav.dataset.nav : 'home';
+    navTo(page);
+  }
+}
+
+function toggleUserMenu() {
+  const menu = document.getElementById('user-switcher-menu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function renderSidebarUser() {
+  const el = document.getElementById('sb-user-area');
+  if (!el) return;
+  const color = personColor(currentUser);
+  const initials = currentUser.slice(0, 2);
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;" onclick="toggleUserMenu()">
+      <div class="sb-user-avatar" style="background:${color};">${initials}</div>
+      <div class="sb-user-name">${currentUser}</div>
+      <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);">▲</span>
+    </div>
+    <div id="user-switcher-menu" style="display:none;position:absolute;bottom:56px;left:8px;right:8px;background:#2a2a2a;border:1px solid var(--border);border-radius:10px;padding:6px;z-index:500;box-shadow:0 -8px 24px rgba(0,0,0,0.4);">
+      ${DEFAULT_PEOPLE.map(name => {
+        const c = personColor(name);
+        const ini = name.slice(0,2);
+        const isActive = name === currentUser;
+        return `<div onclick="switchUser('${name}')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;background:${isActive?'rgba(61,90,254,0.18)':'transparent'};" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='${isActive?'rgba(61,90,254,0.18)':'transparent'}'">
+          <div style="width:28px;height:28px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${ini}</div>
+          <span style="font-size:13px;color:rgba(255,255,255,0.85);">${name}</span>
+          ${isActive ? '<span style="margin-left:auto;color:var(--accent);font-size:14px;">✓</span>' : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
 
 // ===================== SIDEBAR =====================
 function renderSidebar() {
@@ -1059,6 +1232,15 @@ function navTo(page) {
   } else if (page === 'inbox') {
     tbTitle.textContent = '受信トレイ';
     renderInbox();
+  } else if (page === 'report') {
+    tbTitle.textContent = 'レポート';
+    renderReport();
+  } else if (page === 'portfolio') {
+    tbTitle.textContent = 'ポートフォリオ';
+    renderPortfolio();
+  } else if (page === 'goals') {
+    tbTitle.textContent = 'ゴール';
+    renderGoals();
   }
 }
 
@@ -1095,110 +1277,126 @@ function switchTab(tab) {
 // ===================== DASHBOARD HOME =====================
 function renderDashboardHome() {
   const projects = getProjects();
-  const total = projects.length;
+  const today = new Date();
+  const hour = today.getHours();
+  const greeting = hour < 12 ? 'おはようございます' : hour < 18 ? 'こんにちは' : 'こんばんは';
+  const dateStr = `${today.getMonth()+1}月${today.getDate()}日 ${['日','月','火','水','木','金','土'][today.getDay()]}曜日`;
+
+  // Collect my tasks
+  const myName = currentUser;
+  const myTasks = [];
+  function collectMyTasks(taskList, proj) {
+    (taskList||[]).forEach(t => {
+      if ((t.assignee||'').includes(myName) || (proj.assignee||'').includes(myName)) {
+        if (t.status !== '完了') myTasks.push({task:t, project:proj});
+      }
+      if (t.children) collectMyTasks(t.children, proj);
+    });
+  }
+  projects.forEach(p => collectMyTasks(p.tasks, p));
+
   const doing = projects.filter(p => p.status === '進行中').length;
-  const done = projects.filter(p => p.status === '完了').length;
-  const todo = projects.filter(p => p.status === '未着手').length;
-
-  // upcoming deadlines
-  const withDeadline = projects
-    .filter(p => p.deadline && p.status !== '完了')
-    .sort((a,b) => new Date(a.deadline) - new Date(b.deadline))
-    .slice(0, 5);
-
-  const milestones = withDeadline.map(p => {
-    const d = daysUntil(p.deadline);
-    const dot = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 7 ? '#f59e0b' : '#3d5afe';
-    const dlText = d === null ? '' : d < 0 ? `超過${Math.abs(d)}日` : d === 0 ? '今日！' : `あと${d}日`;
-    return `<div class="milestone-item" onclick="selectProject('${p.id}')">
-      <div class="milestone-dot" style="background:${dot};"></div>
-      <div class="milestone-name">${p.name}</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        ${statusBadge(p.status)}
-        <span class="milestone-date">${formatDate(p.deadline)} <span style="color:${dot};">${dlText}</span></span>
-      </div>
-    </div>`;
-  }).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px 0;">期限設定済みのプロジェクトはありません</div>';
-
-  // High priority active projects
-  const highPrio = projects
-    .filter(p => p.status !== '完了' && (p.priority === '最優先' || p.priority === '高'))
-    .slice(0, 6);
+  const withDeadline = projects.filter(p => p.deadline && p.status !== '完了')
+    .sort((a,b) => new Date(a.deadline)-new Date(b.deadline)).slice(0,5);
 
   const content = document.getElementById('content-area');
   content.innerHTML = `
     <div style="max-width:1100px;">
-      <!-- Stats row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
-        <div class="card" style="text-align:center;padding:16px;">
-          <div style="font-size:28px;font-weight:800;color:var(--accent);">${total}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">総プロジェクト</div>
-        </div>
-        <div class="card" style="text-align:center;padding:16px;">
-          <div style="font-size:28px;font-weight:800;color:#3d5afe;">${doing}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">進行中</div>
-        </div>
-        <div class="card" style="text-align:center;padding:16px;">
-          <div style="font-size:28px;font-weight:800;color:#f59e0b;">${todo}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">未着手</div>
-        </div>
-        <div class="card" style="text-align:center;padding:16px;">
-          <div style="font-size:28px;font-weight:800;color:#00b8a9;">${done}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">完了</div>
-        </div>
+      <!-- 挨拶 -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${dateStr}</div>
+        <h1 style="font-size:24px;font-weight:800;color:var(--text);letter-spacing:-0.02em;">${currentUser} さん、${greeting}</h1>
+      </div>
+      <!-- 統計バー -->
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:10px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);">
+        <span>週</span>
+        <span style="color:var(--accent2);font-weight:600;">✓ ${myTasks.filter(({task})=>task.status==='完了').length}件のタスクが完了済み</span>
+        <span>👤 ${doing}件進行中</span>
+        <span style="margin-left:auto;cursor:pointer;color:var(--accent);">カスタマイズ</span>
       </div>
 
-      <!-- 2 col -->
-      <div class="home-2col">
-        <div>
-          <!-- Milestones -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="section-label">マイルストーン</div>
-            ${milestones}
-          </div>
-
-          <!-- Priority projects -->
-          <div class="card">
-            <div class="section-label">優先プロジェクト</div>
-            ${highPrio.map(p => {
-              const cat = getCategoryById(p.categoryId);
-              return `<div class="milestone-item" onclick="selectProject('${p.id}')">
-                <div class="milestone-dot" style="background:${cat.color};"></div>
-                <div class="milestone-name">${p.name}</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  ${priorityBadge(p.priority)}
-                  ${statusBadge(p.status)}
-                </div>
-              </div>`;
-            }).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px 0;">なし</div>'}
+      <!-- ウィジェットグリッド -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- 自分が割り当てたタスク -->
+        <div class="card">
+          <div class="section-label">自分が割り当てたタスク</div>
+          ${myTasks.slice(0,5).map(({task,project}) => {
+            const d = daysUntil(task.deadline);
+            const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fbbf24' : 'var(--muted)';
+            return `<div class="task-row" onclick="openTaskDetail('${project.id}','${task.id}')" style="border-radius:8px;border:none;border-bottom:1px solid var(--border);padding:10px 0;cursor:pointer;">
+              <div class="tr-name">
+                <input type="checkbox" class="task-checkbox" ${task.status==='完了'?'checked':''} onclick="event.stopPropagation();toggleTaskDone('${project.id}','${task.id}',this)">
+                <span>${task.name}</span>
+              </div>
+              <span style="font-size:11px;color:var(--muted);">${project.name}</span>
+              <span style="font-size:11px;color:${dlColor};">${task.deadline ? formatDate(task.deadline) : '—'}</span>
+              <span>${priorityBadge(task.priority)}</span>
+              <span>${statusBadge(task.status)}</span>
+            </div>`;
+          }).join('') || '<div style="color:var(--muted);font-size:13px;padding:12px 0;">タスクがありません</div>'}
+          <div style="padding-top:12px;">
+            <button onclick="navTo('mytasks')" class="btn btn-secondary btn-sm">タスクを割り当てる</button>
           </div>
         </div>
 
-        <div>
-          <!-- カテゴリ別 -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="section-label">カテゴリ別</div>
-            ${CATEGORIES.map(cat => {
-              const count = projects.filter(p => p.categoryId === cat.id).length;
-              return `<div class="resource-link" onclick="filterByCategory('${cat.id}')">
-                <span style="font-size:18px;">${cat.icon}</span>
-                <span style="flex:1;">${cat.name}</span>
-                <span style="font-size:12px;color:var(--muted);">${count}件</span>
-              </div>`;
-            }).join('')}
+        <!-- プロジェクト一覧 -->
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">プロジェクト</span>
+            <span style="font-size:11px;color:var(--muted);">最近 ▾</span>
           </div>
+          ${withDeadline.slice(0,5).map(p => {
+            const {pct} = calcProgress(p);
+            const cat = getCategoryById(p.categoryId);
+            const d = daysUntil(p.deadline);
+            const dot = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 7 ? '#fbbf24' : 'var(--accent2)';
+            return `<div class="milestone-item" onclick="selectProject('${p.id}')" style="border-color:var(--border);">
+              <div class="milestone-dot" style="background:${cat.color};"></div>
+              <div class="milestone-name">${p.name}</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                ${statusBadge(p.status)}
+                <span style="font-size:11px;color:${dot};">${formatDate(p.deadline)}</span>
+              </div>
+            </div>`;
+          }).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px 0;">期限設定済みのプロジェクトなし</div>'}
+        </div>
 
-          <!-- Members -->
-          <div class="card">
-            <div class="section-label">メンバー</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-              ${DEFAULT_PEOPLE.map(name => `
-                <div class="member-chip">
-                  ${avatarHtml(name, 24)}
-                  <span style="font-size:13px;">${name}</span>
-                </div>`).join('')}
+        <!-- メンバー -->
+        <div class="card">
+          <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>メンバー</span>
+            <span style="font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">今週 ▾</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+            ${DEFAULT_PEOPLE.map(name => `
+              <div class="member-chip">
+                ${avatarHtml(name,26)}
+                <span style="font-size:12px;">${name}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- マイタスク -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+            ${avatarHtml(currentUser,24)}
+            <span style="font-size:13px;font-weight:700;">マイタスク</span>
+            <div style="display:flex;gap:10px;margin-left:auto;font-size:12px;color:var(--muted);">
+              <span style="color:var(--accent);cursor:pointer;">今後</span>
+              <span style="cursor:pointer;">期限超過</span>
+              <span style="cursor:pointer;">完了</span>
             </div>
           </div>
+          <div style="font-size:12px;color:var(--muted);padding:4px 0;margin-bottom:6px;">+ タスクを作成</div>
+          ${myTasks.slice(0,3).map(({task,project}) => {
+            const d = daysUntil(task.deadline);
+            const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fbbf24' : 'var(--muted)';
+            return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="openTaskDetail('${project.id}','${task.id}')">
+              <input type="checkbox" class="task-checkbox" onclick="event.stopPropagation();toggleTaskDone('${project.id}','${task.id}',this)">
+              <span style="flex:1;font-size:13px;">${task.name}</span>
+              <span style="font-size:11px;color:${dlColor};">${task.deadline ? formatDate(task.deadline) : ''}</span>
+            </div>`;
+          }).join('') || '<div style="color:var(--muted);font-size:13px;">タスクがありません</div>'}
         </div>
       </div>
     </div>`;
@@ -1212,7 +1410,7 @@ function filterByCategory(catId) {
 // ===================== MY TASKS =====================
 function renderMyTasks() {
   const projects = getProjects();
-  const myName = 'こうた';
+  const myName = currentUser;
   const tasks = [];
   function collectTasks(taskList, proj) {
     (taskList || []).forEach(t => {
@@ -1224,35 +1422,56 @@ function renderMyTasks() {
   }
   projects.forEach(p => collectTasks(p.tasks, p));
 
-  const content = document.getElementById('content-area');
-  if (tasks.length === 0) {
-    content.innerHTML = `<div class="empty-state"><div class="es-icon">✅</div><p>タスクがありません</p></div>`;
-    return;
-  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 7);
 
+  const sections = [
+    { key: 'recent',    label: '最近の割り当て', items: tasks.filter(({task}) => task.status !== '完了').slice(0,8) },
+    { key: 'today',     label: '今日の作業',    items: tasks.filter(({task}) => { if (!task.deadline || task.status === '完了') return false; const d = new Date(task.deadline); d.setHours(0,0,0,0); return d.getTime() === today.getTime(); }) },
+    { key: 'thisweek',  label: '来週の作業',    items: tasks.filter(({task}) => { if (!task.deadline || task.status === '完了') return false; const d = new Date(task.deadline); d.setHours(0,0,0,0); return d > today && d <= nextWeek; }) },
+    { key: 'later',     label: '後にする',      items: tasks.filter(({task}) => { if (task.status === '完了') return false; if (!task.deadline) return true; const d = new Date(task.deadline); d.setHours(0,0,0,0); return d > nextWeek; }) },
+  ];
+
+  const content = document.getElementById('content-area');
   content.innerHTML = `
-    <div style="max-width:800px;">
+    <div style="max-width:900px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:700;">マイタスク</h2>
+        <div style="display:flex;gap:4px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+          ${['リスト','ボード','カレンダー'].map((t,i) => `<button class="tb-tab${i===0?' active':''}" style="font-size:12px;padding:5px 12px;">${t}</button>`).join('')}
+        </div>
+      </div>
       <div class="list-header">
-        <span>タスク名</span>
-        <span>プロジェクト</span>
+        <span>名前</span>
         <span>期日</span>
-        <span>優先度</span>
+        <span>コラボレーター</span>
+        <span>プロジェクト</span>
         <span>ステータス</span>
       </div>
-      ${tasks.map(({task, project}) => {
-        const d = daysUntil(task.deadline);
-        const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#f59e0b' : 'var(--muted)';
-        return `<div class="task-row${task.status === '完了' ? ' is-done' : ''}" onclick="selectProject('${project.id}')">
-          <div class="tr-name">
-            <input type="checkbox" class="task-checkbox" ${task.status === '完了' ? 'checked' : ''} onclick="event.stopPropagation()">
-            <span>${task.name}</span>
+      ${sections.map(sec => `
+        <div class="mt-section">
+          <div class="mt-section-header">
+            <span class="mt-section-toggle">▼</span>
+            <span>${sec.label}</span>
+            <span style="font-size:11px;opacity:0.5;">${sec.items.length}</span>
           </div>
-          <span style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${project.name}</span>
-          <span style="font-size:12px;color:${dlColor};">${task.deadline ? formatDate(task.deadline) : '—'}</span>
-          <span>${priorityBadge(task.priority)}</span>
-          <span>${statusBadge(task.status)}</span>
-        </div>`;
-      }).join('')}
+          ${sec.items.length === 0 ? `<div style="padding:8px 16px 12px;font-size:12px;color:var(--muted);">タスクを追加…</div>` :
+            sec.items.map(({task, project}) => {
+              const d = daysUntil(task.deadline);
+              const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fbbf24' : 'var(--muted)';
+              return `<div class="task-row${task.status==='完了'?' is-done':''}" onclick="openTaskDetail('${project.id}','${task.id}')">
+                <div class="tr-name">
+                  <input type="checkbox" class="task-checkbox" ${task.status==='完了'?'checked':''} onclick="event.stopPropagation();toggleTaskDone('${project.id}','${task.id}',this)">
+                  <span>${task.name}</span>
+                </div>
+                <span style="font-size:12px;color:${dlColor};">${task.deadline ? formatDate(task.deadline) : '—'}</span>
+                <span style="font-size:12px;color:var(--muted);">${project.assignee||'—'}</span>
+                <span style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${project.name}</span>
+                <span>${statusBadge(task.status)}</span>
+              </div>`;
+            }).join('')}
+        </div>`).join('')}
+      <div style="padding:10px 16px;font-size:13px;color:var(--muted);cursor:pointer;">+ セクションを追加</div>
     </div>`;
 }
 
@@ -1260,6 +1479,98 @@ function renderMyTasks() {
 function renderInbox() {
   const content = document.getElementById('content-area');
   content.innerHTML = `<div class="empty-state"><div class="es-icon">📥</div><p>新しいメッセージはありません</p></div>`;
+}
+
+function renderReport() {
+  const projects = getProjects();
+  const content = document.getElementById('content-area');
+  const doing = projects.filter(p => p.status==='進行中').length;
+  const done = projects.filter(p => p.status==='完了').length;
+  const todo = projects.filter(p => p.status==='未着手').length;
+  content.innerHTML = `
+    <div style="max-width:1100px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:700;">レポート</h2>
+        <button class="btn btn-primary btn-sm">+ 作成</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+        <div class="card">
+          <div class="section-label">プロジェクト（ステータス別）</div>
+          <div style="display:flex;align-items:center;justify-content:center;padding:24px 0;">
+            <div style="width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--accent) 0% ${Math.round(doing/(projects.length||1)*100)}%, var(--accent2) ${Math.round(doing/(projects.length||1)*100)}% ${Math.round((doing+done)/(projects.length||1)*100)}%, var(--border) ${Math.round((doing+done)/(projects.length||1)*100)}%);display:flex;align-items:center;justify-content:center;">
+              <div style="width:80px;height:80px;border-radius:50%;background:var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;">${projects.length}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;font-size:12px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent);"></span>進行中 ${doing}</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent2);"></span>完了 ${done}</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--border);"></span>未着手 ${todo}</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-label">未完了タスク（プロジェクト別）</div>
+          ${projects.slice(0,5).map(p => {
+            const {total,done:d,pct} = calcProgress(p);
+            const remaining = total - d;
+            return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+              <div style="flex:1;font-size:12px;">${p.name.slice(0,20)}…</div>
+              <div style="width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                <div style="width:${pct}%;height:100%;background:var(--accent);"></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);width:30px;text-align:right;">${remaining}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderPortfolio() {
+  const projects = getProjects();
+  const content = document.getElementById('content-area');
+  content.innerHTML = `
+    <div style="max-width:1100px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:700;">ポートフォリオ</h2>
+        <button class="btn btn-primary btn-sm">+ 作成</button>
+      </div>
+      <div style="margin-bottom:16px;border-bottom:1px solid var(--border);display:flex;gap:0;">
+        <button class="tb-tab active" style="font-size:13px;">最近とお気に入り</button>
+        <button class="tb-tab" style="font-size:13px;">すべて参照</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+        ${CATEGORIES.map(cat => {
+          const count = projects.filter(p=>p.categoryId===cat.id).length;
+          if (!count) return '';
+          return `<div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;" onclick="filterByCategory('${cat.id}')">
+            <div style="font-size:32px;margin-bottom:8px;">${cat.icon}</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${cat.name}</div>
+            <div style="font-size:12px;color:var(--muted);">${count}件のプロジェクト</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function renderGoals() {
+  const content = document.getElementById('content-area');
+  content.innerHTML = `
+    <div style="max-width:900px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:700;">ゴール</h2>
+        <button class="btn btn-primary btn-sm">+ 目標を作成</button>
+      </div>
+      <div style="margin-bottom:20px;border-bottom:1px solid var(--border);display:flex;gap:0;">
+        <button class="tb-tab active" style="font-size:13px;">戦略マップ</button>
+        <button class="tb-tab" style="font-size:13px;">チームの目標</button>
+        <button class="tb-tab" style="font-size:13px;">自分の目標</button>
+      </div>
+      <div class="empty-state">
+        <div class="es-icon">🎯</div>
+        <p>目標を設定して戦略マップを作成しましょう</p>
+        <button class="btn btn-primary" style="margin-top:16px;">+ 目標を作成</button>
+      </div>
+    </div>`;
 }
 
 // ===================== PROJECT VIEW =====================
@@ -1299,7 +1610,10 @@ function renderProjectHome(p) {
             </select>
           </div>
         </div>
-        <textarea placeholder="今週の進捗・メモを入力…">${p.thisWeek || ''}</textarea>
+        <div style="position:relative;">
+          <textarea id="week-text-${p.id}" placeholder="今週の進捗・メモを入力…" style="width:100%;padding-right:72px;">${p.thisWeek || ''}</textarea>
+          <button id="week-save-btn-${p.id}" class="btn btn-primary btn-sm" onclick="saveWeekStatus('${p.id}', document.getElementById('week-text-${p.id}').value)" style="position:absolute;right:8px;bottom:8px;">保存</button>
+        </div>
         <!-- Progress -->
         <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
           <div style="flex:1;height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;">
@@ -1334,9 +1648,9 @@ function renderProjectHome(p) {
           <!-- Resources -->
           <div class="card">
             <div class="section-label">主要リソース</div>
-            ${p.deliverables ? `<div class="resource-link"><span>📦</span><span>成果物: ${p.deliverables}</span></div>` : ''}
-            ${p.purpose ? `<div class="resource-link"><span>🎯</span><span>目的: ${p.purpose}</span></div>` : ''}
-            ${p.completionCriteria ? `<div class="resource-link"><span>✅</span><span>完了条件: ${p.completionCriteria}</span></div>` : ''}
+            ${p.deliverables ? `<div class="resource-link" onclick="copyToClip(this,'${p.deliverables.replace(/'/g,"\\'")}')"><span>📦</span><span style="flex:1;">成果物: ${p.deliverables}</span><span class="rl-copy-hint">コピー</span></div>` : ''}
+            ${p.purpose ? `<div class="resource-link" onclick="copyToClip(this,'${p.purpose.replace(/'/g,"\\'")}')"><span>🎯</span><span style="flex:1;">目的: ${p.purpose}</span><span class="rl-copy-hint">コピー</span></div>` : ''}
+            ${p.completionCriteria ? `<div class="resource-link" onclick="copyToClip(this,'${p.completionCriteria.replace(/'/g,"\\'")}')"><span>✅</span><span style="flex:1;">完了条件: ${p.completionCriteria}</span><span class="rl-copy-hint">コピー</span></div>` : ''}
             ${!p.deliverables && !p.purpose ? `<div style="color:var(--muted);font-size:13px;">リソース未設定</div>` : ''}
           </div>
         </div>
@@ -1394,11 +1708,161 @@ function renderProjectHome(p) {
     </div>`;
 }
 
+// ===================== TASK DETAIL PANEL =====================
+let tdpCurrentTask = null;
+let tdpCurrentProjectId = null;
+
+function openTaskDetail(projectId, taskId) {
+  const p = getProjectById(projectId);
+  if (!p) return;
+  function findTask(tasks) {
+    for (const t of (tasks||[])) {
+      if (String(t.id) === String(taskId)) return t;
+      const found = findTask(t.children);
+      if (found) return found;
+    }
+    return null;
+  }
+  const task = findTask(p.tasks);
+  if (!task) return;
+  tdpCurrentTask = task;
+  tdpCurrentProjectId = projectId;
+  renderTaskDetailPanel(task, p);
+  document.getElementById('task-detail-panel').classList.add('tdp-open');
+}
+
+function closeTaskDetail() {
+  document.getElementById('task-detail-panel').classList.remove('tdp-open');
+  tdpCurrentTask = null;
+  tdpCurrentProjectId = null;
+}
+
+function tdpToggleComplete() {
+  if (!tdpCurrentTask) return;
+  tdpCurrentTask.status = tdpCurrentTask.status === '完了' ? '未着手' : '完了';
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  renderTaskDetailPanel(tdpCurrentTask, getProjectById(tdpCurrentProjectId));
+  renderSidebar();
+  updateSidebarActiveProject();
+  if (currentProjectId) renderProjectView(currentTab);
+}
+
+function renderTaskDetailPanel(task, proj) {
+  const btn = document.getElementById('tdp-complete-btn');
+  if (btn) {
+    if (task.status === '完了') {
+      btn.textContent = '✓ 完了済み';
+      btn.style.background = '#374151';
+    } else {
+      btn.textContent = '完了にする';
+      btn.style.background = '';
+    }
+  }
+
+  const d = daysUntil(task.deadline);
+  const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#fbbf24' : 'var(--muted)';
+  const dlText = task.deadline
+    ? formatDate(task.deadline) + (d !== null ? ` (${d < 0 ? '超過'+Math.abs(d)+'日' : d === 0 ? '今日' : 'あと'+d+'日'})` : '')
+    : '—';
+
+  document.getElementById('tdp-body').innerHTML = `
+    <div class="tdp-task-name">${task.name}</div>
+
+    <div class="tdp-field">
+      <div class="tdp-field-label">担当者</div>
+      <div class="tdp-field-value">
+        ${task.assignee
+          ? `<div style="display:flex;align-items:center;gap:6px;">${avatarHtml(task.assignee.split(/[、,]+/)[0].trim(),22)}<span>${task.assignee}</span></div>`
+          : `<span style="color:var(--muted);">未設定</span>`}
+      </div>
+    </div>
+    <div class="tdp-field">
+      <div class="tdp-field-label">期日</div>
+      <div class="tdp-field-value" style="color:${dlColor};">${dlText}</div>
+    </div>
+    <div class="tdp-field">
+      <div class="tdp-field-label">優先度</div>
+      <div class="tdp-field-value">${priorityBadge(task.priority)}</div>
+    </div>
+    <div class="tdp-field">
+      <div class="tdp-field-label">ステータス</div>
+      <div class="tdp-field-value">${statusBadge(task.status)}</div>
+    </div>
+    <div class="tdp-field">
+      <div class="tdp-field-label">プロジェクト</div>
+      <div class="tdp-field-value" style="display:flex;align-items:center;gap:6px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${getCategoryById(proj.categoryId).color};display:inline-block;flex-shrink:0;"></span>
+        <span>${proj.name}</span>
+      </div>
+    </div>
+
+    <div class="tdp-section-title">説明</div>
+    <div style="color:${task.notes ? 'var(--text)' : 'var(--muted)'};font-size:13px;padding:8px 0;line-height:1.6;">
+      ${task.notes || 'クリックして説明を追加…'}
+    </div>
+
+    <div class="tdp-section-title">サブタスク</div>
+    <div style="padding:4px 0;">
+      ${(task.children && task.children.length)
+        ? task.children.map(c => `
+          <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+            <input type="checkbox" class="task-checkbox" ${c.status==='完了'?'checked':''}>
+            <span style="font-size:12px;${c.status==='完了'?'text-decoration:line-through;color:var(--muted);':''}">${c.name}</span>
+          </div>`).join('')
+        : `<div style="color:var(--muted);font-size:13px;cursor:pointer;padding:6px 0;">+ サブタスクを追加</div>`}
+    </div>
+
+    <div class="tdp-section-title">コメント</div>
+    <div style="margin-top:8px;">
+      <textarea class="tdp-comment-area" placeholder="コメントを追加…"></textarea>
+    </div>
+  `;
+}
+
 function quickUpdateStatus(pid, status) {
   const p = getProjectById(pid);
   if (!p) return;
   p.status = status;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  renderSidebar();
+  updateSidebarActiveProject();
+}
+
+function saveWeekStatus(pid, val) {
+  const p = getProjectById(pid);
+  if (!p) return;
+  p.thisWeek = val;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  // Brief visual feedback
+  const btn = document.getElementById('week-save-btn-' + pid);
+  if (btn) { btn.textContent = '✓ 保存済'; setTimeout(() => { btn.textContent = '保存'; }, 1500); }
+}
+
+function copyToClip(el, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const hint = el.querySelector('.rl-copy-hint');
+    if (hint) { hint.textContent = '✓ コピー済'; setTimeout(() => { hint.textContent = 'コピー'; }, 1500); }
+  }).catch(() => {});
+}
+
+function cycleTaskStatus(taskId) {
+  const p = getProjectById(currentProjectId);
+  if (!p) return;
+  function findTask(tasks) {
+    for (const t of (tasks||[])) {
+      if (String(t.id) === String(taskId)) return t;
+      const found = findTask(t.children);
+      if (found) return found;
+    }
+    return null;
+  }
+  const task = findTask(p.tasks);
+  if (!task) return;
+  const cycle = ['未着手', '進行中', '要確認', '完了'];
+  const idx = cycle.indexOf(task.status);
+  task.status = cycle[(idx + 1) % cycle.length];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP));
+  renderProjectView('board');
   renderSidebar();
   updateSidebarActiveProject();
 }
@@ -1440,9 +1904,9 @@ function renderTaskRow(t, projectId) {
   const d = daysUntil(t.deadline);
   const dlColor = d !== null && d < 0 ? '#ef4444' : d !== null && d <= 3 ? '#f59e0b' : 'var(--muted)';
   const isDone = t.status === '完了';
-  return `<div class="task-row${isDone ? ' is-done' : ''}">
+  return `<div class="task-row${isDone ? ' is-done' : ''}" onclick="openTaskDetail('${projectId}','${t.id}')">
     <div class="tr-name">
-      <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskDone('${projectId}','${t.id}',this)">
+      <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onclick="event.stopPropagation();toggleTaskDone('${projectId}','${t.id}',this)">
       <span>${t.name}</span>
     </div>
     <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);">
@@ -1505,7 +1969,7 @@ function renderBoardCard(t) {
   const d = daysUntil(t.deadline);
   const dateClass = d !== null && d < 0 ? 'overdue' : d !== null && d <= 3 ? 'soon' : '';
   const dateText = t.deadline ? (d === 0 ? '今日' : d !== null && d < 0 ? `${Math.abs(d)}日超過` : formatDate(t.deadline)) : '';
-  return `<div class="board-card" draggable="true">
+  return `<div class="board-card" draggable="true" onclick="cycleTaskStatus('${t.id}')" title="クリックでステータスを変更">
     <div class="bc-name">${t.name}</div>
     <div class="bc-meta">
       ${t.assignee ? `<span style="display:flex;align-items:center;gap:4px;">${avatarHtml(t.assignee.split(/[、,]+/)[0].trim(),20)}<span style="font-size:11px;color:var(--muted);">${t.assignee}</span></span>` : '<span></span>'}
@@ -1566,9 +2030,18 @@ document.addEventListener('keydown', e => {
 // ===================== INIT =====================
 function init() {
   renderSidebar();
+  renderSidebarUser();
   // Show dashboard by default
   navTo('home');
   document.querySelector('.sb-nav-item[data-nav="home"]').classList.add('active');
+  // Close user menu when clicking outside
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('user-switcher-menu');
+    const area = document.getElementById('sb-user-area');
+    if (menu && area && !area.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
 }
 
 init();

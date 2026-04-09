@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紙ものの入稿データの作り方</title>
+<style>
+:root {
+  --danger: #e53e3e;
+  --ok:     #38a169;
+  --info:   #2b6cb0;
+  --warn:   #d69e2e;
+  --bg:     #eef2f7;
+  --card:   #ffffff;
+  --text:   #1a202c;
+  --sub:    #4a5568;
+  --border: #cbd5e0;
+  --r: 24px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── VIEWER ── */
+.viewer {
+  width: 100vw; height: 100dvh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+/* ── SLIDE AREA ── */
+.slide-area { overflow: hidden; position: relative; }
+.track {
+  display: flex;
+  height: 100%;
+  transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+  will-change: transform;
+}
+.slide {
+  min-width: 100vw;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 10px 14px 6px;
+}
+@media (max-width: 600px) {
+  .slide { padding: 6px 6px 4px; }
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border-radius: var(--r);
+  box-shadow: 0 12px 60px rgba(0,0,0,.12);
+  width: 100%;
+  max-width: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── CARD HEADER ── */
+.card-head {
+  padding: 28px 56px 18px;
+  border-bottom: 2px solid var(--bg);
+  position: relative;
+}
+@media (max-width: 700px) {
+  .card-head { padding: 18px 20px 12px; }
+}
+.slide-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: var(--sub);
+  margin-bottom: 6px;
+}
+.card-title {
+  font-size: clamp(26px, 4.5vw, 52px);
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--text);
+}
+.card-title small {
+  display: block;
+  font-size: clamp(14px, 2.2vw, 22px);
+  font-weight: 700;
+  color: var(--sub);
+  margin-top: 4px;
+}
+.card-kv {
+  font-size: clamp(13px, 1.8vw, 17px);
+  color: var(--sub);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ── CARD BODY ── */
+.card-body {
+  padding: 20px 56px 24px;
+  overflow-y: auto;
+  font-size: clamp(13px, 1.6vw, 16px);
+  line-height: 1.8;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (max-width: 700px) {
+  .card-body { padding: 14px 16px 18px; gap: 10px; }
+}
+.card-body::-webkit-scrollbar { width: 5px; }
+.card-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── HERO SLIDE ── */
+.hero-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 36px 56px;
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .hero-wrap { padding: 24px 20px; }
+}
+.hero-emoji { font-size: clamp(56px, 10vw, 96px); line-height: 1; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.hero-title {
+  font-size: clamp(30px, 5.5vw, 64px);
+  font-weight: 900;
+  line-height: 1.15;
+}
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 24px);
+  color: var(--sub);
+  font-weight: 700;
+}
+.hero-body {
+  font-size: clamp(14px, 1.8vw, 18px);
+  line-height: 1.85;
+  max-width: 700px;
+}
+
+/* ── INLINE UTILITIES ── */
+strong { font-weight: 800; }
+.t-danger { color: var(--danger); }
+.t-ok     { color: var(--ok); }
+.t-info   { color: var(--info); }
+.t-warn   { color: var(--warn); }
+.t-sub    { color: var(--sub); }
+.fw9      { font-weight: 900; }
+.fs-sm    { font-size: clamp(11px, 1.3vw, 13px); }
+
+/* ── CHIPS / TAGS ── */
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  vertical-align: middle;
+}
+.chip-danger { background:#fff0f0; color:var(--danger); }
+.chip-ok     { background:#f0fff4; color:var(--ok); }
+.chip-info   { background:#ebf8ff; color:var(--info); }
+.chip-warn   { background:#fffbeb; color:var(--warn); }
+
+/* ── NOTICE BOXES ── */
+.notice {
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: clamp(13px,1.5vw,15px);
+  line-height: 1.75;
+}
+.notice b { font-weight: 800; }
+.notice-danger { background:#fff5f5; border-left: 5px solid var(--danger); }
+.notice-ok     { background:#f0fff4; border-left: 5px solid var(--ok); }
+.notice-info   { background:#ebf8ff; border-left: 5px solid var(--info); }
+.notice-warn   { background:#fffbeb; border-left: 5px solid var(--warn); }
+.notice-gray   { background:var(--bg); border-left: 5px solid var(--border); }
+
+/* ── COMPARE ── */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+.cbox {
+  border-radius: 16px;
+  padding: 18px 20px;
+  font-size: clamp(13px,1.5vw,15px);
+  line-height: 1.75;
+}
+.cbox-label {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+  display: block;
+}
+.cbox-ng   { background:#fff5f5; border: 2.5px solid #fc8181; }
+.cbox-ng .cbox-label { color: var(--danger); }
+.cbox-ok   { background:#f0fff4; border: 2.5px solid #68d391; }
+.cbox-ok .cbox-label { color: var(--ok); }
+.cbox-info { background:#ebf8ff; border: 2.5px solid #63b3ed; }
+.cbox-info .cbox-label { color: var(--info); }
+
+/* ── BADGE ROW ── */
+.badge-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 14px 20px;
+  font-size: clamp(14px,1.6vw,17px);
+  font-weight: 800;
+  flex: 1;
+  min-width: 150px;
+}
+.badge-icon { font-size: 26px; }
+
+/* ── CHECKLIST ── */
+.checklist { display: flex; flex-direction: column; gap: 10px; list-style: none; }
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 15px 20px;
+  font-size: clamp(14px,1.6vw,16px);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background .18s;
+}
+.checklist li.done { background: #f0fff4; }
+.chk {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  border: 2.5px solid var(--border);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+  transition: all .18s;
+}
+.checklist li.done .chk { background: var(--ok); border-color: var(--ok); color: white; }
+
+/* ── STEP LIST ── */
+.step-list { display: flex; flex-direction: column; gap: 10px; }
+.step-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--bg); border-radius: 14px;
+  padding: 15px 20px;
+  font-size: clamp(14px,1.6vw,16px);
+  font-weight: 700;
+}
+.step-num {
+  min-width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--info); color: white;
+  font-size: 14px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── FAIL LIST ── */
+.fail-list { display: flex; flex-direction: column; gap: 10px; }
+.fail-item {
+  border-radius: 14px;
+  padding: 14px 20px;
+  background: var(--bg);
+}
+.fail-title { font-weight: 800; font-size: clamp(14px,1.6vw,16px); margin-bottom: 4px; }
+.fail-cause { color: var(--sub); font-size: clamp(12px,1.3vw,14px); margin-bottom: 3px; }
+.fail-fix   { color: var(--ok); font-size: clamp(12px,1.3vw,14px); font-weight: 700; }
+
+/* ── SVG WRAP ── */
+.fig { display: flex; justify-content: center; align-items: center; }
+.fig svg { max-width: 100%; height: auto; }
+
+/* ── COLOR SWATCH ── */
+.swatch-row { display: flex; gap: 10px; }
+.swatch {
+  flex: 1;
+  height: clamp(42px,6vw,60px);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(11px,1.3vw,13px);
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,.35);
+}
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px 10px;
+  flex-shrink: 0;
+  gap: 12px;
+}
+@media (max-width: 500px) { .nav { padding: 5px 10px 8px; } }
+.nav-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 100px;
+  padding: 10px 28px;
+  font-size: clamp(13px,1.5vw,15px);
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--text);
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  transition: all .15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.nav-btn:hover:not(:disabled) { background: var(--text); color: white; border-color: var(--text); }
+.nav-btn:disabled { opacity: .28; cursor: default; }
+
+.prog-wrap {
+  display: flex; align-items: center; gap: 6px;
+  flex: 1; justify-content: center;
+  overflow: hidden; padding: 0 8px;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all .3s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dot.on { width: 28px; border-radius: 5px; background: var(--text); }
+
+/* ── ACCENT LINE ── */
+.accent-line {
+  width: 56px; height: 5px;
+  border-radius: 3px;
+  margin: 10px 0 16px;
+}
+
+/* ── GRID 3COL ── */
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) { .grid3 { grid-template-columns: 1fr; } }
+.g3box {
+  border-radius: 14px;
+  padding: 16px;
+  font-size: clamp(12px,1.4vw,14px);
+  line-height: 1.7;
+}
+.g3box .g3label {
+  font-size: clamp(13px,1.5vw,15px);
+  font-weight: 900;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── highlight span ── */
+.hl { background: linear-gradient(transparent 58%, #ffd70088 58%); }
+</style>
+</head>
+<body>
+<div class="viewer">
+  <div class="slide-area" id="sa">
+    <div class="track" id="track">
+
+<!-- ============================================================ SLIDE 01 -->
+<div class="slide"><div class="card">
+  <div class="hero-wrap">
+    <div class="hero-emoji">🖨️</div>
+    <div class="hero-title">やさしくわかる<br>紙ものの入稿データの<br>作り方</div>
+    <div class="hero-sub">名刺・チラシ・ショップカードなど <span class="hl">全部ほぼこれでOK</span></div>
+    <div class="notice notice-info hero-body">
+      <b>「入稿」って聞くと難しそうに聞こえますよね。</b><br>
+      でも実は、気にすべきポイントは <strong>たった5〜7個</strong> しかありません。<br><br>
+      このページでは「最低限ここさえ押さえれば事故らない」を、図解たっぷりで解説します。<br>
+      デザイナーじゃなくてもOK。初めてでもOK。<br>
+      <strong>読み終わったら「自分でも作れそう」と思えるはずです。</strong>
+    </div>
+    <div class="notice notice-warn" style="max-width:700px">
+      ⚠️ 印刷会社によって細かい仕様は異なります。<strong>各社のテンプレ・ガイドラインを最優先</strong>にしてください。このページはその前提知識として活用してください。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 02 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">02 / 15　まずは結論</div>
+    <h1 class="card-title">見るのは<span class="t-info">この5つだけ</span>
+      <small>この5つが合ってれば、だいたい大事故は防げる</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="badge-row">
+      <div class="badge"><span class="badge-icon">📐</span>① サイズ</div>
+      <div class="badge"><span class="badge-icon">🎨</span>② 塗り足し</div>
+      <div class="badge"><span class="badge-icon">🌈</span>③ 色（CMYK）</div>
+      <div class="badge"><span class="badge-icon">🖼️</span>④ 画像の粗さ</div>
+      <div class="badge"><span class="badge-icon">📄</span>⑤ 書き出し形式</div>
+    </div>
+
+    <div class="notice notice-ok">
+      ✅ <b>これだけ！本当にこれだけです。</b><br>
+      「トンボって何？」「アウトライン化って？」といった話も出てきますが、まずこの5つを頭に入れておけば全体像がつかめます。
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">✕ 入稿でよくある事故</span>
+        • 白いフチが出た（塗り足しなし）<br>
+        • 文字が切れた（端ギリギリに配置）<br>
+        • 色が全然違う（RGB入稿）<br>
+        • 写真がボケた（低解像度）<br>
+        • フォントが変わった（アウトライン未処理）
+      </div>
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">✓ この5つを押さえると防げる</span>
+        • サイズ → 正しい寸法で作る<br>
+        • 塗り足し → 白フチを防ぐ<br>
+        • CMYK → 色ずれを防ぐ<br>
+        • 解像度 → ボケを防ぐ<br>
+        • 書き出し → 全部まとめて確認
+      </div>
+    </div>
+
+    <div class="notice notice-info">
+      💡 <b>専門用語は後でゆっくり覚えればOK。</b><br>
+      まずは「このリストを順番に確認する習慣」だけ身につければ、ほとんどのミスは防げます。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 03 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">03 / 15　ポイント①</div>
+    <h1 class="card-title">サイズ
+      <small>まず「仕上がりサイズ」を確認する ← これが最初の一歩</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-danger">
+      ⚠️ <b>サイズは自分で決めない！</b><br>
+      まず印刷会社の商品ページを開いて、「このサイズで作ってください」という仕様を確認してから作業開始してください。
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 216" width="680" height="216" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0L0,6L9,3z" fill="#718096"/></marker></defs>
+
+        <!-- 外側ラベル（矩形の上に配置） -->
+        <text x="135" y="14" text-anchor="middle" font-size="12" fill="#e53e3e" font-weight="bold">作業ファイルのサイズ（塗り足し込み）</text>
+
+        <!-- 外側：作業サイズ（点線） -->
+        <rect x="20" y="22" width="230" height="170" rx="10" fill="#fed7d744" stroke="#e53e3e" stroke-width="2.5" stroke-dasharray="8,4"/>
+
+        <!-- 内側：仕上がりサイズ -->
+        <rect x="44" y="46" width="182" height="126" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="2.5"/>
+        <text x="135" y="80" text-anchor="middle" font-size="15" fill="#276749" font-weight="bold">仕上がりサイズ</text>
+        <text x="135" y="102" text-anchor="middle" font-size="12" fill="#276749">例）名刺 91 × 55 mm</text>
+        <text x="135" y="126" text-anchor="middle" font-size="22">✂️</text>
+        <text x="135" y="152" text-anchor="middle" font-size="12" fill="#276749" font-weight="bold">← ここで切られる</text>
+
+        <!-- 矢印 -->
+        <line x1="266" y1="107" x2="306" y2="107" stroke="#718096" stroke-width="2" marker-end="url(#a1)"/>
+
+        <!-- 右側：ステップボックス -->
+        <rect x="315" y="22" width="350" height="170" rx="12" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+        <text x="490" y="52" text-anchor="middle" font-size="15" fill="#2c5282" font-weight="bold">📋 確認の手順</text>
+        <rect x="330" y="64" width="320" height="34" rx="8" fill="#bee3f8"/>
+        <text x="490" y="86" text-anchor="middle" font-size="13" fill="#2a4365" font-weight="bold">① 印刷会社の商品ページでサイズを確認</text>
+        <rect x="330" y="106" width="320" height="34" rx="8" fill="#bee3f8"/>
+        <text x="490" y="128" text-anchor="middle" font-size="13" fill="#2a4365" font-weight="bold">② テンプレートがあれば最優先で使う</text>
+        <rect x="330" y="146" width="320" height="34" rx="8" fill="#bee3f8"/>
+        <text x="490" y="168" text-anchor="middle" font-size="13" fill="#2a4365" font-weight="bold">③ そのサイズで新規ファイルを作る</text>
+      </svg>
+    </div>
+
+    <div class="grid3">
+      <div class="g3box" style="background:#f0fff4; border:2px solid #68d391;">
+        <div class="g3label t-ok">📌 名刺の一般サイズ</div>
+        91 × 55mm が日本の標準。印刷会社によって若干異なるので必ず確認。
+      </div>
+      <div class="g3box" style="background:#f0fff4; border:2px solid #68d391;">
+        <div class="g3label t-ok">📌 A4チラシ</div>
+        210 × 297mm が基本。塗り足し込みでは 216 × 303mm になる（3mm × 4辺）。
+      </div>
+      <div class="g3box" style="background:#ebf8ff; border:2px solid #63b3ed;">
+        <div class="g3label t-info">💡 テンプレがある場合</div>
+        印刷会社がIllustrator/Word用テンプレを配布していることが多い。ダウンロードして使うのが最速で確実。
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 04 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">04 / 15　ポイント②</div>
+    <h1 class="card-title">塗り足し
+      <small>＝「はみ出し保険」。端まで色がある場合は3mm外に広げる</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-info">
+      💡 <b>「塗り足し」とは何か、ひとことで言うと：</b><br>
+      紙を切るとき、機械は完璧に同じ場所では切れず、0.1〜1mmくらいズレることがあります。そのズレをカバーするために、<strong>背景色や写真を外側に3mm余計にはみ出させておく</strong>のが「塗り足し」です。
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 225" width="680" height="225" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#e53e3e"/></marker></defs>
+
+        <!-- NG ラベル（上） -->
+        <text x="155" y="16" text-anchor="middle" font-size="14" font-weight="bold" fill="#e53e3e">✕ NG：塗り足しなし</text>
+
+        <!-- NG 背景 -->
+        <rect x="30" y="24" width="250" height="158" rx="10" fill="#c6f6d5"/>
+        <rect x="30" y="24" width="250" height="158" rx="10" fill="none" stroke="#e53e3e" stroke-width="3"/>
+
+        <!-- 白フチ表現 -->
+        <rect x="30" y="24" width="10" height="158" fill="white"/>
+        <rect x="30" y="24" width="250" height="10" fill="white"/>
+
+        <!-- 背景ラベル（中央） -->
+        <text x="162" y="110" text-anchor="middle" font-size="14" fill="#276749">背景</text>
+
+        <!-- 白フチ矢印 -->
+        <line x1="40" y1="106" x2="14" y2="106" stroke="#e53e3e" stroke-width="2" marker-end="url(#a2)"/>
+
+        <!-- NG キャプション（下） -->
+        <text x="155" y="200" text-anchor="middle" font-size="12" fill="#e53e3e" font-weight="bold">↑ 断裁ズレで白いフチが出てしまう</text>
+
+        <!-- 中央矢印 -->
+        <text x="340" y="116" text-anchor="middle" font-size="26" fill="#718096">→</text>
+
+        <!-- OK ラベル（上） -->
+        <text x="542" y="16" text-anchor="middle" font-size="14" font-weight="bold" fill="#38a169">✓ OK：塗り足し 3mm</text>
+
+        <!-- 塗り足し（ピンク） -->
+        <rect x="422" y="24" width="240" height="158" rx="10" fill="#fbb6ce"/>
+
+        <!-- 仕上がり（緑） -->
+        <rect x="442" y="44" width="200" height="118" rx="6" fill="#c6f6d5"/>
+
+        <!-- 背景ラベル（中央） -->
+        <text x="542" y="108" text-anchor="middle" font-size="13" fill="#276749">背景（仕上がり範囲）</text>
+
+        <!-- 3mm 計測ブラケット -->
+        <line x1="422" y1="185" x2="442" y2="185" stroke="#c53030" stroke-width="2"/>
+        <line x1="422" y1="178" x2="422" y2="192" stroke="#c53030" stroke-width="2"/>
+        <line x1="442" y1="178" x2="442" y2="192" stroke="#c53030" stroke-width="2"/>
+        <text x="432" y="207" text-anchor="middle" font-size="11" fill="#c53030" font-weight="bold">3mm</text>
+
+        <!-- OK キャプション（下） -->
+        <text x="542" y="220" text-anchor="middle" font-size="11" fill="#38a169">ピンク＝塗り足しエリア（外にはみ出させた部分）</text>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">✕ よくある間違い</span>
+        仕上がりサイズぴったりで作って入稿する。<br>
+        断裁がわずかにズレると白いフチが出てしまう。<br>
+        <b>特に全面に背景色を使うデザインは要注意。</b>
+      </div>
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">✓ 正しい対処法</span>
+        背景色・写真・柄を<b>仕上がり線より3mm外まで広げる</b>。<br>
+        文字やロゴは逆に内側に寄せること（次スライド参照）。<br>
+        <b>この3mmさえ確保すれば白フチ問題はほぼ防げる。</b>
+      </div>
+    </div>
+
+    <div class="notice notice-ok">
+      ✅ <b>作業サイズ ＝ 仕上がりサイズ + 上下左右各3mm</b><br>
+      名刺なら 91×55mm → 作業サイズは <strong>97×61mm</strong> になる。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 05 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">05 / 15　補足知識</div>
+    <h1 class="card-title">トンボって何？
+      <small>「ここで切ってください」という目印のこと</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-gray">
+      📌 トンボ（トリムマーク）とは、印刷後に紙を断裁する位置を印刷会社に伝えるための<b>目印の線</b>です。<br>
+      仕上がり線の四隅に小さなL字の線が付いているのがトンボです。
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 216" width="680" height="216" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- 塗り足しエリア -->
+        <rect x="55" y="26" width="234" height="156" rx="6" fill="#fbb6ce" opacity=".45"/>
+
+        <!-- 仕上がりエリア -->
+        <rect x="76" y="46" width="192" height="116" rx="4" fill="#c6f6d5"/>
+        <text x="172" y="110" text-anchor="middle" font-size="13" fill="#276749" font-weight="bold">仕上がり範囲</text>
+
+        <!-- トンボ線 4隅 -->
+        <line x1="76"  y1="12"  x2="76"  y2="40"  stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="36"  y1="46"  x2="70"  y2="46"  stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="268" y1="12"  x2="268" y2="40"  stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="274" y1="46"  x2="308" y2="46"  stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="76"  y1="168" x2="76"  y2="196" stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="36"  y1="162" x2="70"  y2="162" stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="268" y1="168" x2="268" y2="196" stroke="#1a202c" stroke-width="1.8"/>
+        <line x1="274" y1="162" x2="308" y2="162" stroke="#1a202c" stroke-width="1.8"/>
+
+        <!-- トンボラベル（図の下） -->
+        <text x="172" y="212" text-anchor="middle" font-size="11" fill="#4a5568">↑ トンボ：断裁はこの線の内側で行われる</text>
+
+        <!-- トンボ指示ラベル（右上角付近、矩形の外） -->
+        <text x="316" y="36" font-size="11" fill="#1a202c" font-weight="bold">← これがトンボ（切り位置の目印）</text>
+
+        <!-- 右側 説明ボックス -->
+        <rect x="344" y="16" width="322" height="180" rx="12" fill="#fffbeb" stroke="#d69e2e" stroke-width="1.5"/>
+        <text x="505" y="44" text-anchor="middle" font-size="14" fill="#744210" font-weight="bold">⚠️ よくある勘違い</text>
+        <line x1="358" y1="54" x2="652" y2="54" stroke="#f6ad55" stroke-width="1"/>
+
+        <text x="362" y="76" font-size="12" fill="#7b341e" font-weight="bold">✕ 線ツールで自分でトンボを描く</text>
+        <text x="362" y="96" font-size="11" fill="#975a16">→ 印刷会社には断裁位置として認識されません</text>
+
+        <line x1="358" y1="108" x2="652" y2="108" stroke="#f6ad55" stroke-width="0.8" stroke-dasharray="5,3"/>
+
+        <text x="362" y="128" font-size="12" fill="#276749" font-weight="bold">✓ 正しい方法</text>
+        <text x="362" y="148" font-size="11" fill="#2d3748">Illustratorなら「効果 → トリムマーク」</text>
+        <text x="362" y="166" font-size="11" fill="#2d3748">または「オブジェクト → トリムマークを作成」</text>
+        <text x="362" y="184" font-size="10" fill="#4a5568">※ 印刷会社のテンプレを使うのが最も確実</text>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">✕ やってはいけないこと</span>
+        自分で線を描いてトンボのつもりになる。<br>
+        これは単なる「飾り線」であり、印刷会社の機械では断裁位置として認識されません。
+      </div>
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">✓ 正しいやり方</span>
+        ソフトの「トリムマーク機能」を使う。<br>
+        または印刷会社が配布するテンプレートを使う（テンプレにはトンボが最初から入っています）。
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 06 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">06 / 15　ポイント③</div>
+    <h1 class="card-title">色はCMYKで作る
+      <small>RGBのままだと、印刷したときに色が変わる</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="compare">
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">📱 RGB（画面用の色）</span>
+        <b>R</b>ed・<b>G</b>reen・<b>B</b>lue の光の三原色。<br>
+        PCやスマホの画面用。鮮やかなネオンカラーや発光感が出る。<br><br>
+        <b class="t-danger">印刷に使うと色が変わりやすい。</b><br>
+        特に明るい青・紫・ピンクは要注意。印刷するとくすんだり暗くなることがある。
+      </div>
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">🖨️ CMYK（印刷用の色）</span>
+        <b>C</b>yan・<b>M</b>agenta・<b>Y</b>ellow・<b>K</b>（Black）のインクの四原色。<br>
+        印刷に最適化されているので、<b class="t-ok">仕上がりが安定する。</b><br><br>
+        画面で見るより少し落ち着いた色味になるが、これが印刷の正しい色。最初からCMYKで作ると色の誤差が小さくなる。
+      </div>
+    </div>
+
+    <div class="swatch-row">
+      <div class="swatch" style="background:linear-gradient(90deg,#ff0080,#ff6b00,#ffff00,#00ff88,#0088ff,#8800ff)">RGB：鮮やかだが画面専用</div>
+    </div>
+    <div class="swatch-row">
+      <div class="swatch" style="background:linear-gradient(90deg,#c0145c,#d4520a,#c8b400,#007a44,#0060b0,#5c008a)">CMYK：落ち着いた発色＝印刷で安定</div>
+    </div>
+
+    <div class="notice notice-warn">
+      ⚠️ <b>画面で見た色と印刷の色は必ず違います。</b><br>
+      「画面ではきれいなネオンピンクだったのに、印刷したら暗い赤になった」という事故はRGBで作業したときによく起きます。<br>
+      IllustratorやPhotoshopでは、<strong>新規ファイルを作るときにカラーモード「CMYK」を選ぶ</strong>だけでOKです。
+    </div>
+
+    <div class="grid3">
+      <div class="g3box" style="background:#f0fff4;border:2px solid #68d391;">
+        <div class="g3label t-ok">✓ Illustratorの場合</div>
+        ファイル → 新規 → カラーモードを「CMYK カラー」に設定してから作業開始。
+      </div>
+      <div class="g3box" style="background:#f0fff4;border:2px solid #68d391;">
+        <div class="g3label t-ok">✓ Photoshopの場合</div>
+        イメージ → モード → 「CMYKカラー」に変換。作業中はCMYKモードを維持する。
+      </div>
+      <div class="g3box" style="background:#ebf8ff;border:2px solid #63b3ed;">
+        <div class="g3label t-info">💡 色校正について</div>
+        重要な案件は「色校正（カラープルーフ）」を依頼すると印刷後の色を事前に確認できる（有料）。
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 07 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">07 / 15　ポイント④</div>
+    <h1 class="card-title">画像解像度
+      <small>粗い画像は引き伸ばすとボケる。300dpi以上が目安</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-info">
+      💡 <b>dpi（ドット・パー・インチ）とは？</b><br>
+      1インチ（2.54cm）の中にドットが何個あるかを示す単位です。数字が大きいほど細かく、きれいな印刷になります。<br>
+      <b>印刷の目安：300dpi以上</b>（画面表示は72dpi程度でOKなので、ネットからの画像は要注意）
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 210" width="680" height="210" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- NG ラベル（上） -->
+        <text x="110" y="15" text-anchor="middle" font-size="13" fill="#e53e3e" font-weight="bold">✕ 低解像度（72dpi）</text>
+
+        <!-- NG 背景 -->
+        <rect x="20" y="22" width="180" height="130" rx="10" fill="#fed7d7"/>
+
+        <!-- ピクセル格子 -->
+        <rect x="38" y="36" width="28" height="28" fill="#fc8181" rx="2" opacity=".9"/>
+        <rect x="70" y="36" width="28" height="28" fill="#f687b3" rx="2" opacity=".8"/>
+        <rect x="102" y="36" width="28" height="28" fill="#fc8181" rx="2" opacity=".7"/>
+        <rect x="134" y="36" width="28" height="28" fill="#f687b3" rx="2" opacity=".9"/>
+        <rect x="38" y="68" width="28" height="28" fill="#f687b3" rx="2" opacity=".7"/>
+        <rect x="70" y="68" width="28" height="28" fill="#fc8181" rx="2" opacity=".9"/>
+        <rect x="102" y="68" width="28" height="28" fill="#f687b3" rx="2" opacity=".8"/>
+        <rect x="134" y="68" width="28" height="28" fill="#fc8181" rx="2" opacity=".7"/>
+        <rect x="38" y="100" width="28" height="28" fill="#fc8181" rx="2" opacity=".8"/>
+        <rect x="70" y="100" width="28" height="28" fill="#f687b3" rx="2" opacity=".9"/>
+        <rect x="102" y="100" width="28" height="28" fill="#fc8181" rx="2" opacity=".7"/>
+        <rect x="134" y="100" width="28" height="28" fill="#f687b3" rx="2" opacity=".8"/>
+
+        <!-- NG キャプション（下） -->
+        <text x="110" y="170" text-anchor="middle" font-size="12" fill="#e53e3e" font-weight="bold">ボケる・粗い</text>
+        <text x="110" y="187" text-anchor="middle" font-size="11" fill="#c53030">ネットから拾った小さい画像</text>
+
+        <!-- 中央矢印 -->
+        <text x="237" y="82" text-anchor="middle" font-size="12" fill="#718096">引き伸ばすと</text>
+        <text x="237" y="102" text-anchor="middle" font-size="24" fill="#718096">→</text>
+
+        <!-- OK ラベル（上） -->
+        <text x="400" y="15" text-anchor="middle" font-size="13" fill="#38a169" font-weight="bold">✓ 高解像度（300dpi以上）</text>
+
+        <!-- OK 背景 -->
+        <rect x="310" y="22" width="180" height="130" rx="10" fill="#c6f6d5"/>
+
+        <!-- 写真っぽい表現 -->
+        <circle cx="400" cy="77" r="40" fill="#68d391" opacity=".8"/>
+        <circle cx="384" cy="63" r="15" fill="#2f855a" opacity=".9"/>
+        <circle cx="408" cy="57" r="11" fill="#2f855a" opacity=".8"/>
+        <circle cx="400" cy="97" r="9" fill="#276749" opacity=".6"/>
+
+        <!-- OK キャプション（下） -->
+        <text x="400" y="170" text-anchor="middle" font-size="12" fill="#38a169" font-weight="bold">くっきりきれい</text>
+        <text x="400" y="187" text-anchor="middle" font-size="11" fill="#276749">最初から高解像度の素材を使う</text>
+
+        <!-- 説明ボックス -->
+        <rect x="508" y="22" width="162" height="130" rx="10" fill="#ebf8ff" stroke="#63b3ed" stroke-width="1.5"/>
+        <text x="589" y="50" text-anchor="middle" font-size="13" fill="#2c5282" font-weight="bold">💡 dpiの目安</text>
+        <line x1="518" y1="58" x2="660" y2="58" stroke="#bee3f8" stroke-width="1"/>
+        <text x="589" y="78" text-anchor="middle" font-size="12" fill="#2c5282">印刷用</text>
+        <text x="589" y="96" text-anchor="middle" font-size="14" fill="#2b6cb0" font-weight="bold">300dpi 以上</text>
+        <line x1="518" y1="106" x2="660" y2="106" stroke="#bee3f8" stroke-width="1"/>
+        <text x="589" y="122" text-anchor="middle" font-size="11" fill="#4a5568">Web・画面表示</text>
+        <text x="589" y="140" text-anchor="middle" font-size="12" fill="#718096">72〜96dpi</text>
+      </svg>
+    </div>
+
+    <div class="notice notice-danger">
+      ⚠️ <b>「Web用に最適化した画像」は印刷には向きません。</b><br>
+      ネットで拾った画像・LINEで送られてきた写真・スクリーンショットなどは基本的に低解像度です。<br>
+      印刷用には<strong>カメラ直撮りのオリジナル写真や、有料ストック素材（印刷用ライセンス）</strong>を使うのが安心です。
+    </div>
+
+    <div class="notice notice-ok">
+      ✅ <b>確認方法（Photoshop）：</b> イメージ → 画像解像度 → 「解像度」が300以上かチェック。<br>
+      このとき「再サンプル」のチェックを外して確認すること（入れてしまうと低解像度でも300と表示されてしまう）。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 08 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">08 / 15　危険ポイント</div>
+    <h1 class="card-title">文字は端ギリギリに<br>置かない！
+      <small class="t-danger">初心者が一番やりがちなミス</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-danger">
+      ⚠️ <b>仕上がり線のギリギリに文字・ロゴを置くと、断裁のズレで切れてしまいます。</b><br>
+      仕上がり線より内側 <strong>3〜5mm</strong> を「安全ゾーン」として、大事な要素はすべてここに収めてください。
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 230" width="680" height="230" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="sc1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#e53e3e"/></marker>
+          <clipPath id="ngclip"><rect x="20" y="24" width="280" height="158" rx="10"/></clipPath>
+        </defs>
+
+        <!-- ====== NG 側 ====== -->
+        <!-- ラベル -->
+        <text x="160" y="16" text-anchor="middle" font-size="13" fill="#e53e3e" font-weight="bold">✕ NG：文字を端ギリギリに置いた結果</text>
+
+        <!-- カード背景 -->
+        <rect x="20" y="24" width="280" height="158" rx="10" fill="#fff"/>
+        <rect x="20" y="24" width="280" height="158" rx="10" fill="none" stroke="#e53e3e" stroke-width="3"/>
+
+        <!-- 切断面：左端に赤い縦線（断裁ライン） -->
+        <line x1="55" y1="24" x2="55" y2="182" stroke="#e53e3e" stroke-width="2.5" stroke-dasharray="6,3"/>
+
+        <!-- 切れた部分（左側：赤く塗って「切れた」表現） -->
+        <rect x="20" y="24" width="35" height="158" fill="#fca5a5" opacity=".55" clip-path="url(#ngclip)"/>
+        <text x="37" y="115" text-anchor="middle" font-size="9" fill="#c53030" writing-mode="tb" transform="rotate(0)">切れる</text>
+
+        <!-- テキスト（端ギリギリ）→左が欠けている表現 -->
+        <text x="25" y="68" font-size="14" fill="#e53e3e" font-weight="bold">会社名〇〇</text>
+        <text x="25" y="94" font-size="12" fill="#4a5568">TEL: 000-0000-0000</text>
+        <text x="25" y="116" font-size="12" fill="#4a5568">〒000-0000 東京都…</text>
+
+        <!-- 断裁ラベル -->
+        <line x1="55" y1="196" x2="55" y2="210" stroke="#e53e3e" stroke-width="1.5"/>
+        <text x="55" y="222" text-anchor="middle" font-size="11" fill="#e53e3e" font-weight="bold">✂ 断裁ライン</text>
+        <text x="37" y="222" text-anchor="end" font-size="10" fill="#c53030">←捨て</text>
+
+        <!-- 中央矢印 -->
+        <text x="340" y="118" text-anchor="middle" font-size="26" fill="#718096">→</text>
+
+        <!-- ====== OK 側 ====== -->
+        <!-- ラベル -->
+        <text x="530" y="16" text-anchor="middle" font-size="13" fill="#38a169" font-weight="bold">✓ OK：安全ゾーンの内側に配置</text>
+
+        <!-- カード背景 -->
+        <rect x="390" y="24" width="280" height="158" rx="10" fill="#fff" stroke="#38a169" stroke-width="2"/>
+
+        <!-- 安全ゾーン（点線） -->
+        <rect x="412" y="44" width="236" height="118" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="2" stroke-dasharray="7,4"/>
+
+        <!-- 安全ゾーンラベル（点線の内側上部） -->
+        <text x="530" y="62" text-anchor="middle" font-size="10" fill="#38a169" font-weight="bold">← 安全ゾーン（3〜5mm内側）→</text>
+
+        <!-- テキスト（安全ゾーン内、余裕ある位置） -->
+        <text x="422" y="92" font-size="14" fill="#276749" font-weight="bold">会社名〇〇</text>
+        <text x="422" y="116" font-size="12" fill="#4a5568">TEL: 000-0000-0000</text>
+        <text x="422" y="138" font-size="12" fill="#4a5568">〒000-0000 東京都…</text>
+
+        <!-- 断裁ラベル（OK側も同じ位置） -->
+        <line x1="390" y1="196" x2="390" y2="210" stroke="#38a169" stroke-width="1.5"/>
+        <text x="390" y="222" text-anchor="middle" font-size="11" fill="#38a169" font-weight="bold">✂ 断裁ライン</text>
+        <text x="412" y="222" text-anchor="middle" font-size="10" fill="#38a169">内側に余白があるので安全</text>
+      </svg>
+    </div>
+
+    <div class="grid3">
+      <div class="g3box" style="background:#fff5f5;border:2px solid #fc8181;">
+        <div class="g3label t-danger">✕ 端ギリギリに置くもの</div>
+        会社名・ロゴ・電話番号・住所・QRコード・重要な画像。これらが切れると最悪使い物にならない。
+      </div>
+      <div class="g3box" style="background:#f0fff4;border:2px solid #68d391;">
+        <div class="g3label t-ok">✓ 安全ゾーンの目安</div>
+        仕上がり線より3〜5mm内側。印刷会社のテンプレには「セーフティゾーン」として点線で示されていることが多い。
+      </div>
+      <div class="g3box" style="background:#ebf8ff;border:2px solid #63b3ed;">
+        <div class="g3label t-info">💡 逆に端に広げるもの</div>
+        背景色・写真・模様は逆に外側3mm（塗り足し）まで広げる。内側に縮めるのは文字・ロゴのみ。
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 09 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">09 / 15　必須作業</div>
+    <h1 class="card-title">フォントのアウトライン化
+      <small>「文字データを図形に変えて固定する」処理</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-info">
+      💡 <b>なぜアウトライン化が必要なのか？</b><br>
+      あなたのPCに入っているフォントが、印刷会社のPCには入っていないことがあります。その場合、フォントが勝手に別のものに置き換わってデザインが崩れます。<br>
+      アウトライン化すると文字が「図形データ」になるので、どんな環境で開いても<strong>見た目が変わらなくなります。</strong>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 170" width="680" height="170" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0L0,6L9,3z" fill="#718096"/></marker></defs>
+
+        <!-- Before ラベル（上） -->
+        <text x="120" y="14" text-anchor="middle" font-size="13" fill="#e53e3e" font-weight="bold">アウトライン化前</text>
+
+        <!-- Before ボックス -->
+        <rect x="20" y="20" width="200" height="135" rx="10" fill="#fff5f5" stroke="#fc8181" stroke-width="2"/>
+        <text x="120" y="66" text-anchor="middle" font-size="36" fill="#2d3748" font-family="Georgia,serif">Aa</text>
+        <text x="120" y="100" text-anchor="middle" font-size="12" fill="#e53e3e">「文字データ」として保存</text>
+        <text x="120" y="120" text-anchor="middle" font-size="11" fill="#c53030">フォントがないと文字化け・崩れ</text>
+        <text x="120" y="143" text-anchor="middle" font-size="10" fill="#718096">（化ける可能性あり）</text>
+
+        <!-- 矢印 -->
+        <line x1="236" y1="87" x2="302" y2="87" stroke="#718096" stroke-width="2.5" marker-end="url(#a3)"/>
+        <text x="269" y="80" text-anchor="middle" font-size="11" fill="#718096">変換</text>
+
+        <!-- After ラベル（上） -->
+        <text x="410" y="14" text-anchor="middle" font-size="13" fill="#38a169" font-weight="bold">アウトライン化後</text>
+
+        <!-- After ボックス -->
+        <rect x="310" y="20" width="200" height="135" rx="10" fill="#f0fff4" stroke="#68d391" stroke-width="2"/>
+        <text x="410" y="66" text-anchor="middle" font-size="36" fill="#2d3748">Aa</text>
+        <text x="410" y="100" text-anchor="middle" font-size="12" fill="#38a169">「図形データ」として保存</text>
+        <text x="410" y="120" text-anchor="middle" font-size="11" fill="#276749">どこで開いても崩れない</text>
+        <text x="410" y="143" text-anchor="middle" font-size="10" fill="#718096">（見た目が固定される）</text>
+
+        <!-- 注意ボックス -->
+        <rect x="530" y="20" width="136" height="135" rx="10" fill="#fffbeb" stroke="#f6ad55" stroke-width="1.5"/>
+        <text x="598" y="46" text-anchor="middle" font-size="12" fill="#744210" font-weight="bold">⚠️ 注意</text>
+        <line x1="540" y1="54" x2="656" y2="54" stroke="#f6ad55" stroke-width="0.8"/>
+        <text x="598" y="74" text-anchor="middle" font-size="11" fill="#7b341e">変換後は</text>
+        <text x="598" y="92" text-anchor="middle" font-size="11" fill="#7b341e">文字の修正が</text>
+        <text x="598" y="110" text-anchor="middle" font-size="11" fill="#7b341e" font-weight="bold">できなくなる！</text>
+        <text x="598" y="130" text-anchor="middle" font-size="10" fill="#975a16">最終確認後に実行</text>
+        <text x="598" y="147" text-anchor="middle" font-size="10" fill="#975a16">バックアップを忘れずに</text>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">⚠️ アウトライン化していないと…</span>
+        • 印刷会社のPCにフォントがない場合、別フォントに置換される<br>
+        • デザインが崩れる・文字の位置がずれる<br>
+        • 最悪の場合、印刷会社から「確認してください」と差し戻しになる
+      </div>
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">✓ Illustratorでのやり方</span>
+        全選択（Ctrl+A）→ 書式メニュー →「アウトラインを作成」<br>
+        または 全選択 → 右クリック →「アウトラインを作成」<br>
+        <b>必ず文字確認が終わってから！バックアップ保存も忘れずに！</b>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 10 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">10 / 15　見落としやすい落とし穴</div>
+    <h1 class="card-title">リンク画像 vs 埋め込み画像
+      <small>基本はリンクのまま。埋め込みすぎるとファイルが開けなくなる</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-info">
+      💡 <b>Illustratorで画像を配置すると、デフォルトは「リンク」状態になります。</b><br>
+      リンクとは「画像ファイルへの参照（道案内）」のこと。ファイルが軽くて扱いやすい反面、<strong>画像ファイルを一緒に送らないと消えてしまいます。</strong><br>
+      逆に全部「埋め込み」にすると写真の多いデータでは<strong>数百MB〜GBになり、ファイルが開けなくなる</strong>ことがあります。
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 185" width="680" height="185" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="a4" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#e53e3e"/></marker>
+          <marker id="a5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#718096"/></marker>
+        </defs>
+
+        <!-- ① リンク状態 ラベル（上） -->
+        <text x="100" y="14" text-anchor="middle" font-size="12" fill="#38a169" font-weight="bold">✓ リンク：ファイルが軽い（推奨）</text>
+
+        <!-- リンクのAIファイルボックス -->
+        <rect x="16" y="20" width="168" height="118" rx="10" fill="#f0fff4" stroke="#68d391" stroke-width="2"/>
+        <text x="100" y="46" text-anchor="middle" font-size="12" fill="#38a169" font-weight="bold">AIファイル（軽い）</text>
+
+        <!-- リンク画像（点線） -->
+        <rect x="30" y="58" width="58" height="58" rx="6" fill="#c6f6d5" stroke="#68d391" stroke-dasharray="4,2"/>
+        <text x="59" y="84" text-anchor="middle" font-size="12">🔗</text>
+        <text x="59" y="102" text-anchor="middle" font-size="9" fill="#276749">photo.jpg</text>
+
+        <!-- 外のファイル -->
+        <rect x="120" y="72" width="60" height="30" rx="6" fill="#c6f6d5" stroke="#68d391"/>
+        <text x="150" y="91" text-anchor="middle" font-size="10" fill="#276749">画像ファイル</text>
+
+        <!-- リンク矢印 -->
+        <line x1="90" y1="87" x2="116" y2="87" stroke="#38a169" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#a4)"/>
+
+        <!-- キャプション（下） -->
+        <text x="100" y="155" text-anchor="middle" font-size="11" fill="#38a169">一緒にフォルダに入れて送ればOK</text>
+
+        <!-- ② 別PCで開くと 矢印 -->
+        <text x="265" y="72" text-anchor="middle" font-size="11" fill="#718096">別PCで</text>
+        <text x="265" y="88" text-anchor="middle" font-size="11" fill="#718096">開くと…</text>
+        <line x1="240" y1="95" x2="308" y2="95" stroke="#718096" stroke-width="2" marker-end="url(#a5)"/>
+
+        <!-- ③ 画像が消えた ラベル（上） -->
+        <text x="394" y="14" text-anchor="middle" font-size="12" fill="#e53e3e" font-weight="bold">✕ 画像ファイルを入れ忘れた！</text>
+
+        <!-- 消えたAIファイルボックス -->
+        <rect x="316" y="20" width="156" height="118" rx="10" fill="#fff5f5" stroke="#fc8181" stroke-width="2"/>
+        <text x="394" y="46" text-anchor="middle" font-size="12" fill="#e53e3e" font-weight="bold">AIファイル</text>
+        <rect x="332" y="58" width="58" height="58" rx="6" fill="#e2e8f0" stroke="#cbd5e0"/>
+        <text x="361" y="90" text-anchor="middle" font-size="28">❓</text>
+        <text x="394" y="155" text-anchor="middle" font-size="11" fill="#e53e3e">画像ファイルを一緒に送らないと消える</text>
+
+        <!-- ④ 埋め込み ラベル（上） -->
+        <text x="582" y="14" text-anchor="middle" font-size="12" fill="#d69e2e" font-weight="bold">⚠️ 埋め込み：ファイルが重くなる</text>
+
+        <!-- 埋め込みAIファイルボックス -->
+        <rect x="494" y="20" width="176" height="118" rx="10" fill="#fffbeb" stroke="#d69e2e" stroke-width="2"/>
+        <text x="582" y="46" text-anchor="middle" font-size="11" fill="#744210" font-weight="bold">AIファイル（超重い）</text>
+
+        <!-- 埋め込み画像（塗りつぶし） -->
+        <rect x="508" y="56" width="58" height="58" rx="6" fill="#fefcbf" stroke="#d69e2e"/>
+        <text x="537" y="84" text-anchor="middle" font-size="22">🖼️</text>
+        <text x="537" y="103" text-anchor="middle" font-size="9" fill="#744210">全部内包</text>
+        <!-- 重いアイコン -->
+        <text x="576" y="80" font-size="18">＋</text>
+        <rect x="592" y="56" width="58" height="58" rx="6" fill="#fefcbf" stroke="#d69e2e"/>
+        <text x="621" y="84" text-anchor="middle" font-size="22">🖼️</text>
+        <text x="621" y="103" text-anchor="middle" font-size="9" fill="#744210">全部内包</text>
+
+        <text x="582" y="155" text-anchor="middle" font-size="11" fill="#d69e2e">写真が多いと数百MBになり開けなくなる</text>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">🔗 リンク画像（こちらを推奨）</span>
+        AIファイルと画像ファイルが別々に存在する状態。<br>
+        ファイルが軽いので<b class="t-ok">重すぎて開けない事故が起きにくい。</b><br>
+        入稿時はAIファイルと画像ファイルをまとめてフォルダごと送る。
+      </div>
+      <div class="cbox cbox-ng">
+        <span class="cbox-label">📦 埋め込み画像（注意が必要）</span>
+        画像がAIファイルの中に全部入る。<br>
+        写真が多いと<b class="t-danger">ファイルサイズが数百MBになり、開けなくなる場合がある。</b><br>
+        重くなりすぎると印刷会社側でも扱えないことがある。
+      </div>
+    </div>
+
+    <div class="notice notice-ok">
+      ✅ <b>基本はリンク状態のまま入稿するのが正解。</b><br>
+      入稿時は「AIファイル＋リンク画像フォルダ」をまとめて圧縮してzip送付するか、印刷会社の指示に従う。<br>
+      PDFで入稿する場合は書き出し時に自動的に画像が含まれるので問題なし。
+    </div>
+
+    <div class="notice notice-warn">
+      ⚠️ <b>「自分のファイルがリンクか埋め込みかわからない」場合は、担当のデザイナーや印刷会社に確認してください。</b><br>
+      判断に迷ったまま入稿すると事故のもとになります。わからないときは聞くのが一番確実です。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 11 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">11 / 15　補足知識 <span class="chip chip-info">読み飛ばしOK</span></div>
+    <h1 class="card-title">黒の扱いに<br>ちょっとだけ注意
+      <small>迷ったら「K100」だけ使えばほぼ大丈夫</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-gray">
+      📌 <b>これは少し難しい話なので、最初は読み飛ばしてもOKです。</b><br>
+      ただ「なんか黒がにじんで見える」「文字がクッキリしない」という経験をした方は参考にしてください。
+    </div>
+
+    <div class="compare">
+      <div class="cbox cbox-ok">
+        <span class="cbox-label">✓ K100（スミ100%）— 文字・細線向き</span>
+        C:0 M:0 Y:0 K:100 の純粋な黒。<br>
+        印刷機のブラックインク1色だけで表現するので、<b>ズレが起きにくく、文字がシャープに仕上がる。</b><br><br>
+        <b>小さい文字・細い線・ロゴのアウトライン</b>はK100が基本。
+      </div>
+      <div class="cbox cbox-info">
+        <span class="cbox-label">ℹ️ リッチブラック — 大面積向き</span>
+        例：C:60 M:40 Y:40 K:100 で混合した深みのある黒。<br>
+        大きな黒背景に使うと<b>より深みのある黒になる</b>一方、<br>
+        <span class="t-danger">4色のインクが重なるため、微妙なズレで文字がにじむことがある。</span><br>
+        <b>文字やロゴには使わないこと。</b>
+      </div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 600 80" width="600" height="80" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="10" width="180" height="50" rx="8" fill="#1a1a1a"/>
+        <text x="110" y="40" text-anchor="middle" font-size="16" fill="white" font-weight="bold">K100の黒</text>
+        <text x="110" y="70" text-anchor="middle" font-size="11" fill="#4a5568">くっきりシャープ</text>
+
+        <rect x="220" y="10" width="180" height="50" rx="8" fill="#050505"/>
+        <text x="310" y="40" text-anchor="middle" font-size="16" fill="white" font-weight="bold">リッチブラック</text>
+        <text x="310" y="70" text-anchor="middle" font-size="11" fill="#4a5568">深みがある（文字には不向き）</text>
+
+        <rect x="420" y="10" width="160" height="50" rx="8" fill="#ebf8ff" stroke="#63b3ed" stroke-width="1.5"/>
+        <text x="500" y="35" text-anchor="middle" font-size="12" fill="#2c5282" font-weight="bold">迷ったら？</text>
+        <text x="500" y="52" text-anchor="middle" font-size="12" fill="#2c5282">全部K100でOK</text>
+      </svg>
+    </div>
+
+    <div class="notice notice-ok">
+      ✅ <b>シンプルなルール：</b> 文字・ロゴ・細かい要素はすべてK100で作る。<br>
+      大きな黒背景だけは印刷会社の指示に従う（テンプレや入稿ガイドに書いてあることが多い）。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 12 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">12 / 15　ポイント⑤</div>
+    <h1 class="card-title">書き出し：最終的に<br>何を出せばいいか
+      <small>基本は「印刷用PDF」。設定を間違えなければOK</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="notice notice-info">
+      💡 <b>データは3種類のフォルダに分けて管理するのがプロの基本です。</b><br>
+      仕上がりのPDFだけ送ればOKと思われがちですが、後から修正が必要になったときのために元データも整理しておくのが大切です。
+    </div>
+
+    <div class="grid3">
+      <div class="g3box" style="background:#f0fff4;border:2px solid #68d391;">
+        <div class="g3label t-ok">📤 アウトプットフォルダ</div>
+        <strong>入稿用PDF</strong> を保存する。<br>
+        トンボ・裁ち落とし込みで書き出したもの。<br>
+        <b>これが印刷会社に送るファイル。</b><br><br>
+        書き出し設定：<br>
+        ファイル → 別名で保存 → Adobe PDF<br>
+        → トンボ・裁ち落とし（3mm）にチェック
+      </div>
+      <div class="g3box" style="background:#ebf8ff;border:2px solid #63b3ed;">
+        <div class="g3label t-info">📁 入稿データフォルダ</div>
+        <strong>アウトライン化済みのパッケージデータ</strong>を保存する。<br>
+        AIファイル（アウトライン化後）＋リンク画像フォルダをまとめたもの。<br><br>
+        Illustratorの「パッケージ」機能（ファイル → パッケージ）を使うと自動でまとめてくれる。
+      </div>
+      <div class="g3box" style="background:#fffbeb;border:2px solid #f6ad55;">
+        <div class="g3label t-warn">💾 入稿前データフォルダ</div>
+        <strong>アウトライン化前の最終版データ</strong>を保存する。<br>
+        文字がまだテキストとして残っているバージョン。<br><br>
+        後から文言を修正したくなったとき用のバックアップ。<br>
+        <b>絶対に消さないこと！</b>
+      </div>
+    </div>
+
+    <div class="notice notice-danger">
+      ⚠️ <b>印刷会社のテンプレ・書き出しプリセットがあるなら最優先で使う！</b><br>
+      プリセットを使えば書き出し設定のミスはほぼゼロになります。まず会社のサイトで確認。
+    </div>
+
+    <div class="notice notice-gray">
+      📌 <b>書き出し後に必ずPDFを目視確認：</b> トンボが入っているか・文字が正しく表示されているか・画像が消えていないかをチェックしてから入稿する。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 13 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">13 / 15　保存版チェックリスト</div>
+    <h1 class="card-title">これだけ見ればOK！<br>最終チェックリスト
+      <small>タップ/クリックでチェックできます　📸スクショして使ってください</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <ul class="checklist" id="cl">
+      <li onclick="chk(this)"><span class="chk"></span>📐 商品の仕上がりサイズが合っている（印刷会社の仕様を確認した）</li>
+      <li onclick="chk(this)"><span class="chk"></span>🎨 塗り足しを上下左右3mm確保した（作業サイズを+6mm大きくした）</li>
+      <li onclick="chk(this)"><span class="chk"></span>🛡️ 大事な文字・ロゴを仕上がり線の内側3〜5mmに収めた</li>
+      <li onclick="chk(this)"><span class="chk"></span>🌈 カラーモードがCMYKになっている（RGBのままではない）</li>
+      <li onclick="chk(this)"><span class="chk"></span>🖼️ 使用している画像が300dpi以上（粗くない・引き伸ばしていない）</li>
+      <li onclick="chk(this)"><span class="chk"></span>🔤 文字を確認してからフォントをアウトライン化した</li>
+      <li onclick="chk(this)"><span class="chk"></span>📎 リンク画像ファイルをAIと同じフォルダにまとめた（パッケージ化）</li>
+      <li onclick="chk(this)"><span class="chk"></span>📄 トンボ・裁ち落とし込みでPDFを書き出した</li>
+    </ul>
+    <div class="notice notice-ok" style="margin-top:12px">
+      ✅ 全部チェックがついたら入稿準備完了です！<br>
+      最後に書き出したPDFをプレビューで開いて目視確認すると完璧です。
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 14 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">14 / 15　失敗ケース集</div>
+    <h1 class="card-title">よくある失敗例と<br>その防ぎ方
+      <small>起きる前に知っておけば完全に防げる</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="fail-list">
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ 白いフチが出た</div>
+        <div class="fail-cause">原因：塗り足しなしで、背景が仕上がり線ぴったりだった。断裁がわずかにズレて地の白が出た。</div>
+        <div class="fail-fix">→ 防ぎ方：背景・写真を仕上がり線の外3mmまで広げる（塗り足し）</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ 文字・ロゴが切れた</div>
+        <div class="fail-cause">原因：テキストや重要な要素を仕上がり線ギリギリに配置した。断裁のズレで切断された。</div>
+        <div class="fail-fix">→ 防ぎ方：大事な要素は仕上がり線より3〜5mm内側の安全ゾーンに配置する</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ 色が全然違う・くすんだ</div>
+        <div class="fail-cause">原因：RGBのまま入稿。または画面の色を見て「いい色だ」と思ったまま印刷した。印刷はRGBの鮮やかさを再現できない。</div>
+        <div class="fail-fix">→ 防ぎ方：最初からCMYKで作業。重要な案件は色校正（プルーフ）を依頼する。</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ 写真がぼやけた・荒れた</div>
+        <div class="fail-cause">原因：ネットから拾った画像（72〜96dpi）を印刷サイズに引き伸ばした。</div>
+        <div class="fail-fix">→ 防ぎ方：印刷用は300dpi以上の素材を最初から使う。小さい画像は引き伸ばさない。</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ フォントが変わった・文字が崩れた</div>
+        <div class="fail-cause">原因：アウトライン化せずに入稿した。印刷会社側にそのフォントがなかった。</div>
+        <div class="fail-fix">→ 防ぎ方：最終確認後にアウトライン化してから書き出す。PDFで入稿すると安全。</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-title t-danger">✕ 入稿後に画像が消えていると言われた</div>
+        <div class="fail-cause">原因：画像がリンク状態のままAIファイルを送ってしまった。リンク画像の実体が含まれていなかった。</div>
+        <div class="fail-fix">→ 防ぎ方：画像を埋め込む、またはPDF書き出しで入稿する。</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============================================================ SLIDE 15 -->
+<div class="slide"><div class="card">
+  <div class="card-head">
+    <div class="slide-label">15 / 15　まとめ</div>
+    <h1 class="card-title">この順番で確認すれば<br>ほぼ事故らない
+      <small>完璧を目指さなくていい。事故るポイントを先に潰せばOK</small>
+    </h1>
+  </div>
+  <div class="card-body">
+    <div class="step-list">
+      <div class="step-item"><span class="step-num">1</span><span><b>印刷会社のページでサイズ・テンプレを確認する</b>　←これが全ての出発点</span></div>
+      <div class="step-item"><span class="step-num">2</span><span><b>正しいサイズ・CMYKモードでファイルを作る</b></span></div>
+      <div class="step-item"><span class="step-num">3</span><span><b>背景・写真を外側に3mm広げる（塗り足し）</b></span></div>
+      <div class="step-item"><span class="step-num">4</span><span><b>文字・ロゴを内側3〜5mmに収める（安全ゾーン）</b></span></div>
+      <div class="step-item"><span class="step-num">5</span><span><b>画像の解像度を確認する（300dpi以上）</b></span></div>
+      <div class="step-item"><span class="step-num">6</span><span><b>文字を最終確認してからアウトライン化する</b></span></div>
+      <div class="step-item"><span class="step-num">7</span><span><b>トンボ・裁ち落とし込みでPDF書き出し → 書き出し後に目視確認</b></span></div>
+    </div>
+
+    <div class="notice notice-ok" style="margin-top:12px; font-size:clamp(14px,1.8vw,17px);">
+      🎉 <b>お疲れ様でした！</b><br>
+      完璧じゃなくていい。このリストを順番に確認するだけで、<strong>ほとんどの入稿事故は防げます。</strong><br>
+      最初は緊張するかもしれませんが、慣れると「こんなものか」と感じるはずです。<br><br>
+      <span class="t-sub fs-sm">※ 印刷会社によって細かい仕様（塗り足し幅・ファイル形式など）は異なります。各社のテンプレ・入稿ガイドラインを必ず確認してください。このページはあくまで「前提知識」として活用してください。</span>
+    </div>
+  </div>
+</div></div>
+
+    </div><!-- /track -->
+  </div><!-- /slide-area -->
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn" id="prevBtn" onclick="go(-1)">← 前へ</button>
+    <div class="prog-wrap" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" onclick="go(1)">次へ →</button>
+    <button class="nav-btn" id="topBtn" onclick="jump(0)" style="display:none;background:#2b6cb0;color:white;border-color:#2b6cb0;">🔝 最初に戻る</button>
+  </nav>
+</div>
+
+<script>
+const TOTAL = 15;
+let cur = 0;
+const track  = document.getElementById('track');
+const prev   = document.getElementById('prevBtn');
+const next   = document.getElementById('nextBtn');
+const topBtn = document.getElementById('topBtn');
+const dotsEl = document.getElementById('dots');
+
+// ドット生成
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.onclick = () => jump(i);
+  dotsEl.appendChild(d);
+}
+
+function render() {
+  track.style.transform = `translateX(-${cur * 100}%)`;
+  prev.disabled = cur === 0;
+  const isLast = cur === TOTAL - 1;
+  next.disabled = isLast;
+  next.style.display = isLast ? 'none' : '';
+  topBtn.style.display = isLast ? '' : 'none';
+  dotsEl.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===cur));
+  // カードのスクロールをリセット
+  const cards = document.querySelectorAll('.card, .hero-wrap');
+  cards.forEach((c,i) => { if (i===cur || (i===0&&cur===0)) c.scrollTop=0; });
+  // 全カードのスクロールリセット（確実に）
+  document.querySelectorAll('.card-body').forEach(b => b.scrollTop = 0);
+}
+
+function go(dir) {
+  const n = cur + dir;
+  if (n < 0 || n >= TOTAL) return;
+  cur = n; render();
+}
+function jump(idx) { cur = idx; render(); }
+
+// キーボード
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+  if (e.key==='ArrowLeft' ||e.key==='ArrowUp')   go(-1);
+});
+
+// タッチスワイプ
+let tx=0, ty=0;
+const sa = document.getElementById('sa');
+sa.addEventListener('touchstart', e => { tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+sa.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 44) go(dx<0?1:-1);
+}, {passive:true});
+
+// チェックリスト
+function chk(el) {
+  el.classList.toggle('done');
+  el.querySelector('.chk').textContent = el.classList.contains('done') ? '✓' : '';
+}
+
+render();
+</script>
+</body>
+</html>

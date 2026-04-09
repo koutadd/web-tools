@@ -11,7 +11,7 @@
 /* ===================== COMMON NAV ===================== */
 #aicare-common-nav {
   position: sticky; top: 0; z-index: 99999;
-  background: var(--bg);
+  background: #040c18;
   border-bottom: 1px solid rgba(245,158,11,0.18);
   display: flex; align-items: center; gap: 6px;
   padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
@@ -23,11 +23,11 @@
 }
 #aicare-common-nav::-webkit-scrollbar { display: none; }
 #aicare-common-nav > * { flex-shrink: 0; }
-#aicare-common-nav .cn-label { color: rgba(0,0,0,0.3); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
-#aicare-common-nav .cn-sep { color: rgba(0,0,0,0.2); padding: 0 2px; user-select: none; }
-#aicare-common-nav a { color: #4b6080; text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); transition: color 0.15s, background 0.15s; white-space: nowrap; }
-#aicare-common-nav a:hover { color: #1a2535; background: rgba(0,0,0,0.05); }
-#aicare-common-nav a.cn-active { color: #2563eb !important; border-color: rgba(37,99,235,0.35) !important; background: rgba(37,99,235,0.08) !important; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
 
 /* ===================== DESIGN SYSTEM ===================== */
 :root {
@@ -929,19 +929,22 @@ body {
   <span class="cn-sep">|</span>
   <a href="aicare-top-prototype.html">サイト TOP</a>
   <a href="aicare-sitemap.html">サイトマップ</a>
-  <a href="aicare-stores.html">店舗一覧</a>
+  <a href="aicare-lab-app.html">出店管理</a>
   <a href="aicare-vision-check.html">視力チェック</a>
   <a href="persona-dashboard.html">ペルソナ / ブランド</a>
   <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="store-persona-map.html">店舗ペルソナ</a>
   <a href="eyecare-glass-branding.html">グラス</a>
   <span class="cn-sep">|</span>
   <a href="reference-sites.html">参考サイト集</a>
   <span class="cn-sep">|</span>
   <a href="aicare-schedule.html">全体スケジュール</a>
   <a href="aicare-projects.html" class="cn-active">プロジェクト管理</a>
-  <a href="project-mgmt-v2.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">🆕 管理仮</a>
+  <a href="weekly-reports.html">週報管理</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <a href="aicare-hq-logo.html">本部ロゴ</a>
   <span class="cn-sep">|</span>
-  <a href="aicare-wireframe.html" style="color:#a5b4fc!important;border-color:rgba(99,102,241,0.3)!important;">⬜ ワイヤーフレーム</a>
+  
 </nav>
 
 <!-- Main App -->
@@ -1745,6 +1748,24 @@ function _doScrollToPerson(person) {
   }, 1600);
 }
 
+function toggleAccordion(bodyId) {
+  const body = document.getElementById(bodyId);
+  const arrow = document.getElementById('acc-arrow-' + bodyId);
+  if (!body) return;
+  const isOpen = body.style.maxHeight !== '0px' && body.style.maxHeight !== '0';
+  if (isOpen) {
+    body.style.maxHeight = '0';
+    body.style.marginTop = '0';
+    if (arrow) arrow.style.transform = 'rotate(-90deg)';
+    sessionStorage.setItem('acc_' + bodyId, '0');
+  } else {
+    body.style.maxHeight = '2000px';
+    body.style.marginTop = '16px';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+    sessionStorage.setItem('acc_' + bodyId, '1');
+  }
+}
+
 function setBlockerFilter(val) {
   blockerFilter = val;
   const el = document.getElementById('blocker-list');
@@ -1756,20 +1777,39 @@ function setBlockerFilter(val) {
 
 function renderBlockerListInner(projects) {
   const active = projects.filter(p => p.status !== '完了' && p.status !== '保留');
-  let filtered;
+
+  // プロジェクトレベルの詰まり項目
+  let filteredProjs;
   if (blockerFilter === '全て') {
-    filtered = active.filter(p => p.waitingFor || p.blockedBy);
+    filteredProjs = active.filter(p => p.waitingFor || p.blockedBy);
+  } else if (blockerFilter === '確認待ち') {
+    filteredProjs = active.filter(p => p.status === '要確認');
   } else {
-    const keyword = blockerFilter.replace('待ち', '').replace('確認', '').toLowerCase();
-    filtered = active.filter(p => {
+    const keyword = blockerFilter.replace('待ち', '').toLowerCase();
+    filteredProjs = active.filter(p => {
       const w = (p.waitingFor || '').toLowerCase();
       const b = (p.blockedBy || '').toLowerCase();
-      const label = blockerFilter.toLowerCase();
-      return w.includes(keyword) || b.includes(keyword) || w.includes(label) || b.includes(label);
+      return w.includes(keyword) || b.includes(keyword);
     });
   }
-  if (filtered.length === 0) return `<div style="color:var(--muted);padding:10px;font-size:13px;">該当なし</div>`;
-  return filtered.map(p => {
+
+  // タスクレベルの「要確認」項目を収集
+  const reviewTasks = [];
+  function collectReviewTasks(tasks, proj) {
+    (tasks || []).forEach(t => {
+      if (t.status === '要確認') {
+        const w = (t.waitingFor || t.assignee || '').toLowerCase();
+        const matches = blockerFilter === '全て' ||
+          blockerFilter === '確認待ち' ||
+          w.includes(blockerFilter.replace('待ち', '').toLowerCase());
+        if (matches) reviewTasks.push({ t, proj });
+      }
+      if (t.children) collectReviewTasks(t.children, proj);
+    });
+  }
+  active.forEach(p => collectReviewTasks(p.tasks, p));
+
+  const projHtml = filteredProjs.map(p => {
     const waiting = p.waitingFor || '';
     const blocked = p.blockedBy || '';
     return `<div class="priority-item" style="border-left-color:#f97316;" onclick="navigate('#/project/${p.id}')">
@@ -1781,6 +1821,23 @@ function renderBlockerListInner(projects) {
       </div>
     </div>`;
   }).join('');
+
+  const taskHtml = reviewTasks.map(({ t, proj }) => {
+    return `<div class="priority-item" style="border-left-color:#f59e0b;" onclick="navigate('#/project/${proj.id}')">
+      <span class="pi-name" style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:10px;color:var(--muted);font-weight:600;">📌 タスク</span>
+        ${t.name}
+      </span>
+      <div class="pi-meta">
+        ${t.waitingFor ? `<span style="background:rgba(249,115,22,0.15);color:#fb923c;padding:1px 7px;border-radius:12px;border:1px solid rgba(249,115,22,0.3);">⏳ ${t.waitingFor}</span>` : ''}
+        <span style="font-size:11px;color:var(--muted);">${proj.name}</span>
+        <span class="badge status-要確認">要確認</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const combined = projHtml + taskHtml;
+  return combined || `<div style="color:var(--muted);padding:10px;font-size:13px;">該当なし</div>`;
 }
 
 // ===================== PERSON VIEW =====================
@@ -1984,7 +2041,7 @@ function renderDashboard() {
     return priorityOrder(a.priority) - priorityOrder(b.priority);
   });
 
-  // ④ 担当者ショートカット
+  // ④ 担当者別タスク
   const people = getPeople();
   const personCounts = {};
   people.forEach(person => {
@@ -2009,6 +2066,18 @@ function renderDashboard() {
       <span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;">${label}</span>
       ${sub ? `<span style="font-size:11px;color:var(--muted);margin-left:auto;background:var(--surface2);padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
     </div>`;
+
+  const accordionSectionHead = (emoji, label, sub, bodyId) => {
+    const open = sessionStorage.getItem('acc_' + bodyId) !== '0';
+    return `
+    <div onclick="toggleAccordion('${bodyId}')" style="display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:2px solid var(--border);cursor:pointer;user-select:none;margin-bottom:0;">
+      <span style="font-size:18px;line-height:1;">${emoji}</span>
+      <span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;">${label}</span>
+      ${sub ? `<span style="font-size:11px;color:var(--muted);background:var(--surface2);padding:2px 8px;border-radius:4px;">${sub}</span>` : ''}
+      <span id="acc-arrow-${bodyId}" style="margin-left:auto;color:var(--muted);font-size:13px;transition:transform 0.2s;display:inline-block;transform:${open ? 'rotate(0deg)' : 'rotate(-90deg)'};">▼</span>
+    </div>
+    <div id="${bodyId}" style="overflow:hidden;transition:max-height 0.25s ease;max-height:${open ? '2000px' : '0'};margin-top:${open ? '16px' : '0'};">`;
+  };
 
   return `
 <div class="page-container">
@@ -2066,16 +2135,22 @@ function renderDashboard() {
 
   <!-- ② 詰まり一覧 -->
   <div class="section-block" id="section-blockers">
-    ${sectionHead('⛔','詰まり一覧','誰待ち / 何待ちで絞り込み')}
+    ${accordionSectionHead('⛔','詰まり一覧','誰待ち / 何待ちで絞り込み','acc-blockers')}
     <div class="blocker-filter">
       ${blockerKeys.map(k => `<button class="blocker-btn${blockerFilter===k?' active':''}" data-bf="${k}" onclick="setBlockerFilter('${k}')">${k}</button>`).join('')}
     </div>
     <div id="blocker-list">${renderBlockerListInner(projects)}</div>
+    </div>
   </div>
 
   <!-- ③ プロジェクト一覧 -->
   <div class="section-block" id="section-projlist">
-    ${sectionHead('📋','全プロジェクト一覧',`${total}件 — 各項目をクリックで直接編集`)}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);">
+      <span style="font-size:18px;line-height:1;">📋</span>
+      <span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;">全プロジェクト一覧</span>
+      <span style="font-size:11px;color:var(--muted);background:var(--surface2);padding:2px 8px;border-radius:4px;">${total}件 — 各項目をクリックで直接編集</span>
+      <button class="btn btn-primary btn-sm" onclick="openProjectModal(null)" style="margin-left:auto;font-size:12px;padding:5px 14px;">＋ 新規プロジェクト</button>
+    </div>
     <!-- 列ヘッダー -->
     <div style="display:flex;align-items:center;gap:10px;padding:4px 21px 8px;font-size:10px;color:#3d5070;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;">
       <span style="flex:1;">プロジェクト名</span>
@@ -2092,9 +2167,9 @@ function renderDashboard() {
     </div>
   </div>
 
-  <!-- ④ 担当者ショートカット -->
+  <!-- ④ 担当者別タスク -->
   <div class="section-block">
-    ${sectionHead('👥','担当者ショートカット','クリックで担当者のプロジェクト・タスク一覧へ')}
+    ${sectionHead('👥','担当者別タスク','クリックで担当者のプロジェクト・タスク一覧へ')}
     <div class="person-shortcuts">
       ${people.map((person, i) => {
         const c = personColor(person);
@@ -2109,7 +2184,7 @@ function renderDashboard() {
 
   <!-- ⑤ カテゴリ一覧 -->
   <div class="section-block" id="section-categories">
-    ${sectionHead('🏷','カテゴリ一覧','カテゴリ別の一覧ページへ')}
+    ${accordionSectionHead('🏷','カテゴリ一覧','カテゴリ別の一覧ページへ','acc-categories')}
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
       ${getCategories().map(cat => {
         const catProjs = projects.filter(p => p.categoryId === cat.id);
@@ -2151,6 +2226,37 @@ function renderDashboard() {
         </div>`;
       }).join('')}
     </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 週報 -->
+  <div class="section-block" id="section-weekly-reports">
+    ${sectionHead('📝','週報','最新の週報を表示')}
+    ${(() => {
+      const wrs = (APP.weekly_reports || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+      const statusLabel = { draft: '下書き', published: '公開済み', archived: 'アーカイブ' };
+      const statusColors = { draft: 'background:rgba(107,114,128,0.12);color:#4b5563;border:1px solid rgba(107,114,128,0.3);', published: 'background:rgba(16,185,129,0.12);color:#059669;border:1px solid rgba(16,185,129,0.3);', archived: 'background:rgba(109,40,217,0.1);color:#6d28d9;border:1px solid rgba(109,40,217,0.3);' };
+      if (!wrs.length) return `
+        <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+          <div style="font-size:36px;margin-bottom:12px;">📋</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px;">まだ週報はありません</div>
+          <div style="font-size:12px;margin-bottom:16px;">プロジェクトデータから自動生成できます</div>
+          <a href="weekly-reports.html#/new" class="btn btn-primary btn-sm" style="text-decoration:none;">週報を生成する</a>
+        </div>`;
+      return wrs.map(r => `
+        <a href="weekly-reports.html#/view/${r.id}" style="display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:10px;transition:border-color 0.15s,transform 0.15s;cursor:pointer;" onmouseenter="this.style.borderColor='rgba(37,99,235,0.4)';this.style.transform='translateY(-1px)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform='none'">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:700;">${r.title || '無題'}</div>
+            <span class="badge" style="${statusColors[r.status] || statusColors.draft};font-size:10px;padding:2px 8px;">${statusLabel[r.status] || r.status}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.5;">${(r.summary || '').slice(0, 50)}${(r.summary || '').length > 50 ? '…' : ''}</div>
+          <div style="font-size:11px;color:var(--muted);">${r.weekStart} 〜 ${r.weekEnd} / 更新: ${new Date(r.updatedAt).toLocaleDateString('ja-JP')}</div>
+        </a>`).join('') + `
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <a href="weekly-reports.html#/new" class="btn btn-primary btn-sm" style="text-decoration:none;">週報を生成する</a>
+          <a href="weekly-reports.html" class="btn btn-secondary btn-sm" style="text-decoration:none;">すべての週報を見る</a>
+        </div>`;
+    })()}
   </div>
 </div>`;
 }
@@ -3008,23 +3114,21 @@ function quickChangeStatus(projectId, newStatus) {
   const p = APP.projects.find(p => String(p.id) === String(projectId));
   if (p) { p.status = newStatus; save(); }
   closeAllDropdowns();
-  // Re-render row if on dashboard
-  const rowEl = document.getElementById('proj-row-' + projectId);
-  if (rowEl) {
-    const rp = APP.projects.find(x => String(x.id) === String(projectId));
-    if (rp) rowEl.outerHTML = renderProjectRow(rp);
+  const route = parseRoute(getHash());
+  if (route.view === 'dashboard') {
+    // ダッシュボードはフル再描画で stats bar・要確認パネルも確実に反映
+    render();
     return;
   }
-  // Re-render current view for category page
-  const route = parseRoute(getHash());
   if (route.view === 'category') {
     render();
-  } else {
-    const sdw = document.getElementById(`sdw-${projectId}`);
-    if (sdw) {
-      const badge = sdw.querySelector('.badge');
-      if (badge) { badge.className = `badge status-${newStatus}`; badge.textContent = `${newStatus} ▾`; }
-    }
+    return;
+  }
+  // プロジェクト詳細画面：バッジだけ更新
+  const sdw = document.getElementById(`sdw-${projectId}`);
+  if (sdw) {
+    const badge = sdw.querySelector('.badge');
+    if (badge) { badge.className = `badge status-${newStatus}`; badge.textContent = `${newStatus} ▾`; }
   }
 }
 
@@ -3612,8 +3716,8 @@ const TOUR_STEPS = [
   },
   {
     id: 'section-shortcuts',
-    title: '👥 担当者ショートカット',
-    body: 'ボタンをクリックすると、<b style="color:#f59e0b">その担当者の最初のプロジェクト</b>までスクロールしてハイライト表示します。',
+    title: '👥 担当者別タスク',
+    body: 'ボタンをクリックすると、<b style="color:#f59e0b">その担当者のプロジェクト・タスク一覧</b>へ移動します。',
     tip: null,
     pos: 'top',
   },
