@@ -22,11 +22,13 @@
     --gap:     20px;
   }
 
+  html { overscroll-behavior-x: none; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
     min-height: 100vh;
+    overscroll-behavior-x: none;
   }
 
   /* ── Nav ─────────────────────────────────────── */
@@ -839,6 +841,7 @@
   .task-table tr.overdue td:first-child { border-left: 3px solid var(--red); }
 
   /* Column widths */
+  .col-chk    { width: 32px; padding-left: 10px !important; padding-right: 4px !important; }
   .col-task   { width: 22%; }
   .col-dept   { width: 12%; }
   .col-assign { width: 12%; }
@@ -847,6 +850,31 @@
   .col-done   { width: 10%; }
   .col-notes  { width: 18%; }
   .col-del    { width: 6%; }
+
+  /* 一括選択バー */
+  .task-bulk-bar {
+    display: none; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px;
+    padding: 5px 12px; margin-left: 8px;
+  }
+  .task-bulk-bar.active { display: flex; }
+  .bulk-count { font-size: .75rem; font-weight: 700; color: #1e40af; white-space: nowrap; }
+  .bulk-status-sel {
+    font-size: .72rem; padding: 4px 8px; border: 1px solid #93c5fd;
+    border-radius: 4px; background: #fff; color: var(--text); cursor: pointer; outline: none;
+  }
+  .bulk-apply-btn {
+    font-size: .72rem; padding: 4px 12px; background: #2563eb; color: #fff;
+    border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
+  }
+  .bulk-apply-btn:hover { background: #1d4ed8; }
+  .bulk-clear-btn {
+    font-size: .72rem; padding: 4px 8px; background: none;
+    border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; color: #64748b;
+  }
+  .bulk-clear-btn:hover { background: #f1f5f9; }
+  /* 選択中の行をハイライト */
+  .task-table tr.row-selected td { background: #eff6ff; }
 
   .status-select {
     font-size: 0.72rem; padding: 3px 6px; border: 1px solid var(--border);
@@ -1163,6 +1191,7 @@
       <div class="detail-store-name" id="d-store-name"></div>
       <div class="detail-badges" id="d-badges"></div>
       <div class="detail-info-grid" id="d-info-grid"></div>
+      <div id="d-drive-link" style="margin-top:6px;display:none;"></div>
     </div>
     <div class="detail-header-right">
       <div class="detail-progress-box">
@@ -1206,6 +1235,20 @@
     <div class="tasks-toolbar">
       <div class="tasks-toolbar-left">
         <button class="add-task-btn" onclick="openAddTaskModal()">＋ タスク追加</button>
+        <button class="add-task-btn" id="btn-select-all" onclick="selectAllTasks()" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;">全選択</button>
+        <!-- 一括操作バー: 選択時のみ表示 -->
+        <div class="task-bulk-bar" id="task-bulk-bar">
+          <span class="bulk-count" id="bulk-count-label">0件選択</span>
+          <select class="bulk-status-sel" id="bulk-status-sel">
+            <option value="">ステータスを変更...</option>
+            <option>未着手</option>
+            <option>対応中</option>
+            <option>完了</option>
+            <option>保留</option>
+          </select>
+          <button class="bulk-apply-btn" onclick="bulkApplyStatus()">適用</button>
+          <button class="bulk-clear-btn" onclick="clearTaskSelection()">選択解除</button>
+        </div>
       </div>
       <span style="font-size:0.72rem;color:var(--muted)" id="tasks-summary"></span>
     </div>
@@ -1853,6 +1896,7 @@ let currentView    = 'list';
 let currentStoreId = null;
 let currentTab     = 'overview';
 let openCats       = {};   // category name → true/false
+let selectedTaskIds = new Set(); // 一括選択中のタスクID
 
 let filterState = { type: '', phase: '', status: '', person: '', area: '', query: '' };
 let sortState   = { field: '', dir: 'asc' };
@@ -2145,6 +2189,17 @@ function renderDetailHeader() {
     return `<div class="detail-info-item"><span class="detail-info-label">${esc(l)}</span><span class="detail-info-value">${esc(v || '—')}</span></div>`;
   }).join('');
 
+  // Drive フォルダリンク（資料フォルダが作成済みの場合のみ表示）
+  const driveEl = document.getElementById('d-drive-link');
+  if (driveEl) {
+    if (s.drive_folder_url) {
+      driveEl.innerHTML = `<a href="${esc(s.drive_folder_url)}" target="_blank" rel="noopener" style="font-size:.68rem;color:#64748b;text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Google Drive 店舗フォルダ">📁 資料フォルダを開く</a>`;
+      driveEl.style.display = '';
+    } else {
+      driveEl.style.display = 'none';
+    }
+  }
+
   // Progress
   updateDetailStats();
 
@@ -2201,7 +2256,7 @@ function switchTab(tab) {
   });
   if (tab === 'dashboard')   renderDashboardTab();
   if (tab === 'overview')    renderOverviewTab();
-  if (tab === 'tasks')       renderTasksTab();
+  if (tab === 'tasks')       { selectedTaskIds.clear(); renderTasksTab(); }
   if (tab === 'phasecheck')  { phaseCheckViewPhase = null; renderPhaseCheckTab(); }
   if (tab === 'gallery')     renderGalleryTab();
   if (tab === 'comment')     renderCommentTab();
@@ -2516,7 +2571,12 @@ function renderTasksTab() {
       const dueClass    = isOverdue ? 'overdue' : '';
 
       return `
-        <tr class="${rowClass}" id="row-${esc(t.id)}">
+        <tr class="${rowClass}${selectedTaskIds.has(t.id) ? ' row-selected' : ''}" id="row-${esc(t.id)}">
+          <td class="col-chk">
+            <input type="checkbox" ${selectedTaskIds.has(t.id) ? 'checked' : ''}
+              onchange="toggleTaskSelection('${esc(t.id)}', this.checked)"
+              style="cursor:pointer;width:14px;height:14px;">
+          </td>
           <td class="col-task">
             ${t.is_required ? '<span class="required-star">★</span> ' : ''}${esc(t.task_name)}
           </td>
@@ -2564,6 +2624,10 @@ function renderTasksTab() {
           <table class="task-table">
             <thead>
               <tr>
+                <th class="col-chk">
+                  <input type="checkbox" title="カテゴリ内を全選択" style="cursor:pointer;width:14px;height:14px;"
+                    onchange="selectCategoryTasks('${esc(cat)}', this.checked)">
+                </th>
                 <th class="col-task">タスク名</th>
                 <th class="col-dept">部署</th>
                 <th class="col-assign">担当者</th>
@@ -2581,6 +2645,104 @@ function renderTasksTab() {
   }).join('');
 
   document.getElementById('tasks-content').innerHTML = html || '<div class="empty-state">タスクがありません</div>';
+}
+
+// ─────────────────────────────────────────────
+// 一括選択
+// ─────────────────────────────────────────────
+function toggleTaskSelection(taskId, checked) {
+  if (checked) selectedTaskIds.add(taskId);
+  else         selectedTaskIds.delete(taskId);
+  updateBulkBar();
+  // 行ハイライトを即時更新
+  const row = document.getElementById('row-' + taskId);
+  if (row) row.classList.toggle('row-selected', checked);
+}
+
+function selectCategoryTasks(cat, checked) {
+  const tasks = (tasksData[currentStoreId] || []).filter(t => t.category === cat);
+  tasks.forEach(t => {
+    if (checked) selectedTaskIds.add(t.id);
+    else         selectedTaskIds.delete(t.id);
+    const row = document.getElementById('row-' + t.id);
+    if (row) {
+      row.classList.toggle('row-selected', checked);
+      const cb = row.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = checked;
+    }
+  });
+  updateBulkBar();
+}
+
+function selectAllTasks() {
+  const tasks = tasksData[currentStoreId] || [];
+  const allSelected = tasks.every(t => selectedTaskIds.has(t.id));
+  if (allSelected) {
+    // 全選択済み → 解除
+    clearTaskSelection();
+  } else {
+    // 全選択
+    tasks.forEach(t => {
+      selectedTaskIds.add(t.id);
+      const row = document.getElementById('row-' + t.id);
+      if (row) {
+        row.classList.add('row-selected');
+        const cb = row.querySelector('input[type=checkbox]');
+        if (cb) cb.checked = true;
+      }
+    });
+    updateBulkBar();
+    // ボタンラベルを切り替え
+    const btn = document.getElementById('btn-select-all');
+    if (btn) btn.textContent = '全解除';
+  }
+}
+
+function clearTaskSelection() {
+  selectedTaskIds.clear();
+  document.querySelectorAll('.task-table input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.task-table tr.row-selected').forEach(r => r.classList.remove('row-selected'));
+  updateBulkBar();
+  const btn = document.getElementById('btn-select-all');
+  if (btn) btn.textContent = '全選択';
+}
+
+function updateBulkBar() {
+  const bar   = document.getElementById('task-bulk-bar');
+  const label = document.getElementById('bulk-count-label');
+  const n = selectedTaskIds.size;
+  if (n > 0) {
+    bar.classList.add('active');
+    label.textContent = n + '件選択中';
+  } else {
+    bar.classList.remove('active');
+    document.getElementById('bulk-status-sel').value = '';
+  }
+}
+
+function bulkApplyStatus() {
+  const newStatus = document.getElementById('bulk-status-sel').value;
+  if (!newStatus) { showToast('ステータスを選択してください'); return; }
+  if (!selectedTaskIds.size) { showToast('タスクを選択してください'); return; }
+  const tasks = tasksData[currentStoreId];
+  if (!tasks) return;
+  const today = todayStr();
+  selectedTaskIds.forEach(id => {
+    const t = tasks.find(x => x.id === id);
+    if (!t || t.status === newStatus) return;
+    const old = t.status;
+    t.status = newStatus;
+    t.completed_at = newStatus === '完了' ? today : '';
+    addLog(currentStoreId, id, 'status_change', old, newStatus);
+  });
+  const s = storesData.find(x => x.id === currentStoreId);
+  if (s) s.updated_at = today;
+  saveData();
+  updateDetailStats();
+  const n = selectedTaskIds.size;
+  clearTaskSelection();
+  renderTasksTab();
+  showToast(`${n}件のステータスを「${newStatus}」に変更しました`);
 }
 
 function toggleCategory(cat) {

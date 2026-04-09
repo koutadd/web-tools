@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive 管理 | アイケアラボ</title>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #0f172a;
+    --bg2:      #1e293b;
+    --surface:  #1e293b;
+    --surface2: #273548;
+    --border:   #334155;
+    --text:     #e2e8f0;
+    --muted:    #94a3b8;
+    --muted2:   #64748b;
+    --teal:     #14b8a6;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --amber:    #f59e0b;
+    --blue:     #60a5fa;
+    --indigo:   #818cf8;
+    --radius:   8px;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; }
+
+  /* ── 共通ナビ ── */
+  #aicare-common-nav {
+    background: #0a101e; border-bottom: 1px solid var(--border);
+    padding: 8px 24px; display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; font-size: .75rem; position: sticky; top: 0; z-index: 200;
+  }
+  #aicare-common-nav .cn-label { font-weight: 700; color: var(--teal); letter-spacing: .06em; }
+  #aicare-common-nav .cn-sep   { color: var(--muted2); }
+  #aicare-common-nav a         { color: var(--muted); text-decoration: none; padding: 3px 8px; border-radius: 4px; }
+  #aicare-common-nav a:hover   { color: var(--text); background: var(--surface2); }
+  #aicare-common-nav .cn-active { color: var(--teal) !important; }
+  #aicare-common-nav .cn-right  { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  #aicare-common-nav .cn-btn-back { background: var(--surface2); color: var(--muted) !important; padding: 4px 12px !important; border-radius: 6px; }
+  #aicare-common-nav .cn-user    { color: var(--muted2); font-size: .7rem; }
+
+  /* ── ヘッダー ── */
+  .page-header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 28px; display: flex; align-items: center; gap: 12px;
+  }
+  .page-badge { font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); background: rgba(20,184,166,.12); border: 1px solid rgba(20,184,166,.3); border-radius: 4px; padding: 3px 8px; font-family: var(--font-mono); }
+  .page-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+  .page-sub   { font-size: .72rem; color: var(--muted); margin-left: 4px; }
+
+  /* ── レイアウト ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 24px 24px 60px; }
+
+  /* ── カード ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+  .card-head { padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; gap: 8px; }
+  .card-title { font-size: .72rem; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-family: var(--font-mono); }
+  .card-body  { padding: 16px 18px; }
+
+  /* ── ボタン ── */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: .78rem; font-weight: 600; transition: all .15s; }
+  .btn-primary   { background: var(--teal);  color: #000; }
+  .btn-primary:hover { background: #0d9488; }
+  .btn-secondary { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+  .btn-green  { background: var(--green); color: #000; }
+  .btn-green:hover { background: #16a34a; }
+  .btn-red    { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #dc2626; }
+  .btn-sm { padding: 4px 10px; font-size: .7rem; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ── フォーム ── */
+  .form-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .form-label { font-size: .72rem; color: var(--muted); min-width: 140px; font-family: var(--font-mono); }
+  .form-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; font-size: .78rem; color: var(--text); font-family: var(--font-mono); outline: none; }
+  .form-input:focus { border-color: var(--teal); }
+  .form-hint  { font-size: .65rem; color: var(--muted2); margin-top: 3px; }
+
+  /* ── ステップバッジ ── */
+  .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: #000; font-size: .68rem; font-weight: 800; flex-shrink: 0; }
+  .step-badge.done { background: var(--green); }
+  .step-badge.skip { background: var(--muted2); }
+
+  /* ── テーブル ── */
+  .store-table { width: 100%; border-collapse: collapse; font-size: .72rem; font-family: var(--font-mono); }
+  .store-table th { padding: 7px 10px; text-align: left; font-size: .6rem; font-weight: 700; color: var(--muted2); letter-spacing: .08em; text-transform: uppercase; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .store-table td { padding: 7px 10px; border-bottom: 1px solid rgba(51,65,85,.5); vertical-align: middle; }
+  .store-table tr:last-child td { border-bottom: none; }
+  .store-table tr:hover td { background: rgba(255,255,255,.02); }
+  .store-table .null-val { color: var(--muted2); font-style: italic; }
+
+  /* ── ステータスバッジ ── */
+  .ds-created  { color: var(--green);  font-size: .65rem; }
+  .ds-pending  { color: var(--amber);  font-size: .65rem; }
+  .ds-error    { color: var(--red);    font-size: .65rem; }
+  .ds-none     { color: var(--muted2); font-size: .65rem; }
+
+  /* ── 認証バー ── */
+  .auth-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg2); border-radius: 6px; margin-bottom: 16px; }
+  .auth-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .auth-dot.ok  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .auth-dot.ng  { background: var(--red); }
+  .auth-text { font-size: .72rem; color: var(--muted); flex: 1; }
+
+  /* ── ログ ── */
+  .log-area { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; height: 200px; overflow-y: auto; font-size: .68rem; font-family: var(--font-mono); color: var(--muted); }
+  .log-line { margin-bottom: 3px; }
+  .log-line.ok   { color: var(--green); }
+  .log-line.err  { color: var(--red); }
+  .log-line.info { color: var(--blue); }
+  .log-line.warn { color: var(--amber); }
+
+  /* ── プログレス ── */
+  .progress-bar { background: var(--bg2); border-radius: 6px; height: 6px; overflow: hidden; margin: 8px 0; }
+  .progress-fill { height: 100%; background: var(--teal); border-radius: 6px; transition: width .3s; }
+
+  /* ── 情報ボックス ── */
+  .info-box { background: rgba(20,184,166,.08); border: 1px solid rgba(20,184,166,.2); border-radius: 6px; padding: 10px 14px; font-size: .72rem; color: var(--muted); margin-bottom: 12px; }
+  .warn-box { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 6px; padding: 10px 14px; font-size: .72rem; color: var(--amber); margin-bottom: 12px; }
+
+  /* ── リンク ── */
+  a.link { color: var(--teal); text-decoration: none; font-size: .72rem; }
+  a.link:hover { text-decoration: underline; }
+
+  /* ── トースト ── */
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #e2e8f0; padding: 9px 20px; border-radius: 8px; font-size: .8rem; border: 1px solid #334155; opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── スプレッドシート情報 ── */
+  .sheet-info { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+  .sheet-info a { color: var(--teal); font-size: .78rem; word-break: break-all; }
+  .sheet-id  { font-family: var(--font-mono); font-size: .65rem; color: var(--muted2); }
+</style>
+</head>
+<body>
+
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-stores.html">出店管理（本部）</a>
+  <a href="aicare-stores-owner.html">オーナー画面</a>
+  <a href="aicare-stores-db.html">DB確認</a>
+  <a href="aicare-drive-admin.html" class="cn-active">Drive管理</a>
+  <div class="cn-right">
+    <a href="aicare-stores.html" class="cn-btn-back">← 本部ページ</a>
+    <span class="cn-user">管理者</span>
+  </div>
+</nav>
+
+<div class="page-header">
+  <span class="page-badge">Drive Admin</span>
+  <span class="page-title">Google Drive 管理</span>
+  <span class="page-sub">店舗フォルダ自動作成・DB スプレッドシート管理</span>
+</div>
+
+<div class="main">
+
+  <!-- ── STEP 1: Google Client ID 設定 ── -->
+  <div class="card" id="card-step1">
+    <div class="card-head">
+      <span class="step-badge" id="badge-step1">1</span>
+      <span class="card-title">Google OAuth2 クライアント ID 設定</span>
+    </div>
+    <div class="card-body">
+      <div class="info-box">
+        Google Cloud Console で作成した <strong>OAuth2 ウェブクライアント ID</strong> を入力してください。<br>
+        ・プロジェクトで <strong>Drive API</strong> を有効化<br>
+        ・承認済み JavaScript オリジンに <code>https://web-tools-black-iota.vercel.app</code> を追加
+      </div>
+      <div class="form-row">
+        <span class="form-label">CLIENT_ID</span>
+        <input class="form-input" id="input-client-id" type="text" placeholder="xxx.apps.googleusercontent.com" autocomplete="off">
+        <button class="btn btn-primary" onclick="saveClientId()">保存して初期化</button>
+      </div>
+      <p class="form-hint" id="client-id-hint" style="color:var(--muted2);padding-left:150px;"></p>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: Google サインイン ── -->
+  <div class="card" id="card-step2">
+    <div class="card-head">
+      <span class="step-badge" id="badge-step2">2</span>
+      <span class="card-title">Google アカウントでサインイン</span>
+    </div>
+    <div class="card-body">
+      <div class="auth-bar">
+        <div class="auth-dot ng" id="auth-dot"></div>
+        <span class="auth-text" id="auth-text">未サインイン</span>
+        <button class="btn btn-primary" id="btn-signin" onclick="doSignIn()" disabled>Google でサインイン</button>
+        <button class="btn btn-secondary btn-sm" id="btn-signout" onclick="doSignOut()" style="display:none;">サインアウト</button>
+      </div>
+      <p class="form-hint">サインイン時に Drive ファイルへのアクセス許可が求められます（このアプリが作成したファイルのみ）。</p>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: DB スプレッドシート ── -->
+  <div class="card" id="card-step3">
+    <div class="card-head">
+      <span class="step-badge" id="badge-step3">3</span>
+      <span class="card-title">DB スプレッドシート作成</span>
+      <span style="margin-left:auto;font-size:.65rem;color:var(--muted2);">初回1回のみ実行</span>
+    </div>
+    <div class="card-body">
+      <div id="sheet-status-area"><!-- JS が更新 --></div>
+      <button class="btn btn-green" id="btn-create-sheet" onclick="createDBSheet()" disabled>
+        📊 アイケアラボ_DB管理 を作成
+      </button>
+      <p class="form-hint" style="margin-top:8px;">
+        作成先: <a class="link" href="https://drive.google.com/drive/folders/1_Hh2-OkgI_X72wmNgta5wtwOm_Tg6NmF" target="_blank">親フォルダ (1_Hh2-OkgI_X72wmNgta5wtwOm_Tg6NmF)</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: 店舗フォルダ作成 ── -->
+  <div class="card" id="card-step4">
+    <div class="card-head">
+      <span class="step-badge" id="badge-step4">4</span>
+      <span class="card-title">店舗フォルダ作成</span>
+    </div>
+    <div class="card-body">
+
+      <div class="warn-box" id="folder-prereq" style="display:none;">
+        ⚠️ サインインが必要です（STEP 2 を完了してください）
+      </div>
+
+      <!-- 統計バー -->
+      <div style="display:flex;gap:20px;margin-bottom:16px;" id="store-stats-bar">
+        <div style="font-size:.72rem;color:var(--muted);">読み込み中…</div>
+      </div>
+
+      <!-- 一括作成 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button class="btn btn-primary" id="btn-batch-all" onclick="batchCreateAll()" disabled>
+          🗂 Drive未作成の全店舗を一括作成
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="reloadStoreTable()">↻ 更新</button>
+      </div>
+
+      <!-- プログレス -->
+      <div id="batch-progress" style="display:none;margin-bottom:16px;">
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;" id="batch-progress-text">処理中...</div>
+        <div class="progress-bar"><div class="progress-fill" id="batch-progress-fill" style="width:0%;"></div></div>
+      </div>
+
+      <!-- ログ -->
+      <div class="log-area" id="log-area"></div>
+
+      <hr style="border-color:var(--border);margin:16px 0;">
+
+      <!-- 店舗テーブル -->
+      <div id="store-table-area" style="overflow-x:auto;">
+        <!-- JS が描画 -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div id="toast"></div>
+
+<script src="data/drive-integration.js"></script>
+<script>
+'use strict';
+
+// ── 状態 ──────────────────────────────────────────────────────
+const LS_STORES   = 'aicare_stores_v1';
+let _isSignedIn   = false;
+let _gisReady     = false;
+
+// ── GIS ロード完了コールバック ────────────────────────────────
+window.addEventListener('load', () => {
+  // GIS は async で読み込まれるため少し待つ
+  let attempts = 0;
+  const check = setInterval(() => {
+    attempts++;
+    if (window.google?.accounts?.oauth2) {
+      clearInterval(check);
+      _gisReady = true;
+      onGISReady();
+    } else if (attempts > 40) {
+      clearInterval(check);
+      log('⚠️ Google Identity Services の読み込みに失敗しました。ネットワーク確認してください。', 'warn');
+    }
+  }, 250);
+
+  // 保存済み ClientId があれば復元
+  const savedId = DriveIntegration.getSavedClientId();
+  if (savedId) {
+    document.getElementById('input-client-id').value = savedId;
+    document.getElementById('client-id-hint').textContent = '✓ 保存済みのクライアントIDが読み込まれました';
+    document.getElementById('client-id-hint').style.color = 'var(--green)';
+  }
+
+  renderSheetStatus();
+  reloadStoreTable();
+});
+
+function onGISReady() {
+  const savedId = DriveIntegration.getSavedClientId();
+  if (savedId) {
+    const ok = DriveIntegration.init(savedId);
+    if (ok) {
+      document.getElementById('btn-signin').disabled = false;
+      document.getElementById('badge-step1').classList.add('done');
+    }
+  }
+}
+
+// ── STEP 1: ClientId 保存 ────────────────────────────────────
+function saveClientId() {
+  const id = document.getElementById('input-client-id').value.trim();
+  if (!id || !id.includes('.apps.googleusercontent.com')) {
+    document.getElementById('client-id-hint').textContent = '⚠️ 有効なクライアントIDを入力してください（xxx.apps.googleusercontent.com）';
+    document.getElementById('client-id-hint').style.color = 'var(--red)';
+    return;
+  }
+  if (!_gisReady) {
+    document.getElementById('client-id-hint').textContent = '⚠️ Google Identity Services がまだ読み込まれていません。しばらく待ってください。';
+    document.getElementById('client-id-hint').style.color = 'var(--amber)';
+    return;
+  }
+  const ok = DriveIntegration.init(id);
+  if (ok) {
+    document.getElementById('client-id-hint').textContent = '✓ 初期化しました。STEP 2 でサインインしてください。';
+    document.getElementById('client-id-hint').style.color = 'var(--green)';
+    document.getElementById('btn-signin').disabled = false;
+    document.getElementById('badge-step1').classList.add('done');
+    log('Client ID を保存しました: ' + id.slice(0, 20) + '…', 'info');
+  } else {
+    document.getElementById('client-id-hint').textContent = '⚠️ 初期化に失敗しました。GIS ライブラリの読み込みを確認してください。';
+    document.getElementById('client-id-hint').style.color = 'var(--red)';
+  }
+}
+
+// ── STEP 2: サインイン ───────────────────────────────────────
+async function doSignIn() {
+  try {
+    document.getElementById('btn-signin').disabled = true;
+    log('Google OAuth2 認証を開始...', 'info');
+    await DriveIntegration.signIn();
+    _isSignedIn = true;
+    updateAuthBar(true);
+    document.getElementById('btn-create-sheet').disabled = false;
+    document.getElementById('btn-batch-all').disabled = false;
+    document.getElementById('badge-step2').classList.add('done');
+    log('✓ サインイン成功', 'ok');
+    reloadStoreTable();
+  } catch(e) {
+    _isSignedIn = false;
+    updateAuthBar(false);
+    document.getElementById('btn-signin').disabled = false;
+    log('✗ サインイン失敗: ' + e.message, 'err');
+  }
+}
+
+function doSignOut() {
+  DriveIntegration.signOut();
+  _isSignedIn = false;
+  updateAuthBar(false);
+  document.getElementById('btn-create-sheet').disabled = true;
+  document.getElementById('btn-batch-all').disabled = true;
+  document.getElementById('badge-step2').classList.remove('done');
+  log('サインアウトしました', 'info');
+}
+
+function updateAuthBar(signedIn) {
+  const dot  = document.getElementById('auth-dot');
+  const text = document.getElementById('auth-text');
+  const btn  = document.getElementById('btn-signin');
+  const out  = document.getElementById('btn-signout');
+  dot.className = 'auth-dot ' + (signedIn ? 'ok' : 'ng');
+  text.textContent = signedIn ? '✓ サインイン中 (Drive API 利用可能)' : '未サインイン';
+  btn.style.display = signedIn ? 'none' : '';
+  out.style.display = signedIn ? '' : 'none';
+  if (!signedIn) btn.disabled = false;
+}
+
+// ── STEP 3: DB スプレッドシート ──────────────────────────────
+function renderSheetStatus() {
+  const cfg = DriveIntegration.getDriveConfig();
+  const area = document.getElementById('sheet-status-area');
+  if (cfg && cfg.db_spreadsheet_url) {
+    document.getElementById('badge-step3').classList.add('done');
+    area.innerHTML = `
+      <div class="sheet-info">
+        <span style="color:var(--green);font-size:1rem;">✓</span>
+        <div>
+          <a href="${escH(cfg.db_spreadsheet_url)}" target="_blank" class="link">
+            📊 ${escH(cfg.db_spreadsheet_name || 'アイケアラボ_DB管理')}
+          </a>
+          <div class="sheet-id">ID: ${escH(cfg.db_spreadsheet_id)}</div>
+          <div class="sheet-id">作成日: ${escH((cfg.created_at||'').slice(0,16).replace('T',' '))}</div>
+        </div>
+      </div>`;
+    document.getElementById('btn-create-sheet').textContent = '↻ 別のスプレッドシートを作成（再作成）';
+  } else {
+    area.innerHTML = '<div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">まだ作成されていません</div>';
+  }
+}
+
+async function createDBSheet() {
+  if (!_isSignedIn) { showToast('先にサインインしてください'); return; }
+  const btn = document.getElementById('btn-create-sheet');
+  btn.disabled = true;
+  btn.textContent = '作成中…';
+  log('DB スプレッドシートを作成中...', 'info');
+  try {
+    const cfg = await DriveIntegration.createDBSpreadsheet();
+    log('✓ スプレッドシート作成完了: ' + cfg.db_spreadsheet_url, 'ok');
+    showToast('スプレッドシートを作成しました');
+    renderSheetStatus();
+    document.getElementById('badge-step3').classList.add('done');
+  } catch(e) {
+    log('✗ スプレッドシート作成失敗: ' + e.message, 'err');
+    showToast('エラー: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📊 アイケアラボ_DB管理 を作成';
+  }
+}
+
+// ── STEP 4: 店舗フォルダ ─────────────────────────────────────
+function loadStores() {
+  try {
+    const raw = localStorage.getItem(LS_STORES);
+    return raw ? JSON.parse(raw) : [];
+  } catch(_) { return []; }
+}
+
+function reloadStoreTable() {
+  const stores = loadStores();
+  const created = stores.filter(s => s.drive_created).length;
+  const pending  = stores.filter(s => !s.drive_created && s.drive_status !== 'error').length;
+  const errors   = stores.filter(s => s.drive_status === 'error').length;
+
+  document.getElementById('store-stats-bar').innerHTML = `
+    <div style="font-size:.72rem;">
+      <span style="color:var(--green);">✓ 作成済み: ${created}</span>
+      &nbsp;|&nbsp;
+      <span style="color:var(--amber);">未作成: ${pending}</span>
+      &nbsp;|&nbsp;
+      <span style="color:var(--red);">エラー: ${errors}</span>
+      &nbsp;|&nbsp;
+      <span style="color:var(--muted);">合計: ${stores.length}</span>
+    </div>`;
+
+  if (!stores.length) {
+    document.getElementById('store-table-area').innerHTML =
+      '<div style="font-size:.75rem;color:var(--muted);padding:16px 0;">店舗データがありません。先に出店管理ページで店舗を登録してください。</div>';
+    return;
+  }
+
+  document.getElementById('store-table-area').innerHTML = `
+    <table class="store-table">
+      <thead><tr>
+        <th>店舗ID</th><th>店舗番号</th><th>店舗名</th><th>Drive フォルダ名</th>
+        <th>Drive 状態</th><th>フォルダ URL</th><th>参考資料 URL</th><th>操作</th>
+      </tr></thead>
+      <tbody>
+        ${stores.map(s => `<tr>
+          <td style="font-size:.6rem;color:var(--muted2);">${escH(s.id)}</td>
+          <td>${escH(s.store_no || '—')}</td>
+          <td style="font-weight:700;white-space:nowrap;">${escH(s.store_name)}</td>
+          <td style="color:var(--indigo);">${escH(s.drive_folder_name || DriveIntegration.buildFolderName(s))}</td>
+          <td>${driveStatusBadge(s)}</td>
+          <td>${s.drive_folder_url ? `<a class="link" href="${escH(s.drive_folder_url)}" target="_blank">開く</a>` : '<span class="null-val">—</span>'}</td>
+          <td>${s.drive_ref_folder_url ? `<a class="link" href="${escH(s.drive_ref_folder_url)}" target="_blank">開く</a>` : '<span class="null-val">—</span>'}</td>
+          <td>
+            ${s.drive_created
+              ? `<button class="btn btn-secondary btn-sm" onclick="createSingle('${escH(s.id)}')" ${_isSignedIn ? '' : 'disabled'}>再作成</button>`
+              : `<button class="btn btn-primary btn-sm" onclick="createSingle('${escH(s.id)}')" ${_isSignedIn ? '' : 'disabled'}>作成</button>`
+            }
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function driveStatusBadge(s) {
+  if (s.drive_created) return `<span class="ds-created">✓ 作成済み</span>`;
+  if (s.drive_status === 'error') return `<span class="ds-error">✗ エラー</span>`;
+  return `<span class="ds-none">— 未作成</span>`;
+}
+
+async function createSingle(storeId) {
+  if (!_isSignedIn) { showToast('先にサインインしてください'); return; }
+  const stores = loadStores();
+  const store  = stores.find(s => s.id === storeId);
+  if (!store) { showToast('店舗が見つかりません'); return; }
+
+  log(`「${store.store_name}」のフォルダ作成中...`, 'info');
+  try {
+    const info = await DriveIntegration.createStoreFolders(store);
+    log(`✓ 完了: ${info.drive_folder_name} → ${info.drive_folder_url}`, 'ok');
+    showToast(`「${store.store_name}」のフォルダを作成しました`);
+    reloadStoreTable();
+  } catch(e) {
+    log(`✗ エラー (${store.store_name}): ${e.message}`, 'err');
+    showToast('エラー: ' + e.message);
+  }
+}
+
+async function batchCreateAll() {
+  if (!_isSignedIn) { showToast('先にサインインしてください'); return; }
+  const stores = loadStores().filter(s => !s.drive_created);
+  if (!stores.length) { showToast('未作成の店舗はありません'); return; }
+
+  if (!confirm(`Drive 未作成の ${stores.length} 店舗のフォルダを一括作成します。よろしいですか？`)) return;
+
+  const batchBtn = document.getElementById('btn-batch-all');
+  batchBtn.disabled = true;
+  document.getElementById('batch-progress').style.display = '';
+  log(`▶ ${stores.length} 店舗の一括作成を開始...`, 'info');
+
+  const results = await DriveIntegration.batchCreateStoreFolders(null, (done, total, store, result) => {
+    const pct = Math.round(done / total * 100);
+    document.getElementById('batch-progress-fill').style.width = pct + '%';
+    document.getElementById('batch-progress-text').textContent = `${done} / ${total} 処理中...`;
+    if (result.success) {
+      log(`✓ [${done}/${total}] ${store.store_name} → ${result.drive_folder_name}`, 'ok');
+    } else {
+      log(`✗ [${done}/${total}] ${store.store_name}: ${result.error}`, 'err');
+    }
+    reloadStoreTable();
+  });
+
+  const ok  = results.filter(r => r.success).length;
+  const err = results.filter(r => !r.success).length;
+  log(`■ 完了: 成功 ${ok} / エラー ${err}`, ok === results.length ? 'ok' : 'warn');
+  document.getElementById('batch-progress-text').textContent = `完了: 成功 ${ok} / エラー ${err}`;
+  batchBtn.disabled = false;
+  showToast(`完了: 成功 ${ok} / エラー ${err}`);
+  reloadStoreTable();
+}
+
+// ── ユーティリティ ──────────────────────────────────────────
+function escH(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function log(msg, type) {
+  const area = document.getElementById('log-area');
+  const line = document.createElement('div');
+  const time = new Date().toTimeString().slice(0,8);
+  line.className = 'log-line ' + (type || '');
+  line.textContent = `[${time}] ${msg}`;
+  area.appendChild(line);
+  area.scrollTop = area.scrollHeight;
+}
+
+let _toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
