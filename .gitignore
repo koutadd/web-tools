@@ -10,4 +10,5 @@ html/
 
 eyecare-monitor/
 website-check-board/
-.claude/
+# .claude/ — プロジェクト設定は追跡対象（settings.json, hooks）
+# .claude/

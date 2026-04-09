@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(vercel *)",
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(wc *)",
+      "Bash(echo *)",
+      "Bash(open *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/koutayamakawa/web-tools/.claude/hooks/ui-protect.js \"$CLAUDE_TOOL_INPUT_FILE_PATH\" \"$CLAUDE_TOOL_NAME\""
+          }
+        ]
+      }
+    ]
+  }
+}
