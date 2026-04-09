@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>店舗管理 | アイケアラボ</title>
+<script>
+  // キャッシュバスティング: バージョンパラメータなしでアクセスされたら付与してリロード
+  (function(){
+    const V = '20260409c';
+    const p = new URLSearchParams(location.search);
+    if (p.get('_v') !== V) { p.set('_v', V); location.replace(location.pathname + '?' + p.toString() + location.hash); }
+  })();
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
