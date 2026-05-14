@@ -404,9 +404,24 @@
     .st td { padding: 7px 12px; font-size: 11px; color: #555; border-bottom: 1px solid #F5F5F5; }
 
     /* ── WORKS GALLERY ── */
+    #works-marquee-wrap {
+      overflow: hidden;
+      width: 100%;
+    }
+    #works-marquee-track {
+      display: flex;
+      gap: 2px;
+      width: max-content;
+      animation: worksScroll 30s linear infinite;
+    }
+    #works-marquee-track:hover { animation-play-state: paused; }
+    @keyframes worksScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
     .work-item {
       position: relative; aspect-ratio: 4/3; overflow: hidden;
-      background: #F5F5F5; cursor: pointer;
+      background: #F5F5F5; cursor: pointer; flex: 0 0 300px; width: 300px;
     }
     .work-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
     .work-item:hover img { transform: scale(1.03); }
@@ -489,7 +504,10 @@
 
   <input type="file" id="works-file-input" accept="image/*" multiple style="display:none;" onchange="addImages(this)">
 
-  <div id="works-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:2px;"></div>
+  <div id="works-marquee-wrap" style="display:none;">
+    <div id="works-marquee-track"></div>
+  </div>
+  <div id="works-grid" style="display:none;"></div>
 
   <div id="upload-area" style="display:none;margin-top:2px;">
     <div onclick="document.getElementById('works-file-input').click()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:200px;border:1.5px dashed #DDD;cursor:pointer;color:#CCC;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;" onmouseenter="this.style.borderColor='#AAA'" onmouseleave="this.style.borderColor='#DDD'">
@@ -964,23 +982,41 @@ function saveWorks(idx, arr) {
   localStorage.setItem(worksKey(idx), JSON.stringify(arr));
 }
 
-var worksGrid  = document.getElementById('works-grid');
-var worksEmpty = document.getElementById('works-empty');
-var worksTitle = document.getElementById('works-title');
+var worksGrid         = document.getElementById('works-grid');
+var worksMarqueeWrap  = document.getElementById('works-marquee-wrap');
+var worksMarqueeTrack = document.getElementById('works-marquee-track');
+var worksEmpty        = document.getElementById('works-empty');
+var worksTitle        = document.getElementById('works-title');
+
+function makeWorkItem(src, i) {
+  var item = document.createElement('div');
+  item.className = 'work-item';
+  item.innerHTML =
+    '<img src="' + src + '" loading="lazy" onclick="openLightbox(' + i + ')">' +
+    '<button class="work-delete" title="削除" onclick="deleteWork(' + i + ')">✕</button>';
+  return item;
+}
 
 function renderWorks() {
   var works = loadWorks(cur);
   worksTitle.textContent = slides[cur] ? slides[cur].caption : '';
-  worksGrid.innerHTML = '';
+  worksMarqueeTrack.innerHTML = '';
   worksEmpty.style.display = works.length ? 'none' : 'block';
-  works.forEach(function(src, i) {
-    var item = document.createElement('div');
-    item.className = 'work-item';
-    item.innerHTML =
-      '<img src="' + src + '" loading="lazy" onclick="openLightbox(' + i + ')">' +
-      '<button class="work-delete" title="削除" onclick="deleteWork(' + i + ')">✕</button>';
-    worksGrid.appendChild(item);
-  });
+  if (works.length) {
+    // 画像が少ない場合も途切れないよう複製して2セット並べる
+    var sets = works.length < 4 ? 4 : 2;
+    for (var s = 0; s < sets; s++) {
+      works.forEach(function(src, i) {
+        worksMarqueeTrack.appendChild(makeWorkItem(src, i));
+      });
+    }
+    worksMarqueeWrap.style.display = 'block';
+    // スピードを画像数に応じて調整（多いほど遅め）
+    var duration = Math.max(20, works.length * 5) + 's';
+    worksMarqueeTrack.style.animationDuration = duration;
+  } else {
+    worksMarqueeWrap.style.display = 'none';
+  }
 }
 
 function addImages(input) {
