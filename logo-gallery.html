@@ -818,6 +818,9 @@ function resetAuto() {
 var _goTo = goTo;
 goTo = function(n) { _goTo(n); resetAuto(); };
 
+// ── INIT ──
+_goTo(0);
+
 // ── TOUCH SWIPE ──
 var tsx = 0;
 var stage = document.getElementById('stage');
