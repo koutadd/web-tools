@@ -342,11 +342,7 @@ function serveFile(req, res) {
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
-    const noCache = ['.html', '.js'].includes(ext);
-    res.writeHead(200, {
-      'Content-Type': MIME[ext] ?? 'application/octet-stream',
-      'Cache-Control': noCache ? 'no-cache, no-store, must-revalidate' : 'max-age=86400',
-    });
+    res.writeHead(200, { 'Content-Type': MIME[ext] ?? 'application/octet-stream' });
     res.end(data);
   });
 }
@@ -395,13 +391,6 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ── Auth guard: 未認証は /login へリダイレクト ────────────────
-  // バージョン確認（認証不要）
-  if (urlPath === '/api/version') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ version: 'ce28a94', ts: '2026-03-15' }));
-    return;
-  }
-
   if (AUTH_PASSWORD && !isAuth(req)) {
     // API は 401 を返す
     if (urlPath.startsWith('/api/')) {
@@ -493,7 +482,7 @@ const server = http.createServer(async (req, res) => {
 
   // ── GAS proxy ──────────────────────────────────────────────────
   if (req.url.startsWith('/api/gas-proxy')) {
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzXcf1GFdaw8_7Y57fqiBo-JWv4u6gk_zRjRrTYktyPkamFT1hYyvP7pEWS2yM_nJoS/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwGfa8kZeYxpmRtmSDFYqfMHgyhkBG5KXQrmhplcMOYj9Ya1rctoX9pkOTykdL_pgFTJg/exec';
     const urlObj = new URL(req.url, 'http://localhost');
     const qs = urlObj.search; // e.g. ?mode=requests
     try {
@@ -535,33 +524,6 @@ const server = http.createServer(async (req, res) => {
         if (!isJson) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'GASエラー: デプロイURLを確認してください' }));
-          return;
-        }
-        // createUploadSession: GASからtokenを受け取り、サーバー側でDrive APIを呼び出す
-        const gasData = JSON.parse(text);
-        if (gasData.ok && gasData.token && gasData.fileName) {
-          const driveInit = await fetch(
-            'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': 'Bearer ' + gasData.token,
-                'Content-Type': 'application/json',
-                'X-Upload-Content-Type': gasData.mimeType,
-              },
-              body: JSON.stringify({ name: gasData.fileName, parents: [gasData.folderId] }),
-              signal: AbortSignal.timeout(15000),
-            }
-          );
-          const uploadUrl = driveInit.headers.get('location') || driveInit.headers.get('Location');
-          if (!uploadUrl) {
-            const errText = await driveInit.text().catch(() => '');
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: false, error: `Drive uploadUrl取得失敗 (${driveInit.status}): ${errText.slice(0, 100)}` }));
-            return;
-          }
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: true, uploadUrl }));
           return;
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });

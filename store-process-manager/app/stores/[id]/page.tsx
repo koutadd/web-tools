@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getStore, PHASES, type Phase, type TaskStatus } from "@/lib/data";
@@ -24,13 +24,49 @@ const statusIcon: Record<TaskStatus, string> = {
   完了: "●",
 };
 
-type Tab = "進行状況" | "タスク";
+type Tab = "進行状況" | "タスク" | "FVシート";
+
+interface FVSheet {
+  catchCopy: string;
+  subCopy: string;
+  ctaText: string;
+  background: string;
+  tone: string;
+  notes: string;
+}
+
+const defaultFV: FVSheet = {
+  catchCopy: "",
+  subCopy: "",
+  ctaText: "",
+  background: "",
+  tone: "",
+  notes: "",
+};
 
 export default function StoreDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const store = getStore(id);
   const [activeTab, setActiveTab] = useState<Tab>("進行状況");
+  const [fv, setFv] = useState<FVSheet>(defaultFV);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const raw = localStorage.getItem(`fv_sheet_${id}`);
+    if (raw) setFv(JSON.parse(raw));
+  }, [id]);
+
+  const handleFvChange = (field: keyof FVSheet, value: string) => {
+    setFv((prev) => ({ ...prev, [field]: value }));
+    setSaved(false);
+  };
+
+  const saveFv = () => {
+    localStorage.setItem(`fv_sheet_${id}`, JSON.stringify(fv));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   if (!store) {
     return (
@@ -74,7 +110,7 @@ export default function StoreDetailPage() {
 
       {/* タブ */}
       <div className="flex border-b border-gray-200 mb-6">
-        {(["進行状況", "タスク"] as Tab[]).map((tab) => (
+        {(["進行状況", "タスク", "FVシート"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -200,6 +236,107 @@ export default function StoreDetailPage() {
               </span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* FVシートタブ */}
+      {activeTab === "FVシート" && (
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-100 rounded-xl px-5 py-3 text-sm text-blue-700">
+            ファーストビュー（FV）の企画・指示内容をまとめるシートです。
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                キャッチコピー
+              </label>
+              <input
+                type="text"
+                value={fv.catchCopy}
+                onChange={(e) => handleFvChange("catchCopy", e.target.value)}
+                placeholder="例：あなたの暮らしに、やすらぎを。"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                サブコピー
+              </label>
+              <input
+                type="text"
+                value={fv.subCopy}
+                onChange={(e) => handleFvChange("subCopy", e.target.value)}
+                placeholder="例：地域密着20年、心をこめたサービスをお届けします。"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                CTAボタンテキスト
+              </label>
+              <input
+                type="text"
+                value={fv.ctaText}
+                onChange={(e) => handleFvChange("ctaText", e.target.value)}
+                placeholder="例：無料相談はこちら"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                背景・ビジュアルの方向性
+              </label>
+              <textarea
+                value={fv.background}
+                onChange={(e) => handleFvChange("background", e.target.value)}
+                placeholder="例：明るいカフェ内観の写真。温かみのある照明。人物は映さない。"
+                rows={3}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                全体トーン・イメージ
+              </label>
+              <input
+                type="text"
+                value={fv.tone}
+                onChange={(e) => handleFvChange("tone", e.target.value)}
+                placeholder="例：ナチュラル・温かい・清潔感・落ち着いた"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                備考・その他指示
+              </label>
+              <textarea
+                value={fv.notes}
+                onChange={(e) => handleFvChange("notes", e.target.value)}
+                placeholder="参考サイトのURL、注意事項など"
+                rows={3}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3">
+            {saved && (
+              <span className="text-sm text-green-600 font-medium">保存しました</span>
+            )}
+            <button
+              onClick={saveFv}
+              className="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              保存する
+            </button>
+          </div>
         </div>
       )}
     </div>

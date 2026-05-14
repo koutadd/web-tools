@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>制作物一覧の見方 – アイケアラボ制作管理</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+         background: #f7f7fa; color: #1a1a2e; line-height: 1.75; }
+  .page { max-width: 740px; margin: 0 auto; padding: 36px 20px 80px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+  .back { font-size: 0.85rem; color: #1a4fa8; text-decoration: none;
+          border: 1px solid #c8d6f0; border-radius: 6px; padding: 6px 14px;
+          background: #fff; white-space: nowrap; }
+  .back:hover { background: #eef4fd; }
+  h1 { font-size: 1.4rem; font-weight: 700; }
+  .card { background: #fff; border-radius: 12px; padding: 24px 28px;
+          margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px;
+             padding-bottom: 10px; border-bottom: 2px solid #eef; }
+  .card h3 { font-size: 0.9rem; font-weight: 700; color: #1a4fa8; margin: 16px 0 6px; }
+  p, li { font-size: 0.88rem; color: #444; }
+  ul { padding-left: 18px; margin-bottom: 8px; }
+  li { margin-bottom: 5px; }
+  .note { background: #fff8e1; border-left: 3px solid #f9a825;
+          padding: 9px 13px; border-radius: 0 6px 6px 0; font-size: 0.83rem; color: #555; margin-top: 10px; }
+  .step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .step-num { min-width: 26px; height: 26px; background: #1a4fa8; color: #fff;
+              border-radius: 50%; display: flex; align-items: center; justify-content: center;
+              font-size: 0.8rem; font-weight: 700; margin-top: 1px; }
+  .step-body { flex: 1; font-size: 0.88rem; color: #444; }
+  .step-body strong { color: #1a1a2e; }
+  .chip { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 2px 8px;
+          border-radius: 12px; margin: 0 2px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <a href="aicare-portfolio.html" class="back">← ダッシュボード</a>
+    <h1>🖼 制作物一覧の見方</h1>
+  </header>
+
+  <div class="card">
+    <h2>概要</h2>
+    <p>制作物一覧は、GoogleドライブのPDFデータをGAS（Googleスプレッドシートのスクリプト）が自動同期し、ギャラリー形式で表示する画面です。</p>
+    <div class="note">⚠️ サーバーが停止している場合、初回表示に50秒ほどかかることがあります。</div>
+  </div>
+
+  <div class="card">
+    <h2>画面の見方</h2>
+    <h3>フィルターバー</h3>
+    <ul>
+      <li><strong>ジャンルボタン（色付き）</strong> ─ チラシ・店舗サイン・名刺・ブランドなどジャンル別に絞り込みます</li>
+      <li><strong>店舗ボタン</strong> ─ 特定の店舗の制作物だけを表示します</li>
+      <li><strong>検索バー</strong> ─ タイトル・店舗名をキーワードで検索できます</li>
+    </ul>
+    <h3>制作物カード</h3>
+    <ul>
+      <li>PDFのサムネイル・タイトル・店舗名・更新日時が表示されます</li>
+      <li>カードをクリックするとドロワー（右サイドパネル）が開きます</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>カード詳細（ドロワー）の使い方</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">カードをクリックすると右からドロワーが開き、<strong>PDFプレビュー・ドライブリンク・タグ</strong>が表示されます</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>ジャンルの変更</strong> ─ 自動分類が合っていない場合、ジャンルセレクトから手動で変更できます（端末ローカル保存）</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>「Driveで開く」</strong> ─ Googleドライブの元フォルダに直接ジャンプします</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body"><strong>格納ボタン</strong> ─ 依頼管理の格納フォルダへのアップロード操作を行います</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>データ更新について</h2>
+    <ul>
+      <li>データはGASが定期的にGoogleドライブを巡回し自動同期します</li>
+      <li>手動で最新データを取得したい場合は「🔄 再読み込み」ボタンをタップしてください</li>
+      <li>キャッシュは5分間有効です</li>
+    </ul>
+    <div class="note">新しくPDFが追加されても、GASの同期実行後でないと一覧に表示されません。</div>
+  </div>
+</div>
+</body>
+</html>

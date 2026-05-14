@@ -121,21 +121,84 @@
   </style>
 </head>
 <body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav { display:none !important; }
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  
+  <a href="aicare-vision-check.html">視力チェック</a>  <a href="aicare-brand-overview.html">ブランドマップ</a>  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>  
+  <a href="aicare-flagship.html">フラッグシップ</a>  <span class="cn-sep">|</span>
+  
+  <a href="logo-gallery.html">Logo</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
 
 <!-- ================================================
   HEADER
 ================================================ -->
 <header id="header" class="sticky top-0 z-50 bg-white border-b border-gray-200" style="transition:box-shadow 0.3s;">
   <div class="max-w-5xl mx-auto px-4 sm:px-6">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex items-center flex-shrink-0">
-        <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-9 w-auto">
-      </div>
+    <div class="flex items-center justify-center h-16">
+      <img src="eyecare_logo.png" alt="アイケアラボ 眼の整体院" class="h-9 w-auto">
     </div>
   </div>
 </header>
-
-
 
 
 <!-- ================================================
@@ -341,8 +404,7 @@
       <p id="result-action" class="text-sm" style="color:#1a3d7a;"></p>
     </div>
 
-
-    <!-- ===== CTA ===== -->
+    <!-- ===== 2分割CTA ===== -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 fade-up delay-4">
 
       <!-- A: 実店舗導線 (主CTA) -->
@@ -353,13 +415,13 @@
         <div class="bg-white p-5">
           <p class="text-xs text-gray-500 leading-relaxed mb-4">今の状態を実際に確認したい方へ。専任スタッフが丁寧にカウンセリングします。強引な勧誘は一切ありません。</p>
           <div class="space-y-2">
-            <span class="btn-navy w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+            <span class="btn-navy w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 block text-center" style="cursor:default;opacity:0.7;">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.3 1.5 2.5 3.3 2.5 5.5c0 3.2 4 7.5 4 7.5s4-4.3 4-7.5C10.5 3.3 8.7 1.5 6.5 1.5Z" stroke="white" stroke-width="1.2"/><circle cx="6.5" cy="5.5" r="1.5" stroke="white" stroke-width="1.2"/></svg>
-              近くの店舗を探す
+              近くの店舗を探す（準備中）
             </span>
-            <span class="btn-outline w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+            <span class="btn-outline w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 block text-center" style="cursor:default;opacity:0.7;">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1.5" width="11" height="10" rx="1.5" stroke="#0D2B5E" stroke-width="1.1"/><path d="M3.5 1v1.5M9.5 1v1.5M1 5.5h11" stroke="#0D2B5E" stroke-width="1.1" stroke-linecap="round"/></svg>
-              無料カウンセリングを予約する
+              無料カウンセリングを予約する（準備中）
             </span>
           </div>
         </div>
@@ -373,13 +435,13 @@
         <div class="bg-white p-5">
           <p class="text-xs text-gray-500 leading-relaxed mb-4" id="icare-desc">今回の結果に近い悩みの背景や日常の整え方は、iCare365でも詳しく学べます。</p>
           <div class="space-y-2">
-            <span class="w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 cursor-default" style="display:flex;background:#EEF2FF; color:#0D2B5E; border:1.5px solid #C7D5EE;">
+            <span class="w-full py-3 rounded-sm text-xs font-medium flex items-center justify-center gap-1.5 block text-center" style="background:#EEF2FF; color:#0D2B5E; border:1.5px solid #C7D5EE; cursor:default;">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5h5M4 4.5h5M4 8.5h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-              iCare365 でもっと学ぶ
+              iCare365 でもっと学ぶ（準備中）
             </span>
-            <span class="w-full py-3 rounded-sm text-xs text-gray-500 flex items-center justify-center gap-1.5 cursor-default" style="display:flex;">
+            <span class="w-full py-3 rounded-sm text-xs text-gray-500 flex items-center justify-center gap-1.5 block text-center" style="cursor:default;">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.1"/><path d="M6.5 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-              日常ケアの習慣化を始める
+              日常ケアの習慣化を始める（準備中）
             </span>
           </div>
         </div>
@@ -414,6 +476,9 @@
           <div class="text-sm font-bold text-white tracking-wider">アイケアラボ</div>
           <div class="text-xs text-blue-300">眼の整体院</div>
         </div>
+      </div>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-blue-300">
+        <a href="#" class="hover:text-white transition-colors">プライバシーポリシー</a>
       </div>
     </div>
     <div class="pt-5 text-xs text-blue-400 text-center">© 2024 アイケアラボ All Rights Reserved.</div>
@@ -683,8 +748,7 @@ function showResult() {
   document.getElementById('result-type-name').textContent = `「${type.name}」の傾向があります`;
   document.getElementById('result-type-label').textContent = type.label;
   document.getElementById('result-desc').textContent = type.desc;
-  const icareEl = document.getElementById('icare-desc');
-  if (icareEl) icareEl.textContent = type.icare;
+  document.getElementById('icare-desc').textContent = type.icare;
   document.getElementById('result-action').textContent = type.action;
 
   // 背景の悩みリスト

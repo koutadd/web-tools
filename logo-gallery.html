@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logo Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      width: 100%;
+      background: #fff;
+    }
+    body {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #fff;
+      color: #111;
+      font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 300;
+    }
+
+    /* ═══════════════════════════════
+       COMMON NAV (aicare utility bar)
+    ═══════════════════════════════ */
+    #aicare-common-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.18);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 20px; height: 36px;
+      overflow-x: auto; overflow-y: hidden;
+      flex-wrap: nowrap; white-space: nowrap;
+      scrollbar-width: none; -ms-overflow-style: none;
+      font-family: 'DM Mono','SF Mono',monospace; font-size: 11px; letter-spacing: 0.05em;
+    }
+    #aicare-common-nav::-webkit-scrollbar { display: none; }
+    #aicare-common-nav > * { flex-shrink: 0; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size:10px; letter-spacing:0.1em; padding-right:4px; }
+    #aicare-common-nav .cn-sep   { color: rgba(255,255,255,0.15); padding:0 2px; user-select:none; }
+    #aicare-common-nav a {
+      color: rgba(148,163,184,0.85); text-decoration:none;
+      padding: 2px 10px; border-radius:4px;
+      border: 1px solid rgba(148,163,184,0.12);
+      transition: color .15s, background .15s;
+    }
+    #aicare-common-nav a:hover { color:#e2eaf4; background:rgba(255,255,255,0.06); }
+    #aicare-common-nav a.cn-active { color:#f5f5f5; background:rgba(255,255,255,0.1); border-color:rgba(148,163,184,0.3); }
+
+    /* ═══════════════════════════════
+       BRAND BAR  (911スタイル)
+    ═══════════════════════════════ */
+    #brand-bar {
+      position: fixed;
+      top: 36px; left: 0; right: 0;
+      z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      height: 44px;
+      background: #fff;
+    }
+    #brand-bar .brand-name {
+      font-size: 18px; font-weight: 400; letter-spacing: 0.02em; color: #111;
+    }
+    #brand-bar nav {
+      display: flex; gap: 32px;
+    }
+    #brand-bar nav a {
+      font-size: 12px; letter-spacing: 0.06em;
+      color: #555; text-decoration: none;
+      transition: color .2s;
+    }
+    #brand-bar nav a:hover { color: #111; }
+    #brand-bar nav a.active { color: #111; }
+    #lnk-add {
+      padding: 4px 12px;
+      background: #1B2E4B;
+      color: #fff !important;
+      border-radius: 2px;
+      transition: opacity .2s !important;
+    }
+    #lnk-add:hover { opacity: .78; }
+
+    /* ═══════════════════════════════
+       ADD LOGO MODAL
+    ═══════════════════════════════ */
+    #add-modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(3px);
+      z-index: 9000;
+      align-items: center; justify-content: center;
+    }
+    #add-modal-overlay.open { display: flex; }
+    #add-modal {
+      background: #FAFAFA;
+      width: 100%; max-width: 520px;
+      padding: 36px 40px;
+      position: relative;
+      animation: mIn .22s ease;
+    }
+    @keyframes mIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    #add-modal-close {
+      position: absolute; top: 14px; right: 18px;
+      font-size: 20px; color: #AAA; cursor: pointer;
+      background: none; border: none;
+    }
+    #add-modal-close:hover { color: #111; }
+    .am-title { font-size: 11px; letter-spacing: 0.28em; color: #888; text-transform: uppercase; margin-bottom: 24px; }
+    .am-group { margin-bottom: 20px; }
+    .am-label { display: block; font-size: 10px; letter-spacing: 0.2em; color: #AAA; text-transform: uppercase; margin-bottom: 6px; }
+    .am-input, .am-textarea, .am-select {
+      width: 100%; padding: 10px 14px;
+      background: #fff; border: 1px solid #E0E0E0;
+      font-family: 'Jost', sans-serif; font-size: 13px; color: #111;
+      outline: none; transition: border-color .2s;
+    }
+    .am-input:focus, .am-textarea:focus { border-color: #1B2E4B; }
+    .am-textarea { resize: vertical; min-height: 100px; line-height: 1.6; font-size: 11px; font-family: monospace; }
+    .am-file-area {
+      width: 100%; padding: 20px;
+      background: #fff; border: 1.5px dashed #DDD;
+      text-align: center; cursor: pointer;
+      font-size: 11px; letter-spacing: 0.14em; color: #BBB;
+      text-transform: uppercase; position: relative;
+      transition: border-color .2s;
+    }
+    .am-file-area:hover { border-color: #1B2E4B; }
+    .am-file-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    #am-img-preview { max-height: 60px; margin: 8px auto 0; display: none; }
+    .am-type-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .am-type-btn {
+      flex: 1; padding: 8px; font-family: 'Jost', sans-serif;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      border: 1px solid #DDD; background: #fff; cursor: pointer; color: #888;
+      transition: all .2s;
+    }
+    .am-type-btn.active { background: #1B2E4B; color: #fff; border-color: #1B2E4B; }
+    .am-submit {
+      width: 100%; padding: 14px;
+      background: #1B2E4B; color: #fff;
+      font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.22em;
+      text-transform: uppercase; border: none; cursor: pointer;
+      transition: opacity .2s; margin-top: 4px;
+    }
+    .am-submit:hover { opacity: .8; }
+
+    /* ═══════════════════════════════
+       SLIDER SECTION WRAPPER
+    ═══════════════════════════════ */
+    #slider-section {
+      position: relative;
+      height: calc(100vh - 80px);
+      margin-top: 80px; /* 36 common-nav + 44 brand-bar */
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════
+       STAGE  (3-panel fill area)
+    ═══════════════════════════════ */
+    #stage {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════
+       TRACK
+    ═══════════════════════════════ */
+    #track {
+      display: flex;
+      width: 100%; height: 100%;
+      transition: transform 0.72s cubic-bezier(0.77,0,0.18,1);
+      will-change: transform;
+    }
+
+    /* ═══════════════════════════════
+       SLIDE
+    ═══════════════════════════════ */
+    .slide {
+      min-width: 100%; height: 100%;
+      display: grid;
+      grid-template-columns: 14% 1fr 14%;
+    }
+
+    /* ═══════════════════════════════
+       PANELS
+    ═══════════════════════════════ */
+    .panel {
+      height: 100%;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+
+    /* Side panels — slightly tinted, full-fill */
+    .panel-side {
+      background: #EBEBEB;
+      cursor: pointer;
+      transition: background .25s;
+    }
+    .panel-side:hover { background: #E0E0E0; }
+
+    /* The logo inside a side panel fills the space, faded */
+    .side-inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      padding: 10%;
+      opacity: 0.28;
+      filter: grayscale(0.6) contrast(0.9);
+      transition: opacity .25s;
+    }
+    .panel-side:hover .side-inner { opacity: 0.42; }
+
+    .side-inner svg,
+    .side-inner img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+    }
+
+    /* Side placeholder (for empty slots) */
+    .side-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .side-placeholder svg { opacity: 0.12; }
+
+    /* Center panel — pure white, logo dominant */
+    .panel-center {
+      background: #fff;
+    }
+
+    .center-inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2% 3%;
+    }
+
+    .center-inner svg,
+    .center-inner img {
+      max-width: 50%; max-height: 50%;
+      width: auto; height: auto;
+      object-fit: contain;
+    }
+
+    /* PNG placeholder */
+    .png-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; color: #CCC;
+    }
+    .png-placeholder span { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #CCC; }
+
+    /* ═══════════════════════════════
+       BOTTOM BAR  (overlaid on panels)
+    ═══════════════════════════════ */
+    #bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      z-index: 200;
+      background: transparent;
+    }
+
+    #caption {
+      font-size: 11px; letter-spacing: 0.04em; color: #444;
+    }
+
+    #dots {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .dot {
+      display: block; width: 20px; height: 1.5px;
+      background: #CCC; cursor: pointer; transition: background .2s, width .2s;
+    }
+    .dot.active { background: #111; width: 32px; }
+
+    #counter {
+      font-size: 11px; letter-spacing: 0.06em; color: #999;
+    }
+
+    /* ═══════════════════════════════
+       REGULATION BUTTON
+    ═══════════════════════════════ */
+    #reg-btn {
+      position: absolute;
+      bottom: 52px; right: 28px;
+      z-index: 300;
+      font-family: 'Jost', sans-serif;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid #999; color: #555; background: rgba(255,255,255,0.9);
+      cursor: pointer; transition: all .2s;
+      display: none; text-decoration: none;
+    }
+    #reg-btn.show { display: block; }
+    #reg-btn:hover { background: #111; color: #fff; border-color: #111; }
+
+    /* ── HP BUTTON ── */
+    #hp-btn {
+      position: absolute;
+      bottom: 93px; right: 28px;
+      z-index: 300;
+      font-family: 'Jost', sans-serif;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid #1B2E4B; color: #1B2E4B; background: rgba(255,255,255,0.9);
+      cursor: pointer; transition: all .2s;
+      display: none; text-decoration: none;
+    }
+    #hp-btn.show { display: block; }
+    #hp-btn:hover { background: #1B2E4B; color: #fff; border-color: #1B2E4B; }
+
+    /* hint */
+    #hint {
+      position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; letter-spacing: 0.2em; color: #CCC; text-transform: uppercase;
+      pointer-events: none; z-index: 50; transition: opacity .6s;
+    }
+
+    /* ═══════════════════════════════
+       REGULATION DRAWER
+    ═══════════════════════════════ */
+    #drawer-overlay {
+      position: fixed; inset: 0; top: 36px;
+      z-index: 8000;
+      background: transparent;
+      pointer-events: none;
+      transition: background .35s;
+    }
+    #drawer-overlay.open {
+      background: rgba(0,0,0,.38);
+      pointer-events: all;
+    }
+
+    #drawer {
+      position: absolute; top: 0; right: 0; bottom: 0;
+      width: 520px; max-width: 92vw;
+      background: #FAFAFA;
+      transform: translateX(100%);
+      transition: transform .4s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto;
+    }
+    #drawer-overlay.open #drawer { transform: translateX(0); }
+
+    .dwr-top {
+      position: sticky; top: 0; background: #FAFAFA;
+      border-bottom: 1px solid #EBEBEB;
+      padding: 12px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 10;
+    }
+    .dwr-top span { font-size: 10px; letter-spacing: 0.22em; color: #AAA; text-transform: uppercase; }
+    .dwr-close {
+      width: 28px; height: 28px;
+      background: transparent; border: 1px solid #DDD;
+      cursor: pointer; font-size: 14px; color: #888;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .dwr-close:hover { background: #111; color: #fff; border-color: #111; }
+
+    .dwr-body { padding: 0 32px 80px; }
+
+    .dwr-hero {
+      height: 200px; display: flex; align-items: center; justify-content: center;
+      background: #1B2E4B; margin: 0 -32px 36px;
+    }
+
+    .reg-s { margin-bottom: 32px; }
+    .reg-s-lbl { font-size: 9px; letter-spacing: 0.28em; color: #BBB; text-transform: uppercase; margin-bottom: 5px; }
+    .reg-s-ttl { font-size: 13px; font-weight: 300; letter-spacing: 0.1em; color: #1B2E4B; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #EBEBEB; }
+
+    blockquote.cq {
+      font-size: 14px; line-height: 2.1; color: #1B2E4B;
+      padding-left: 14px; border-left: 2px solid #1B2E4B;
+      font-style: italic; letter-spacing: 0.03em;
+    }
+
+    .ag { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ac { padding: 14px; background: #fff; border: 1px solid #EBEBEB; }
+    .ac h4 { font-size: 9px; letter-spacing: 0.18em; color: #BBB; text-transform: uppercase; margin-bottom: 5px; }
+    .ac p  { font-size: 11px; color: #666; line-height: 1.85; }
+
+    .cr { display: flex; gap: 8px; }
+    .cc { flex: 1; border: 1px solid #EBEBEB; overflow: hidden; }
+    .cc-b { height: 56px; }
+    .cc-i { padding: 8px 10px; }
+    .cc-n { font-size: 10px; font-weight: 400; color: #333; margin-bottom: 2px; }
+    .cc-h { font-size: 9px; color: #AAA; font-family: monospace; }
+
+    .rl { list-style: none; }
+    .rl li { display: flex; gap: 7px; padding: 7px 0; border-bottom: 1px solid #F5F5F5; font-size: 11px; color: #555; line-height: 1.7; }
+    .rl li:last-child { border-bottom: none; }
+    .rl .x { color: #C0392B; }
+
+    .st { width: 100%; border-collapse: collapse; }
+    .st th { background: #1B2E4B; color: #fff; font-size: 9px; letter-spacing: 0.14em; padding: 7px 12px; text-align: left; font-weight: 300; }
+    .st td { padding: 7px 12px; font-size: 11px; color: #555; border-bottom: 1px solid #F5F5F5; }
+
+    /* ── WORKS GALLERY ── */
+    .work-item {
+      position: relative; aspect-ratio: 4/3; overflow: hidden;
+      background: #F5F5F5; cursor: pointer;
+    }
+    .work-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .work-item:hover img { transform: scale(1.03); }
+    .work-delete {
+      position: absolute; top: 8px; right: 8px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); border: none; cursor: pointer;
+      color: #fff; font-size: 14px; display: none;
+      align-items: center; justify-content: center;
+    }
+    body.edit-mode .work-delete { display: flex; }
+    body.edit-mode #edit-btn { background: #111; color: #fff; border-color: #111; }
+    #lightbox.open { display: flex !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── COMMON NAV ── -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>  <a href="aicare-brand-overview.html">ブランドマップ</a>  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>  <a href="aicare-flagship.html">フラッグシップ</a>  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html" class="cn-active">Logo</a>
+</nav>
+
+<!-- ── BRAND BAR (911スタイル) ── -->
+<div id="brand-bar">
+  <span class="brand-name">Logos</span>
+  <nav>
+    <a href="#" id="lnk-gallery" class="active">Gallery</a>
+    <a href="#" id="lnk-regulation">Regulation</a>
+    <a href="#" id="lnk-add">Add Logo</a>
+  </nav>
+</div>
+
+<!-- ── SLIDER SECTION ── -->
+<div id="slider-section">
+
+  <!-- ── STAGE ── -->
+  <div id="stage">
+    <div id="track">
+    </div><!-- /track (populated by JS) -->
+  </div><!-- /stage -->
+
+  <!-- ── BOTTOM BAR ── -->
+  <div id="bottom-bar">
+    <span id="caption">Mizuki Holdings (2026)</span>
+    <div id="dots"></div>
+    <span id="counter">01 / 03</span>
+  </div>
+
+  <!-- ── REGULATION BUTTON ── -->
+  <a id="reg-btn" class="show" href="logo-regulation-mizuki.html">Regulation →</a>
+
+  <!-- ── HP BUTTON ── -->
+  <a id="hp-btn" href="#" target="_blank" rel="noopener">HP →</a>
+
+  <!-- hint -->
+  <div id="hint">← → to navigate</div>
+
+</div><!-- /slider-section -->
+
+<!-- ── WORKS GALLERY ── -->
+<div id="works-section" style="padding: 80px 56px; border-top: 1px solid #EBEBEB; background: #fff;">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:40px;">
+    <div>
+      <p style="font-size:9px;letter-spacing:0.28em;color:#BBB;text-transform:uppercase;margin-bottom:6px;">Works Gallery</p>
+      <h2 id="works-title" style="font-size:clamp(24px,3vw,40px);font-weight:200;letter-spacing:-0.01em;color:#111;">Mizuki Holdings</h2>
+    </div>
+    <button id="edit-btn" onclick="toggleEdit()" style="font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:8px 16px;border:1px solid #CCC;color:#888;background:transparent;cursor:pointer;transition:all .2s;">Edit</button>
+  </div>
+
+  <input type="file" id="works-file-input" accept="image/*" multiple style="display:none;" onchange="addImages(this)">
+
+  <div id="works-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:2px;"></div>
+
+  <div id="upload-area" style="display:none;margin-top:2px;">
+    <div onclick="document.getElementById('works-file-input').click()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:200px;border:1.5px dashed #DDD;cursor:pointer;color:#CCC;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;" onmouseenter="this.style.borderColor='#AAA'" onmouseleave="this.style.borderColor='#DDD'">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#CCC" stroke-width="1.5"/><line x1="16" y1="9" x2="16" y2="23" stroke="#CCC" stroke-width="1.5"/><line x1="9" y1="16" x2="23" y2="16" stroke="#CCC" stroke-width="1.5"/></svg>
+      画像を追加
+    </div>
+  </div>
+
+  <p id="works-empty" style="font-size:12px;color:#CCC;letter-spacing:0.1em;padding:60px 0;text-align:center;">Edit を押して制作物の画像を追加できます（名刺・封筒・看板など）</p>
+</div>
+
+
+<!-- ════════════════════════════
+     ADD LOGO MODAL
+════════════════════════════ -->
+<div id="add-modal-overlay">
+  <div id="add-modal">
+    <button id="add-modal-close">✕</button>
+    <div class="am-title">Add Logo</div>
+    <form id="add-logo-form">
+      <div class="am-group">
+        <label class="am-label">ロゴ名・キャプション</label>
+        <input type="text" class="am-input" id="am-caption" placeholder="Brand Name (2026)" required />
+      </div>
+      <div class="am-group">
+        <label class="am-label">種別</label>
+        <div class="am-type-row">
+          <button type="button" class="am-type-btn active" data-type="png" id="am-type-png">画像 (PNG/JPG)</button>
+          <button type="button" class="am-type-btn" data-type="svg" id="am-type-svg">SVG コード</button>
+        </div>
+      </div>
+      <div class="am-group" id="am-section-png">
+        <label class="am-label">画像ファイル</label>
+        <div class="am-file-area">
+          <input type="file" id="am-file" accept="image/*" />
+          クリックして画像を選択
+          <img id="am-img-preview" src="" alt="" />
+        </div>
+      </div>
+      <div class="am-group" id="am-section-svg" style="display:none;">
+        <label class="am-label">SVG HTML を貼り付け</label>
+        <textarea class="am-textarea" id="am-svg" placeholder='<svg viewBox="0 0 320 200" ...>...</svg>'></textarea>
+      </div>
+      <div class="am-group">
+        <label class="am-label">ウェブサイト URL（任意）</label>
+        <input type="url" class="am-input" id="am-siteurl" placeholder="https://example.com" />
+      </div>
+      <div class="am-group">
+        <label class="am-label">背景色（任意・デフォルト #fff）</label>
+        <input type="color" class="am-input" id="am-bgcolor" value="#ffffff" style="padding:4px;height:40px;" />
+      </div>
+      <button type="submit" class="am-submit">追加する</button>
+    </form>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     REGULATION DRAWER
+════════════════════════════ -->
+<div id="drawer-overlay" onclick="handleOvClick(event)">
+  <div id="drawer">
+
+    <div class="dwr-top">
+      <span>Mizuki Holdings — Brand Regulation</span>
+      <button class="dwr-close" onclick="closeDrawer()">✕</button>
+    </div>
+
+    <div class="dwr-body">
+
+      <div class="dwr-hero">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <svg width="180" height="108" viewBox="0 0 320 190" fill="none">
+            <line x1="96"  y1="95"  x2="96"  y2="31"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="96"  y2="159" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="32"  y2="66"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="32"  y2="124" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="51"  y2="43"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="51"  y2="147" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="96"  y1="95"  x2="160" y2="95"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="208" y2="24"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="208" y2="166" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="160" y2="95"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="272" y2="47"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="272" y2="143" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="160" y2="56"  stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="208" y1="95"  x2="160" y2="134" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div style="text-align:center;">
+            <p style="font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.4em;color:#fff;font-weight:300;margin-bottom:3px;">MIZUKI</p>
+            <p style="font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.4em;color:rgba(255,255,255,0.3);font-weight:300;">HOLDINGS</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reg-s">
+        <p class="reg-s-lbl">01</p>
+        <p class="reg-s-ttl">Brand Concept</p>
+        <blockquote class="cq">水滴が光の結晶へと変わるように、若い生命力と希望を原動力に、不可能を可能へ変え、社会をより良い方向へ導く。吉兆と変革のリーダーたちが集い、互いの光を増幅させながら、瑞々しく生きる力を世界へ広げていく。</blockquote>
+      </div>
+
+      <div class="reg-s">
+        <p class="reg-s-lbl">02</p>
+        <p class="reg-s-ttl">Symbol Anatomy</p>
+        <div class="ag">
+          <div class="ac"><h4>Hidden M & K</h4><p>左核が「M」右核が「K」。二核が連動してMIZUKIが成立。リーダーの連鎖が変革を生む。</p></div>
+          <div class="ac"><h4>Water Drop & Light</h4><p>各核の中心は水滴の落下点。不均等な放射線が波紋から光の結晶へ変容する瞬間を表す。</p></div>
+          <div class="ac"><h4>Dual Resonance</h4><p>二核は孤立せず呼応。一人の光が次の核に触れ連鎖的に輝きを増す。</p></div>
+          <div class="ac"><h4>Typography</h4><p>Light Geometric Sans。トラッキング +200〜300。MIZUKI / HOLDINGS 必ず二行分割。</p></div>
+        </div>
+      </div>
+
+      <div class="reg-s">
+        <p class="reg-s-lbl">03</p>
+        <p class="reg-s-ttl">Color</p>
+        <div class="cr">
+          <div class="cc"><div class="cc-b" style="background:#1B2E4B;"></div><div class="cc-i"><p class="cc-n">Navy</p><p class="cc-h">#1B2E4B</p></div></div>
+          <div class="cc"><div class="cc-b" style="background:#A8A8A8;"></div><div class="cc-i"><p class="cc-n">Gray</p><p class="cc-h">#A8A8A8</p></div></div>
+          <div class="cc"><div class="cc-b" style="background:#fff;border-bottom:1px solid #EEE;"></div><div class="cc-i"><p class="cc-n">White</p><p class="cc-h">#FFFFFF</p></div></div>
+        </div>
+      </div>
+
+      <div class="reg-s">
+        <p class="reg-s-lbl">04</p>
+        <p class="reg-s-ttl">Minimum Size & Clear Space</p>
+        <table class="st" style="margin-bottom:10px;">
+          <thead><tr><th>媒体</th><th>最小幅</th></tr></thead>
+          <tbody>
+            <tr><td>印刷物</td><td>15mm 以上</td></tr>
+            <tr><td>デジタル</td><td>40px 以上</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:10px;color:#AAA;line-height:1.8;">シンボル高さ X の 0.5 倍を四辺に確保。</p>
+      </div>
+
+      <div class="reg-s">
+        <p class="reg-s-lbl">05</p>
+        <p class="reg-s-ttl">Prohibited Use</p>
+        <ul class="rl">
+          <li><span class="x">✕</span>シンボルとテキストを同色にしない</li>
+          <li><span class="x">✕</span>線の太さを変更しない</li>
+          <li><span class="x">✕</span>非均等変形・回転・反転をしない</li>
+          <li><span class="x">✕</span>影・グラデーション・装飾効果を加えない</li>
+          <li><span class="x">✕</span>規定外カラーで使用しない</li>
+          <li><span class="x">✕</span>MIZUKI HOLDINGS を一行表記しない</li>
+          <li><span class="x">✕</span>シンボルとテキストを分離使用しない（アイコン除く）</li>
+        </ul>
+      </div>
+
+    </div><!-- /dwr-body -->
+  </div><!-- /drawer -->
+</div><!-- /drawer-overlay -->
+
+<script>
+// ════════════════════════════════════════════════════
+//  LOGOS — ここにロゴを追加するだけでギャラリーが更新される
+//  新しいロゴを追加する方法:
+//  1. 以下の配列に1オブジェクト追加
+//  2. imgType: 'png' の場合は imgSrc にファイルパスを指定
+//  3. regUrl に個別レギュレーションページのパスを指定
+// ════════════════════════════════════════════════════
+const LOGOS = [
+  {
+    caption:    'Mizuki Holdings (2026)',
+    imgType:    'png',
+    imgSrc:     'MKHD_logo_tate.png',
+    regUrl:     'logo-regulation-mizuki.html',
+    siteUrl:    'https://trail-clone.vercel.app',
+    bgColor:    '#fff',
+    svgContent: null
+  },
+  {
+    caption:    'SUJI',
+    imgType:    'png',
+    imgSrc:     'suji-logo.png',
+    regUrl:     'logo-regulation-suji.html',
+    siteUrl:    null,
+    bgColor:    '#fff',
+    svgContent: null
+  },
+  {
+    caption:    'Dr.BUDDY (by Eyecare LaBo)',
+    imgType:    'png',
+    imgSrc:     'BUDDY_logo_K.png',
+    regUrl:     null,
+    siteUrl:    null,
+    bgColor:    '#fff',
+    svgContent: null
+  },
+  {
+    caption:    'TORINA',
+    imgType:    'png',
+    imgSrc:     'torina-logo.png',
+    regUrl:     null,
+    siteUrl:    'https://resilire-careers.vercel.app',
+    bgColor:    '#fff',
+    svgContent: null
+  },
+  // ── 次のロゴをここに追加 ──
+  // {
+  //   caption:  'Brand Name (2026)',
+  //   imgType:  'png',
+  //   imgSrc:   'logo-file.png',
+  //   regUrl:   'logo-regulation-xxx.html',
+  //   siteUrl:  'https://example.com',
+  //   bgColor:  '#fff',
+  //   svgContent: null
+  // },
+];
+
+// ── CUSTOM LOGOS (localStorage から追加分をマージ) ──
+const CUSTOM_LOGOS_KEY = 'logo_gallery_custom_v1';
+(function() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(CUSTOM_LOGOS_KEY)) || [];
+    saved.forEach(function(l) { LOGOS.push(l); });
+  } catch(e) {}
+})();
+
+// ── PLACEHOLDER SVG (ロゴ未設定のスライド用) ──
+const PLACEHOLDER_SVG = `<div class="png-placeholder">
+  <svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="26" stroke="#DDD" stroke-width="1.5"/><line x1="28" y1="12" x2="28" y2="44" stroke="#DDD" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="#DDD" stroke-width="1.5"/></svg>
+  <span>PNG Logo</span><span style="font-size:10px;color:#DDD;letter-spacing:0.08em;">後でデータを追加</span>
+</div>`;
+
+const SIDE_PLACEHOLDER = `<svg width="60" height="60" viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="28" stroke="#999" stroke-width="1.5"/><line x1="30" y1="10" x2="30" y2="50" stroke="#999" stroke-width="1.5"/><line x1="10" y1="30" x2="50" y2="30" stroke="#999" stroke-width="1.5"/></svg>`;
+
+// ── BUILD SLIDES ──
+const track = document.getElementById('track');
+const n = LOGOS.length;
+LOGOS.forEach(function(logo, i) {
+  var prev = (i - 1 + n) % n;
+  var next = (i + 1) % n;
+
+  function sideContent(idx) {
+    var l = LOGOS[idx];
+    if (!l) return SIDE_PLACEHOLDER;
+    if (l.imgType === 'png' && l.imgSrc) return '<img src="' + l.imgSrc + '" alt="" style="width:100%;height:100%;object-fit:contain;">';
+    if (l.imgType === 'svg' && l.svgContent) return l.svgContent;
+    return SIDE_PLACEHOLDER;
+  }
+
+  function centerContent(logo) {
+    if (logo.imgType === 'png' && logo.imgSrc) return '<img src="' + logo.imgSrc + '" alt="' + logo.caption + '" style="width:100%;height:100%;object-fit:contain;">';
+    if (logo.imgType === 'svg' && logo.svgContent) return logo.svgContent;
+    return PLACEHOLDER_SVG;
+  }
+
+  var slide = document.createElement('div');
+  slide.className = 'slide';
+  slide.innerHTML =
+    '<div class="panel panel-side" onclick="goTo(' + prev + ')">' +
+      '<div class="side-inner">' + sideContent(prev) + '</div>' +
+    '</div>' +
+    '<div class="panel panel-center" style="background:' + (logo.bgColor||'#fff') + '">' +
+      '<div class="center-inner">' + centerContent(logo) + '</div>' +
+    '</div>' +
+    '<div class="panel panel-side" onclick="goTo(' + next + ')">' +
+      '<div class="side-inner">' + sideContent(next) + '</div>' +
+    '</div>';
+  track.appendChild(slide);
+});
+
+const slides = LOGOS;
+const slideCount = slides.length;
+let cur = 0;
+
+const caption = document.getElementById('caption');
+const counter = document.getElementById('counter');
+const dotsEl  = document.getElementById('dots');
+const regBtn  = document.getElementById('reg-btn');
+const hpBtn   = document.getElementById('hp-btn');
+const hint    = document.getElementById('hint');
+
+// build dots
+slides.forEach(function(_, i) {
+  const d = document.createElement('span');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = function() { goTo(i); };
+  dotsEl.appendChild(d);
+});
+
+function goTo(n) {
+  n = ((n % slideCount) + slideCount) % slideCount;
+  cur = n;
+  track.style.transform = 'translateX(-' + (n * 100) + '%)';
+  document.querySelectorAll('.dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === n);
+  });
+  caption.textContent = slides[n].caption;
+  counter.textContent = String(n + 1).padStart(2, '0') + ' / ' + String(slideCount).padStart(2, '0');
+  if (slides[n].regUrl) {
+    regBtn.classList.add('show');
+    regBtn.href = slides[n].regUrl;
+  } else {
+    regBtn.classList.remove('show');
+    regBtn.href = '#';
+  }
+  if (slides[n].siteUrl) {
+    hpBtn.classList.add('show');
+    hpBtn.href = slides[n].siteUrl;
+  } else {
+    hpBtn.classList.remove('show');
+    hpBtn.href = '#';
+  }
+}
+
+// keyboard (lightbox.js handles keys when lightbox is open via capture phase)
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('_lb') && document.getElementById('_lb').style.display !== 'none') return;
+  if (document.getElementById('drawer-overlay').classList.contains('open')) {
+    if (e.key === 'Escape') closeDrawer();
+    return;
+  }
+  if (e.key === 'ArrowRight') goTo(cur + 1);
+  if (e.key === 'ArrowLeft')  goTo(cur - 1);
+});
+
+// ── AUTO PLAY ──
+var autoTimer = setInterval(function(){ goTo(cur + 1); }, 4000);
+function resetAuto() {
+  clearInterval(autoTimer);
+  autoTimer = setInterval(function(){ goTo(cur + 1); }, 4000);
+}
+
+// override goTo to reset timer on manual nav
+var _goTo = goTo;
+goTo = function(n) { _goTo(n); resetAuto(); };
+
+// ── TOUCH SWIPE ──
+var tsx = 0;
+var stage = document.getElementById('stage');
+stage.addEventListener('touchstart', function(e){ tsx = e.touches[0].clientX; }, { passive: true });
+stage.addEventListener('touchend',   function(e){
+  var dx = e.changedTouches[0].clientX - tsx;
+  if (Math.abs(dx) > 48) goTo(dx < 0 ? cur + 1 : cur - 1);
+}, { passive: true });
+
+// ── MOUSE DRAG ──
+var dragStartX = 0;
+var isDragging = false;
+stage.addEventListener('mousedown', function(e){
+  dragStartX = e.clientX;
+  isDragging = true;
+  stage.style.cursor = 'grabbing';
+  track.style.transition = 'none';
+});
+document.addEventListener('mousemove', function(e){
+  if (!isDragging) return;
+  var dx = e.clientX - dragStartX;
+  var base = -cur * 100;
+  track.style.transform = 'translateX(calc(' + base + '% + ' + dx + 'px))';
+});
+document.addEventListener('mouseup', function(e){
+  if (!isDragging) return;
+  isDragging = false;
+  stage.style.cursor = '';
+  track.style.transition = '';
+  var dx = e.clientX - dragStartX;
+  if (Math.abs(dx) > 60) {
+    goTo(dx < 0 ? cur + 1 : cur - 1);
+  } else {
+    track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+  }
+});
+
+// drawer
+function openDrawer()  { document.getElementById('drawer-overlay').classList.add('open'); }
+function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); }
+function handleOvClick(e) { if (e.target === document.getElementById('drawer-overlay')) closeDrawer(); }
+
+// nav links
+document.getElementById('lnk-gallery').addEventListener('click', function(e){ e.preventDefault(); closeDrawer(); });
+document.getElementById('lnk-regulation').addEventListener('click', function(e){
+  e.preventDefault();
+  if (slides[cur].regUrl) { window.location.href = slides[cur].regUrl; }
+});
+document.getElementById('lnk-add').addEventListener('click', function(e){ e.preventDefault(); openAddModal(); });
+
+// ── ADD LOGO MODAL LOGIC ──
+var addModalOverlay = document.getElementById('add-modal-overlay');
+function openAddModal()  { addModalOverlay.classList.add('open'); }
+function closeAddModal() { addModalOverlay.classList.remove('open'); }
+document.getElementById('add-modal-close').addEventListener('click', closeAddModal);
+addModalOverlay.addEventListener('click', function(e){ if (e.target === addModalOverlay) closeAddModal(); });
+
+// type toggle (PNG / SVG)
+var currentType = 'png';
+document.querySelectorAll('.am-type-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    currentType = this.dataset.type;
+    document.querySelectorAll('.am-type-btn').forEach(function(b){ b.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('am-section-png').style.display = currentType === 'png' ? '' : 'none';
+    document.getElementById('am-section-svg').style.display = currentType === 'svg' ? '' : 'none';
+  });
+});
+
+// image preview
+var amFileInput  = document.getElementById('am-file');
+var amImgPreview = document.getElementById('am-img-preview');
+var amImgDataUrl = null;
+amFileInput.addEventListener('change', function() {
+  var file = this.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    amImgDataUrl = e.target.result;
+    amImgPreview.src = amImgDataUrl;
+    amImgPreview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+// form submit
+document.getElementById('add-logo-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var caption  = document.getElementById('am-caption').value.trim();
+  var bgcolor  = document.getElementById('am-bgcolor').value || '#ffffff';
+  var svgText  = document.getElementById('am-svg').value.trim();
+  var siteurl  = document.getElementById('am-siteurl').value.trim() || null;
+
+  if (!caption) return;
+  if (currentType === 'png' && !amImgDataUrl) { alert('画像を選択してください。'); return; }
+  if (currentType === 'svg' && !svgText)       { alert('SVGコードを入力してください。'); return; }
+
+  var newLogo = {
+    caption:    caption,
+    imgType:    currentType,
+    imgSrc:     currentType === 'png' ? amImgDataUrl : null,
+    svgContent: currentType === 'svg' ? svgText : null,
+    bgColor:    bgcolor,
+    regUrl:     null,
+    siteUrl:    siteurl
+  };
+
+  // save to localStorage
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem(CUSTOM_LOGOS_KEY)) || []; } catch(e) {}
+  saved.push(newLogo);
+  localStorage.setItem(CUSTOM_LOGOS_KEY, JSON.stringify(saved));
+
+  // reload to re-render slider
+  window.location.reload();
+});
+
+// hint fade
+setTimeout(function(){ hint.style.opacity = '0'; }, 3500);
+
+// active nav
+(function(){
+  var c = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    a.classList.remove('cn-active');
+    if (a.getAttribute('href') === c) a.classList.add('cn-active');
+  });
+})();
+
+// ── WORKS GALLERY ──
+var WORKS_PREFIX = 'logo_works_';
+
+function worksKey(idx) {
+  return WORKS_PREFIX + (slides[idx] ? slides[idx].caption.replace(/\s+/g,'_') : idx);
+}
+
+function loadWorks(idx) {
+  try { return JSON.parse(localStorage.getItem(worksKey(idx))) || []; } catch(e) { return []; }
+}
+function saveWorks(idx, arr) {
+  localStorage.setItem(worksKey(idx), JSON.stringify(arr));
+}
+
+var worksGrid  = document.getElementById('works-grid');
+var worksEmpty = document.getElementById('works-empty');
+var worksTitle = document.getElementById('works-title');
+
+function renderWorks() {
+  var works = loadWorks(cur);
+  worksTitle.textContent = slides[cur] ? slides[cur].caption : '';
+  worksGrid.innerHTML = '';
+  worksEmpty.style.display = works.length ? 'none' : 'block';
+  works.forEach(function(src, i) {
+    var item = document.createElement('div');
+    item.className = 'work-item';
+    item.innerHTML =
+      '<img src="' + src + '" loading="lazy" onclick="openLightbox(' + i + ')">' +
+      '<button class="work-delete" title="削除" onclick="deleteWork(' + i + ')">✕</button>';
+    worksGrid.appendChild(item);
+  });
+}
+
+function addImages(input) {
+  var files = Array.from(input.files);
+  if (!files.length) return;
+  var works = loadWorks(cur);
+  var pending = files.length;
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      works.push(e.target.result);
+      pending--;
+      if (pending === 0) { saveWorks(cur, works); renderWorks(); }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function deleteWork(i) {
+  if (!confirm('この画像を削除しますか？')) return;
+  var works = loadWorks(cur);
+  works.splice(i, 1);
+  saveWorks(cur, works);
+  renderWorks();
+}
+
+function toggleEdit() {
+  var isEdit = document.body.classList.toggle('edit-mode');
+  var btn = document.getElementById('edit-btn');
+  var ua  = document.getElementById('upload-area');
+  btn.textContent = isEdit ? 'Done' : 'Edit';
+  ua.style.display = isEdit ? 'block' : 'none';
+}
+
+// lightbox
+function openLightbox(i) {
+  if (document.body.classList.contains('edit-mode')) return;
+  LBOpen(loadWorks(cur), i);
+}
+
+// スライド切替時にWorksも更新
+var _goToOrig = goTo;
+goTo = function(n) {
+  _goToOrig(n);
+  renderWorks();
+};
+
+renderWorks();
+</script>
+<script src="lightbox.js"></script>
+</body>
+</html>
