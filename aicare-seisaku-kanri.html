@@ -270,7 +270,8 @@
     .guide-close-btn { background: transparent; border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 16px; font-size: .75rem; color: #64748b; cursor: pointer; }
 
     /* ── 納期・依頼日表示 ── */
-    .item-name-wrap { flex: 1; min-width: 0; }
+    .item-name-wrap { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .item-size-tag { font-size: .6rem; font-weight: 700; font-family: var(--mono); color: #0369a1; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 4px; padding: 1px 6px; white-space: nowrap; flex-shrink: 0; }
     .item-dl-wrap {
       display: flex; align-items: center; gap: 4px;
       flex-shrink: 0; white-space: nowrap;
@@ -1826,6 +1827,7 @@ const SS_ID_FRONT   = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
 const STATUS_LIST        = ['', '依頼前', '依頼済', '制作中', '確認中', '修正中', '完了'];
 const SLACK_DELIVERY_CH  = 'C0ANHC8B6QY'; // 納品通知チャンネル
 const SLACK_PRODUCTION_CH = 'C0AQKU2KL2D'; // 制作進行チャンネル
+const WASHIZU_SLACK_ID   = 'U0AKKRTQ006'; // Yuta Washizu / 鷲巣祐太 — 変更禁止
 
 // ── 状態 ─────────────────────────────────────────
 let GAS_URL       = '';
@@ -2093,6 +2095,7 @@ function renderRow(item) {
   return `<div class="item-row ${stRowCls}" onclick="openDetailModal('${esc(iid)}')">
     <div class="item-name-wrap">
       <span class="item-name">${esc(item.item)}${urgentMark}</span>
+      ${item.size ? `<span class="item-size-tag">${esc(item.size)}</span>` : ''}
     </div>
     <span class="st-badge ${esc(stCls)}">${esc(stLbl)}</span>
     ${dlHtml}
@@ -2123,7 +2126,10 @@ function renderCard(item) {
   const stCardCls = item.status === '完了' ? 'completed' : (item.status ? 'st-card-' + item.status : '');
   return `<div class="item-card ${stCardCls}" onclick="openDetailModal('${esc(iid)}')">
     <div class="item-card-header">
-      <div class="item-name" style="flex:1;font-size:.85rem;">${esc(item.item)}</div>
+      <div style="flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <div class="item-name" style="font-size:.85rem;">${esc(item.item)}</div>
+        ${item.size ? `<span class="item-size-tag">${esc(item.size)}</span>` : ''}
+      </div>
       <span class="st-badge ${esc(stCls)}">${esc(stLbl)}</span>
     </div>
     ${item.urgent ? `<div class="item-card-urgent">⚡ 急ぎ</div>` : ''}
@@ -2785,7 +2791,7 @@ const DEFAULT_SLACK_SETTINGS = {
   channelName: '制作管理',
   accounts: [],
   mentionUsers: [
-    { name: 'Yuta Washizu / 鷲巣祐太',     userId: '' },
+    { name: 'Yuta Washizu / 鷲巣祐太',     userId: WASHIZU_SLACK_ID },
     { name: 'kouta yamakawa / 山川鴻太', userId: '' },
   ],
   workspace: { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' },
@@ -2806,6 +2812,9 @@ function loadSlackCfg() {
   if (!_slackSettings.mentionUsers?.length) {
     _slackSettings.mentionUsers = DEFAULT_SLACK_SETTINGS.mentionUsers;
   }
+  // WashizuのIDは定数で固定 — localStorageの値を無視して常に上書き
+  const washizuEntry = _slackSettings.mentionUsers.find(u => u.name.includes('Washizu') || u.name.includes('鷲巣'));
+  if (washizuEntry) washizuEntry.userId = WASHIZU_SLACK_ID;
   if (!_slackSettings.workspace) _slackSettings.workspace = { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' };
   if (!_slackSettings.slackMembers) _slackSettings.slackMembers = [];
   return _slackSettings;
@@ -2823,15 +2832,7 @@ async function postDeliveryNotification(rowNum) {
   const token = cfg.workspace?.slackBotToken;
   if (!token) { toast('Slackが未連携です', 'err'); return; }
 
-  // @Yuta Washizu を名前検索で取得
-  const members = cfg.slackMembers || [];
-  const washizu = members.find(m =>
-    [m.name, m.realName, m.displayName].some(n => n && (
-      n.toLowerCase().includes('washizu') || n.includes('鷲')
-    ))
-  );
-
-  const driveUrl = item.driveInfo?.outputFolderUrl || item.driveInfo?.itemFolderUrl || '';
+  const driveUrl = item.driveInfo?.nyukouDataUrl || item.driveInfo?.itemFolderUrl || '';
   const btn      = document.getElementById('delivery-notify-btn');
   const statusEl = document.getElementById('delivery-notify-status');
   if (btn) { btn.disabled = true; btn.textContent = '送信中...'; }
@@ -2845,7 +2846,7 @@ async function postDeliveryNotification(rowNum) {
       storeNo:   item.storeNo || '',
       item:      item.item,
       folderUrl: driveUrl,
-      mentionId: washizu?.id || '',
+      mentionId: WASHIZU_SLACK_ID,
     });
     if (res.error) throw new Error(res.error);
     toast('納品通知をSlackに送信しました ✅', 'ok');
