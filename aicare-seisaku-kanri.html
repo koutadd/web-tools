@@ -810,7 +810,8 @@ function updateStatus(rowNum, status) {
 function createFolders(storeName, itemName) {
   const itemFolderName = storeName + '_' + itemName;
   const parent = DriveApp.getFolderById(PARENT_FOLDER);
-  const sf   = getOrCreate(parent, storeName);
+  // 「〇〇_storeName」形式の既存フォルダを優先検索してから使う
+  const sf   = findStoreFolder(parent, storeName);
   const itf  = getOrCreate(sf,   itemFolderName);
   const outf = getOrCreate(itf,  'アウトプット');
   const prod = getOrCreate(itf,  '制作データ');
@@ -824,6 +825,48 @@ function createFolders(storeName, itemName) {
     nyukouDataUrl:   nd.getUrl(),
     nyukouMaeUrl:    nm.getUrl(),
   };
+}
+
+// 店舗名/フォルダ名の正規化（番号prefix・店・空白・アイケアLaBo接頭辞を吸収）
+function normalizeStoreName(s) {
+  return String(s == null ? '' : s)
+    .replace(/　/g, '')
+    .replace(/\s+/g, '')
+    .replace(/^(?:アイケア(?:LaBo|ラボ))/i, '')
+    .replace(/^\d{1,4}(_\d{1,3})?_/, '')
+    .replace(/店$/, '')
+    .toLowerCase();
+}
+// 親フォルダから店舗フォルダを探す。
+// 1) 既存ロジック（完全一致 / _storeName 終端）を最優先で温存
+// 2) 見つからなければ正規化キー一致で番号付き正準フォルダを優先採用
+// 3) それも無ければ正規化キー一致の裸フォルダ
+// 4) どれも無ければ従来通り storeName で新規作成
+function findStoreFolder(parent, storeName) {
+  const suffix = '_' + storeName;
+  const key = normalizeStoreName(storeName);
+  const all = parent.getFolders();
+  let legacyMatch   = null;
+  let numberedMatch = null;
+  let looseMatch    = null;
+  while (all.hasNext()) {
+    const f = all.next();
+    const n = f.getName();
+    if (n === storeName || n.endsWith(suffix)) {
+      if (!legacyMatch) legacyMatch = f;
+    }
+    if (normalizeStoreName(n) === key) {
+      if (/^\d{1,4}(_\d{1,3})?_/.test(n)) {
+        if (!numberedMatch) numberedMatch = f;
+      } else if (!looseMatch) {
+        looseMatch = f;
+      }
+    }
+  }
+  if (numberedMatch) return numberedMatch;
+  if (legacyMatch)   return legacyMatch;
+  if (looseMatch)    return looseMatch;
+  return parent.createFolder(storeName);
 }
 
 function getOrCreate(parent, name) {
