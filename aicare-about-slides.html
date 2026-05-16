@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイケアラボ — TOPおよびAboutページ 構成意図のご説明</title>
+<style>
+  :root {
+    --deep: #0d2244;
+    --green: #1a4a8a;
+    --green-mid: #2d6cc0;
+    --green-light: #7aaee0;
+    --gold: #3a7bd5;
+    --gold-light: #b8d4f5;
+    --cream: #f0f4fb;
+    --white: #ffffff;
+    --gray-100: #eef2fa;
+    --gray-200: #d8e3f5;
+    --gray-400: #8090b0;
+    --gray-600: #4a5a7a;
+    --gray-800: #1c2840;
+    --slide-w: 1100px;
+    --slide-h: 618px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: #070e1e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  /* ---- Slideshow Wrapper ---- */
+  .slideshow-wrap {
+    position: relative;
+    width: var(--slide-w);
+    max-width: 100%;
+  }
+
+  .slides-container {
+    width: var(--slide-w);
+    height: var(--slide-h);
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.7);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease;
+    overflow: hidden;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---- Navigation ---- */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: var(--slide-w);
+    max-width: 100%;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,.1);
+    border: none;
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.22); }
+
+  .slide-counter {
+    color: rgba(255,255,255,.6);
+    font-size: 13px;
+    min-width: 70px;
+    text-align: center;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.4); }
+
+
+  .hint { font-size: 11px; color: rgba(255,255,255,.3); text-align: center; font-family: 'Hiragino Sans', sans-serif; }
+
+  /* ============================
+     Slide Common Helpers
+  ============================ */
+  .slide-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 62px;
+    background: var(--white);
+    position: relative;
+  }
+
+  /* Gold top accent line */
+  .slide-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--deep), var(--green-mid));
+  }
+
+  /* Slide number */
+  .slide-num {
+    position: absolute;
+    bottom: 22px; right: 28px;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: .08em;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  /* Logo mark bottom left */
+  .slide-brand {
+    position: absolute;
+    bottom: 22px; left: 28px;
+    font-size: 10px;
+    letter-spacing: .16em;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  .slide-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 14px;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--deep);
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .slide-subtitle {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  /* ============================
+     Slide 1: Cover
+  ============================ */
+  .s1-inner {
+    background: var(--deep);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 62px 76px;
+    position: relative;
+    overflow: hidden;
+  }
+  .s1-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--deep), var(--green-mid));
+  }
+  .s1-deco {
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .s1-deco2 {
+    position: absolute;
+    right: 40px; top: 40px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.04);
+  }
+  .s1-tag {
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--gold-light);
+    margin-bottom: 28px;
+    font-family: 'Hiragino Sans', sans-serif;
+    text-transform: uppercase;
+  }
+  .s1-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    max-width: 520px;
+  }
+  .s1-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    line-height: 1.8;
+    font-family: 'Hiragino Sans', sans-serif;
+    max-width: 460px;
+    margin-bottom: 36px;
+  }
+  .s1-date {
+    font-size: 12px;
+    color: var(--gold-light);
+    letter-spacing: .1em;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  /* ============================
+     Two-col layout
+  ============================ */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    flex: 1;
+    align-items: start;
+  }
+  .col-box {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 22px 24px;
+    height: 100%;
+  }
+  .col-box-green {
+    background: var(--green);
+    color: white;
+    border-radius: 8px;
+    padding: 22px 24px;
+    height: 100%;
+  }
+
+  /* ============================
+     Role Comparison (Slide 3)
+  ============================ */
+  .role-compare {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    flex: 1;
+    align-items: center;
+  }
+  .role-box {
+    border-radius: 8px;
+    padding: 24px 22px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .role-box-left {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+  }
+  .role-box-right {
+    background: linear-gradient(135deg, var(--green), var(--green-mid));
+    color: white;
+  }
+  .role-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--gray-400);
+  }
+  .role-tag {
+    font-size: 9px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+  .role-name {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .role-keyword {
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255,255,255,.2);
+    margin-top: 4px;
+  }
+  .role-keyword-dark {
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 0;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 4px;
+    color: var(--deep);
+  }
+  .role-items {
+    font-size: 12px;
+    line-height: 1.9;
+    font-family: 'Hiragino Sans', sans-serif;
+    color: var(--gray-600);
+  }
+  .role-items-white {
+    font-size: 12px;
+    line-height: 1.9;
+    font-family: 'Hiragino Sans', sans-serif;
+    color: rgba(255,255,255,.8);
+  }
+
+  /* ============================
+     Flow / Step
+  ============================ */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+  .flow-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .flow-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    text-align: center;
+    font-family: 'Hiragino Sans', sans-serif;
+    line-height: 1.4;
+    font-weight: 700;
+    padding: 6px;
+  }
+  .flow-circle-light {
+    background: var(--gray-100);
+    color: var(--gray-800);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    text-align: center;
+    font-family: 'Hiragino Sans', sans-serif;
+    line-height: 1.4;
+    font-weight: 700;
+    padding: 6px;
+    border: 1px solid var(--gray-200);
+  }
+  .flow-label {
+    font-size: 11px;
+    color: var(--gray-600);
+    text-align: center;
+    font-family: 'Hiragino Sans', sans-serif;
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    width: 24px;
+    text-align: center;
+    color: var(--gold);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ============================
+     Tag chip
+  ============================ */
+  .chip {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    font-size: 10px;
+    letter-spacing: .1em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-family: 'Hiragino Sans', sans-serif;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+  .chip-gold {
+    background: var(--gold);
+    color: white;
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: .1em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-family: 'Hiragino Sans', sans-serif;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+  .chip-outline {
+    border: 1px solid var(--green);
+    color: var(--green);
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: .1em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-family: 'Hiragino Sans', sans-serif;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+
+  /* ============================
+     Section list
+  ============================ */
+  .sec-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .sec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: var(--gray-100);
+  }
+  .sec-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    width: 24px;
+    flex-shrink: 0;
+    font-family: 'Hiragino Sans', sans-serif;
+    padding-top: 1px;
+  }
+  .sec-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 2px;
+  }
+  .sec-desc {
+    font-size: 12px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  /* ============================
+     Intent cards
+  ============================ */
+  .intent-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .intent-card {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .intent-card-green {
+    background: var(--green);
+    color: white;
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .intent-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .intent-card-title-white {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .intent-card-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+  .intent-card-dot-gold {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    flex-shrink: 0;
+  }
+  .intent-card-text {
+    font-size: 12px;
+    color: var(--gray-600);
+    line-height: 1.7;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+  .intent-card-text-white {
+    font-size: 12px;
+    color: rgba(255,255,255,.8);
+    line-height: 1.7;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  /* ============================
+     Diagram: Eye → Brain → Life
+  ============================ */
+  .diagram-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-top: 18px;
+  }
+  .diag-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .diag-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+  .diag-label {
+    font-size: 11px;
+    font-family: 'Hiragino Sans', sans-serif;
+    color: var(--gray-600);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .diag-arrow {
+    font-size: 18px;
+    color: var(--gold);
+    margin: 0 10px;
+    padding-bottom: 20px;
+  }
+
+  /* ============================
+     Highlight box
+  ============================ */
+  .hl-box {
+    background: linear-gradient(135deg, var(--green), var(--green-mid));
+    color: white;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .hl-box-gold {
+    background: linear-gradient(135deg, var(--green-mid), #1a5fac);
+    color: white;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .hl-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .hl-text {
+    font-size: 12px;
+    line-height: 1.7;
+    font-family: 'Hiragino Sans', sans-serif;
+    color: rgba(255,255,255,.85);
+  }
+
+  /* ============================
+     Confirm checklist
+  ============================ */
+  .check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: var(--gray-100);
+    border-left: 3px solid var(--green);
+  }
+  .check-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .check-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 3px;
+  }
+  .check-desc {
+    font-size: 12px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+
+  /* ============================
+     Reason card
+  ============================ */
+  .reason-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .reason-card {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reason-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green-light);
+    line-height: 1;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+  .reason-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--deep);
+    line-height: 1.4;
+  }
+  .reason-desc {
+    font-size: 11.5px;
+    color: var(--gray-600);
+    line-height: 1.7;
+    font-family: 'Hiragino Sans', sans-serif;
+    flex: 1;
+  }
+
+  /* divider */
+  .divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 14px 0;
+  }
+
+  /* small text */
+  .txt-sm {
+    font-size: 12px;
+    color: var(--gray-600);
+    line-height: 1.7;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+  .txt-body {
+    font-size: 13px;
+    color: var(--gray-800);
+    line-height: 1.8;
+    font-family: 'Hiragino Sans', sans-serif;
+  }
+  .txt-em {
+    font-weight: 700;
+    color: var(--deep);
+  }
+</style>
+</head>
+<body>
+
+<div class="slideshow-wrap">
+  <div class="slides-container" id="slides">
+
+    <!-- ==================== SLIDE 1: 表紙 ==================== -->
+    <div class="slide active" data-notes="本日はお時間をいただきありがとうございます。TOPページのAboutセクションと、About下層ページの構成意図についてご説明します。デザインを見せるだけでなく、なぜこの順番・この構成にしているかをお伝えするための資料です。">
+      <div class="s1-inner">
+        <div class="s1-deco"></div>
+        <div class="s1-deco2"></div>
+        <div class="s1-tag">Aicare Lab — Page Concept Brief</div>
+        <div class="s1-title">TOPおよびAboutページ<br>構成意図のご説明</div>
+        <div class="s1-desc">TOPのAboutセクションとAbout下層ページ、それぞれの役割・順番・意図について整理した資料です。デザインの見た目ではなく、「なぜこの構成にしているか」をお伝えします。</div>
+        <div class="s1-date">2026.04 — Aicare Lab</div>
+      </div>
+      <span class="slide-num">01 / 11</span>
+    </div>
+
+    <!-- ==================== SLIDE 2: 今回の対象 ==================== -->
+    <div class="slide" data-notes="今回ご説明するのは2つのページです。TOPのAboutセクションと、About下層ページ。この2つは別々のページではなく、役割を分けて設計したひとつの流れです。まずその全体像から入ります。">
+      <div class="slide-inner">
+        <div class="slide-label">Overview</div>
+        <div class="slide-title">今回説明する対象</div>
+        <div class="slide-subtitle">2つのページを、ひとつの「流れ」として設計しています</div>
+        <div class="two-col" style="flex:1;align-items:stretch;">
+          <div style="background:var(--gray-100);border-radius:8px;padding:26px 24px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:10px;letter-spacing:.2em;color:var(--green);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Page 01</div>
+            <div style="font-size:20px;font-weight:700;color:var(--deep);line-height:1.4;">TOPページ<br>Aboutセクション</div>
+            <div class="divider"></div>
+            <div class="txt-sm">TOPページ全体のなかに設けた、<br>アイケアラボの考え方を紹介するセクション。<br>コピー・短い本文・図解で構成。</div>
+            <div style="margin-top:auto;">
+              <span class="chip-outline">入口</span>
+              <span class="chip-outline">直感理解</span>
+              <span class="chip-outline">コンパクト</span>
+            </div>
+          </div>
+          <div style="background:var(--green);border-radius:8px;padding:26px 24px;display:flex;flex-direction:column;gap:14px;color:white;">
+            <div style="font-size:10px;letter-spacing:.2em;color:var(--gold-light);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Page 02</div>
+            <div style="font-size:20px;font-weight:700;color:white;line-height:1.4;">About<br>下層ページ</div>
+            <div style="height:1px;background:rgba(255,255,255,.2);margin:0;"></div>
+            <div class="txt-sm" style="color:rgba(255,255,255,.8);">Concept → Why → Method → Strength / Value<br>→ Message → Company の順で構成。<br>ブランドの考え方を丁寧に理解してもらう場。</div>
+            <div style="margin-top:auto;">
+              <span class="chip">腹落ち</span>
+              <span class="chip">納得理解</span>
+              <span class="chip">詳細説明</span>
+            </div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">02 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 3: 役割の違い ==================== -->
+    <div class="slide" data-notes="TOPと下層では役割が根本的に違います。TOPは「眼の整体院とは何か」を直感で分からせる入口。下層は「なぜそうなのか、どういう方法なのか」まで腹落ちさせる場。この使い分けが今回の設計の核心です。">
+      <div class="slide-inner">
+        <div class="slide-label">Role Design</div>
+        <div class="slide-title">TOPと下層 — 役割の違い</div>
+        <div class="role-compare" style="flex:1;margin-top:4px;">
+          <div class="role-box role-box-left">
+            <div class="role-tag" style="color:var(--gray-400);">TOP About Section</div>
+            <div class="role-name" style="color:var(--deep);">TOPのAboutセクション</div>
+            <div class="role-keyword-dark">直感理解</div>
+            <div class="role-items">
+              ・「眼の整体院とは何か」を<br>　コンパクトに伝える<br>
+              ・コピー＋短文＋図解で完結<br>
+              ・理解させきらない。興味を持たせる<br>
+              ・詳細説明は下層に任せる
+            </div>
+          </div>
+          <div class="role-arrow">→</div>
+          <div class="role-box role-box-right">
+            <div class="role-tag" style="color:rgba(255,255,255,.6);">About Sub-page</div>
+            <div class="role-name">About下層ページ</div>
+            <div class="role-keyword" style="border-top-color:rgba(255,255,255,.2);">納得理解</div>
+            <div class="role-items-white">
+              ・「眼の整体院って何？」を<br>　丁寧に腹落ちさせる<br>
+              ・考え方→必要性→方法論の順で説明<br>
+              ・単なる会社紹介ではない<br>
+              ・ブランド理解ページとして設計
+            </div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">03 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 4: なぜこの順番か ==================== -->
+    <div class="slide" data-notes="情報の並び順に意味があります。強みや実績から始めるのではなく、まず考え方・思想から入る。なぜかというと、アイケアラボが提供するものは施術だけでなく、ものの見方・考え方だからです。その考え方に共感してもらってから、強みや実績を見せるほうが腹に落ちる。">
+      <div class="slide-inner">
+        <div class="slide-label">Information Architecture</div>
+        <div class="slide-title">なぜこの順番にしているか</div>
+        <div class="slide-subtitle" style="margin-bottom:14px;">強みや実績ではなく、考え方から入る理由</div>
+        <div class="flow-row" style="flex:1;align-items:center;">
+          <div class="flow-step">
+            <div class="flow-circle">Concept<br>考え方</div>
+            <div class="flow-label">眼の整体院とは<br>何かを定義する</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">Why<br>必要性</div>
+            <div class="flow-label">なぜ目だけでは<br>足りないか</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle">Method<br>方法論</div>
+            <div class="flow-label">思想を実際の<br>方法として形に</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle-light">Strength<br>強み・価値</div>
+            <div class="flow-label">何が違うか<br>何を届けるか</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle-light">Message<br>代表の想い</div>
+            <div class="flow-label">最後に温度感を<br>補強する</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-circle-light">Company<br>会社概要</div>
+            <div class="flow-label">安心感を補足する<br>最小限の情報</div>
+          </div>
+        </div>
+        <div class="hl-box" style="margin-top:14px;padding:12px 18px;">
+          <div class="hl-text">強みや実績を先に出すのではなく、<span style="color:white;font-weight:700;">「考え方への共感」を先に作ることで、強みが初めて意味を持つ</span>。その順番を意識した設計です。</div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">04 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: TOP Aboutの意図 ==================== -->
+    <div class="slide" data-notes="TOPのAboutセクションの役割は、「理解させきること」ではありません。「眼の整体院」という言葉自体が一般には浸透していないため、まずそのカテゴリを認知させることが先。でも詳しく説明しすぎるとTOPが重くなる。だから核だけを短く届けて、下層に誘導する入口に徹します。">
+      <div class="slide-inner">
+        <div class="slide-label">TOP — About Section Intent</div>
+        <div class="slide-title">TOPのAboutセクション — 意図</div>
+        <div class="slide-subtitle">「理解させきること」ではなく「興味と納得の入口を作ること」</div>
+        <div class="intent-grid" style="flex:1;">
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>カテゴリ認知を先に作る
+            </div>
+            <div class="intent-card-text">「眼の整体院」はまだ一般に浸透していない言葉。だからTOPで最初にそのカテゴリを理解させることが必要。</div>
+          </div>
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>説明しすぎない
+            </div>
+            <div class="intent-card-text">TOPで説明を詰め込むとページ全体が重くなる。考え方の核だけを短く届けて、詳細は下層に任せる。</div>
+          </div>
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>直感で「そういうことか」と感じさせる
+            </div>
+            <div class="intent-card-text">図解と短いコピーで、眼→脳→日常生活のつながりを感覚的に理解させる。論理より感覚が先。</div>
+          </div>
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>下層への自然な誘導
+            </div>
+            <div class="intent-card-text">「もっと知りたい」と思わせてから下層へ。TOPで終わらせず、関心を持ったまま遷移させる設計。</div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">05 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: TOP About 要素 ==================== -->
+    <div class="slide" data-notes="TOPのAboutセクションに入れる要素は5つに絞ります。キャッチコピー、短い本文、図解、眼の整体院という考え方の説明、そして下層への導線。この5つで「直感理解→興味→詳細へ」という流れを作ります。図解は眼→脳→日常生活への矢印で、言葉だけで語るより感覚的に刺さります。">
+      <div class="slide-inner">
+        <div class="slide-label">TOP — About Section Contents</div>
+        <div class="slide-title">TOPのAboutセクション — 入れる情報</div>
+        <div class="slide-subtitle">コピー・短文・図解の3点セットで直感理解を作る</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;align-items:start;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="sec-item" style="border-left:3px solid var(--green);">
+              <div class="sec-num">①</div>
+              <div>
+                <div class="sec-name">キャッチコピー</div>
+                <div class="sec-desc">目の不調は、目だけの問題ではない。このブランドの核心を1行で伝える。</div>
+              </div>
+            </div>
+            <div class="sec-item" style="border-left:3px solid var(--green);">
+              <div class="sec-num">②</div>
+              <div>
+                <div class="sec-name">短い本文</div>
+                <div class="sec-desc">「眼の整体院」という考え方と、なぜアイケアラボが必要かを2〜3文で。</div>
+              </div>
+            </div>
+            <div class="sec-item" style="border-left:3px solid var(--gold);">
+              <div class="sec-num">③</div>
+              <div>
+                <div class="sec-name">図解</div>
+                <div class="sec-desc">眼 → 脳 → 日常 / 仕事 / 趣味 のつながりを視覚的に示す。言葉より早く伝わる。</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="sec-item" style="border-left:3px solid var(--green);">
+              <div class="sec-num">④</div>
+              <div>
+                <div class="sec-name">「眼の整体院」と「独自メソッド」</div>
+                <div class="sec-desc">アイケアラボがただの眼科・眼鏡店と違う理由を明示。カテゴリ理解の要。</div>
+              </div>
+            </div>
+            <div class="sec-item" style="border-left:3px solid var(--green);">
+              <div class="sec-num">⑤</div>
+              <div>
+                <div class="sec-name">「それがアイケアラボ」という着地</div>
+                <div class="sec-desc">考え方からブランド名へ接続。なぜここなのかを短く締める。</div>
+              </div>
+            </div>
+            <div class="sec-item" style="border-left:3px solid var(--gold);">
+              <div class="sec-num">⑥</div>
+              <div>
+                <div class="sec-name">下層への導線</div>
+                <div class="sec-desc">「詳しく見る」ボタン等で、関心を持ったまま自然に下層へ誘導する。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">06 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: About下層 全体構成 ==================== -->
+    <div class="slide" data-notes="About下層ページは全部で6セクション＋フッターで構成します。会社概要はあえて最後に置いています。最初に会社概要を見せると「よくある会社紹介ページ」になってしまう。まず考え方を理解してもらい、その後に会社情報を見せることで、信頼ではなく共感から入る設計になっています。">
+      <div class="slide-inner">
+        <div class="slide-label">About Sub-page — Structure</div>
+        <div class="slide-title">About下層ページ — 全体構成</div>
+        <div class="slide-subtitle">単なる会社紹介ではなく、「ブランド理解ページ」として設計</div>
+        <div class="sec-list" style="flex:1;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="sec-item">
+                <div class="sec-num">1</div>
+                <div>
+                  <div class="sec-name">Concept</div>
+                  <div class="sec-desc">「眼の整体院とは何か」を定義する。まず考え方から入る。</div>
+                </div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-num">2</div>
+                <div>
+                  <div class="sec-name">Why</div>
+                  <div class="sec-desc">なぜ目だけでは足りないのかを説明。必要性の根拠を示す。</div>
+                </div>
+              </div>
+              <div class="sec-item" style="background:var(--green);color:white;">
+                <div class="sec-num" style="color:var(--gold-light);">3</div>
+                <div>
+                  <div class="sec-name" style="color:white;">Method</div>
+                  <div class="sec-desc" style="color:rgba(255,255,255,.8);">独自メソッドを説明。思想ではなく「方法論として形になっている」ことを伝える。</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="sec-item">
+                <div class="sec-num">4</div>
+                <div>
+                  <div class="sec-name">Strength / Value</div>
+                  <div class="sec-desc">アイケアラボの強みと、そこから生まれる価値を整理する。</div>
+                </div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-num">5</div>
+                <div>
+                  <div class="sec-name">Message</div>
+                  <div class="sec-desc">代表（樫村瑞生さん）の言葉。最後に温度感を補強する役割。</div>
+                </div>
+              </div>
+              <div class="sec-item">
+                <div class="sec-num">6</div>
+                <div>
+                  <div class="sec-name">Company + Footer</div>
+                  <div class="sec-desc">会社概要は最後に置く。主役ではなく、安心感を補足するための最小限情報。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">07 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: Concept / Why / Method ==================== -->
+    <div class="slide" data-notes="前半3セクションは「考え方を作る」ためのゾーンです。特にMethodという名前には意味があります。ApproachやPhilosophyではなく、Methodにしているのは、考え方だけでなく、実際の方法として形になっていることを伝えたいから。独自メソッドを持っている、という事実がブランドの差別化要素です。">
+      <div class="slide-inner">
+        <div class="slide-label">Section Intent — 前半</div>
+        <div class="slide-title">Concept / Why / Method の意図</div>
+        <div class="slide-subtitle">「考え方を理解してもらう」ゾーン</div>
+        <div class="intent-grid" style="flex:1;">
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>Concept
+            </div>
+            <div class="intent-card-text">「眼の整体院とは何か」をまず定義する。目だけを診る場所ではなく、その先の毎日まで見つめる考え方だと伝える。</div>
+          </div>
+          <div class="intent-card">
+            <div class="intent-card-title">
+              <div class="intent-card-dot"></div>Why
+            </div>
+            <div class="intent-card-text">目の不調が脳・日常生活・仕事・趣味にどうつながるかを整理する。「なぜ眼だけでは足りないか」の根拠を示す。</div>
+          </div>
+          <div class="intent-card-green" style="grid-column:span 2;">
+            <div class="intent-card-title-white">
+              <div class="intent-card-dot-gold"></div>Method — なぜ「Approach」ではなく「Method」か
+            </div>
+            <div class="intent-card-text-white">
+              <span style="color:white;font-weight:700;">Approachは「考え方・姿勢」</span>を指す言葉ですが、<span style="color:white;font-weight:700;">Methodは「実際の方法・手法」</span>として成立していることを指します。<br>
+              アイケアラボには独自の方法論があり、それが形になっている。その事実をセクション名で伝えることで、「思想があるだけでなく、具体的な方法を持っている」という信頼感を作ります。
+            </div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">08 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: Strength / Value / Message / Company ==================== -->
+    <div class="slide" data-notes="後半セクションは「共感を深め、安心させる」ゾーンです。前半で考え方に共感してもらった後に、具体的な強み・価値・代表の想い・会社概要へとつなぎます。Messageは説明で終わらせず、最後に人の温度感を出すためにあります。Companyはあくまで補足。主役ではありません。">
+      <div class="slide-inner">
+        <div class="slide-label">Section Intent — 後半</div>
+        <div class="slide-title">Strength / Value / Message / Company の意図</div>
+        <div class="slide-subtitle">「共感を深め、安心させる」ゾーン</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;flex:1;align-items:start;">
+          <div style="background:var(--gray-100);border-radius:8px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;height:100%;">
+            <div style="font-size:10px;letter-spacing:.15em;color:var(--green);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Section 4</div>
+            <div style="font-size:14px;font-weight:700;color:var(--deep);">Strength<br>/ Value</div>
+            <div class="divider"></div>
+            <div class="txt-sm">何が違うのか・どんな特徴があるか・どういう価値を届けるのかを明確にする。考え方の共感の後に強みを見せるから刺さる。</div>
+          </div>
+          <div style="background:var(--gray-100);border-radius:8px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;height:100%;">
+            <div style="font-size:10px;letter-spacing:.15em;color:var(--green);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Section 5</div>
+            <div style="font-size:14px;font-weight:700;color:var(--deep);">Message</div>
+            <div class="divider"></div>
+            <div class="txt-sm">代表・樫村瑞生さんの言葉として、ブランドの想いや目指す方向性を伝える。説明で終わらず、最後に人の温度感を補強する役割。</div>
+          </div>
+          <div style="background:var(--gray-100);border-radius:8px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;height:100%;">
+            <div style="font-size:10px;letter-spacing:.15em;color:var(--gray-400);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Section 6</div>
+            <div style="font-size:14px;font-weight:700;color:var(--deep);">Company</div>
+            <div class="divider"></div>
+            <div class="txt-sm">主役ではなく、補足。ブランド理解の後に安心感を添える最小限の情報。会社名・代表者・所在地・事業内容程度で十分。</div>
+          </div>
+          <div style="background:var(--gray-100);border-radius:8px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;height:100%;">
+            <div style="font-size:10px;letter-spacing:.15em;color:var(--gray-400);font-family:'Hiragino Sans',sans-serif;text-transform:uppercase;">Footer</div>
+            <div style="font-size:14px;font-weight:700;color:var(--deep);">Footer</div>
+            <div class="divider"></div>
+            <div class="txt-sm">情報を詰め込まず、整理された締め。ブランドの余韻を残しながら必要な導線だけを置く。</div>
+          </div>
+        </div>
+        <div class="hl-box" style="margin-top:12px;padding:11px 16px;">
+          <div class="hl-text">後半は「理解 → 信頼 → 安心」の順。説明より共感を先に置いているから、会社概要を最後にしても遅くない。</div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">09 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 10: この方向で進めたい理由 ==================== -->
+    <div class="slide" data-notes="今回の設計には3つの理由があります。1つ目は、眼の整体院というカテゴリをまず作る必要があること。2つ目は、今後体全体への展開を見据えた思想の軸を今のうちに作ること。3つ目は、強みを先に出す設計より、考え方に共感させてから強みを見せる順番のほうが、ブランドとして長く機能すること。">
+      <div class="slide-inner">
+        <div class="slide-label">Design Rationale</div>
+        <div class="slide-title">今回この方向で進めたい理由</div>
+        <div class="slide-subtitle">3つの設計意図</div>
+        <div class="reason-grid" style="flex:1;">
+          <div class="reason-card">
+            <div class="reason-num">01</div>
+            <div class="reason-title">「眼の整体院」という<br>カテゴリを先に作る</div>
+            <div class="reason-desc">まだ一般に認知されていない言葉だからこそ、最初にカテゴリ理解を作ることが必要。TOPでその入口を設けることで、下層での説明が初めて意味を持つ。</div>
+          </div>
+          <div class="reason-card">
+            <div class="reason-num">02</div>
+            <div class="reason-title">思想を「眼だけに<br>閉じない」設計にする</div>
+            <div class="reason-desc">今後、体全体への展開が想定されている。だからブランドの思想軸は「部分ではなく全体を見ること」「その先の毎日まで見つめること」に置く。眼が入口でも、思想は眼だけに閉じない。</div>
+          </div>
+          <div class="reason-card">
+            <div class="reason-num">03</div>
+            <div class="reason-title">共感から入ることで<br>ブランドとして機能する</div>
+            <div class="reason-desc">強みや実績を先に出すと「よくある紹介ページ」になる。考え方に共感してもらってから強みを見せることで、同じ情報でも受け取り方が変わる。その順番がブランドとして長く機能する設計。</div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">10 / 11</span>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 11: 確認いただきたい点 ==================== -->
+    <div class="slide" data-notes="最後に、今日ご確認いただきたい点をまとめました。この構成・順番の方向性に合意いただけるかが最も重要です。その上で、コピーや図解の具体的な表現は次のステップで詰めていきます。今日は方向性の確認に集中させてください。">
+      <div class="slide-inner">
+        <div class="slide-label">Confirmation</div>
+        <div class="slide-title">本日ご確認いただきたい点</div>
+        <div class="slide-subtitle">方向性の合意が今日のゴールです</div>
+        <div class="check-list" style="flex:1;">
+          <div class="check-item">
+            <div class="check-icon">✦</div>
+            <div>
+              <div class="check-title">TOPと下層の役割分担に合意いただけるか</div>
+              <div class="check-desc">TOPは「直感理解の入口」、下層は「納得理解の場」という設計方針について。</div>
+            </div>
+          </div>
+          <div class="check-item">
+            <div class="check-icon">✦</div>
+            <div>
+              <div class="check-title">Concept → Why → Method の順番の考え方について</div>
+              <div class="check-desc">強みや実績より先に「考え方」から入る構成について。この順番に違和感がないかを確認したい。</div>
+            </div>
+          </div>
+          <div class="check-item">
+            <div class="check-icon">✦</div>
+            <div>
+              <div class="check-title">「Method」というセクション名の採用について</div>
+              <div class="check-desc">Approach・Philosophyではなく、Methodにしている意図について合意いただけるか。</div>
+            </div>
+          </div>
+          <div class="check-item">
+            <div class="check-icon">✦</div>
+            <div>
+              <div class="check-title">眼だけに閉じない思想軸の設計について</div>
+              <div class="check-desc">今後の体への展開を見据えた「全体を見る」という思想軸の方向性について。</div>
+            </div>
+          </div>
+        </div>
+        <span class="slide-brand">Aicare Lab</span>
+        <span class="slide-num">11 / 11</span>
+      </div>
+    </div>
+
+  </div><!-- /slides-container -->
+</div><!-- /slideshow-wrap -->
+
+<!-- Navigation -->
+<div class="nav-row">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 11</span>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">→</button>
+</div>
+
+
+<div class="hint">← → キーで操作できます</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = (idx + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${slides.length}`;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+</script>
+</body>
+</html>

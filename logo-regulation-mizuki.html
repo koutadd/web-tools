@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mizuki Holdings — Brand Regulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;600&family=Cormorant+Garamond:ital,wght@1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif; font-weight: 300; background: #fff; color: #111; line-height: 1.7; }
+
+    /* ── COMMON NAV ── */
+    #aicare-common-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: #040c18; border-bottom: 1px solid rgba(245,158,11,0.18);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 20px; height: 36px;
+      overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; white-space: nowrap;
+      scrollbar-width: none; -ms-overflow-style: none;
+      font-family: 'DM Mono','SF Mono',monospace; font-size: 11px; letter-spacing: 0.05em;
+    }
+    #aicare-common-nav::-webkit-scrollbar { display: none; }
+    #aicare-common-nav > * { flex-shrink: 0; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size:10px; letter-spacing:0.1em; padding-right:4px; }
+    #aicare-common-nav .cn-sep   { color: rgba(255,255,255,0.15); padding:0 2px; user-select:none; }
+    #aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration:none; padding: 2px 10px; border-radius:4px; border: 1px solid rgba(148,163,184,0.12); transition: color .15s, background .15s; }
+    #aicare-common-nav a:hover { color:#e2eaf4; background:rgba(255,255,255,0.06); }
+    #aicare-common-nav a.cn-active { color:#f5f5f5; background:rgba(255,255,255,0.1); border-color:rgba(148,163,184,0.3); }
+
+    /* ── BRAND BAR ── */
+    #brand-bar {
+      position: fixed; top: 36px; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 44px; background: #fff; border-bottom: 1px solid #F0F0F0;
+    }
+    #brand-bar a.brand-name { font-size: 13px; font-weight: 300; letter-spacing: 0.08em; color: #111; text-decoration: none; }
+    #brand-bar nav { display: flex; gap: 28px; }
+    #brand-bar nav a { font-size: 11px; letter-spacing: 0.1em; color: #888; text-decoration: none; transition: color .2s; }
+    #brand-bar nav a:hover, #brand-bar nav a.active { color: #111; }
+
+    main { padding-top: 80px; }
+
+    /* ── HERO ── */
+    .hero { padding: 56px 56px 0; display: grid; grid-template-columns: 1fr 280px; gap: 32px; align-items: flex-end; min-height: 200px; }
+    .hero-title { font-size: clamp(42px, 6vw, 80px); font-weight: 200; letter-spacing: -0.01em; line-height: 1; color: #111; }
+    .hero-sub { font-size: 12px; letter-spacing: 0.06em; color: #888; line-height: 1.9; padding-bottom: 8px; }
+    .hero-image { width: 100%; display: flex; align-items: stretch; margin-top: 48px; }
+
+    /* ── SECTION ── */
+    .section { padding: 96px 56px; border-top: 1px solid #EBEBEB; display: grid; grid-template-columns: 80px 1fr; gap: 0 48px; }
+    .section-label { font-size: 11px; letter-spacing: 0.3em; color: #BBB; text-transform: uppercase; padding-top: 4px; }
+    .section-title { font-size: 28px; font-weight: 200; letter-spacing: 0.06em; color: #111; margin-bottom: 40px; line-height: 1.2; }
+
+    /* concept */
+    .concept-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 26px; line-height: 1.85; color: #1B2E4B; border-left: 2px solid #1B2E4B; padding-left: 28px; margin-bottom: 36px; max-width: 720px; }
+    .concept-body { font-size: 14px; color: #555; line-height: 2; max-width: 600px; letter-spacing: 0.03em; }
+
+    /* logo variants — 縦・横2列 */
+    .logo-variants { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 48px; }
+    .variant-block { border: 1px solid #EBEBEB; }
+    .variant-block-header { padding: 18px 24px; border-bottom: 1px solid #EBEBEB; display: flex; align-items: center; justify-content: space-between; }
+    .variant-block-title { font-size: 10px; letter-spacing: 0.25em; color: #888; text-transform: uppercase; }
+    .variant-block-tag { font-size: 9px; letter-spacing: 0.15em; color: #BBB; text-transform: uppercase; border: 1px solid #EEE; padding: 3px 8px; }
+    .variant-row { display: grid; grid-template-columns: 1fr 1fr; }
+    .variant-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 32px; gap: 16px; }
+    .variant-cell.light { background: #fff; }
+    .variant-cell.dark  { background: #1B2E4B; }
+    .variant-cell img { max-width: 160px; max-height: 120px; width: auto; height: auto; object-fit: contain; }
+    .variant-cell.dark img { filter: brightness(0) invert(1); }
+    .variant-label { font-size: 9px; letter-spacing: 0.18em; color: #CCC; text-transform: uppercase; text-align: center; }
+    .variant-cell.dark .variant-label { color: rgba(255,255,255,0.25); }
+
+    /* usage guide */
+    .usage-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    .usage-table th { background: #1B2E4B; color: #fff; font-size: 9px; letter-spacing: 0.18em; padding: 12px 20px; text-align: left; font-weight: 300; text-transform: uppercase; }
+    .usage-table td { padding: 14px 20px; font-size: 12px; color: #555; border-bottom: 1px solid #F0F0F0; line-height: 1.7; vertical-align: top; }
+    .usage-table tr:last-child td { border-bottom: none; }
+    .usage-table .check { color: #1B2E4B; font-weight: 400; }
+    .usage-table .cross { color: #C0392B; }
+
+    /* anatomy */
+    .anatomy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; margin-bottom: 48px; }
+    .anatomy-card { background: #F8F8F8; padding: 32px; }
+    .anatomy-card .card-label { font-size: 9px; letter-spacing: 0.3em; color: #BBB; text-transform: uppercase; margin-bottom: 12px; }
+    .anatomy-card h3 { font-size: 15px; font-weight: 300; letter-spacing: 0.08em; color: #111; margin-bottom: 12px; }
+    .anatomy-card p { font-size: 13px; color: #666; line-height: 1.9; }
+
+    /* color */
+    .color-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 32px; }
+    .color-card { border: 1px solid #EBEBEB; overflow: hidden; }
+    .color-swatch { height: 120px; }
+    .color-info { padding: 20px 24px; }
+    .color-name { font-size: 13px; font-weight: 400; color: #111; margin-bottom: 8px; }
+    .color-codes { display: flex; flex-direction: column; gap: 3px; }
+    .color-code { font-size: 11px; color: #AAA; font-family: 'SF Mono', 'Consolas', monospace; }
+    .color-note { padding: 20px 24px; background: #F8F8F8; border-left: 3px solid #1B2E4B; font-size: 13px; color: #555; line-height: 1.9; }
+
+    /* typography */
+    .type-demo { padding: 48px; background: #F8F8F8; margin-bottom: 24px; }
+    .type-demo-label { font-size: 9px; letter-spacing: 0.3em; color: #AAA; text-transform: uppercase; margin-bottom: 20px; }
+    .type-display { font-family: 'Jost', sans-serif; font-size: 40px; font-weight: 200; letter-spacing: 0.35em; color: #A8A8A8; line-height: 1.4; margin-bottom: 8px; }
+    .type-meta { font-size: 11px; color: #AAA; letter-spacing: 0.1em; }
+    .type-spec-table { width: 100%; border-collapse: collapse; }
+    .type-spec-table th { background: #1B2E4B; color: #fff; font-size: 10px; letter-spacing: 0.15em; padding: 12px 20px; text-align: left; font-weight: 300; }
+    .type-spec-table td { padding: 12px 20px; font-size: 13px; color: #555; border-bottom: 1px solid #F0F0F0; }
+    .type-spec-table tr:last-child td { border-bottom: none; }
+
+    /* clearspace */
+    .clearspace-demo { background: #F8F8F8; padding: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+    .clearspace-inner { position: relative; border: 1px dashed #CCC; padding: 48px; display: flex; align-items: center; justify-content: center; }
+    .cs-label { position: absolute; font-size: 9px; letter-spacing: 0.2em; color: #AAA; }
+    .cs-label.top    { top:-18px; left:50%; transform:translateX(-50%); }
+    .cs-label.bottom { bottom:-18px; left:50%; transform:translateX(-50%); }
+    .cs-label.left   { left:-48px; top:50%; transform:translateY(-50%) rotate(-90deg); }
+    .cs-label.right  { right:-48px; top:50%; transform:translateY(-50%) rotate(90deg); }
+    .size-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .size-table th { background: #1B2E4B; color: #fff; font-size: 10px; letter-spacing: 0.15em; padding: 12px 20px; text-align: left; font-weight: 300; }
+    .size-table td { padding: 12px 20px; font-size: 13px; color: #555; border-bottom: 1px solid #F0F0F0; }
+
+    /* prohibited */
+    .prohibited-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .prohibited-item { background: #F8F8F8; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .prohibited-x { width: 40px; height: 40px; border-radius: 50%; background: #FDF0F0; border: 1px solid #EBBCBC; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #C0392B; }
+    .prohibited-item p { font-size: 12px; color: #666; text-align: center; line-height: 1.7; }
+
+    /* quote */
+    .big-quote { padding: 120px 56px; background: #1B2E4B; }
+    .big-quote blockquote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(28px, 3.5vw, 48px); font-weight: 300; line-height: 1.7; color: #fff; max-width: 900px; }
+    .big-quote cite { display: block; margin-top: 24px; font-style: normal; font-size: 12px; letter-spacing: 0.2em; color: rgba(255,255,255,0.4); }
+
+    footer { padding: 48px 56px; background: #0D1B2E; display: flex; align-items: center; justify-content: space-between; }
+    footer p { font-size: 10px; letter-spacing: 0.2em; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+    footer a { font-size: 11px; letter-spacing: 0.15em; color: rgba(255,255,255,0.4); text-decoration: none; border: 1px solid rgba(255,255,255,0.15); padding: 8px 16px; transition: all .2s; }
+    footer a:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* works gallery */
+    .work-item { position: relative; aspect-ratio: 4/3; overflow: hidden; background: #F5F5F5; cursor: pointer; }
+    .work-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .work-item:hover img { transform: scale(1.03); }
+    .work-delete { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.55); border: none; cursor: pointer; color: #fff; font-size: 14px; display: none; align-items: center; justify-content: center; }
+    body.edit-mode .work-delete { display: flex; }
+    body.edit-mode #edit-btn { background: #111; color: #fff; border-color: #111; }
+  </style>
+</head>
+<body>
+
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>  <a href="aicare-brand-overview.html">ブランドマップ</a>  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>  <a href="aicare-flagship.html">フラッグシップ</a>  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+</nav>
+
+<div id="brand-bar">
+  <a href="logo-gallery.html" class="brand-name">← Logos</a>
+  <nav>
+    <a href="logo-gallery.html">Gallery</a>
+    <a href="#" class="active">Regulation</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="hero reveal">
+    <h1 class="hero-title">BRAND<br>REGULATION</h1>
+    <p class="hero-sub">
+      Mizuki Holdings<br>
+      Brand Identity Guidelines<br>
+      2026
+    </p>
+  </div>
+
+  <!-- ── HERO IMAGE：縦・横を並べて表示 ── -->
+  <div class="hero-image reveal" style="padding:0;gap:0;">
+    <!-- 左：白背景 → ロゴそのまま -->
+    <div style="flex:1;background:#fff;display:flex;align-items:center;justify-content:center;padding:80px 60px;">
+      <img src="MKHD_logo_tate.png" alt="縦組み" style="max-height:280px;width:auto;">
+    </div>
+    <!-- 右：紺背景 → ロゴを白に -->
+    <div style="flex:1;background:#1B2E4B;display:flex;align-items:center;justify-content:center;padding:80px 60px;">
+      <img src="MKHD_logo_yoko.png" alt="横組み" style="max-height:180px;width:auto;filter:brightness(0) invert(1);">
+    </div>
+  </div>
+
+  <!-- ── A: BRAND CONCEPT ── -->
+  <div class="section reveal">
+    <span class="section-label">A</span>
+    <div class="section-body">
+      <h2 class="section-title">Brand Concept</h2>
+      <blockquote class="concept-quote">
+        水滴が光の結晶へと変わるように、若い生命力と希望を原動力に不可能を可能へ変える。<br>
+        吉兆と変革のリーダーたちが集い、互いの光を増幅させながら、<br>
+        瑞々しく生きる力を世界へ広げていく。
+      </blockquote>
+      <p class="concept-body">
+        「瑞」は瑞兆・清らかさ・みずみずしさの象徴。「生」は誕生・生命・躍動の根源。この二文字が交わる地点に、ブランドのすべての意味が宿る。水滴はやがて光となり、光は世界を照らす——その変容のプロセスを、ロゴからコミュニケーションまで一貫したビジョンとして体現する。
+      </p>
+    </div>
+  </div>
+
+  <!-- ── B: SYMBOL ANATOMY ── -->
+  <div class="section reveal">
+    <span class="section-label">B</span>
+    <div class="section-body">
+      <h2 class="section-title">Symbol Anatomy</h2>
+      <div class="anatomy-grid">
+        <div class="anatomy-card">
+          <p class="card-label">Hidden Letters</p>
+          <h3>M & K</h3>
+          <p>左の放射核が「M」（Mizuki の頭文字）、右の放射核が「K」（miZuKi の K）を形成。二核が連動して初めて「MIZUKI」が成立する構造は、リーダーたちが集い連鎖することで変革が生まれる企業哲学を体現している。</p>
+        </div>
+        <div class="anatomy-card">
+          <p class="card-label">Origin Point</p>
+          <h3>Water Drop</h3>
+          <p>各放射核の中心は、水滴が落下した瞬間のインパクトポイント。生命力の原点であり、すべての変革が生まれる「ゼロ地点」。水の持つ清澄さ・純粋さをここに宿す。</p>
+        </div>
+        <div class="anatomy-card">
+          <p class="card-label">Radiation</p>
+          <h3>Crystal of Light</h3>
+          <p>中心から伸びる不均等な線が、水の波紋が光の結晶へと変容する瞬間を幾何学として凝固させている。整然としすぎない放射が生命の有機的な躍動を宿す。</p>
+        </div>
+        <div class="anatomy-card">
+          <p class="card-label">Structure</p>
+          <h3>Dual Resonance</h3>
+          <p>二つのシンボルは孤立せず呼応している。一人のリーダーが放つ光が次のリーダーの核に触れ、連鎖的に輝きを増す——吉兆と変革のリーダーたちが集い、互いを増幅させる組織像そのもの。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── C: LOGO VARIATIONS ── -->
+  <div class="section reveal">
+    <span class="section-label">C</span>
+    <div class="section-body">
+      <h2 class="section-title">Logo Variations</h2>
+
+      <!-- 縦組み -->
+      <div class="logo-variants" style="margin-bottom:24px;">
+        <div class="variant-block">
+          <div class="variant-block-header">
+            <span class="variant-block-title">縦組み — Vertical</span>
+            <span class="variant-block-tag">Standard</span>
+          </div>
+          <div class="variant-row">
+            <div class="variant-cell light">
+              <img src="MKHD_logo_tate.png" alt="縦組み Positive">
+              <p class="variant-label">Positive</p>
+            </div>
+            <div class="variant-cell dark">
+              <img src="MKHD_logo_tate.png" alt="縦組み Negative">
+              <p class="variant-label">Negative</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 横組み -->
+        <div class="variant-block">
+          <div class="variant-block-header">
+            <span class="variant-block-title">横組み — Horizontal</span>
+            <span class="variant-block-tag">Sub</span>
+          </div>
+          <div class="variant-row">
+            <div class="variant-cell light">
+              <img src="MKHD_logo_yoko.png" alt="横組み Positive">
+              <p class="variant-label">Positive</p>
+            </div>
+            <div class="variant-cell dark">
+              <img src="MKHD_logo_yoko.png" alt="横組み Negative">
+              <p class="variant-label">Negative</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-note">
+        <strong>バリエーション使い分け：</strong>縦組みを標準として使用する。横長メディア（Webヘッダー・スライド・横型名刺・バナー）では横組みを使用する。ダーク背景では必ずホワイト版データを使用し、CSS反転は禁止。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── D: USAGE GUIDE ── -->
+  <div class="section reveal">
+    <span class="section-label">D</span>
+    <div class="section-body">
+      <h2 class="section-title">Usage Guide</h2>
+      <table class="usage-table">
+        <thead>
+          <tr><th>場面</th><th>使用バリエーション</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>名刺（縦向き）</td><td><span class="check">縦組み</span></td><td>上部中央に配置。縦長比率に自然に収まる</td></tr>
+          <tr><td>名刺（横向き）</td><td><span class="check">横組み</span></td><td>左端またはヘッダー部に配置</td></tr>
+          <tr><td>封筒・レターヘッド</td><td><span class="check">縦組み</span></td><td>左上または中央</td></tr>
+          <tr><td>Webサイトヘッダー</td><td><span class="check">横組み</span></td><td>ナビゲーションバー左端</td></tr>
+          <tr><td>スライド表紙・ヘッダー</td><td><span class="check">横組み</span></td><td>16:9横長フォーマット</td></tr>
+          <tr><td>SNSアイコン（正方形）</td><td><span class="check">縦組み</span></td><td>またはシンボルのみ</td></tr>
+          <tr><td>SNSカバー（横長）</td><td><span class="check">横組み</span></td><td>Twitter/Facebookヘッダー</td></tr>
+          <tr><td>看板・サイン（縦型）</td><td><span class="check">縦組み</span></td><td>ビル入口・エレベーター内</td></tr>
+          <tr><td>看板・バナー（横長）</td><td><span class="check">横組み</span></td><td></td></tr>
+          <tr><td>スタンプ・刻印</td><td><span class="check">縦組み</span></td><td>正方形・円形フォーマット</td></tr>
+          <tr><td>メール署名</td><td><span class="check">横組み</span></td><td>縦スペースを節約</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── E: COLOR ── -->
+  <div class="section reveal">
+    <span class="section-label">E</span>
+    <div class="section-body">
+      <h2 class="section-title">Color</h2>
+      <div class="color-row">
+        <div class="color-card">
+          <div class="color-swatch" style="background:#1B2E4B;"></div>
+          <div class="color-info">
+            <p class="color-name">Navy — Symbol</p>
+            <div class="color-codes">
+              <span class="color-code">HEX #1B2E4B</span>
+              <span class="color-code">C90 M70 Y30 K20</span>
+              <span class="color-code">R27 G46 B75</span>
+            </div>
+          </div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background:#A8A8A8;"></div>
+          <div class="color-info">
+            <p class="color-name">Gray — Logotype</p>
+            <div class="color-codes">
+              <span class="color-code">HEX #A8A8A8</span>
+              <span class="color-code">C0 M0 Y0 K35</span>
+              <span class="color-code">R168 G168 B168</span>
+            </div>
+          </div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background:#fff;border-bottom:1px solid #EEE;"></div>
+          <div class="color-info">
+            <p class="color-name">White — Background</p>
+            <div class="color-codes">
+              <span class="color-code">HEX #FFFFFF</span>
+              <span class="color-code">C0 M0 Y0 K0</span>
+              <span class="color-code">R255 G255 B255</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="color-note">
+        <strong>縦・横共通：</strong>シンボルマークは Navy #1B2E4B 固定。ロゴタイプ（MIZUKI HOLDINGS）は Gray #A8A8A8 固定。シンボルとテキストを同色にしない。ダーク背景では両方 White #FFFFFF に統一。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── F: TYPOGRAPHY ── -->
+  <div class="section reveal">
+    <span class="section-label">F</span>
+    <div class="section-body">
+      <h2 class="section-title">Typography</h2>
+      <div class="type-demo">
+        <p class="type-demo-label">Logotype — MIZUKI HOLDINGS</p>
+        <p class="type-display">MIZUKI<br>HOLDINGS</p>
+        <p class="type-meta">Geometric Sans-serif · Weight: Regular · Tracking: +200〜+300 · ALL CAPS · 必ず2行</p>
+      </div>
+      <table class="type-spec-table">
+        <thead><tr><th>項目</th><th>規定値</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr><td>書体</td><td>Geometric Sans-serif</td><td>Futura / Gill Sans 系推奨</td></tr>
+          <tr><td>ウェイト</td><td>Regular</td><td>Bold・Black 禁止</td></tr>
+          <tr><td>文字間隔</td><td>トラッキング +200〜+300</td><td>広いトラッキングを常に維持</td></tr>
+          <tr><td>ケース</td><td>全大文字（ALL CAPS）</td><td>小文字・混在禁止</td></tr>
+          <tr><td>改行</td><td>MIZUKI / HOLDINGS 必ず2行</td><td>1行表記禁止</td></tr>
+          <tr><td>テキストカラー</td><td>Gray #A8A8A8</td><td>シンボルの Navy と混同させない</td></tr>
+          <tr><td>縦組み 配置</td><td>シンボル下・中央揃え</td><td>シンボルと等間隔の余白</td></tr>
+          <tr><td>横組み 配置</td><td>シンボル右横・上下中央揃え</td><td>シンボル高さの中央に揃える</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── G: CLEAR SPACE & SIZE ── -->
+  <div class="section reveal">
+    <span class="section-label">G</span>
+    <div class="section-body">
+      <h2 class="section-title">Clear Space & Size</h2>
+      <div class="clearspace-demo">
+        <div class="clearspace-inner">
+          <span class="cs-label top">0.5X</span>
+          <span class="cs-label bottom">0.5X</span>
+          <span class="cs-label left">0.5X</span>
+          <span class="cs-label right">0.5X</span>
+          <img src="MKHD_logo_tate.png" alt="" style="width:80px;height:auto;opacity:0.6;">
+        </div>
+      </div>
+      <p style="font-size:12px;color:#888;text-align:center;margin-bottom:48px;">X = シンボルマークの幅。縦・横ともに四辺に 0.5X 以上の保護エリアを確保する。</p>
+      <table class="size-table">
+        <thead><tr><th>バリエーション</th><th>媒体</th><th>最小サイズ</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2">縦組み</td><td>印刷物</td><td>幅 20mm 以上</td></tr>
+          <tr><td>デジタル</td><td>幅 60px 以上</td></tr>
+          <tr><td rowspan="2">横組み</td><td>印刷物</td><td>幅 40mm 以上</td></tr>
+          <tr><td>デジタル</td><td>幅 120px 以上</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── H: PROHIBITED USE ── -->
+  <div class="section reveal">
+    <span class="section-label">H</span>
+    <div class="section-body">
+      <h2 class="section-title">Prohibited Use</h2>
+      <div class="prohibited-grid">
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>シンボルとテキストを<br>同色にしない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>縦・横を<br>互いに代替しない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>比率・縦横比を<br>変形させない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>回転・反転<br>をしない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>影・グラデーション・<br>装飾効果を加えない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>規定外カラーで<br>使用しない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>MIZUKI HOLDINGS を<br>1行で表記しない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>ダーク背景で<br>CSS反転を使わない</p></div>
+        <div class="prohibited-item"><div class="prohibited-x">✕</div><p>シンボルとテキストを<br>分離使用しない<br><span style="font-size:10px;color:#BBB;">(アイコン用途除く)</span></p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUOTE ── -->
+  <div class="big-quote reveal">
+    <blockquote>
+      "一滴の水が、世界を照らす光になる。"
+      <cite>— 瑞生ホールディングス ブランドコンセプト</cite>
+    </blockquote>
+  </div>
+
+  <!-- ── I: WORKS GALLERY ── -->
+  <div class="section" id="works-section">
+    <span class="section-label">I</span>
+    <div class="section-body">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:40px;">
+        <h2 class="section-title" style="margin-bottom:0;border:none;">Works Gallery</h2>
+        <button id="edit-btn" onclick="toggleEdit()" style="font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:8px 16px;border:1px solid #CCC;color:#888;background:transparent;cursor:pointer;transition:all .2s;">Edit</button>
+      </div>
+      <input type="file" id="works-file-input" accept="image/*" multiple style="display:none;" onchange="addImages(this)">
+      <div id="works-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px;"></div>
+      <div id="upload-area" style="display:none;margin-top:2px;">
+        <div onclick="document.getElementById('works-file-input').click()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:180px;border:1.5px dashed #DDD;cursor:pointer;color:#CCC;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;" onmouseenter="this.style.borderColor='#AAA'" onmouseleave="this.style.borderColor='#DDD'">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#CCC" stroke-width="1.5"/><line x1="16" y1="9" x2="16" y2="23" stroke="#CCC" stroke-width="1.5"/><line x1="9" y1="16" x2="23" y2="16" stroke="#CCC" stroke-width="1.5"/></svg>
+          画像を追加
+        </div>
+      </div>
+      <p id="works-empty" style="font-size:12px;color:#CCC;letter-spacing:0.1em;padding:48px 0;text-align:center;">Edit を押して制作物の画像を追加できます（名刺・封筒・看板など）</p>
+    </div>
+  </div>
+
+</main>
+
+
+<footer>
+  <p>Mizuki Holdings — Brand Regulation Book 2026</p>
+  <a href="logo-gallery.html">← Back to Gallery</a>
+</footer>
+
+<script>
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+
+(function(){
+  var c = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    a.classList.remove('cn-active');
+    if (a.getAttribute('href') === c) a.classList.add('cn-active');
+  });
+})();
+
+var STORAGE_KEY = 'mizuki_works_v1';
+var grid = document.getElementById('works-grid');
+var empty = document.getElementById('works-empty');
+function loadWorks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
+function saveWorks(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function renderWorks() {
+  var works = loadWorks(); grid.innerHTML = '';
+  empty.style.display = works.length ? 'none' : 'block';
+  works.forEach(function(src, i) {
+    var item = document.createElement('div'); item.className = 'work-item';
+    item.innerHTML = '<img src="' + src + '" loading="lazy" onclick="openLightbox(' + i + ')"><button class="work-delete" onclick="deleteWork(' + i + ')">✕</button>';
+    grid.appendChild(item);
+  });
+}
+function addImages(input) {
+  var files = Array.from(input.files); if (!files.length) return;
+  var works = loadWorks(); var pending = files.length;
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) { works.push(e.target.result); pending--; if (pending === 0) { saveWorks(works); renderWorks(); } };
+    reader.readAsDataURL(file);
+  }); input.value = '';
+}
+function deleteWork(i) { if (!confirm('削除しますか？')) return; var works = loadWorks(); works.splice(i, 1); saveWorks(works); renderWorks(); }
+function toggleEdit() {
+  var isEdit = document.body.classList.toggle('edit-mode');
+  document.getElementById('edit-btn').textContent = isEdit ? 'Done' : 'Edit';
+  document.getElementById('upload-area').style.display = isEdit ? 'block' : 'none';
+}
+function openLightbox(i) { if (document.body.classList.contains('edit-mode')) return; LBOpen(loadWorks(), i); }
+renderWorks();
+</script>
+<script src="lightbox.js"></script>
+</body>
+</html>

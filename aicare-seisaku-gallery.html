@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>制作物一覧 | アイケアラボ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #f8fafc;
+      --surface: #ffffff;
+      --border:  #e2e8f0;
+      --text:    #1e293b;
+      --muted:   #64748b;
+      --muted2:  #94a3b8;
+      --teal:    #0d9488;
+      --green:   #16a34a;
+      --radius:  8px;
+      --mono:    'JetBrains Mono','Fira Code','Courier New',monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; }
+
+    /* ── 共通ナビ ── */
+    #aicare-common-nav {
+      position: sticky; top: 0; z-index: 99999;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.18);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+      overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; white-space: nowrap;
+      scrollbar-width: none; font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+    }
+    #aicare-common-nav::-webkit-scrollbar { display: none; }
+    #aicare-common-nav > * { flex-shrink: 0; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,.25); font-size: 10px; letter-spacing: .1em; padding-right: 4px; }
+    #aicare-common-nav .cn-sep  { color: rgba(255,255,255,.15); padding: 0 2px; }
+    #aicare-common-nav a { color: rgba(148,163,184,.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,.12); transition: color .15s, background .15s; }
+    #aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,.06); }
+    #aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,.35) !important; background: rgba(245,158,11,.08) !important; }
+
+    /* ── ページヘッダー ── */
+    .page-header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 14px 28px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      position: sticky; top: 42px; z-index: 9998;
+    }
+
+    /* ── TOPに戻るボタン ── */
+    #back-to-top {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--teal); color: #fff; border: none; cursor: pointer;
+      font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      display: none; align-items: center; justify-content: center;
+      transition: opacity .2s, transform .2s;
+    }
+    #back-to-top:hover { transform: translateY(-2px); }
+    .page-badge { font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); background: rgba(13,148,136,.1); border: 1px solid rgba(13,148,136,.25); border-radius: 4px; padding: 3px 8px; font-family: var(--mono); }
+    .page-title { font-size: 1rem; font-weight: 700; }
+    .page-sub   { font-size: .72rem; color: var(--muted); }
+
+    /* ── メイン ── */
+    .main { max-width: 1400px; margin: 0 auto; padding: 20px 24px 80px; }
+
+    /* ── フィルターバー ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 0 6px; flex-wrap: wrap;
+    }
+    .media-filter-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 0 12px; flex-wrap: wrap;
+    }
+    .filter-label { font-size: .68rem; color: var(--muted2); font-family: var(--mono); margin-right: 4px; white-space: nowrap; }
+    .filter-chip {
+      padding: 4px 14px; border-radius: 20px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-size: .72rem; font-weight: 600; transition: all .15s; white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: var(--muted); color: var(--text); }
+    .filter-chip.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .filter-chip.media-active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+    .search-box {
+      margin-left: auto; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 6px 12px; font-size: .78rem; color: var(--text);
+      outline: none; width: 220px; font-family: inherit;
+    }
+    .search-box:focus { border-color: var(--teal); }
+    .reload-btn {
+      background: transparent; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 12px; color: var(--muted); font-size: .72rem; cursor: pointer;
+    }
+    .reload-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── ギャラリーグリッド ── */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 8px;
+    }
+    @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 580px) { .gallery-grid { grid-template-columns: 1fr; } }
+
+    /* ── PDFカード ── */
+    .pdf-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      display: flex; flex-direction: column;
+      transition: box-shadow .15s, transform .15s;
+      cursor: pointer;
+    }
+    .pdf-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); transform: translateY(-2px); }
+
+    /* PDF プレビューエリア */
+    .pdf-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1.414; /* A4比率 */
+      background: #f1f5f9;
+      overflow: hidden;
+    }
+    .pdf-preview .pdf-thumb {
+      width: 100%; height: 100%;
+      object-fit: contain; display: block;
+      background: #f8fafc;
+    }
+    .pdf-preview .pdf-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; color: var(--muted); font-size: .8rem;
+    }
+    .pdf-preview .pdf-icon { font-size: 3rem; }
+
+    /* カード情報エリア */
+    .pdf-info {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .pdf-store {
+      font-size: .62rem; color: var(--muted2); font-family: var(--mono);
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pdf-item {
+      font-size: .8rem; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .pdf-filename {
+      font-size: .65rem; color: var(--muted2); font-family: var(--mono);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ドライブフォルダボタン */
+    .drive-folder-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 8px; padding: 7px 12px;
+      background: #f1f5f9; border: 1px solid var(--border);
+      border-radius: 6px; color: var(--muted); font-size: .72rem; font-weight: 600;
+      text-decoration: none; transition: all .15s; width: 100%;
+    }
+    .drive-folder-btn:hover {
+      background: var(--teal); border-color: var(--teal); color: #fff;
+    }
+    .drive-folder-btn svg { flex-shrink: 0; }
+
+    /* ── セクション区切り（店舗別）── */
+    .store-section { margin-bottom: 32px; }
+    .store-section-title {
+      font-size: .8rem; font-weight: 700; color: var(--text);
+      margin-bottom: 12px; padding: 10px 14px;
+      background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none;
+      transition: background .15s;
+    }
+    .store-section-title:hover { background: #e8eef5; }
+    .store-section-count { font-size: .65rem; color: var(--muted2); font-family: var(--mono); }
+    .toggle-arrow {
+      margin-left: auto; font-size: .75rem; color: var(--muted2);
+      transition: transform .2s;
+    }
+    .store-section-title.collapsed .toggle-arrow { transform: rotate(-90deg); }
+    .gallery-grid.hidden { display: none; }
+
+    /* ── ローディング / 空 ── */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 12px; color: var(--muted); }
+    .spinner { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+
+    /* ── セットアップカード ── */
+    .setup-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; margin-bottom: 20px;
+    }
+    .setup-title { font-size: .88rem; font-weight: 700; margin-bottom: 8px; }
+    .setup-desc  { font-size: .78rem; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+    .form-row { display: flex; align-items: center; gap: 10px; }
+    .form-input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 12px; font-size: .78rem; color: var(--text); outline: none; font-family: var(--mono);
+    }
+    .form-input:focus { border-color: var(--teal); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer;
+      font-size: .78rem; font-weight: 600; transition: all .15s; font-family: inherit;
+    }
+    .btn-primary { background: var(--teal); color: #fff; }
+    .btn-primary:hover { background: #0f766e; }
+
+    /* ── トースト ── */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); color: var(--text); padding: 9px 20px; border-radius: 8px; font-size: .8rem; border: 1px solid var(--border); opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── 共通ナビ ── -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html">制作管理シート</a>
+  <a href="aicare-seisaku-gallery.html" class="cn-active">制作物一覧</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+    else a.classList.remove('cn-active');
+  });
+})();
+</script>
+
+<!-- ── ページヘッダー ── -->
+<div class="page-header">
+  <span class="page-badge">Gallery</span>
+  <span class="page-title">制作物一覧</span>
+  <span class="page-sub">アウトプットフォルダのPDF一覧</span>
+  <a href="aicare-seisaku-kanri.html" style="margin-left:auto;font-size:.72rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;">← 制作管理シートへ</a>
+</div>
+
+<div class="main">
+
+  <!-- セットアップ -->
+  <div class="setup-card" id="setup-card" style="display:none;">
+    <div class="setup-title">⚙️ GAS URL を設定してください</div>
+    <div class="setup-desc">
+      制作管理シートと同じ GAS URL を入力してください。<br>
+      GAS に <code>getGallery</code> アクションが含まれていることを確認してください。
+    </div>
+    <div class="form-row">
+      <input class="form-input" id="gas-url-input" type="text"
+        placeholder="https://script.google.com/macros/s/.../exec">
+      <button class="btn btn-primary" onclick="saveUrl()">接続</button>
+    </div>
+  </div>
+
+  <!-- フィルター -->
+  <div id="filter-area" style="display:none;">
+    <div class="filter-bar">
+      <span class="filter-label">媒体</span>
+      <button class="filter-chip active" onclick="setMedia('',this)">すべて</button>
+      <div id="media-chips" style="display:contents;"></div>
+      <input class="search-box" id="search-box" type="text"
+        placeholder="店舗名・ファイル名で検索..." oninput="filterRender()">
+      <button class="reload-btn" onclick="loadGallery()">↻ 更新</button>
+    </div>
+  </div>
+
+  <!-- コンテンツ -->
+  <div id="gallery-container">
+    <div class="loading"><div class="spinner"></div><span>読み込み中...</span></div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<button id="back-to-top" title="TOPに戻る" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+'use strict';
+
+// TOPに戻るボタン表示制御
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('back-to-top');
+  btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+}, { passive: true });
+
+const LS_GAS_URL = 'aicare_seisaku_gas_url_v1';
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxGKYOJNXuAvLX8zE7V9S0rjoiv3Hr-KPMOM-6eR-1scfaUxMn04mhu012h2ZwAmCIW/exec';
+let GAS_URL    = DEFAULT_GAS_URL;
+let _gallery   = []; // [{store, item, folderUrl, pdfs:[{id,name,url}]}]
+let _mediaType = '';
+let _collapsed = {}; // {storeName: true/false}
+
+// ── 初期化 ────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(LS_GAS_URL);
+  if (saved) GAS_URL = saved;
+  // デフォルトURLが設定済みなので、localStorageが空でも即ロード
+  document.getElementById('gallery-container').innerHTML =
+    '<div class="loading"><div class="spinner"></div><span>制作物を読み込み中...</span></div>';
+  loadGallery();
+});
+
+function saveUrl() {
+  const url = document.getElementById('gas-url-input').value.trim();
+  if (!url.startsWith('https://script.google.com/macros/')) {
+    alert('GAS URLを正確に入力してください');
+    return;
+  }
+  GAS_URL = url;
+  localStorage.setItem(LS_GAS_URL, url);
+  document.getElementById('setup-card').style.display = 'none';
+  loadGallery();
+}
+
+// ── GAS 呼び出し ──────────────────────────────────
+async function gasGet(params) {
+  const res = await fetch(GAS_URL + '?' + new URLSearchParams(params));
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// ── ギャラリー読み込み ────────────────────────────
+async function loadGallery() {
+  const c = document.getElementById('gallery-container');
+  c.innerHTML = '<div class="loading"><div class="spinner"></div><span>データを読み込み中...</span></div>';
+  try {
+    // 静的JSONを優先、失敗時はGASにフォールバック
+    let gallery = null;
+    try {
+      const res = await fetch('./gallery-data.json?t=' + Date.now());
+      if (res.ok) {
+        const j = await res.json();
+        gallery = j.gallery;
+      }
+    } catch(_) {}
+    if (!gallery) {
+      const data = await gasGet({ action: 'getGallery' });
+      if (data.error) throw new Error(data.error);
+      gallery = data.gallery || [];
+    }
+    _gallery = gallery;
+    buildChips();
+    document.getElementById('filter-area').style.display = '';
+    filterRender();
+    toast(`${_gallery.reduce((s,g)=>s+g.pdfs.length,0)}件のPDFを取得しました`, 'ok');
+  } catch(e) {
+    c.innerHTML = `<div class="empty">
+      <div style="font-size:2rem;margin-bottom:8px;">⚠️</div>
+      <div style="font-weight:700;margin-bottom:6px;">読み込みエラー</div>
+      <div style="font-size:.78rem;color:var(--muted);">${esc(e.message)}</div>
+    </div>`;
+  }
+}
+
+// ── 媒体タイプ抽出 ────────────────────────────────
+const MEDIA_KEYWORDS = ['チラシ','のぼり','サインシート','バナー','ポスター','DM','看板','シール','カード','パンフレット','ステッカー','ボード'];
+function extractMediaType(item) {
+  for (const kw of MEDIA_KEYWORDS) {
+    if (item.includes(kw)) return kw;
+  }
+  return item;
+}
+
+// ── チップ構築 ────────────────────────────────────
+function buildChips() {
+  const medias = [...new Set(_gallery.map(g => extractMediaType(g.item)).filter(Boolean))].sort();
+  document.getElementById('media-chips').innerHTML = medias.map(m =>
+    `<button class="filter-chip" onclick="setMedia('${esc(m)}',this)">${esc(m)}</button>`
+  ).join('');
+}
+
+function setMedia(media, btn) {
+  _mediaType = media;
+  document.querySelectorAll('#media-chips .filter-chip, .filter-bar > .filter-chip').forEach(c => {
+    c.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+  filterRender();
+}
+
+// ── 折りたたみトグル ──────────────────────────────
+function toggleStore(storeName) {
+  _collapsed[storeName] = !_collapsed[storeName];
+  const titleEl = document.querySelector(`.store-section-title[data-store="${CSS.escape(storeName)}"]`);
+  const gridEl  = titleEl?.nextElementSibling;
+  if (!titleEl || !gridEl) return;
+  if (_collapsed[storeName]) {
+    titleEl.classList.add('collapsed');
+    gridEl.classList.add('hidden');
+  } else {
+    titleEl.classList.remove('collapsed');
+    gridEl.classList.remove('hidden');
+  }
+}
+
+// ── レンダリング ──────────────────────────────────
+function filterRender() {
+  const q = (document.getElementById('search-box')?.value || '').toLowerCase();
+  let data = _gallery;
+  if (_mediaType) data = data.filter(g => extractMediaType(g.item) === _mediaType);
+  if (q)          data = data.filter(g =>
+    (g.store + g.item).toLowerCase().includes(q) ||
+    g.pdfs.some(p => p.name.toLowerCase().includes(q))
+  );
+
+  const c = document.getElementById('gallery-container');
+  if (!data.length) {
+    c.innerHTML = '<div class="empty">該当する制作物がありません</div>';
+    return;
+  }
+
+  // 店舗別グループ
+  const byStore = {};
+  data.forEach(g => {
+    if (!byStore[g.store]) byStore[g.store] = [];
+    byStore[g.store].push(g);
+  });
+
+  c.innerHTML = Object.entries(byStore).map(([store, groups]) => {
+    const totalPdfs = groups.reduce((s, g) => s + g.pdfs.length, 0);
+    const isCollapsed = !!_collapsed[store];
+    const cards = groups.flatMap(g =>
+      g.pdfs.map(pdf => renderCard(store, g.item, pdf, g.folderUrl))
+    ).join('');
+    return `<div class="store-section">
+      <div class="store-section-title${isCollapsed ? ' collapsed' : ''}"
+           data-store="${esc(store)}"
+           onclick="toggleStore('${esc(store).replace(/'/g,"\\'")}')">
+        <span>${esc(store)}</span>
+        <span class="store-section-count">PDF ${totalPdfs}件</span>
+        <span class="toggle-arrow">▼</span>
+      </div>
+      <div class="gallery-grid${isCollapsed ? ' hidden' : ''}">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCard(store, item, pdf, folderUrl) {
+  const thumbUrl = `https://drive.google.com/thumbnail?id=${esc(pdf.id)}&sz=w800`;
+  const openUrl  = pdf.url;
+  const fUrl     = folderUrl || '';
+
+  return `<div class="pdf-card" onclick="window.open('${esc(openUrl)}','_blank')">
+    <div class="pdf-preview">
+      <img class="pdf-thumb" src="${esc(thumbUrl)}" alt="${esc(pdf.name)}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="pdf-overlay" style="display:none;">
+        <div class="pdf-icon">📄</div>
+        <div style="font-size:.72rem;color:var(--muted);text-align:center;">${esc(pdf.name)}</div>
+      </div>
+    </div>
+    <div class="pdf-info">
+      <div class="pdf-store">${esc(store)}</div>
+      <div class="pdf-item">${esc(item)}</div>
+      <div class="pdf-filename">${esc(pdf.name)}</div>
+      ${fUrl
+        ? `<a class="drive-folder-btn" href="${esc(fUrl)}" target="_blank" rel="noopener"
+             onclick="event.stopPropagation()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            保管ドライブを開く
+          </a>`
+        : `<a class="drive-folder-btn" href="${esc(openUrl)}" target="_blank" rel="noopener"
+             onclick="event.stopPropagation()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            ファイルを開く
+          </a>`
+      }
+    </div>
+  </div>`;
+}
+
+// ── ヘルパー ──────────────────────────────────────
+function esc(s) {
+  return (s==null?'':String(s))
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+let _toastT;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show';
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.className = '', 3000);
+}
+</script>
+</body>
+</html>

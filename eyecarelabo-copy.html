@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アイケアLaBo — 既存コピー・キャッチコピー・ロゴ まとめ</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: rgba(255,255,255,.08);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; line-height: 1.7; }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  .doc-header { margin-bottom: 48px; padding-bottom: 24px; border-bottom: 2px solid var(--border); }
+  .doc-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .doc-header .meta { font-size: 12px; color: var(--muted); }
+  .doc-header .meta a { color: var(--accent); text-decoration: none; }
+
+  .section { margin-bottom: 48px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); background: rgba(59,130,246,.1); display: inline-block;
+    padding: 3px 10px; border-radius: 4px; margin-bottom: 14px;
+  }
+  .section-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+
+  /* Logo block */
+  .logo-block { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .logo-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; flex: 1; min-width: 200px; }
+  .logo-item .lbl { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .logo-item img { max-height: 60px; max-width: 200px; display: block; }
+  .logo-item .url { font-size: 10px; color: var(--muted); margin-top: 8px; word-break: break-all; }
+
+  /* Copy blocks */
+  .copy-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 12px;
+  }
+  .copy-card .copy-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+  .copy-card .copy-text { font-size: 16px; font-weight: 700; line-height: 1.5; color: var(--text); }
+  .copy-card.main .copy-text { font-size: 22px; color: #fff; }
+  .copy-card .copy-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .copy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+
+  .reason-item {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .reason-num { font-size: 11px; font-weight: 800; color: var(--accent); flex-shrink: 0; min-width: 40px; }
+  .reason-text { font-size: 13px; font-weight: 600; }
+  .reason-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .fact-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .fact-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .fact-card .fact-num { font-size: 28px; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+  .fact-card .fact-label { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .fact-card .fact-body { font-size: 12px; color: var(--muted); }
+
+  .program-steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .step { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .step-num { background: var(--accent); color: #fff; font-size: 10px; font-weight: 800; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .nav-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .nav-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--muted); }
+
+  .btn-sample { display: inline-block; background: var(--accent); color: #fff; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 700; margin-right: 8px; margin-bottom: 8px; }
+  .btn-sample.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+
+  .quote { border-left: 3px solid var(--accent); padding: 12px 16px; background: var(--surface); border-radius: 0 8px 8px 0; font-size: 13px; color: var(--text); margin-bottom: 10px; }
+  .quote strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 40px; }
+  .toc h3 { font-size: 12px; color: var(--muted); margin-bottom: 10px; letter-spacing: .1em; }
+  .toc a { display: block; font-size: 13px; color: var(--accent); text-decoration: none; padding: 2px 0; }
+  .toc a:hover { text-decoration: underline; }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    .surface, .copy-card, .logo-item, .reason-item, .fact-card, .step, .toc { background: #f8f8f8 !important; border-color: #ddd !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ヘッダー -->
+  <div class="doc-header">
+    <h1>アイケアLaBo — 既存コピー・キャッチコピー・ロゴ まとめ</h1>
+    <div class="meta">
+      出典: <a href="https://eyecarelabo.com/" target="_blank">https://eyecarelabo.com/</a>
+      &nbsp;|&nbsp; 取得日: <span id="date-text"></span>
+      &nbsp;|&nbsp; このドキュメントはブランド再設計の棚卸し用です
+    </div>
+  </div>
+
+  <!-- 目次 -->
+  <div class="toc">
+    <h3>目次</h3>
+    <a href="#logo">01. ロゴ・サイト名</a>
+    <a href="#catch">02. メインキャッチコピー</a>
+    <a href="#concept">03. コンセプトコピー</a>
+    <a href="#reasons">04. 選ばれる6つの理由</a>
+    <a href="#facts">05. なぜ眼のケアが大切か（数字コピー）</a>
+    <a href="#strengths">06. 強みコピー</a>
+    <a href="#program">07. プログラム・フロー</a>
+    <a href="#message">08. 代表の想い</a>
+    <a href="#nav">09. ナビゲーション・ボタン文言</a>
+  </div>
+
+  <!-- 01 ロゴ -->
+  <div class="section" id="logo">
+    <div class="section-label">01. ロゴ・サイト名</div>
+    <div class="section-title">ロゴ</div>
+    <div class="logo-block">
+      <div class="logo-item">
+        <div class="lbl">メインロゴ（白背景対応 / 通常使用）</div>
+        <img src="https://eyecarelabo.com/wp-content/uploads/2023/10/df55a7126bb5af9617792680bcb210ce.png" alt="アイケアLaBo">
+        <div class="url">https://eyecarelabo.com/wp-content/uploads/2023/10/df55a7126bb5af9617792680bcb210ce.png</div>
+      </div>
+      <div class="logo-item">
+        <div class="lbl">サイト名（テキスト表記）</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin:8px 0;">アイケアLaBo</div>
+        <div class="url">表記ゆれ確認: 「アイケアLaBo」「アイケアラボ」「eye care labo」</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 02 メインキャッチ -->
+  <div class="section" id="catch">
+    <div class="section-label">02. メインキャッチコピー</div>
+    <div class="copy-card main">
+      <div class="copy-label">メインキャッチ①（ページトップ）</div>
+      <div class="copy-text">眼のケアを当たり前に！</div>
+    </div>
+    <div class="copy-card main">
+      <div class="copy-label">メインキャッチ②（コンセプトセクション）</div>
+      <div class="copy-text">アイケアから始まる<br>視力改善と健康習慣</div>
+    </div>
+    <div class="copy-card">
+      <div class="copy-label">サブコピー（ターゲット訴求）</div>
+      <div class="copy-text">眼精疲労や視力低下でお悩みの方へ</div>
+      <div class="copy-sub">視力回復トレーニングや目に特化した整体施術</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 03 コンセプト -->
+  <div class="section" id="concept">
+    <div class="section-label">03. コンセプトコピー</div>
+    <div class="copy-grid">
+      <div class="copy-card">
+        <div class="copy-label">サービス定義</div>
+        <div class="copy-text">視力低下・眼精疲労・老眼などに悩む方のためのアイケア整体専門院</div>
+      </div>
+      <div class="copy-card">
+        <div class="copy-label">アプローチ</div>
+        <div class="copy-text">眼精疲労整体や視力改善トレーニングを通じて根本改善を目指す</div>
+      </div>
+      <div class="copy-card">
+        <div class="copy-label">体験提供</div>
+        <div class="copy-text">視力改善トレーニングとセルフアイケアを体系的に学べる</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 04 選ばれる理由 -->
+  <div class="section" id="reasons">
+    <div class="section-label">04. 選ばれる6つの理由</div>
+    <div class="section-title">アイケアLaBoが選ばれる6つの理由</div>
+    <div class="reason-item">
+      <div class="reason-num">理由 01</div>
+      <div>
+        <div class="reason-text">根っこからアプローチ</div>
+        <div class="reason-sub">表面的な症状ではなく、根本原因から改善する</div>
+      </div>
+    </div>
+    <div class="reason-item">
+      <div class="reason-num">理由 02</div>
+      <div>
+        <div class="reason-text">経験豊富な一流トレーナー</div>
+        <div class="reason-sub">専門知識と実績を持つトレーナーが担当</div>
+      </div>
+    </div>
+    <div class="reason-item">
+      <div class="reason-num">理由 03</div>
+      <div>
+        <div class="reason-text">国家資格保有者監修</div>
+        <div class="reason-sub">アスレティックトレーナー・柔道整復師が監修</div>
+      </div>
+    </div>
+    <div class="reason-item">
+      <div class="reason-num">理由 04</div>
+      <div>
+        <div class="reason-text">個々に合わせた最適なプログラム</div>
+        <div class="reason-sub">オーダーメイドで一人ひとりの症状に対応</div>
+      </div>
+    </div>
+    <div class="reason-item">
+      <div class="reason-num">理由 05</div>
+      <div>
+        <div class="reason-text">業界初の特殊技術</div>
+        <div class="reason-sub">独自施術【ムーブメントリリース】剥がしの技術</div>
+      </div>
+    </div>
+    <div class="reason-item">
+      <div class="reason-num">理由 06</div>
+      <div>
+        <div class="reason-text">全額返金保障</div>
+        <div class="reason-sub">安心して試せる返金制度あり</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 05 数字コピー -->
+  <div class="section" id="facts">
+    <div class="section-label">05. なぜ眼のケアが大切か（数字コピー）</div>
+    <div class="section-title">Why Eye Care</div>
+    <div class="fact-row">
+      <div class="fact-card">
+        <div class="fact-num">8割</div>
+        <div class="fact-label">日本人の眼が危険</div>
+        <div class="fact-body">成人の8割は裸眼視力1.0未満。眼の不調は多くの人が抱える課題。</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-num">25%</div>
+        <div class="fact-label">裸眼人口は25%</div>
+        <div class="fact-body">メガネ・コンタクトを使用している人は成人の74.6%を超えた。</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-num">8割</div>
+        <div class="fact-label">眼からの情報が8割</div>
+        <div class="fact-body">私たちが受け取る情報の８割は視覚情報。眼の不調は生活全体に影響する。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 06 強みコピー -->
+  <div class="section" id="strengths">
+    <div class="section-label">06. 強みコピー</div>
+    <div class="section-title">アイケアLaBoの強み</div>
+
+    <div class="quote">
+      <strong>Point 01 — 根本アプローチで視力改善と眼の健康をサポート</strong>
+      アスレティックトレーナーと柔道整復師の資格を有し、視力低下・眼精疲労・老眼などに対して追究。根本原因から改善し、疲れづらいクリアな視界へ導く。
+    </div>
+    <div class="quote">
+      <strong>Point 02 — アイケアLaBoだからできる独自技術</strong>
+      ハワイ大学医学部で筋肉の連鎖、血流、神経などを研究。独自施術【ムーブメントリリース】剥がしの技術。機械を用いて再現性のある効果的な施術を実現。
+    </div>
+    <div class="quote">
+      <strong>Point 03 — 1人1人に合わせたオーダーメイド施術</strong>
+      眼のお悩みはそれぞれ原因が異なる。徹底したカウンセリングと施術で的確に評価し、オーダーメイドで創る。
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 07 プログラム -->
+  <div class="section" id="program">
+    <div class="section-label">07. プログラム・フロー</div>
+    <div class="section-title">眼の不調から解放されるオーダーメイドプログラム</div>
+    <div class="program-steps">
+      <div class="step"><div class="step-num">1</div>カウンセリング</div>
+      <div class="step"><div class="step-num">2</div>アイチェック</div>
+      <div class="step"><div class="step-num">3</div>アイケア</div>
+      <div class="step"><div class="step-num">4</div>アイトレーニング</div>
+      <div class="step"><div class="step-num">5</div>オーダーメイドの習慣化プラン作成</div>
+      <div class="step"><div class="step-num">6</div>クリアな視界の維持</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 08 代表の想い -->
+  <div class="section" id="message">
+    <div class="section-label">08. 代表の想い</div>
+    <div class="section-title">代表メッセージ</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px;">
+      <img src="https://eyecarelabo.com/wp-content/uploads/2024/08/IMG_3641-683x1024.jpg" alt="代表 樫村瑞生" style="width:100px;border-radius:10px;flex-shrink:0;">
+      <div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:2px;">樫村瑞生（かしむら みずき）</div>
+        <div style="font-size:12px;color:var(--muted);">アスレティックトレーナー / 柔道整復師</div>
+      </div>
+    </div>
+    <div class="quote">日本人口の約半数が近視、８割以上が眼になんらかの悩みを抱えている。</div>
+    <div class="quote">2050年には人口の半数が近視になる（失明パンデミックス）とWHOが声明。</div>
+    <div class="quote">眼のケアの文化を創れば世界中の眼に悩む人は減らすことができると確信している。世界中に店舗展開をしていくビジョンを持ち、日々研究開発に励んでいる。</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 09 ナビ・ボタン文言 -->
+  <div class="section" id="nav">
+    <div class="section-label">09. ナビゲーション・ボタン文言</div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">ナビゲーション</div>
+      <div class="nav-pills">
+        <div class="nav-pill">Home</div>
+        <div class="nav-pill">メニュー</div>
+        <div class="nav-pill">代表プロフィール / スタッフ紹介</div>
+        <div class="nav-pill">店舗一覧</div>
+        <div class="nav-pill">よくあるご質問</div>
+        <div class="nav-pill">企業情報</div>
+        <div class="nav-pill">お問い合わせ</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">CTAボタン</div>
+      <span class="btn-sample">1分でカンタン予約！施術体験はこちらから</span>
+      <span class="btn-sample ghost">もっと詳しく</span>
+      <span class="btn-sample ghost">採用情報はこちら</span>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">セクション英語タイトル（使用中）</div>
+      <div class="nav-pills">
+        <div class="nav-pill">Concept</div>
+        <div class="nav-pill">Strengths</div>
+        <div class="nav-pill">Why Eye Care</div>
+        <div class="nav-pill">Reason</div>
+        <div class="nav-pill">Program</div>
+        <div class="nav-pill">Client Voice</div>
+        <div class="nav-pill">Flow</div>
+        <div class="nav-pill">Q&A</div>
+        <div class="nav-pill">Message</div>
+        <div class="nav-pill">Trainers</div>
+        <div class="nav-pill">LOCATION</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <div style="margin-top:60px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:12px;color:var(--muted);">アイケアLaBo コピー棚卸しドキュメント</div>
+    <div style="font-size:12px;color:var(--muted);">出典: <a href="https://eyecarelabo.com/" style="color:var(--accent);">eyecarelabo.com</a></div>
+  </div>
+
+</div>
+
+<script>
+  document.getElementById('date-text').textContent = new Date().toLocaleDateString('ja-JP');
+</script>
+</body>
+</html>

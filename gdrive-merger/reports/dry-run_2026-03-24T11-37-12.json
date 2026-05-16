@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-03-24T11:37:12.674Z",
+  "mode": "dry-run",
+  "summary": {
+    "move": 0,
+    "skipExact": 0,
+    "quarantine": 0,
+    "trash": 4,
+    "total": 4
+  },
+  "actions": [
+    {
+      "type": "TRASH",
+      "fileId": "1yXDox3NtzCduvNFz1kNKNJ4xZ4rFN4ov",
+      "fileName": "128_川口駅前店",
+      "fromFolderId": "1yXDox3NtzCduvNFz1kNKNJ4xZ4rFN4ov",
+      "fromFolderPath": "128_川口駅前店",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1M-8ZmoAUPzMt_0OK45hfF_2wvSoamGe-",
+      "fileName": "116_朝霞台駅前店_店舗のロゴ作成ニ種類",
+      "fromFolderId": "1M-8ZmoAUPzMt_0OK45hfF_2wvSoamGe-",
+      "fromFolderPath": "116_朝霞台駅前店_店舗のロゴ作成ニ種類",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1j9hqd2W1p_qirPJEfQ4O-A0K9Y8dmJnC",
+      "fileName": "115_博多駅前店_チラシ三種類",
+      "fromFolderId": "1j9hqd2W1p_qirPJEfQ4O-A0K9Y8dmJnC",
+      "fromFolderPath": "115_博多駅前店_チラシ三種類",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1Ie2xXDEKm2AYjdyvYmQBfG-6Ucj8kqNn",
+      "fileName": "114_大宮店_ グランドオープンチラシ",
+      "fromFolderId": "1Ie2xXDEKm2AYjdyvYmQBfG-6Ucj8kqNn",
+      "fromFolderPath": "114_大宮店_ グランドオープンチラシ",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "projectPath": "/Users/koutayamakawa/clones/resilire-careers",
+  "previewUrl": "http://localhost:3000",
+  "deployCmd": "vercel --prod --yes",
+  "openaiKey": "",
+  "photos": [
+    {
+      "filename": "hero-1.png",
+      "x": 54,
+      "y": 55,
+      "scale": 1.44,
+      "bg": "transparent"
+    },
+    {
+      "filename": "hero-2.png",
+      "x": 62,
+      "y": 27,
+      "scale": 0.6,
+      "bg": "#1b2a3c"
+    },
+    {
+      "filename": "hero-3.png",
+      "x": 52,
+      "y": 15,
+      "scale": 0.26,
+      "bg": "transparent"
+    },
+    {
+      "filename": "hero-4.png",
+      "x": 46,
+      "y": 20,
+      "scale": 1,
+      "bg": "transparent"
+    }
+  ],
+  "headline": [
+    "採用で、",
+    "未来を",
+    "取りにいく。"
+  ],
+  "description": "人で、会社は変わる。TORINAは採用を「待ち」から「戦略」へ変える、採用戦略パートナーです。",
+  "services": [
+    {
+      "category": "AGENT",
+      "title": "紹介",
+      "description": "採用スピードを、経営スピードに合わせる。"
+    },
+    {
+      "category": "CONSULTING",
+      "title": "戦略",
+      "description": "勘と経験の採用を、勝てる仕組みに変える。"
+    },
+    {
+      "category": "RPO",
+      "title": "代行",
+      "description": "採用実務を止めない。経営は意思決定に集中する。"
+    },
+    {
+      "category": "GROWTH",
+      "title": "定着",
+      "description": "採用の成果を、入社で終わらせない。"
+    }
+  ],
+  "hiring": {
+    "recruitSubtitle": "採用で、未来を取りにいく",
+    "recruitBody": "私たちと一緒に、すべての企業の採用を変えるメンバーを募集しています。採用の専門家として、企業の未来をつくるチームに加わりませんか。",
+    "recruitCta": "採用情報を見る",
+    "contactDesc": "まずは現状の整理から。",
+    "contactCta": "無料で採用課題を相談する"
+  },
+  "slideshow": {
+    "headline": [
+      "待っていても、",
+      "未来は",
+      "来ない。"
+    ],
+    "tagline": "採用は、景気に流される受け身の活動ではない。",
+    "subheadline": "そこまでやって初めて、採用は事業成長のエンジンになる。",
+    "body": "採用は、景気に流される受け身の活動ではない。\n必要な人材を定義し、勝てる打ち手を設計し、入社後の定着までやり切る。\nそこまでやって初めて、採用は事業成長のエンジンになる。",
+    "ctaText": "会社情報を見る",
+    "ctaUrl": "/about",
+    "headlineSize": 82,
+    "taglineSize": 13,
+    "subheadlineSize": 28,
+    "bodySize": 15,
+    "headlineLeading": 1.19,
+    "subheadlineLeading": 1.4,
+    "bodyLeading": 1.85,
+    "paddingTop": 139,
+    "paddingBottom": 152,
+    "paddingLeft": 40,
+    "paddingRight": 40
+  }
+}

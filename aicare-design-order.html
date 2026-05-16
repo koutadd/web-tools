@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デザイン発注管理 | eye care lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* ── AICARE COMMON NAV ── */
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+
+/* ── BASE ── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+  background: #f8f7f5;
+  color: #111827;
+  min-height: 100vh;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 42px;
+  z-index: 9990;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page-header-left .title { font-size: 1.05rem; font-weight: 700; color: #111827; }
+.page-header-left .subtitle { font-size: 0.7rem; color: #6b7280; letter-spacing: 0.06em; font-family: 'DM Mono', monospace; margin-top: 1px; }
+.page-header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.summary-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.summary-chip { font-size: 0.68rem; padding: 3px 9px; border-radius: 9999px; border: 1px solid #e5e7eb; background: #f9fafb; color: #6b7280; font-family: 'DM Mono', monospace; white-space: nowrap; }
+.summary-chip.active { background: #111827; color: #fff; border-color: #111827; }
+
+/* ── STATUS FILTER TABS ── */
+.filter-bar {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 28px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-tab {
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.filter-tab:hover { color: #111827; }
+.filter-tab.active { color: #111827; border-bottom-color: #111827; font-weight: 600; }
+.tab-badge {
+  font-size: 0.65rem;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 9999px;
+  padding: 1px 6px;
+  font-family: 'DM Mono', monospace;
+  min-width: 20px;
+  text-align: center;
+}
+.filter-tab.active .tab-badge { background: #111827; color: #fff; }
+
+/* ── MAIN CONTENT ── */
+.main { max-width: 1400px; margin: 0 auto; padding: 24px 28px 80px; }
+
+/* ── TABLE ── */
+.table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+thead { background: #f9fafb; }
+th { padding: 10px 12px; text-align: left; font-size: 0.7rem; font-weight: 600; color: #6b7280; letter-spacing: 0.07em; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+td { padding: 11px 12px; font-size: 0.8rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f3f4f6; }
+tr[onclick]:hover td { background: #f0f9ff; }
+tr.overdue td { background: #fff5f5 !important; }
+tr.overdue:hover td { background: #ffeeee !important; }
+.table-overflow { overflow-x: auto; }
+
+/* ── BADGES ── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 9px; border-radius: 9999px; font-size: 0.68rem; font-weight: 600;
+  white-space: nowrap;
+}
+.status-received  { background: #f3f4f6; color: #374151; }
+.status-inprogress { background: #dbeafe; color: #1d4ed8; }
+.status-review    { background: #fed7aa; color: #c2410c; }
+.status-done      { background: #d1fae5; color: #065f46; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+
+.priority-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 600;
+  white-space: nowrap;
+}
+.priority-high   { background: #fee2e2; color: #991b1b; }
+.priority-medium { background: #fef9c3; color: #854d0e; }
+.priority-low    { background: #d1fae5; color: #065f46; }
+
+/* ── ORDER NUMBER ── */
+.order-no { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: #9ca3af; }
+
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.15s; font-family: inherit; text-decoration: none; }
+.btn-black { background: #111827; color: #fff; }
+.btn-black:hover { background: #1f2937; }
+.btn-ghost { background: transparent; color: #6b7280; border: 1px solid #e5e7eb; }
+.btn-ghost:hover { background: #f9fafb; color: #111827; }
+.btn-sm { padding: 4px 10px; font-size: 0.7rem; border-radius: 5px; }
+.btn-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.btn-danger:hover { background: #fecaca; }
+
+/* ── STATUS SELECT ── */
+.status-select {
+  appearance: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 26px 4px 10px;
+  font-size: 0.72rem;
+  font-family: inherit;
+  background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 3l3 4 3-4' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center;
+  cursor: pointer;
+  color: #374151;
+  transition: border-color 0.15s;
+}
+.status-select:focus { outline: none; border-color: #111827; }
+
+/* ── EMPTY STATE ── */
+.empty-state { padding: 60px 0; text-align: center; color: #9ca3af; }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.85rem; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 99998;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+}
+.modal-header {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: #fff; z-index: 1;
+  border-radius: 12px 12px 0 0;
+}
+.modal-title { font-size: 0.95rem; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #9ca3af; padding: 2px 6px; border-radius: 4px; }
+.modal-close:hover { background: #f3f4f6; color: #111827; }
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  background: #f9fafb;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ── FORM ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 5px; }
+.form-label .required { color: #ef4444; margin-left: 2px; }
+.form-label .optional { font-size: 0.65rem; color: #9ca3af; font-weight: 400; margin-left: 4px; }
+.form-control {
+  display: block; width: 100%;
+  border: 1px solid #d1d5db; border-radius: 7px;
+  padding: 9px 13px; font-size: 0.82rem; font-family: inherit;
+  color: #111827; background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-control:focus { outline: none; border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,0.07); }
+textarea.form-control { resize: vertical; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.radio-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.radio-group label {
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  font-size: 0.82rem; color: #374151;
+  border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 8px 16px;
+  transition: all 0.15s; user-select: none;
+}
+.radio-group label:has(input:checked) { border-color: #111827; background: #f9fafb; font-weight: 600; }
+.radio-group input[type="radio"] { display: none; }
+
+/* ── WIZARD STEPPER ── */
+.wizard-stepper {
+  display: flex; align-items: center; padding: 0 24px 16px; margin-top: 4px; gap: 0;
+}
+.wizard-step {
+  display: flex; align-items: center; gap: 8px; flex: 1; position: relative;
+}
+.wizard-step:last-child { flex: none; }
+.step-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid #e5e7eb; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700; color: #9ca3af;
+  flex-shrink: 0; transition: all 0.2s; position: relative; z-index: 1;
+}
+.step-circle.active { border-color: #111827; background: #111827; color: #fff; }
+.step-circle.done { border-color: #111827; background: #111827; color: #fff; }
+.step-label {
+  font-size: 0.68rem; font-weight: 600; color: #9ca3af; white-space: nowrap; line-height: 1.2;
+  transition: color 0.2s;
+}
+.step-label.active { color: #111827; }
+.step-label.done { color: #6b7280; }
+.step-connector {
+  flex: 1; height: 2px; background: #e5e7eb; margin: 0 8px; transition: background 0.2s;
+}
+.step-connector.done { background: #111827; }
+
+/* ── WIZARD PANELS ── */
+.wizard-panel { display: none; }
+.wizard-panel.active { display: block; }
+
+/* ── CONFIRM PANEL ── */
+.confirm-section { margin-bottom: 20px; }
+.confirm-section-title {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #9ca3af; font-family: 'DM Mono', monospace; margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid #f3f4f6;
+}
+.confirm-row { display: flex; gap: 12px; margin-bottom: 7px; font-size: 0.8rem; }
+.confirm-key { color: #6b7280; min-width: 110px; flex-shrink: 0; }
+.confirm-val { color: #111827; font-weight: 500; flex: 1; }
+.confirm-brief {
+  background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 7px;
+  padding: 12px; font-size: 0.8rem; color: #374151; line-height: 1.7;
+  white-space: pre-wrap; margin-top: 6px;
+}
+
+/* ── DETAIL MODAL ── */
+.detail-section { margin-bottom: 18px; }
+.detail-section-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 6px; font-size: 0.8rem; }
+.detail-key { color: #6b7280; min-width: 100px; flex-shrink: 0; }
+.detail-val { color: #111827; font-weight: 500; flex: 1; }
+.detail-brief { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 7px; padding: 12px; font-size: 0.8rem; color: #374151; line-height: 1.6; white-space: pre-wrap; }
+.detail-status-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.status-btn {
+  padding: 5px 12px; border-radius: 6px; border: 1px solid #e5e7eb;
+  font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  background: #f9fafb; color: #374151;
+  transition: all 0.15s;
+}
+.status-btn:hover { background: #111827; color: #fff; border-color: #111827; }
+.status-btn.current { background: #111827; color: #fff; border-color: #111827; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: #111827; color: #fff;
+  padding: 12px 20px; border-radius: 9px;
+  font-size: 0.82rem; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 999999;
+  transform: translateY(20px); opacity: 0;
+  transition: transform 0.25s, opacity 0.25s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── RESPONSIVE: card mode for mobile ── */
+@media (max-width: 768px) {
+  .table-wrap { border-radius: 0; border-left: none; border-right: none; }
+  .table-overflow { overflow-x: visible; }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  td {
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    border-bottom: none;
+  }
+  td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 2px;
+  }
+  tr { border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+  tr.overdue { border-color: #fca5a5; }
+  .main { padding: 16px 12px 60px; }
+  .filter-bar { padding: 0 12px; }
+  .page-header { padding: 10px 16px; }
+  .form-row-2 { grid-template-columns: 1fr; }
+  .summary-chips { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-stores.html">出展管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html">制作管理シート</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-design-order.html" style="color:#f59e0b !important; border-color:rgba(245,158,11,0.35) !important; background:rgba(245,158,11,0.08) !important;">✦ デザイン発注</a>
+  <span class="cn-sep">|</span>
+  <a href="yamakawa-tasks.html" style="color:#a78bfa !important; border-color:rgba(167,139,250,0.35) !important; background:rgba(167,139,250,0.08) !important;">✦ 山川タスク</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="title">デザイン発注管理</div>
+    <div class="subtitle">Design Order System — 山川さんへの発注・ステータス管理</div>
+  </div>
+  <div class="page-header-right">
+    <div class="summary-chips" id="summaryChips"></div>
+    <button class="btn btn-black" onclick="openNewOrderModal()">＋ 新規発注</button>
+  </div>
+</div>
+
+<!-- ── STATUS FILTER TABS ── -->
+<div class="filter-bar" id="filterBar">
+  <button class="filter-tab active" data-status="all" onclick="setFilter('all')">すべて <span class="tab-badge" id="badge-all">0</span></button>
+  <button class="filter-tab" data-status="received" onclick="setFilter('received')">📥 受付済み <span class="tab-badge" id="badge-received">0</span></button>
+  <button class="filter-tab" data-status="inprogress" onclick="setFilter('inprogress')">🔄 対応中 <span class="tab-badge" id="badge-inprogress">0</span></button>
+  <button class="filter-tab" data-status="review" onclick="setFilter('review')">👀 確認待ち <span class="tab-badge" id="badge-review">0</span></button>
+  <button class="filter-tab" data-status="done" onclick="setFilter('done')">✅ 完了 <span class="tab-badge" id="badge-done">0</span></button>
+  <button class="filter-tab" data-status="cancelled" onclick="setFilter('cancelled')">⛔ キャンセル <span class="tab-badge" id="badge-cancelled">0</span></button>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="table-wrap">
+    <div class="table-overflow">
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>案件名</th>
+            <th>クライアント</th>
+            <th>種別</th>
+            <th>納期</th>
+            <th>優先度</th>
+            <th>発注者</th>
+            <th>ステータス</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr id="loadingRow">
+            <td colspan="9" style="text-align:center;padding:32px;color:#9ca3af;font-size:0.8rem;">
+              読み込み中…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="apiWarning" style="display:none;margin:12px 16px;padding:10px 14px;background:#fef9c3;border:1px solid #fde047;border-radius:6px;font-size:0.78rem;color:#854d0e;">
+      ⚠️ <strong>GAS URLが未設定です。</strong>データはこの端末のみに表示されています。下記の手順でGASを設定してください。
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="icon">📭</div>
+      <p>発注がありません</p>
+      <p style="font-size:0.75rem; margin-top:6px; color:#d1d5db;">「＋ 新規発注」ボタンから発注を作成できます</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── NEW ORDER MODAL (WIZARD) ── -->
+<div class="modal-overlay" id="newOrderModal">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">新規デザイン発注</div>
+        <div id="wizard-step-label" style="font-size:0.68rem;color:#9ca3af;margin-top:2px;"></div>
+      </div>
+      <button class="modal-close" onclick="closeNewOrderModal()">✕</button>
+    </div>
+
+    <!-- ステッパー -->
+    <div class="wizard-stepper" style="padding-top:16px;">
+      <div class="wizard-step">
+        <div class="step-circle" id="sc-1">1</div>
+        <div class="step-label" id="sl-1">基本情報</div>
+      </div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="wizard-step">
+        <div class="step-circle" id="sc-2">2</div>
+        <div class="step-label" id="sl-2">デザイン仕様</div>
+      </div>
+      <div class="step-connector" id="conn-2"></div>
+      <div class="wizard-step">
+        <div class="step-circle" id="sc-3">3</div>
+        <div class="step-label" id="sl-3">ブリーフ</div>
+      </div>
+      <div class="step-connector" id="conn-3"></div>
+      <div class="wizard-step">
+        <div class="step-circle" id="sc-4">4</div>
+        <div class="step-label" id="sl-4">確認・発注</div>
+      </div>
+    </div>
+
+    <div class="modal-body" style="padding-top:8px;">
+      <form id="newOrderForm" onsubmit="return false;">
+
+        <!-- STEP 1: 基本情報 -->
+        <div class="wizard-panel" id="wp-1">
+          <div class="form-group">
+            <label class="form-label">発注者名 <span class="required">*</span></label>
+            <input type="text" class="form-control" id="f-requester" placeholder="例: 田中">
+            <div style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">誰からの発注かを明記してください</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">クライアント名 <span class="optional">任意</span></label>
+            <input type="text" class="form-control" id="f-client" placeholder="例: N Generation">
+          </div>
+          <div class="form-group">
+            <label class="form-label">案件名 <span class="required">*</span></label>
+            <input type="text" class="form-control" id="f-projectName" placeholder="例: 春のキャンペーンバナー制作">
+            <div style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">一覧で識別できる具体的な名前をつけてください</div>
+          </div>
+        </div>
+
+        <!-- STEP 2: デザイン仕様 -->
+        <div class="wizard-panel" id="wp-2">
+          <div class="form-group">
+            <label class="form-label">デザインの種別 <span class="required">*</span></label>
+            <select class="form-control" id="f-type" onchange="toggleTypeOther(); updateDeadlineHint()">
+              <option value="">選択してください</option>
+              <option value="バナー広告">バナー広告</option>
+              <option value="SNS投稿画像">SNS投稿画像</option>
+              <option value="資料・スライド">資料・スライド</option>
+              <option value="ロゴ・アイコン">ロゴ・アイコン</option>
+              <option value="動画サムネイル">動画サムネイル</option>
+              <option value="チラシ・印刷物">チラシ・印刷物</option>
+              <option value="Webサイト素材">Webサイト素材</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+          <div class="form-group" id="f-type-other-wrap" style="display:none;">
+            <label class="form-label">種別の詳細 <span class="required">*</span></label>
+            <input type="text" class="form-control" id="f-type-other" placeholder="例: 名刺デザイン、展示会パネル、メルマガヘッダーなど">
+          </div>
+          <div class="form-group">
+            <label class="form-label">サイズ・フォーマット <span class="optional">任意</span></label>
+            <div id="size-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+            <button type="button" onclick="addSizeRow()" style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#6b7280;background:none;border:1px dashed #d1d5db;border-radius:6px;padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#111827';this.style.color='#111827'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#6b7280'">＋ サイズを追加</button>
+            <div style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">複数サイズがある場合はまとめて登録できます</div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">納期 <span class="required">*</span></label>
+              <input type="date" class="form-control" id="f-deadline" onchange="updateDeadlineHint()">
+              <div id="deadline-hint" style="margin-top:6px;font-size:0.72rem;line-height:1.5;display:none;"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">優先度</label>
+              <div class="radio-group">
+                <label><input type="radio" name="priority" value="high"> 🔴 高</label>
+                <label><input type="radio" name="priority" value="medium" checked> 🟡 中</label>
+                <label><input type="radio" name="priority" value="low"> 🟢 低</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: ブリーフ -->
+        <div class="wizard-panel" id="wp-3">
+          <div class="form-group">
+            <label class="form-label">概要・ブリーフ <span class="optional">任意</span></label>
+            <textarea class="form-control" id="f-brief" rows="5"
+              placeholder="・このデザインの目的は？&#10;・ターゲット層は？&#10;・トーン＆マナー（シンプル／華やか／etc.）&#10;・必ず入れてほしい要素（ロゴ、キャッチコピーなど）&#10;・NG事項があれば"></textarea>
+            <div style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">詳しく書くほど仕上がりが希望に近づきます</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">参考URL・素材メモ <span class="optional">任意</span></label>
+            <textarea class="form-control" id="f-reference" rows="3"
+              placeholder="参考にしてほしいサイトURL、Driveリンク、使用する素材のパスなど"></textarea>
+          </div>
+        </div>
+
+        <!-- STEP 4: 確認 -->
+        <div class="wizard-panel" id="wp-4">
+          <div id="confirm-content"></div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer" style="justify-content:space-between;">
+      <div>
+        <button class="btn btn-ghost" id="btn-cancel-close" onclick="closeNewOrderModal()">キャンセル</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" id="btn-back" onclick="wizardBack()" style="display:none;">← 戻る</button>
+        <button class="btn btn-black" id="btn-next" onclick="wizardNext()">次へ →</button>
+        <button class="btn btn-black" id="btn-submit" onclick="submitOrder()" style="display:none;">✓ 発注する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DETAIL MODAL ── -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="detailTitle"></div>
+        <div style="font-size:0.68rem; color:#9ca3af; font-family:'DM Mono',monospace; margin-top:2px;" id="detailOrderNo"></div>
+      </div>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-danger btn-sm" id="detailDeleteBtn">削除</button>
+      <button class="btn btn-ghost" onclick="closeDetailModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG — GASデプロイ後にURLをここに貼る
+// ============================================================
+const GAS_URL = 'YOUR_GAS_URL_HERE';
+
+// ============================================================
+// DATA LAYER (API)
+// ============================================================
+
+const STATUS_MAP = {
+  received:   { label: '📥 受付済み', cls: 'status-received' },
+  inprogress: { label: '🔄 対応中',   cls: 'status-inprogress' },
+  review:     { label: '👀 確認待ち', cls: 'status-review' },
+  done:       { label: '✅ 完了',     cls: 'status-done' },
+  cancelled:  { label: '⛔ キャンセル', cls: 'status-cancelled' },
+};
+
+const PRIORITY_MAP = {
+  high:   { label: '🔴 高', cls: 'priority-high' },
+  medium: { label: '🟡 中', cls: 'priority-medium' },
+  low:    { label: '🟢 低', cls: 'priority-low' },
+};
+
+// GAS URLが未設定の場合のサンプルデータ（ローカル確認用）
+const SAMPLE_DATA = [
+  {
+    id: '1001',
+    orderNo: 'DO-001',
+    requester: '佐藤',
+    projectName: 'アイケアラボ 春キャンペーンバナー',
+    client: 'N Generation',
+    type: 'バナー広告',
+    sizeFormat: '1200×628px、JPEG / 300×250px、PNG',
+    deadline: (() => { const d = new Date(); d.setDate(d.getDate() + 5); return d.toISOString().split('T')[0]; })(),
+    priority: 'high',
+    brief: '春の新生活シーズンに向けたキャンペーン。メインビジュアルはフレッシュで明るいトーン。コピー「見える未来、アイケアラボで。」を大きく配置。ブランドカラー（ネイビー×ゴールド）を使用。',
+    reference: 'https://drive.google.com/... （参考ビジュアル一式）\n使用ロゴ: /assets/logo-aicare.svg',
+    status: 'inprogress',
+    createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+  },
+  {
+    id: '1002',
+    orderNo: 'DO-002',
+    requester: '田中',
+    projectName: 'Instagram用 出店告知投稿画像',
+    client: 'eye care lab',
+    type: 'SNS投稿画像',
+    sizeFormat: '1080×1080px、PNG',
+    deadline: new Date().toISOString().split('T')[0],
+    priority: 'medium',
+    brief: '5月の博多マルイ出店告知。日時・場所・主要サービスを掲載。背景はホワイト基調でスタイリッシュに。#eyecarelab #視力測定 等のハッシュタグも画像内に入れる。',
+    reference: '',
+    status: 'received',
+    createdAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+  },
+  {
+    id: '1003',
+    orderNo: 'DO-003',
+    requester: '山川',
+    projectName: 'ブランドブック スライドデザイン',
+    client: 'N Generation',
+    type: '資料・スライド',
+    sizeFormat: '16:9（1920×1080px）、PDF + PPTX',
+    deadline: (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })(),
+    priority: 'low',
+    brief: 'アイケアラボのブランドブックをスライド形式に落とし込んだもの。全20スライド想定。内容はブランドミッション・ビジョン・ターゲット・デザインシステム。',
+    reference: 'ブランドブック原稿: /docs/brand-book-draft.docx',
+    status: 'done',
+    createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+  },
+];
+
+// ============================================================
+// API
+// ============================================================
+function isApiReady() {
+  return GAS_URL && GAS_URL !== 'YOUR_GAS_URL_HERE';
+}
+
+async function apiCall(params) {
+  const url = new URL(GAS_URL);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const res = await fetch(url.toString(), { redirect: 'follow' });
+  return res.json();
+}
+
+async function loadFromAPI() {
+  if (!isApiReady()) {
+    orders = SAMPLE_DATA;
+    renderAll();
+    showApiWarning();
+    return;
+  }
+  setTableLoading(true);
+  try {
+    const data = await apiCall({ action: 'list' });
+    orders = Array.isArray(data) ? data : [];
+    renderAll();
+  } catch (e) {
+    showToast('データの取得に失敗しました。GAS URLを確認してください。', true);
+    orders = [];
+    renderAll();
+  } finally {
+    setTableLoading(false);
+  }
+}
+
+function setTableLoading(on) {
+  const el = document.getElementById('loadingRow');
+  if (el) el.style.display = on ? '' : 'none';
+  const body = document.getElementById('ordersBody');
+  if (body) body.style.opacity = on ? '0.4' : '1';
+}
+
+function showApiWarning() {
+  const el = document.getElementById('apiWarning');
+  if (el) el.style.display = '';
+}
+
+function getNextOrderNo(orders) {
+  let max = 0;
+  orders.forEach(o => {
+    const n = parseInt((o.orderNo || 'DO-000').replace('DO-', ''), 10);
+    if (n > max) max = n;
+  });
+  return 'DO-' + String(max + 1).padStart(3, '0');
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let orders = [];
+let currentFilter = 'all';
+let currentDetailId = null;
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAll() {
+  updateBadges();
+  updateSummaryChips();
+  renderTable();
+}
+
+function updateBadges() {
+  const counts = { all: orders.length, received: 0, inprogress: 0, review: 0, done: 0, cancelled: 0 };
+  orders.forEach(o => { if (counts[o.status] !== undefined) counts[o.status]++; });
+  Object.entries(counts).forEach(([k, v]) => {
+    const el = document.getElementById('badge-' + k);
+    if (el) el.textContent = v;
+  });
+}
+
+function updateSummaryChips() {
+  const counts = { received: 0, inprogress: 0, review: 0 };
+  orders.forEach(o => { if (counts[o.status] !== undefined) counts[o.status]++; });
+  const active = counts.received + counts.inprogress + counts.review;
+  const container = document.getElementById('summaryChips');
+  container.innerHTML = `
+    <div class="summary-chip${active > 0 ? ' active' : ''}">進行中 ${active}件</div>
+    <div class="summary-chip">🔄 ${counts.inprogress}</div>
+    <div class="summary-chip">👀 ${counts.review}</div>
+    <div class="summary-chip">📥 ${counts.received}</div>
+  `;
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function isOverdue(order) {
+  return order.deadline && order.deadline <= today() && order.status !== 'done' && order.status !== 'cancelled';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const [y, m, d] = dateStr.split('-');
+  const t = today();
+  const diffMs = new Date(dateStr) - new Date(t);
+  const diffDays = Math.round(diffMs / 86400000);
+  let hint = '';
+  if (dateStr < t && diffDays < 0) {
+    hint = ` <span style="color:#ef4444;font-size:0.65rem;">(${Math.abs(diffDays)}日超過)</span>`;
+  } else if (dateStr === t) {
+    hint = ` <span style="color:#f59e0b;font-size:0.65rem;">(今日)</span>`;
+  } else if (diffDays === 1) {
+    hint = ` <span style="color:#f59e0b;font-size:0.65rem;">(明日)</span>`;
+  }
+  return `${y}/${m}/${d}${hint}`;
+}
+
+function renderTable() {
+  const filtered = currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter);
+  const tbody = document.getElementById('ordersBody');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((o, idx) => {
+    const overdue = isOverdue(o);
+    const statusInfo = STATUS_MAP[o.status] || STATUS_MAP.received;
+    const priorityInfo = PRIORITY_MAP[o.priority] || PRIORITY_MAP.medium;
+    return `
+      <tr class="${overdue ? 'overdue' : ''}" id="row-${o.id}" onclick="handleRowClick(event,'${o.id}')" style="cursor:pointer;">
+        <td data-label="#">
+          <span class="order-no">${o.orderNo}</span>
+        </td>
+        <td data-label="案件名" style="font-weight:600; max-width:200px;">
+          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;" title="${esc(o.projectName)}">${esc(o.projectName)}</div>
+        </td>
+        <td data-label="クライアント" style="color:#6b7280;">${esc(o.client || '—')}</td>
+        <td data-label="種別" style="color:#6b7280;white-space:nowrap;">${esc(o.type || '—')}</td>
+        <td data-label="納期">${formatDate(o.deadline)}</td>
+        <td data-label="優先度"><span class="priority-badge ${priorityInfo.cls}">${priorityInfo.label}</span></td>
+        <td data-label="発注者" style="color:#374151;">${esc(o.requester || '—')}</td>
+        <td data-label="ステータス">
+          <select class="status-select" onchange="changeStatus('${o.id}', this.value)">
+            ${Object.entries(STATUS_MAP).map(([k, v]) =>
+              `<option value="${k}"${o.status === k ? ' selected' : ''}>${v.label}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td data-label="操作" style="white-space:nowrap;">
+          <button class="btn btn-ghost btn-sm" onclick="openDetail('${o.id}')">詳細</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="deleteOrder('${o.id}')">削除</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function setFilter(status) {
+  currentFilter = status;
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.status === status);
+  });
+  renderTable();
+}
+
+// ============================================================
+// WIZARD
+// ============================================================
+let wizardStep = 1;
+const WIZARD_STEPS = [
+  { id: 1, label: 'STEP 1 / 4 — 基本情報' },
+  { id: 2, label: 'STEP 2 / 4 — デザイン仕様' },
+  { id: 3, label: 'STEP 3 / 4 — ブリーフ・参考資料' },
+  { id: 4, label: 'STEP 4 / 4 — 確認・発注' },
+];
+
+function updateWizardUI() {
+  WIZARD_STEPS.forEach(s => {
+    const circle = document.getElementById('sc-' + s.id);
+    const label  = document.getElementById('sl-' + s.id);
+    circle.classList.remove('active','done');
+    label.classList.remove('active','done');
+    if (s.id === wizardStep) { circle.classList.add('active'); label.classList.add('active'); }
+    else if (s.id < wizardStep) { circle.classList.add('done'); circle.textContent = '✓'; label.classList.add('done'); }
+    else { circle.textContent = s.id; }
+  });
+  for (let i = 1; i <= 3; i++) {
+    const conn = document.getElementById('conn-' + i);
+    conn.classList.toggle('done', i < wizardStep);
+  }
+  document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('wp-' + wizardStep).classList.add('active');
+  document.getElementById('wizard-step-label').textContent = WIZARD_STEPS[wizardStep - 1].label;
+  document.getElementById('btn-back').style.display = wizardStep > 1 ? '' : 'none';
+  document.getElementById('btn-next').style.display = wizardStep < 4 ? '' : 'none';
+  document.getElementById('btn-submit').style.display = wizardStep === 4 ? '' : 'none';
+  if (wizardStep === 4) buildConfirmPanel();
+}
+
+// ============================================================
+// SIZE ROWS
+// ============================================================
+function addSizeRow(value = '') {
+  const list = document.getElementById('size-list');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:6px;';
+  row.innerHTML = `
+    <input type="text" class="form-control" placeholder="例: 1200×628px、PNG" value="${esc(value)}" style="flex:1;">
+    <button type="button" onclick="this.parentElement.remove()" style="width:28px;height:28px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#9ca3af;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#9ca3af'">×</button>
+  `;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function getSizeValues() {
+  return Array.from(document.querySelectorAll('#size-list input'))
+    .map(i => i.value.trim()).filter(Boolean).join(' / ');
+}
+
+// ============================================================
+// DEADLINE HINT
+// ============================================================
+const PROD_DAYS = {
+  'バナー広告':    { min: 2, max: 3,  label: '2〜3営業日' },
+  'SNS投稿画像':   { min: 1, max: 2,  label: '1〜2営業日' },
+  '動画サムネイル': { min: 1, max: 2,  label: '1〜2営業日' },
+  '資料・スライド': { min: 3, max: 5,  label: '3〜5営業日' },
+  'Webサイト素材':  { min: 3, max: 5,  label: '3〜5営業日' },
+  'チラシ・印刷物': { min: 5, max: 7,  label: '5〜7営業日' },
+  'ロゴ・アイコン': { min: 5, max: 10, label: '5〜10営業日' },
+  'その他':        { min: 3, max: 5,  label: '3〜5営業日（目安）' },
+};
+
+function countBusinessDays(from, to) {
+  let count = 0;
+  const cur = new Date(from);
+  cur.setHours(0,0,0,0);
+  const end = new Date(to);
+  end.setHours(0,0,0,0);
+  while (cur < end) {
+    cur.setDate(cur.getDate() + 1);
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
+
+function updateDeadlineHint() {
+  const hint = document.getElementById('deadline-hint');
+  const val  = document.getElementById('f-deadline').value;
+  const type = document.getElementById('f-type').value;
+  if (!val) { hint.style.display = 'none'; return; }
+
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const deadline = new Date(val + 'T00:00:00');
+  const bizDays  = countBusinessDays(today, deadline);
+  const prod     = PROD_DAYS[type] || null;
+
+  let status, icon, color, msg;
+  if (bizDays <= 0) {
+    icon = '⛔'; color = '#991b1b';
+    status = `今日以前の日付です。納期を見直してください。`;
+  } else if (prod) {
+    if (bizDays < prod.min) {
+      icon = '🔴'; color = '#b91c1c';
+      status = `残り <strong>${bizDays}営業日</strong> — ${type}の目安（${prod.label}）より短いです。事前に口頭で相談してください。`;
+    } else if (bizDays <= prod.max + 1) {
+      icon = '🟡'; color = '#92400e';
+      status = `残り <strong>${bizDays}営業日</strong> — ${type}の目安（${prod.label}）ギリギリです。`;
+    } else {
+      icon = '🟢'; color = '#065f46';
+      status = `残り <strong>${bizDays}営業日</strong> — ${type}の目安（${prod.label}）に対して余裕があります。`;
+    }
+  } else {
+    icon = bizDays <= 2 ? '🔴' : bizDays <= 5 ? '🟡' : '🟢';
+    color = bizDays <= 2 ? '#b91c1c' : bizDays <= 5 ? '#92400e' : '#065f46';
+    status = `本日から <strong>${bizDays}営業日</strong> あります。`;
+  }
+
+  hint.style.display = '';
+  hint.style.color = color;
+  hint.innerHTML = `${icon} ${status}`;
+}
+
+function toggleTypeOther() {
+  const isOther = document.getElementById('f-type').value === 'その他';
+  document.getElementById('f-type-other-wrap').style.display = isOther ? '' : 'none';
+  if (!isOther) document.getElementById('f-type-other').value = '';
+}
+
+function wizardNext() {
+  if (!validateWizardStep(wizardStep)) return;
+  if (wizardStep < 4) { wizardStep++; updateWizardUI(); }
+}
+
+function wizardBack() {
+  if (wizardStep > 1) { wizardStep--; updateWizardUI(); }
+}
+
+function validateWizardStep(step) {
+  if (step === 1) {
+    if (!document.getElementById('f-requester').value.trim()) {
+      alert('発注者名を入力してください。'); return false;
+    }
+    if (!document.getElementById('f-projectName').value.trim()) {
+      alert('案件名を入力してください。'); return false;
+    }
+  }
+  if (step === 2) {
+    if (!document.getElementById('f-type').value) {
+      alert('デザインの種別を選択してください。'); return false;
+    }
+    if (document.getElementById('f-type').value === 'その他' && !document.getElementById('f-type-other').value.trim()) {
+      alert('種別の詳細を入力してください。'); return false;
+    }
+    if (!document.getElementById('f-deadline').value) {
+      alert('納期を入力してください。'); return false;
+    }
+  }
+  return true;
+}
+
+function buildConfirmPanel() {
+  const priority = document.querySelector('input[name="priority"]:checked')?.value || 'medium';
+  const pInfo = PRIORITY_MAP[priority];
+  const deadline = document.getElementById('f-deadline').value;
+  const brief = document.getElementById('f-brief').value.trim();
+  const ref   = document.getElementById('f-reference').value.trim();
+  document.getElementById('confirm-content').innerHTML = `
+    <div class="confirm-section">
+      <div class="confirm-section-title">基本情報</div>
+      <div class="confirm-row"><span class="confirm-key">発注者</span><span class="confirm-val">${esc(document.getElementById('f-requester').value.trim())}</span></div>
+      <div class="confirm-row"><span class="confirm-key">クライアント</span><span class="confirm-val">${esc(document.getElementById('f-client').value.trim() || '—')}</span></div>
+      <div class="confirm-row"><span class="confirm-key">案件名</span><span class="confirm-val" style="font-weight:700;">${esc(document.getElementById('f-projectName').value.trim())}</span></div>
+    </div>
+    <div class="confirm-section">
+      <div class="confirm-section-title">デザイン仕様</div>
+      <div class="confirm-row"><span class="confirm-key">種別</span><span class="confirm-val">${esc(document.getElementById('f-type').value === 'その他' ? 'その他：' + document.getElementById('f-type-other').value.trim() : document.getElementById('f-type').value)}</span></div>
+      <div class="confirm-row"><span class="confirm-key">サイズ</span><span class="confirm-val">${esc(getSizeValues() || '—')}</span></div>
+      <div class="confirm-row"><span class="confirm-key">納期</span><span class="confirm-val">${formatDate(deadline)}</span></div>
+      <div class="confirm-row"><span class="confirm-key">優先度</span><span class="confirm-val"><span class="priority-badge ${pInfo.cls}">${pInfo.label}</span></span></div>
+    </div>
+    ${brief ? `<div class="confirm-section"><div class="confirm-section-title">ブリーフ</div><div class="confirm-brief">${esc(brief)}</div></div>` : ''}
+    ${ref   ? `<div class="confirm-section"><div class="confirm-section-title">参考・素材</div><div class="confirm-brief">${esc(ref)}</div></div>` : ''}
+  `;
+}
+
+function openNewOrderModal() {
+  document.getElementById('newOrderForm').reset();
+  document.querySelector('input[name="priority"][value="medium"]').checked = true;
+  document.getElementById('f-type-other-wrap').style.display = 'none';
+  document.getElementById('deadline-hint').style.display = 'none';
+  document.getElementById('size-list').innerHTML = '';
+  wizardStep = 1;
+  updateWizardUI();
+  document.getElementById('newOrderModal').classList.add('open');
+}
+
+function closeNewOrderModal() {
+  document.getElementById('newOrderModal').classList.remove('open');
+}
+
+function submitOrder() {
+  const priority = document.querySelector('input[name="priority"]:checked')?.value || 'medium';
+  const now = new Date().toISOString();
+  const order = {
+    id: Date.now().toString(),
+    orderNo: getNextOrderNo(orders),
+    requester:   document.getElementById('f-requester').value.trim(),
+    projectName: document.getElementById('f-projectName').value.trim(),
+    client:      document.getElementById('f-client').value.trim(),
+    type:        document.getElementById('f-type').value === 'その他'
+                   ? 'その他：' + document.getElementById('f-type-other').value.trim()
+                   : document.getElementById('f-type').value,
+    sizeFormat:  getSizeValues(),
+    deadline:    document.getElementById('f-deadline').value,
+    priority,
+    brief:       document.getElementById('f-brief').value.trim(),
+    reference:   document.getElementById('f-reference').value.trim(),
+    status: 'received',
+    createdAt: now,
+    updatedAt: now,
+  };
+  orders.unshift(order);
+  closeNewOrderModal();
+  renderAll();
+  showToast('発注を受け付けました ✓');
+  if (isApiReady()) {
+    apiCall({ action: 'create', data: encodeURIComponent(JSON.stringify(order)) })
+      .catch(() => showToast('保存に失敗しました。再度お試しください。', true));
+  }
+}
+
+// ============================================================
+// STATUS CHANGE (inline select)
+// ============================================================
+function changeStatus(id, newStatus) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
+  order.status = newStatus;
+  order.updatedAt = new Date().toISOString();
+  renderAll();
+  showToast('ステータスを更新しました ✓');
+  if (isApiReady()) {
+    apiCall({ action: 'updateStatus', id, status: newStatus })
+      .catch(() => showToast('保存に失敗しました。', true));
+  }
+}
+
+// ============================================================
+// DELETE
+// ============================================================
+function deleteOrder(id) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
+  if (!confirm(`「${order.projectName}」を削除しますか？この操作は取り消せません。`)) return;
+  orders = orders.filter(o => o.id !== id);
+  renderAll();
+  showToast('削除しました');
+  if (isApiReady()) {
+    apiCall({ action: 'delete', id })
+      .catch(() => showToast('削除の保存に失敗しました。', true));
+  }
+}
+
+// ============================================================
+// DETAIL MODAL
+// ============================================================
+function handleRowClick(e, id) {
+  if (e.target.closest('select, button, a')) return;
+  openDetail(id);
+}
+
+function openDetail(id) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+  currentDetailId = id;
+
+  document.getElementById('detailTitle').textContent = o.projectName;
+  document.getElementById('detailOrderNo').textContent = o.orderNo + ' — ' + (o.createdAt ? o.createdAt.split('T')[0] : '');
+
+  const statusInfo = STATUS_MAP[o.status] || STATUS_MAP.received;
+  const priorityInfo = PRIORITY_MAP[o.priority] || PRIORITY_MAP.medium;
+  const createdDate = o.createdAt ? o.createdAt.replace('T', ' ').substring(0, 16) : '—';
+  const updatedDate = o.updatedAt ? o.updatedAt.replace('T', ' ').substring(0, 16) : '—';
+
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">基本情報</div>
+      <div class="detail-row"><span class="detail-key">発注者</span><span class="detail-val">${esc(o.requester || '—')}</span></div>
+      <div class="detail-row"><span class="detail-key">クライアント</span><span class="detail-val">${esc(o.client || '—')}</span></div>
+      <div class="detail-row"><span class="detail-key">種別</span><span class="detail-val">${esc(o.type || '—')}</span></div>
+      <div class="detail-row"><span class="detail-key">サイズ</span><span class="detail-val">${esc(o.sizeFormat || '—')}</span></div>
+      <div class="detail-row"><span class="detail-key">納期</span><span class="detail-val">${o.deadline || '—'}${isOverdue(o) ? ' <span style="color:#ef4444;font-size:0.72rem;font-weight:600;">⚠ 期限超過</span>' : ''}</span></div>
+      <div class="detail-row"><span class="detail-key">優先度</span><span class="detail-val"><span class="priority-badge ${priorityInfo.cls}">${priorityInfo.label}</span></span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">ステータス変更</div>
+      <div class="detail-status-actions">
+        ${Object.entries(STATUS_MAP).map(([k, v]) =>
+          `<button class="status-btn${o.status === k ? ' current' : ''}" onclick="changeStatusFromDetail('${o.id}','${k}')">${v.label}</button>`
+        ).join('')}
+      </div>
+    </div>
+    ${o.brief ? `
+    <div class="detail-section">
+      <div class="detail-section-title">概要・ブリーフ</div>
+      <div class="detail-brief">${esc(o.brief)}</div>
+    </div>` : ''}
+    ${o.reference ? `
+    <div class="detail-section">
+      <div class="detail-section-title">参考URL・素材メモ</div>
+      <div class="detail-brief">${esc(o.reference)}</div>
+    </div>` : ''}
+    <div class="detail-section" style="margin-bottom:0;">
+      <div class="detail-section-title">タイムスタンプ</div>
+      <div class="detail-row"><span class="detail-key">登録日時</span><span class="detail-val" style="font-family:'DM Mono',monospace;font-size:0.72rem;color:#6b7280;">${createdDate}</span></div>
+      <div class="detail-row"><span class="detail-key">更新日時</span><span class="detail-val" style="font-family:'DM Mono',monospace;font-size:0.72rem;color:#6b7280;">${updatedDate}</span></div>
+    </div>
+  `;
+
+  document.getElementById('detailDeleteBtn').onclick = () => {
+    closeDetailModal();
+    deleteOrder(id);
+  };
+
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.remove('open');
+  currentDetailId = null;
+}
+
+function changeStatusFromDetail(id, newStatus) {
+  changeStatus(id, newStatus);
+  // Re-render detail body to reflect new status buttons
+  openDetail(id);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// KEYBOARD & CLICK OUTSIDE
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeNewOrderModal();
+    closeDetailModal();
+  }
+});
+
+document.getElementById('newOrderModal').addEventListener('click', function(e) {
+  if (e.target === this) closeNewOrderModal();
+});
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDetailModal();
+});
+
+// Prevent Enter in text inputs from submitting (textarea handles its own Enter)
+document.getElementById('newOrderForm').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+loadFromAPI();
+</script>
+</body>
+</html>

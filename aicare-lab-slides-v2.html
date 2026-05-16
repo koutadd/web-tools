@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店管理アプリ — 業務効率化のご提案 v2</title>
+<style>
+  :root {
+    --navy: #1e3a5f;
+    --navy-mid: #2d5986;
+    --navy-light: #4a90c4;
+    --accent: #0d9488;
+    --accent-light: #ccfbf1;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-800: #1e293b;
+    --slide-w: 1100px;
+    --slide-h: 618px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    background: #0a1628;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+    gap: 16px;
+  }
+
+  .slideshow-wrap {
+    position: relative;
+    width: var(--slide-w);
+    max-width: 100%;
+  }
+
+  .slides-container {
+    width: var(--slide-w);
+    height: var(--slide-h);
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.7);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Nav */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,.1);
+    border: none;
+    color: #fff;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.22); }
+  .slide-counter { color: rgba(255,255,255,.6); font-size: 13px; min-width: 60px; text-align: center; }
+  .dots { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.25); cursor: pointer; transition: background .2s, transform .2s; }
+  .dot.active { background: var(--accent); transform: scale(1.4); }
+
+  /* Notes */
+  .notes-panel { width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09); border-radius: 10px; overflow: hidden; }
+  .notes-header { background: rgba(255,255,255,.07); padding: 9px 16px; font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: .06em; }
+  .notes-body { padding: 12px 16px; font-size: 13px; line-height: 1.75; color: rgba(255,255,255,.72); }
+  .notes-body p { margin-bottom: .4em; }
+
+  .hint { font-size: 11px; color: rgba(255,255,255,.3); text-align: center; }
+
+  /* ==============================
+     Slide base
+  ============================== */
+  .slide-inner {
+    width: 100%; height: 100%;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 50px 62px;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
+  }
+  .slide-num {
+    position: absolute;
+    bottom: 22px; right: 28px;
+    font-size: 11px; color: var(--gray-400);
+    letter-spacing: .07em;
+  }
+  .slide-label {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .slide-title {
+    font-size: 26px; font-weight: 800;
+    color: var(--navy);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .slide-title small { font-size: 18px; font-weight: 700; }
+  .slide-sub {
+    font-size: 14px; color: var(--gray-500);
+    line-height: 1.65;
+    margin-bottom: 24px;
+    font-weight: 400;
+  }
+  .divider { width: 44px; height: 4px; background: var(--accent); border-radius: 2px; margin-bottom: 24px; }
+
+  /* Grids */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  /* Cards */
+  .card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 18px; }
+  .card.teal { background: var(--accent-light); border-color: var(--accent); }
+  .card.navy { background: var(--navy); color: white; border-color: var(--navy); }
+  .card.red { background: #fff1f2; border-color: #fecaca; }
+  .card.green { background: #f0fdf4; border-color: #86efac; }
+  .card.amber { background: #fffbeb; border-color: #fcd34d; }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge-navy { background: var(--navy); color: white; }
+  .badge-accent { background: var(--accent); color: white; }
+  .badge-danger { background: var(--danger); color: white; }
+  .badge-warn { background: var(--warn); color: white; }
+  .badge-gray { background: var(--gray-200); color: var(--gray-600); }
+
+  /* List helpers */
+  ul.check { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.check li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--gray-800); line-height: 1.5; }
+  ul.check li .ck { color: var(--accent); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+  ul.check li .xk { color: var(--danger); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+
+  /* ==============================
+     SLIDE 1 — 表紙
+  ============================== */
+  #s1 .slide-inner {
+    background: linear-gradient(135deg, #12294a 0%, #1e3d6b 55%, #163258 100%);
+    padding: 56px 70px;
+    justify-content: center;
+  }
+  #s1 .slide-inner::before { display: none; }
+  #s1 .deco { position: absolute; border-radius: 50%; background: white; opacity: .05; }
+  #s1 .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px; padding: 5px 14px;
+    color: rgba(255,255,255,.8); font-size: 12px; font-weight: 400;
+    letter-spacing: .06em; margin-bottom: 28px;
+  }
+  #s1 .m-title { font-size: 38px; font-weight: 800; color: white; line-height: 1.3; margin-bottom: 16px; letter-spacing: -.01em; }
+  #s1 .m-title em { color: #5dd8c8; font-style: normal; }
+  #s1 .m-sub { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.75; max-width: 560px; margin-bottom: 36px; font-weight: 400; }
+  #s1 .meta { display: flex; gap: 24px; }
+  #s1 .meta-item { font-size: 12px; color: rgba(255,255,255,.45); }
+  #s1 .meta-item strong { color: rgba(255,255,255,.75); display: block; font-size: 13px; margin-bottom: 2px; font-weight: 500; }
+
+  /* ==============================
+     SLIDE 2 — 出店準備の課題
+  ============================== */
+  #s2 .issue {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 10px; padding: 16px 18px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  #s2 .issue .ico { font-size: 20px; margin-top: 2px; }
+  #s2 .issue h3 { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
+  #s2 .issue p { font-size: 12px; color: var(--gray-500); line-height: 1.5; }
+  #s2 .issue .voice {
+    margin-top: 8px; font-size: 11px;
+    color: #92400e; background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    padding: 5px 9px; border-radius: 0 5px 5px 0;
+    font-style: italic;
+  }
+
+  /* ==============================
+     SLIDE 3 — LINE・口頭の限界
+  ============================== */
+  #s3 .line-flow {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #s3 .lf-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #e0f2fe; border-radius: 10px 10px 10px 3px;
+    padding: 9px 13px; font-size: 12px; color: #0c4a6e;
+    max-width: 320px;
+  }
+  #s3 .lf-item.reply {
+    background: #dcfce7; color: #166534;
+    border-radius: 10px 10px 3px 10px;
+    align-self: flex-end; max-width: 320px;
+  }
+  #s3 .lf-label { font-size: 10px; color: var(--gray-400); text-align: right; margin-top: -2px; }
+  #s3 .limit-list { display: flex; flex-direction: column; gap: 10px; }
+  #s3 .limit-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--gray-800); line-height: 1.5;
+  }
+  #s3 .limit-item .num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--danger); color: white;
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ==============================
+     SLIDE 4 — 何が変わるか
+  ============================== */
+  #s4 .ba {
+    display: grid; grid-template-columns: 1fr 36px 1fr; gap: 0;
+    align-items: center; flex: 1;
+  }
+  #s4 .ba-col { height: 100%; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  #s4 .ba-col.before { background: #fff1f2; border: 1.5px solid #fecaca; }
+  #s4 .ba-col.after  { background: #f0fdf4; border: 1.5px solid #86efac; }
+  #s4 .ba-lbl { font-size: 11px; font-weight: 600; letter-spacing: .08em; margin-bottom: 4px; }
+  #s4 .ba-lbl.b { color: #dc2626; } #s4 .ba-lbl.a { color: #16a34a; }
+  #s4 .ba-row { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; line-height: 1.45; color: var(--gray-800); }
+  #s4 .ba-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  #s4 .arr { display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 20px; font-weight: 400; }
+
+  /* ==============================
+     SLIDE 5 — コミュニケーションコスト
+  ============================== */
+  #s5 .old-flow { display: flex; flex-direction: column; gap: 6px; }
+  #s5 .of-box {
+    background: var(--gray-100); border: 1px solid var(--gray-200);
+    border-radius: 8px; padding: 9px 13px;
+    font-size: 12px; color: var(--gray-600); line-height: 1.4;
+  }
+  #s5 .of-box.bad { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+  #s5 .of-box.good { background: var(--accent-light); border-color: var(--accent); color: var(--navy); font-weight: 600; }
+  #s5 .step-arrow { text-align: center; font-size: 11px; color: var(--gray-400); }
+  #s5 .pt-row { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--gray-800); line-height: 1.5; margin-bottom: 10px; }
+  #s5 .pt-row .ck { color: var(--accent); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ==============================
+     SLIDE 6 — 抜け漏れ防止
+  ============================== */
+  #s6 .pbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  #s6 .pbar-label { font-size: 12px; color: var(--gray-500); width: 140px; flex-shrink: 0; }
+  #s6 .pbar { flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+  #s6 .pbar-fill { height: 100%; border-radius: 4px; }
+  #s6 .status-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 13px; border-radius: 8px;
+    font-size: 12px; margin-bottom: 8px;
+  }
+  #s6 .status-row.delay { background: #fee2e2; color: #991b1b; }
+  #s6 .status-row.warn  { background: #fef3c7; color: #92400e; }
+  #s6 .status-row.good  { background: #dcfce7; color: #166534; }
+  #s6 .val-card { border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-weight: 400; }
+
+  /* ==============================
+     SLIDE 7 — バックアップ
+  ============================== */
+  #s7 .tl { display: flex; flex-direction: column; gap: 0; }
+  #s7 .tl-item { display: flex; gap: 12px; padding-bottom: 14px; position: relative; }
+  #s7 .tl-item:last-child { padding-bottom: 0; }
+  #s7 .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 4px; flex-shrink: 0; position: relative; z-index: 1; }
+  #s7 .tl-item:not(:last-child) .tl-dot::after {
+    content: ''; position: absolute; top: 10px; left: 4px;
+    width: 2px; background: var(--gray-200); height: calc(100% + 4px);
+  }
+  #s7 .tl-text { font-size: 13px; color: var(--gray-800); line-height: 1.5; }
+  #s7 .tl-text strong { color: var(--navy); font-weight: 600; }
+  #s7 .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ==============================
+     SLIDE 8 — オーナー閲覧
+  ============================== */
+  #s8 .role-row { display: flex; gap: 14px; }
+  #s8 .role-card { flex: 1; border-radius: 10px; padding: 16px; border: 2px solid transparent; }
+  #s8 .role-card.hq    { background: #eff6ff; border-color: #93c5fd; }
+  #s8 .role-card.owner { background: #f5f3ff; border-color: #c4b5fd; }
+  #s8 .role-lbl { font-size: 11px; font-weight: 600; letter-spacing: .08em; margin-bottom: 8px; }
+  #s8 .role-lbl.hq { color: #1d4ed8; } #s8 .role-lbl.owner { color: #7c3aed; }
+  #s8 .role-item { font-size: 12.5px; color: var(--gray-800); line-height: 1.6; display: flex; gap: 6px; margin-bottom: 4px; }
+  #s8 .caution { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 9px; padding: 11px 14px; font-size: 12px; color: #92400e; display: flex; gap: 9px; align-items: flex-start; }
+
+  /* ==============================
+     SLIDE 9 — デモ案内
+  ============================== */
+  #s9 .demo-card { border-radius: 10px; overflow: hidden; border: 1.5px solid var(--gray-200); flex: 1; }
+  #s9 .demo-head { padding: 12px 16px; font-weight: 600; font-size: 13px; color: white; }
+  #s9 .demo-head.fc { background: #db2777; }
+  #s9 .demo-head.dr { background: #2563eb; }
+  #s9 .demo-head.ow { background: #7c3aed; }
+  #s9 .demo-body { padding: 12px 16px; background: white; }
+  #s9 .dp { font-size: 12px; color: var(--gray-800); line-height: 1.55; display: flex; gap: 7px; margin-bottom: 6px; }
+  #s9 .dp .n { width: 16px; height: 16px; border-radius: 50%; background: var(--navy); color: white; font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s9 .url-strip { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+  #s9 .url-code { font-family: monospace; font-size: 12px; color: var(--navy-mid); font-weight: 600; }
+
+  /* ==============================
+     SLIDE 10 — みずきさんまとめ
+  ============================== */
+  #s10 .cl-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; border-left: 4px solid var(--navy); }
+  #s10 .cl-item.a { border-left-color: var(--accent); }
+  #s10 .cl-item.w { border-left-color: var(--warn); }
+  #s10 .cl-item.t { border-left-color: #0d9488; }
+  #s10 .cl-icon { font-size: 24px; flex-shrink: 0; }
+  #s10 .cl-item h3 { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  #s10 .cl-item p { font-size: 12px; color: var(--gray-500); line-height: 1.5; }
+  #s10 .bottom-bar { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); border-radius: 10px; padding: 13px 18px; display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+
+  /* ==============================
+     SLIDE 11 — 将来構想
+  ============================== */
+  #s11 .slide-inner {
+    background: linear-gradient(135deg, #0f2240 0%, #1a3660 100%);
+    padding: 48px 62px;
+    justify-content: center;
+  }
+  #s11 .slide-inner::before { display: none; }
+  #s11 .f-label { font-size: 10px; font-weight: 500; letter-spacing: .15em; color: #5dd8c8; margin-bottom: 20px; }
+  #s11 .f-title { font-size: 28px; font-weight: 800; color: white; line-height: 1.35; margin-bottom: 20px; }
+  #s11 .f-title em { color: #5dd8c8; font-style: normal; }
+  #s11 .f-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  #s11 .f-step { display: flex; align-items: flex-start; gap: 12px; }
+  #s11 .f-step-n { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.15); color: white; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s11 .f-step-t { font-size: 14px; color: rgba(255,255,255,.8); line-height: 1.6; font-weight: 400; }
+  #s11 .f-step-t strong { color: white; font-weight: 600; }
+  #s11 .f-note { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 9px; padding: 12px 16px; font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.6; }
+  #s11 .f-note strong { color: rgba(255,255,255,.9); }
+  #s11 .app-flow {
+    display: flex; align-items: center; gap: 6px;
+    position: absolute; right: 56px; top: 50%; transform: translateY(-50%);
+  }
+  #s11 .app-box { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 10px 14px; text-align: center; font-size: 11px; color: rgba(255,255,255,.8); font-weight: 600; }
+  #s11 .app-box.current { background: rgba(13,148,136,.3); border-color: #5dd8c8; }
+  #s11 .app-box.future { background: rgba(255,255,255,.05); border-style: dashed; color: rgba(255,255,255,.5); }
+  #s11 .app-arr { color: rgba(255,255,255,.35); font-size: 12px; }
+
+  /* ==============================
+     SLIDE 12 — 締め
+  ============================== */
+  #s12 .slide-inner {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3d6b 100%);
+    padding: 52px 68px;
+    justify-content: center;
+  }
+  #s12 .slide-inner::before { display: none; }
+  #s12 .cl-tag { font-size: 11px; font-weight: 500; letter-spacing: .14em; color: #5dd8c8; margin-bottom: 22px; }
+  #s12 .cl-title { font-size: 30px; font-weight: 800; color: white; line-height: 1.35; margin-bottom: 26px; }
+  #s12 .cl-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  #s12 .cs { display: flex; align-items: flex-start; gap: 12px; }
+  #s12 .cs-n { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.13); color: white; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s12 .cs-t { font-size: 14px; color: rgba(255,255,255,.78); line-height: 1.6; font-weight: 400; }
+  #s12 .cs-t strong { color: white; font-weight: 600; }
+  #s12 .cl-bottom { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 620px; }
+  #s12 .cl-bottom strong { color: white; }
+
+  /* Talk guide slides */
+  #s13 .slide-inner, #s14 .slide-inner { padding: 38px 52px; overflow-y: auto; }
+  .tg-section { margin-bottom: 16px; }
+  .tg-section h3 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1.5px solid var(--gray-200); }
+  .tg-line { font-size: 12px; color: var(--gray-800); line-height: 1.65; padding: 5px 0; border-bottom: 1px dashed var(--gray-200); display: flex; gap: 9px; }
+  .tg-line .ts { font-size: 10px; font-weight: 600; color: var(--accent); min-width: 48px; flex-shrink: 0; margin-top: 2px; }
+
+  @media (max-width: 1140px) {
+    :root { --slide-w: 92vw; --slide-h: calc(92vw * 0.562); }
+    #s1 .m-title { font-size: 28px; }
+  }
+  @media (max-width: 680px) {
+    :root { --slide-w: 99vw; --slide-h: calc(99vw * 0.63); }
+    .slide-inner { padding: 28px 24px; }
+    #s1 .m-title { font-size: 20px; }
+    .slide-title { font-size: 19px; }
+    .g4 { grid-template-columns: 1fr 1fr; }
+    #s9 .demo-card { flex: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="slideshow-wrap">
+  <div class="slides-container">
+
+    <!-- S1: 表紙 -->
+    <div class="slide active" id="s1">
+      <div class="slide-inner">
+        <div class="deco" style="width:380px;height:380px;right:-80px;bottom:-130px;"></div>
+        <div class="deco" style="width:180px;height:180px;right:220px;top:-70px;"></div>
+        <div class="chip">🏢 AICARE LAB — 社内説明資料</div>
+        <div class="m-title">「探して聞く」管理から、<br><em>「見れば分かる」管理</em>へ。</div>
+        <div class="m-sub">
+          チャット・口頭・Excel に散らばった出店情報を一元化し、<br>
+          確認コスト・抜け漏れ・往復ゼロを目指す業務効率化のご提案です。
+        </div>
+        <div class="meta">
+          <div class="meta-item"><strong>対象</strong>社内向け業務効率化説明</div>
+          <div class="meta-item"><strong>ツール</strong>AICARE LAB 出店管理アプリ</div>
+          <div class="meta-item"><strong>作成</strong>2026年4月</div>
+        </div>
+        <div class="slide-num" style="color:rgba(255,255,255,.25)">01 / 14</div>
+      </div>
+    </div>
+
+    <!-- S2: 出店準備で起きがちな課題 -->
+    <div class="slide" id="s2">
+      <div class="slide-inner">
+        <div class="slide-label">Before — 現場の実態</div>
+        <div class="slide-title">出店準備では、情報が散らばりやすい</div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div class="issue">
+            <div class="ico">📂</div>
+            <div>
+              <h3>情報の置き場所がバラバラ</h3>
+              <p>LINE・メール・Excel・口頭…どれが最新か分からない。誰かに確認しないと安心できない。</p>
+              <div class="voice">「Aさんに送った内容、どこにありましたっけ？」</div>
+            </div>
+          </div>
+          <div class="issue">
+            <div class="ico">❓</div>
+            <div>
+              <h3>担当や状況が見えにくい</h3>
+              <p>SATTOU・HPB・Square・広告・研修…複数テーマが並走し、今どこまで進んでいるかが分かりにくい。</p>
+              <div class="voice">「採用、今どの段階でしたっけ？」</div>
+            </div>
+          </div>
+          <div class="issue">
+            <div class="ico">💬</div>
+            <div>
+              <h3>確認のためだけに会話が増える</h3>
+              <p>オーナー・本部・スタッフ間で、開業時期・進捗・物件状況の確認が何度も繰り返される。</p>
+              <div class="voice">「今週中に広告開始できそうですか？」</div>
+            </div>
+          </div>
+          <div class="issue">
+            <div class="ico">⚠️</div>
+            <div>
+              <h3>遅れや抜けに気づくのが遅い</h3>
+              <p>締め後に提出漏れが見つかったり、修正依頼が後追いになったりと、全体を俯瞰する場所がない。</p>
+              <div class="voice">「あの書類、まだ提出されてなかった…」</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">02 / 14</div>
+      </div>
+    </div>
+
+    <!-- S3: LINE・口頭運用の限界 -->
+    <div class="slide" id="s3">
+      <div class="slide-inner">
+        <div class="slide-label">根本課題 — 運用構造の問題</div>
+        <div class="slide-title">「情報はある。でも探せない」<br><small>LINEと口頭中心の運用が生む構造的コスト</small></div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:12px">よくある会話のパターン</p>
+            <div class="line-flow">
+              <div class="lf-item">💬 「日計、修正お願いします」</div>
+              <div class="lf-label">本部 → 担当者</div>
+              <div class="lf-item reply">「どの日付の分ですか？」</div>
+              <div class="lf-label">担当者 → 本部</div>
+              <div class="lf-item">「先週の◯日です。あと集計シートも」</div>
+              <div class="lf-label">本部 → 担当者</div>
+              <div class="lf-item reply">「確認しました。修正しました」</div>
+              <div class="lf-label">担当者 → 本部</div>
+              <div style="background:#fee2e2;border-radius:8px;padding:9px 12px;font-size:12px;color:#991b1b;margin-top:8px">
+                🕐 このやり取りが毎回発生。合計すると<strong>相当な時間のロス</strong>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:12px">LINE・口頭運用の4つの限界</p>
+            <div class="limit-list">
+              <div class="limit-item"><span class="num">1</span><div>ログを遡らないと<strong>今の状況が分からない</strong>。新たに加わったメンバーは特に把握しにくい</div></div>
+              <div class="limit-item"><span class="num">2</span><div>修正依頼・提出漏れ確認が<strong>散発的に後追い</strong>で発生する</div></div>
+              <div class="limit-item"><span class="num">3</span><div>担当変更時の<strong>引き継ぎコストが高い</strong>。情報が個人のトーク履歴に埋まっている</div></div>
+              <div class="limit-item"><span class="num">4</span><div>「聞かないと分からない」ので、<strong>同じ説明や確認が繰り返される</strong></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">03 / 14</div>
+      </div>
+    </div>
+
+    <!-- S4: 何が変わるか -->
+    <div class="slide" id="s4">
+      <div class="slide-inner">
+        <div class="slide-label">After — このアプリで何が変わるか</div>
+        <div class="slide-title">情報の置き場所をひとつに。<br>「見れば分かる」状態をつくる</div>
+        <div class="divider"></div>
+        <div class="ba" style="flex:1">
+          <div class="ba-col before">
+            <div class="ba-lbl b">❌ BEFORE</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>情報がLINE・メール・Excelに分散</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>進捗は「聞かないと分からない」</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>遅延・未対応に気づくのが遅い</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>修正依頼が後追い・散発的</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>担当変更で情報が消えやすい</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>オーナーへ都度説明が必要</div>
+          </div>
+          <div class="arr">▶</div>
+          <div class="ba-col after">
+            <div class="ba-lbl a">✅ AFTER</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>全情報がアプリ1か所に集約</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>ダッシュボードで状況を一目把握</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>遅延・注意が色で即座に分かる</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>未対応タスクが一覧で見える</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>クラウドに履歴が蓄積、引き継ぎがラク</div>
+            <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>オーナー用ページで随時共有可能</div>
+          </div>
+        </div>
+        <div class="slide-num">04 / 14</div>
+      </div>
+    </div>
+
+    <!-- S5: コミュニケーションコスト削減 -->
+    <div class="slide" id="s5">
+      <div class="slide-inner">
+        <div class="slide-label">効率化ポイント 1</div>
+        <div class="slide-title">「ここを見るだけで完結」<br>確認の往復が、なくなる</div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px">今まで：確認往復のフロー</p>
+            <div class="old-flow">
+              <div class="of-box">💬 「今の進捗を教えてください」</div>
+              <div class="step-arrow">⬇ 返信待ち / ログを探す</div>
+              <div class="of-box">💬 「Excelはこちら、LINEはあっちに…」</div>
+              <div class="step-arrow">⬇ 情報を収集・照合</div>
+              <div class="of-box">💬 「分かりました。あとX件確認なんですが」</div>
+              <div class="step-arrow">⬇ また返信待ち</div>
+              <div class="of-box bad">🕐 1回の確認に数十分〜数時間のロス</div>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px">アプリで変わること</p>
+            <div class="pt-row"><span class="ck">✔</span><div><strong>チャットを遡らなくていい</strong><br><span style="font-size:11px;color:var(--gray-400)">最新情報は常にアプリに集約されている</span></div></div>
+            <div class="pt-row"><span class="ck">✔</span><div><strong>誰かに都度聞かなくていい</strong><br><span style="font-size:11px;color:var(--gray-400)">開けば状況が分かる状態になっている</span></div></div>
+            <div class="pt-row"><span class="ck">✔</span><div><strong>状況確認の往復が減る</strong><br><span style="font-size:11px;color:var(--gray-400)">「見ればいい」が定着するとチーム全体が変わる</span></div></div>
+            <div class="pt-row"><span class="ck">✔</span><div><strong>情報の置き場所が1つにまとまる</strong><br><span style="font-size:11px;color:var(--gray-400)">散らばりの原因ごと解消される</span></div></div>
+            <div class="of-box good" style="margin-top:6px">
+              🎯 「聞く前に見る」が文化になると、<br>チーム全体の生産性が上がります
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">05 / 14</div>
+      </div>
+    </div>
+
+    <!-- S6: 抜け漏れ防止 -->
+    <div class="slide" id="s6">
+      <div class="slide-inner">
+        <div class="slide-label">効率化ポイント 2</div>
+        <div class="slide-title">遅延・未対応が「見える」から、<br>抜け・漏れが起きにくい</div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px">ダッシュボードのイメージ</p>
+            <div class="pbar-row"><span class="pbar-label">A店舗 / 施工フェーズ</span><div class="pbar"><div class="pbar-fill" style="width:80%;background:#22c55e"></div></div><span class="badge badge-accent" style="font-size:10px">順調</span></div>
+            <div class="pbar-row"><span class="pbar-label">B店舗 / 人材採用フェーズ</span><div class="pbar"><div class="pbar-fill" style="width:45%;background:#f59e0b"></div></div><span class="badge badge-warn" style="font-size:10px">注意</span></div>
+            <div class="pbar-row" style="margin-bottom:12px"><span class="pbar-label">C店舗 / 契約交渉フェーズ</span><div class="pbar"><div class="pbar-fill" style="width:20%;background:#ef4444"></div></div><span class="badge badge-danger" style="font-size:10px">遅延</span></div>
+            <div class="status-row delay">🔴 C店舗 / 契約書確認 — 期限3日超過 / <strong>本部担当者待ち</strong></div>
+            <div class="status-row warn">🟡 B店舗 / 採用面接設定 — 期限近い / <strong>オーナー確認待ち</strong></div>
+            <div class="status-row good">🟢 A店舗 / 内装工事 — 完了予定通り</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600">これが見えることの価値</p>
+            <div class="card teal">
+              <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:5px">📍 どこで止まっているか一目でわかる</div>
+              <div style="font-size:12px;color:var(--gray-600)">「なんか遅い気がする」が「C店舗の○○が3日止まっている」に変わる</div>
+            </div>
+            <div class="card teal">
+              <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:5px">👤 誰待ち・何待ちかが分かる</div>
+              <div style="font-size:12px;color:var(--gray-600)">声をかけるべき相手が明確になる。修正依頼の見逃しも減る</div>
+            </div>
+            <div class="card teal">
+              <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:5px">📋 今やるべきことが明確になる</div>
+              <div style="font-size:12px;color:var(--gray-600)">勘や口頭確認に頼らず、システムが「次はこれ」を示してくれる</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">06 / 14</div>
+      </div>
+    </div>
+
+    <!-- S7: バックアップ -->
+    <div class="slide" id="s7">
+      <div class="slide-inner">
+        <div class="slide-label">効率化ポイント 3 — クラウドの安心感</div>
+        <div class="slide-title">バックアップがあるから、<br>万が一でも情報を守れる</div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:12px">データの守られ方</p>
+            <div class="tl">
+              <div class="tl-item"><div class="tl-dot"></div><div class="tl-text"><strong>更新のたびに自動保存</strong><br>操作後600ms以内に保存。「保存忘れ」が起きない</div></div>
+              <div class="tl-item"><div class="tl-dot"></div><div class="tl-text"><strong>バックアップファイルの出力・保存</strong><br>JSON形式で外部退避が可能。アプリ外にも保管できる</div></div>
+              <div class="tl-item"><div class="tl-dot"></div><div class="tl-text"><strong>状態の復元が可能</strong><br>バックアップから元の状態に戻せる。突然のトラブルにも対応可</div></div>
+              <div class="tl-item"><div class="tl-dot"></div><div class="tl-text"><strong>変更履歴・コメントが記録される</strong><br>「誰がいつ何をしたか」が追跡できる</div></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <p style="font-size:12px;color:var(--gray-500);font-weight:600">属人管理との違い</p>
+            <div class="vs-row">
+              <div class="card red">
+                <div style="font-size:20px;margin-bottom:7px">🗂️</div>
+                <div style="font-size:12px;font-weight:600;color:#991b1b;margin-bottom:5px">個人管理のリスク</div>
+                <div style="font-size:11px;color:var(--gray-600);line-height:1.55">担当者が変わると情報が消える。「最新版どれ？」が繰り返される</div>
+              </div>
+              <div class="card green">
+                <div style="font-size:20px;margin-bottom:7px">☁️</div>
+                <div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:5px">アプリ管理の強み</div>
+                <div style="font-size:11px;color:var(--gray-600);line-height:1.55">バックアップで情報が飛びにくい。誰でも引き継げる状態を維持</div>
+              </div>
+            </div>
+            <div style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:10px;padding:14px 16px;color:white">
+              <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:#5dd8c8">みずきさんポイント ☁️</div>
+              <div style="font-size:12px;line-height:1.6;color:rgba(255,255,255,.85)">
+                クラウドで管理することの本質は、<strong style="color:white">「情報が人でなく組織に属する」</strong>こと。バックアップと復旧性はその重要な柱です。
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">07 / 14</div>
+      </div>
+    </div>
+
+    <!-- S8: オーナー閲覧 -->
+    <div class="slide" id="s8">
+      <div class="slide-inner">
+        <div class="slide-label">効率化ポイント 4</div>
+        <div class="slide-title">オーナー様からも見られる設計<br>「説明しなくても伝わる」透明性</div>
+        <div class="divider"></div>
+        <div class="role-row" style="margin-bottom:14px">
+          <div class="role-card hq">
+            <div class="role-lbl hq">🏢 本部用UI</div>
+            <div class="role-item">✅ 全店舗の進捗ダッシュボード</div>
+            <div class="role-item">✅ タスク・工程の詳細管理</div>
+            <div class="role-item">✅ コメント・ファイル・フォト管理</div>
+            <div class="role-item">✅ 全店舗横断での遅延把握</div>
+            <div style="margin-top:8px;font-size:11px;color:#1d4ed8;font-weight:600">管理・オペレーション機能がフル装備</div>
+          </div>
+          <div class="role-card owner">
+            <div class="role-lbl owner">👤 オーナー用UI（別ページ）</div>
+            <div class="role-item">✅ 自分の店舗の進捗が一目で分かる</div>
+            <div class="role-item">✅「今やること」がヒーロー表示</div>
+            <div class="role-item">✅ 提出書類の確認・チェック</div>
+            <div class="role-item">✅ モバイル最適化で外出先も確認可</div>
+            <div style="margin-top:8px;font-size:11px;color:#7c3aed;font-weight:600">「迷わず使える」シンプル設計</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:stretch">
+          <div class="card teal" style="flex:1;padding:13px 15px">
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:5px">💬 「見えない」ことによる不信感をなくす</div>
+            <div style="font-size:12px;color:var(--gray-600);line-height:1.5">「今どうなっているか」が共有されると、問い合わせ・確認電話が減る。関係者全員の安心感が上がる</div>
+          </div>
+          <div class="caution" style="flex:1">
+            <span style="font-size:18px">⚠️</span>
+            <div>
+              <div style="font-weight:600;margin-bottom:3px;font-size:13px">今後の運用課題として整理すること</div>
+              <div style="font-size:11px;line-height:1.5">どこまでオーナーに見せるか（フェーズ・タスク・コメント）の共有範囲は、運用しながら最適化していく設計課題です。最初から完璧に決めなくてOK。</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">08 / 14</div>
+      </div>
+    </div>
+
+    <!-- S9: デモ案内 -->
+    <div class="slide" id="s9">
+      <div class="slide-inner">
+        <div class="slide-label">デモのご案内</div>
+        <div class="slide-title">実際のデモページで<br>機能・使い勝手を確認してください</div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:12px;flex:1;margin-bottom:12px">
+          <div class="demo-card">
+            <div class="demo-head fc">🏪 FCデモ</div>
+            <div class="demo-body">
+              <div class="dp"><span class="n">1</span>FC店舗の出店フロー・工程テンプレートを確認</div>
+              <div class="dp"><span class="n">2</span>タスクの進捗・遅延の色分け表示を確認</div>
+              <div class="dp"><span class="n">3</span>ダッシュボードの「遅延」バッジを確認</div>
+              <div class="dp"><span class="n">4</span>コメント・ファイル管理タブを確認</div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-head dr">🏬 直営デモ</div>
+            <div class="demo-body">
+              <div class="dp"><span class="n">1</span>直営店舗の工程・タスク構成を確認</div>
+              <div class="dp"><span class="n">2</span>FC版と比較して違いを体感</div>
+              <div class="dp"><span class="n">3</span>フェーズ進行・ステータス管理の使い心地を確認</div>
+              <div class="dp"><span class="n">4</span>写真・ファイルアップロード機能も確認</div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-head ow">👤 オーナーページ</div>
+            <div class="demo-body">
+              <div class="dp"><span class="n">1</span><strong>右上のリンクからアクセス</strong></div>
+              <div class="dp"><span class="n">2</span>「今やること」ヒーロー表示を確認</div>
+              <div class="dp"><span class="n">3</span>提出書類チェック機能を体験</div>
+              <div class="dp"><span class="n">4</span>本部UIとの見せ方の違いを比較</div>
+            </div>
+          </div>
+        </div>
+        <div class="url-strip">
+          <span style="font-size:16px">🔗</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px">本番URL</div>
+            <div class="url-code">https://web-tools-black-iota.vercel.app/aicare-lab-app.html</div>
+          </div>
+          <div style="font-size:11px;color:var(--gray-400)">オーナーページへのリンクは画面右上にあります</div>
+        </div>
+        <div class="slide-num">09 / 14</div>
+      </div>
+    </div>
+
+    <!-- S10: みずきさんまとめ -->
+    <div class="slide" id="s10">
+      <div class="slide-inner">
+        <div class="slide-label">クラウド管理の視点からのまとめ</div>
+        <div class="slide-title">クラウドで一元管理するから、<br>確認がラクで、属人化しにくい</div>
+        <div class="divider"></div>
+        <div class="g2" style="flex:1">
+          <div class="cl-item"><div class="cl-icon">☁️</div><div><h3>情報がクラウドに一元化されている</h3><p>誰がどのデバイスからアクセスしても同じ最新情報を見られる。「手元に最新版がない」が起きない</p></div></div>
+          <div class="cl-item a"><div class="cl-icon">👥</div><div><h3>関係者が同じ情報を見られる</h3><p>本部・担当者・オーナーが、役割に合ったビューで同一データを参照。情報のズレが起きにくい</p></div></div>
+          <div class="cl-item w"><div class="cl-icon">🔄</div><div><h3>バックアップと復旧性がある</h3><p>データがシステムに蓄積されるため、属人管理より安全。担当交代でも情報が引き継がれる</p></div></div>
+          <div class="cl-item t"><div class="cl-icon">📱</div><div><h3>確認のためだけに人を動かさなくていい</h3><p>ブラウザがあればどこからでも確認可能。外出中でも、オーナー様でも、いつでもアクセスできる</p></div></div>
+        </div>
+        <div class="bottom-bar">
+          <span style="font-size:20px">💡</span>
+          <div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.6">
+            <strong style="color:#5dd8c8">クラウド管理の本質</strong>は「データが人ではなく組織に属する」こと。このアプリはその考え方を業務フローに組み込んでいます。
+          </div>
+        </div>
+        <div class="slide-num">10 / 14</div>
+      </div>
+    </div>
+
+    <!-- S11: 将来構想 -->
+    <div class="slide" id="s11">
+      <div class="slide-inner">
+        <div class="f-label">Future Vision — 将来構想</div>
+        <div class="f-title">
+          出店管理から、<em>業務全体の一本化</em>へ。<br>
+          <span style="font-size:18px;color:rgba(255,255,255,.7)">人が本来やるべき仕事に集中できる環境を目指す</span>
+        </div>
+        <div class="f-steps">
+          <div class="f-step"><div class="f-step-n">1</div><div class="f-step-t"><strong>今：出店管理を効率化</strong><br>確認往復・抜け漏れ・散らばりを解消。まずここから始める</div></div>
+          <div class="f-step"><div class="f-step-n">2</div><div class="f-step-t"><strong>次のステップ：業務を一本のアプリで管理したい</strong><br>出店管理の延長線上に、アイケアラボ業務全体を1つのアプリで管理できる状態を目指す</div></div>
+          <div class="f-step"><div class="f-step-n">3</div><div class="f-step-t"><strong>目的は「管理を厳しくすること」ではない</strong><br>確認・事務処理・探し物などのムダを減らし、<strong>個々が強みを発揮できる状態</strong>をつくること</div></div>
+        </div>
+        <div class="f-note">
+          情報が一元化されると、<strong>「確認するために人を止める」「ログを探すために時間を使う」</strong>ことが減ります。<br>
+          その先には、スタッフ一人ひとりが<strong>本来やるべき業務・価値を出せる仕事</strong>に集中できる環境があります。
+        </div>
+
+        <div class="app-flow">
+          <div>
+            <div class="app-box current">📋<br>出店管理</div>
+            <div style="font-size:9px;text-align:center;color:#5dd8c8;margin-top:4px">← 現在</div>
+          </div>
+          <div class="app-arr">→</div>
+          <div>
+            <div class="app-box future">📊<br>日次管理</div>
+            <div style="font-size:9px;text-align:center;color:rgba(255,255,255,.35);margin-top:4px">将来</div>
+          </div>
+          <div class="app-arr">→</div>
+          <div>
+            <div class="app-box future">👥<br>採用管理</div>
+            <div style="font-size:9px;text-align:center;color:rgba(255,255,255,.35);margin-top:4px">将来</div>
+          </div>
+          <div class="app-arr">→</div>
+          <div>
+            <div class="app-box future" style="border-color:rgba(93,216,200,.35);color:rgba(93,216,200,.6)">🔗<br>全業務<br>一本化</div>
+            <div style="font-size:9px;text-align:center;color:rgba(93,216,200,.5);margin-top:4px">目指す姿</div>
+          </div>
+        </div>
+
+        <div class="slide-num" style="color:rgba(255,255,255,.25)">11 / 14</div>
+      </div>
+    </div>
+
+    <!-- S12: 締め -->
+    <div class="slide" id="s12">
+      <div class="slide-inner">
+        <div class="cl-tag">CLOSING — まとめ</div>
+        <div class="cl-title">
+          まずは使ってみて、<br>
+          <span style="color:#5dd8c8">現場に合わせて育てていく</span>アプリです
+        </div>
+        <div class="cl-steps">
+          <div class="cs"><div class="cs-n">1</div><div class="cs-t"><strong>まず使ってみる</strong> — デモで操作感を確認。実際の業務で使ってみることが一番の評価</div></div>
+          <div class="cs"><div class="cs-n">2</div><div class="cs-t"><strong>共有範囲を運用しながら調整</strong> — オーナーへの見せ方・情報の粒度は、使いながら最適化。最初から完璧でなくていい</div></div>
+          <div class="cs"><div class="cs-n">3</div><div class="cs-t"><strong>現場のフィードバックで改善</strong> — 使って気づいた課題は改善として積み上げる。育てるプロセスも価値</div></div>
+          <div class="cs"><div class="cs-n">4</div><div class="cs-t"><strong>その先に業務一本化の基盤を</strong> — 出店管理を起点に、アイケアラボ全体の業務効率化基盤を目指す</div></div>
+        </div>
+        <div class="cl-bottom">
+          このアプリが目指すのは「管理を厳しくすること」ではありません。<br>
+          <strong>確認・事務処理・探し物のムダを減らし、人が本来価値を出す仕事に集中できる環境</strong>をつくることです。
+        </div>
+        <div class="slide-num" style="color:rgba(255,255,255,.25)">12 / 14</div>
+      </div>
+    </div>
+
+    <!-- S13: 話し方ガイド 3分版 -->
+    <div class="slide" id="s13">
+      <div class="slide-inner">
+        <div class="slide-label">発表者ガイド</div>
+        <div class="slide-title" style="font-size:20px;margin-bottom:6px">3分版 — 話し方の要約</div>
+        <div class="divider" style="margin-bottom:16px"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <div class="tg-section">
+              <h3>S1-3（表紙〜LINE限界）— 40秒</h3>
+              <div class="tg-line"><span class="ts">S1</span>「今日は出店管理アプリが現場の効率化にどう効くかをご説明します。テーマは"探して聞く管理から見れば分かる管理へ"です。」</div>
+              <div class="tg-line"><span class="ts">S2-3</span>「まず現状ですが、LINEや口頭中心の運用だと、情報はあるのに探せない、同じ説明が繰り返される、という課題が出やすいです。」</div>
+            </div>
+            <div class="tg-section">
+              <h3>S4-6（変化〜コスト〜抜け漏れ）— 1分10秒</h3>
+              <div class="tg-line"><span class="ts">S4</span>「このアプリで情報の置き場所が1つになります。ビフォーアフターで見ると、かなり変わります。」</div>
+              <div class="tg-line"><span class="ts">S5</span>「確認の往復がなくなります。チャットを遡らなくていい、聞かなくていい、状態になります。」</div>
+              <div class="tg-line"><span class="ts">S6</span>「遅延・誰待ちが色で見えるので、抜け漏れに早く気づけます。修正依頼の見逃しも減ります。」</div>
+            </div>
+          </div>
+          <div>
+            <div class="tg-section">
+              <h3>S7-10（バックアップ〜まとめ）— 40秒</h3>
+              <div class="tg-line"><span class="ts">S7</span>「バックアップがあるので情報が飛びにくい。担当交代でも安心です。」</div>
+              <div class="tg-line"><span class="ts">S8</span>「オーナー様用ページもあるので、都度説明しなくても進捗を共有できます。共有範囲は今後整理します。」</div>
+              <div class="tg-line"><span class="ts">S10</span>「クラウドで一元管理、関係者全員が同じ情報を見られる。これが本質的な価値です。」</div>
+            </div>
+            <div class="tg-section">
+              <h3>S11-12（将来構想〜締め）— 30秒</h3>
+              <div class="tg-line"><span class="ts">S11</span>「将来的には出店管理だけでなく、業務全体を一本のアプリで管理したい。確認や事務処理のムダを減らし、人が本来やるべき仕事に集中できる環境を目指します。」</div>
+              <div class="tg-line"><span class="ts">S12</span>「まずデモを触ってみてください。使いながら一緒に育てていきましょう。」</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">13 / 14</div>
+      </div>
+    </div>
+
+    <!-- S14: 話し方ガイド 5分版 -->
+    <div class="slide" id="s14">
+      <div class="slide-inner">
+        <div class="slide-label">発表者ガイド</div>
+        <div class="slide-title" style="font-size:20px;margin-bottom:6px">5分版 — 話し方の要約</div>
+        <div class="divider" style="margin-bottom:14px"></div>
+        <div class="g2" style="flex:1">
+          <div>
+            <div class="tg-section">
+              <h3>S1-2 現場課題の設定 — 50秒</h3>
+              <div class="tg-line"><span class="ts">S1</span>タイトルを読みながら「"探して聞く"が"見れば分かる"に変わることがゴールです」と入る</div>
+              <div class="tg-line"><span class="ts">S2</span>4枚の課題カードを一つずつ確認。「この中で心当たりがあるものはありますか？」と問いかける</div>
+            </div>
+            <div class="tg-section">
+              <h3>S3 LINE・口頭の限界 — 40秒</h3>
+              <div class="tg-line"><span class="ts">S3</span>会話フローを見せながら「このやり取り、実際に起きていますよね」と確認する</div>
+              <div class="tg-line"><span class="ts">S3</span>4つの限界を読み上げ「構造的に情報が個人に閉じてしまっている」でまとめる</div>
+            </div>
+            <div class="tg-section">
+              <h3>S4-5 変化とコスト削減 — 1分</h3>
+              <div class="tg-line"><span class="ts">S4</span>ビフォーアフターを左右で比較。「6つすべてが変わります」と言い切る</div>
+              <div class="tg-line"><span class="ts">S5</span>確認往復フローを見せながら「これが毎回なくなる」と説明。右の4点を丁寧に読む</div>
+            </div>
+            <div class="tg-section">
+              <h3>S6 抜け漏れ防止 — 40秒</h3>
+              <div class="tg-line"><span class="ts">S6</span>進捗バーと色バッジを見ながら「赤が出たら即アクション、という状態を作れます」</div>
+              <div class="tg-line"><span class="ts">S6</span>「誰待ちか分かる」の価値は特に強調。「"なんか遅い気がする"が"Cさん待ち"に変わる」</div>
+            </div>
+          </div>
+          <div>
+            <div class="tg-section">
+              <h3>S7 バックアップ — 40秒</h3>
+              <div class="tg-line"><span class="ts">S7</span>「クラウド管理の安心感の最大のポイントはデータが消えないこと」から入る</div>
+              <div class="tg-line"><span class="ts">S7</span>属人管理との左右比較で「情報が組織の資産になる」でまとめる。右下のみずきさんメモも見せる</div>
+            </div>
+            <div class="tg-section">
+              <h3>S8-9 オーナー＆デモ — 50秒</h3>
+              <div class="tg-line"><span class="ts">S8</span>本部UIとオーナーUIの2画面構成を説明。注意ボックスは正直に「共有範囲は今後整理します」</div>
+              <div class="tg-line"><span class="ts">S9</span>FCデモ→直営デモ→右上オーナーリンクの順で案内。「右上に小さくリンクがあります」を忘れずに</div>
+            </div>
+            <div class="tg-section">
+              <h3>S10-11 まとめ＆将来構想 — 50秒</h3>
+              <div class="tg-line"><span class="ts">S10</span>4つのクラウド価値を並べ「これが効率化の正体です」とまとめる</div>
+              <div class="tg-line"><span class="ts">S11</span>「今は出店管理から始めますが、目指す先は業務全体の一本化です。管理を厳しくするためではなく、人が本来やるべき仕事に集中できるようにするためです」</div>
+            </div>
+            <div class="tg-section">
+              <h3>S12 締め — 30秒</h3>
+              <div class="tg-line"><span class="ts">S12</span>4ステップを読み上げ「まず触ってみて、一緒に育てていきましょう」で締める</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">14 / 14</div>
+      </div>
+    </div>
+
+  </div><!-- /slides-container -->
+
+  <!-- Navigation -->
+  <div class="nav-row" style="margin-top:14px">
+    <button class="nav-btn" onclick="changeSlide(-1)">◀</button>
+    <div class="dots" id="dotsContainer"></div>
+    <span class="slide-counter" id="counter">1 / 14</span>
+    <button class="nav-btn" onclick="changeSlide(1)">▶</button>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-panel" id="notesPanel">
+    <div class="notes-header">🎤 発表者メモ</div>
+    <div class="notes-body" id="notesBody"></div>
+  </div>
+
+  <div class="hint">← → キーで操作できます</div>
+</div>
+
+<script>
+const NOTES = [
+  // S1
+  `<p>「"探して聞く"から"見れば分かる"へ、というのがこの提案のすべてです」と入る。</p>
+   <p>チャット・口頭・Excelに散らばった情報を1か所にまとめることで、確認のムダがなくなる、というストーリーを最初に予告しておく。</p>`,
+  // S2
+  `<p>4枚のカードを順番に指しながら「この4つ、どれか心当たりありますか？」と問いかける。</p>
+   <p>吹き出しの会話フレーズは実際に起きやすい例。「こういう会話、ありますよね」と共感を引き出す形で進める。</p>`,
+  // S3
+  `<p>LINEの会話フロー（左）は実際に起きていた修正依頼のパターンをイメージ。「このやり取りが毎回発生するとどれくらい時間を使うか」を問いかけるとイメージしやすい。</p>
+   <p>右の4つの限界は「情報が個人に閉じている構造」を説明するもの。「問題は人ではなく仕組みです」と添えると刺さりやすい。</p>`,
+  // S4
+  `<p>左（ビフォー）から右（アフター）へ視線を誘導。「6つすべてが変わります」と言い切ってからリストを読む。</p>
+   <p>「詳しい説明は次のスライドから順番にします」と予告してから進むとスムーズ。</p>`,
+  // S5
+  `<p>左の確認往復フローは「毎回発生するとしたら1日何回・何時間になるか」を想像させると効果的。</p>
+   <p>右4点の中で特に強調するのは「情報の置き場所が1つ」。散らばりの原因ごと解消、という言い方が伝わりやすい。</p>`,
+  // S6
+  `<p>進捗バーと色バッジを見せながら「赤が出たら即アクション、という判断が画面を見るだけでできます」と説明。</p>
+   <p>「誰待ちか分かる」は特に強調。「"なんか遅い気がする"が"Cさんの契約書確認が3日止まっている"に変わる」という具体例で伝える。</p>`,
+  // S7
+  `<p>「クラウド管理の安心感の本丸はデータが消えないこと」から入る。みずきさんはクラウドに詳しいので技術的な話は簡潔に。</p>
+   <p>右下の紺色ボックスはみずきさん向けメッセージ。「まさにクラウドの本質がここにあります」と直接語りかける。</p>
+   <p>⚠️ 誇張しない：「完全に安全」ではなく「属人管理より安全で、万一の際も復旧しやすい」という言い方で。</p>`,
+  // S8
+  `<p>本部UIとオーナーUIの2画面構成を説明。「役割ごとに必要な情報だけ見せる設計です」</p>
+   <p>オレンジの注意ボックスは正直に触れる：「どこまで見せるかは今後整理します。最初から全部決めなくていい」と言うほうが信頼感が出る。</p>`,
+  // S9
+  `<p>ブラウザを開いてデモを見せる流れで使う。FCデモ→直営デモ→右上のオーナーリンクの順で案内。</p>
+   <p>「右上に小さくオーナーページへのリンクがあります」は必ず口頭でも補足する。気づきにくい場所なので。</p>`,
+  // S10
+  `<p>クラウドの価値を4つまとめたスライド。みずきさんが普段語っているクラウドの話と重ねながら説明すると刺さりやすい。</p>
+   <p>「情報が人でなく組織に属する、というのがクラウド管理の本質です」というフレーズで締めると印象に残る。</p>`,
+  // S11
+  `<p>将来構想は「夢の話」にしない。「今の出店管理アプリの延長線上にある、現実的な次のステップ」として話す。</p>
+   <p>右側のアプリフロー図を見せながら「今は出店管理から始めて、順番に広げていく想定です」と説明。</p>
+   <p>「管理を厳しくするためではなく、ムダを減らして人が本来やるべき仕事に集中できるようにするため」というメッセージは強めに伝える。</p>`,
+  // S12
+  `<p>4ステップをゆっくり読み上げながら「完成品を渡すのではなく、一緒に育てていく提案です」と着地させる。</p>
+   <p>最後の一文「人が本来価値を出す仕事に集中できる環境をつくること」を強調して締める。</p>`,
+  // S13
+  `<p>発表者ガイド（3分版）。プレゼン参加者には見せず、発表準備として使用。</p>
+   <p>S1→S2→S3→S4→S5→S6→S7（要点）→S10→S11→S12 の流れ。S8・S9はデモ時間がある場合のみ。</p>`,
+  // S14
+  `<p>発表者ガイド（5分版）。プレゼン参加者には見せず、発表準備として使用。</p>
+   <p>5分の場合は全スライドを使う。各スライド約25秒を目安に進める。デモは別途時間を取ると丁寧。</p>`,
+];
+
+const total = 14;
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const counter = document.getElementById('counter');
+const notesBody = document.getElementById('notesBody');
+const dotsContainer = document.getElementById('dotsContainer');
+
+for (let i = 0; i < total; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsContainer.appendChild(d);
+}
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  dotsContainer.children[current].classList.remove('active');
+  current = Math.max(0, Math.min(total - 1, n));
+  slides[current].classList.add('active');
+  dotsContainer.children[current].classList.add('active');
+  counter.textContent = (current + 1) + ' / ' + total;
+  notesBody.innerHTML = NOTES[current] || '';
+}
+function changeSlide(d) { goTo(current + d); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+});
+notesBody.innerHTML = NOTES[0];
+</script>
+</body>
+</html>

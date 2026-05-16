@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗デザイン プレビューツール | あいけあらぼ</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#111111;
+      --accent:#0D2B5E;
+      --bg:#f0f1f3;
+      --panel:#ffffff;
+      --border:#e2e4e7;
+      --text:#1a1a1a;
+      --muted:#6b7280;
+      --shadow:0 2px 12px rgba(0,0,0,0.08);
+    }
+    body{font-family:'Helvetica Neue','Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+    /* ===== HEADER ===== */
+    .app-header{background:white;border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 16px;gap:16px;flex-shrink:0;z-index:100}
+    .app-header a.back{font-size:12px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px}
+    .app-header a.back:hover{color:var(--text)}
+    .app-header h1{font-size:14px;font-weight:700;letter-spacing:0.04em;flex:1}
+    .app-header .hdr-actions{display:flex;gap:8px}
+    .btn{padding:7px 14px;border-radius:4px;border:none;font-size:12px;cursor:pointer;font-weight:600;letter-spacing:0.03em;transition:all .15s}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-primary:hover{background:#333}
+    .btn-outline{background:white;color:var(--text);border:1px solid var(--border)}
+    .btn-outline:hover{background:var(--bg)}
+    .btn-danger{background:#fee2e2;color:#dc2626}
+    .btn-danger:hover{background:#fecaca}
+
+    /* ===== LAYOUT ===== */
+    .main{display:flex;flex:1;overflow:hidden}
+
+    /* ===== SIDEBAR ===== */
+    .sidebar{width:230px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+    .cat-tabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:8px;border-bottom:1px solid var(--border)}
+    .cat-tab{padding:5px 4px;font-size:10px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;text-align:center;color:var(--muted);transition:all .15s;white-space:nowrap}
+    .cat-tab.active{background:var(--primary);color:white;border-color:var(--primary)}
+    .cat-tab span{display:block;font-size:14px;margin-bottom:2px}
+    .preset-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px}
+    .preset-item{border:1px solid var(--border);border-radius:6px;padding:8px 8px;cursor:grab;display:flex;align-items:center;gap:8px;transition:all .15s;user-select:none;position:relative}
+    .preset-item:hover{border-color:#aaa;background:#f8f9fa}
+    .preset-item:active{cursor:grabbing}
+    .preset-thumb{width:44px;height:36px;border-radius:4px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#f5f5f5}
+    .preset-thumb svg{width:100%;height:100%}
+    .preset-meta{flex:1;min-width:0}
+    .preset-meta .name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .preset-meta .desc{font-size:10px;color:var(--muted);margin-top:1px}
+    .preset-edit-btn{width:20px;height:20px;border:none;background:transparent;cursor:pointer;border-radius:3px;font-size:12px;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .preset-edit-btn:hover{background:var(--border);color:var(--text)}
+    .preset-add-btn{width:22px;height:22px;border:1.5px solid #3b82f6;background:transparent;cursor:pointer;border-radius:4px;font-size:14px;color:#3b82f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:700;transition:all .12s}
+    .preset-add-btn:hover{background:#3b82f6;color:#fff}
+    .preset-btns{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+    .sidebar-footer{padding:8px;border-top:1px solid var(--border)}
+    .btn-add{width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:6px;background:transparent;cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s}
+    .btn-add:hover{border-color:var(--primary);color:var(--primary);background:#f0f4ff}
+    .sidebar-add-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .add-bar-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .add-bar-btn{padding:3px 10px;border:1.5px solid #3b82f6;border-radius:5px;background:transparent;color:#3b82f6;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;flex-shrink:0}
+    .add-bar-btn:hover{background:#3b82f6;color:#fff}
+
+    /* ===== CANVAS ===== */
+    .canvas-wrapper{flex:1;position:relative;overflow:hidden;background:#c8cdd3;background-image:radial-gradient(circle,rgba(255,255,255,.15) 1px,transparent 1px);background-size:18px 18px}
+    .canvas-toolbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:white;border-radius:20px;padding:5px 10px;box-shadow:var(--shadow);z-index:10}
+    .zoom-btn{width:26px;height:26px;border:none;background:transparent;cursor:pointer;border-radius:5px;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+    .zoom-btn:hover{background:var(--border)}
+    .zoom-label{font-size:12px;color:var(--muted);min-width:40px;text-align:center}
+    .canvas-sep{width:1px;height:16px;background:var(--border);margin:0 4px}
+    .snap-btn{font-size:11px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);transition:all .15s}
+    .snap-btn:hover{background:var(--bg)}
+    .canvas-scene{position:absolute;top:50%;left:50%;transform-origin:center center}
+    .store-front{position:relative;width:600px;height:700px;overflow:visible}
+    #elements-layer{position:absolute;inset:0;pointer-events:none}
+    .canvas-el{position:absolute;pointer-events:all;cursor:move;user-select:none}
+    .canvas-el.selected{outline:2px solid #3b82f6;outline-offset:1px}
+    .canvas-el .el-del{position:absolute;top:-28px;right:-4px;width:20px;height:20px;background:#dc2626;color:white;border:none;border-radius:50%;cursor:pointer;font-size:12px;display:none;align-items:center;justify-content:center;z-index:5;line-height:1}
+    .canvas-el.selected .el-del{display:flex}
+    .canvas-el .rh{position:absolute;width:9px;height:9px;background:white;border:2px solid #3b82f6;border-radius:1px;display:none;z-index:4}
+    .canvas-el.selected .rh{display:block}
+    .rh.se{bottom:-5px;right:-5px;cursor:se-resize}
+    .rh.sw{bottom:-5px;left:-5px;cursor:sw-resize}
+    .rh.ne{top:-5px;right:-5px;cursor:ne-resize}
+    .rh.nw{top:-5px;left:-5px;cursor:nw-resize}
+    .rh.n{top:-5px;left:50%;transform:translateX(-50%);cursor:n-resize}
+    .rh.s{bottom:-5px;left:50%;transform:translateX(-50%);cursor:s-resize}
+    .rh.e{right:-5px;top:50%;transform:translateY(-50%);cursor:e-resize}
+    .rh.w{left:-5px;top:50%;transform:translateY(-50%);cursor:w-resize}
+    .el-content{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+    .canvas-el.distorted .rh.n,.canvas-el.distorted .rh.s,.canvas-el.distorted .rh.e,.canvas-el.distorted .rh.w{display:none!important}
+    .canvas-el.distorted .rh.ne,.canvas-el.distorted .rh.nw,.canvas-el.distorted .rh.se,.canvas-el.distorted .rh.sw{background:#f59e0b;border-color:#d97706;width:11px;height:11px;border-radius:50%;cursor:crosshair;transform:translate(-50%,-50%)}
+    .canvas-el.distorted .rot-handle,.canvas-el.distorted .rot-line{display:none!important}
+    .distort-hint{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;background:#7c3aed;color:#fff;padding:1px 7px;border-radius:8px;white-space:nowrap;pointer-events:none;display:none}
+    .canvas-el.distorted .distort-hint{display:block}
+    .canvas-el .el-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;background:rgba(0,0,0,0.6);color:white;white-space:nowrap;padding:1px 5px;border-radius:3px;display:none;pointer-events:none}
+    .canvas-el.selected .el-label{display:block}
+    /* Rotation handle */
+    .canvas-el .rot-line{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:2px;height:26px;background:#3b82f6;display:none;pointer-events:none;z-index:3}
+    .canvas-el .rot-handle{position:absolute;top:-44px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:white;border:2px solid #3b82f6;border-radius:50%;cursor:grab;display:none;z-index:6;transition:background .15s}
+    .canvas-el .rot-handle:hover{background:#dbeafe}
+    .canvas-el .rot-handle:active{cursor:grabbing}
+    .canvas-el.selected .rot-line,.canvas-el.selected .rot-handle{display:block}
+    /* Blend select */
+    .prop-select{width:100%;height:26px;border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:10px;background:white;cursor:pointer;color:var(--text)}
+
+    /* ===== RIGHT PANEL ===== */
+    .right-panel{width:210px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+    .rp-section{padding:12px 12px;border-bottom:1px solid var(--border)}
+    .rp-section h3{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+    .prop-row{display:flex;align-items:center;margin-bottom:7px;gap:6px}
+    .prop-row label{font-size:10px;color:var(--muted);width:32px;flex-shrink:0}
+    .prop-row input[type=number]{flex:1;height:26px;border:1px solid var(--border);border-radius:4px;padding:0 6px;font-size:11px;width:0}
+    .prop-row input[type=range]{flex:1;height:4px;cursor:pointer}
+    .prop-row .vl{font-size:10px;color:var(--muted);width:32px;text-align:right;flex-shrink:0}
+    .layer-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+    .layer-btns button{padding:4px 2px;font-size:10px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;transition:background .15s}
+    .layer-btns button:hover{background:var(--bg)}
+    .no-sel{padding:16px 12px;font-size:11px;color:var(--muted);line-height:1.7;text-align:center}
+    .flyer-card{background:#f8f9fa;border-radius:6px;padding:8px;font-size:10px;color:var(--muted)}
+    .flyer-card .fname{font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px}
+    .flyer-thumb-box{width:100%;aspect-ratio:3/4;background:white;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .flyer-thumb-box img{width:100%;height:100%;object-fit:contain}
+    .layer-list-item{font-size:10px;padding:4px 6px;border-radius:3px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--muted);transition:background .15s}
+    .layer-list-item:hover{background:var(--bg)}
+    .layer-list-item.active-layer{background:#eff6ff;color:#2563eb}
+    .layer-list-item .li-icon{font-size:12px;flex-shrink:0}
+    .layer-list-item .li-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bg-upload-label{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:6px;cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s}
+    .bg-upload-label:hover{border-color:var(--primary);color:var(--primary);background:#f0f4ff}
+    /* Address search panel */
+    .addr-section{padding:12px;border-bottom:1px solid var(--border)}
+    .addr-section h3{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+    .addr-input{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:11px;color:var(--text);line-height:1.4}
+    .addr-input:focus{outline:none;border-color:#3b82f6}
+    .sv-sliders{margin-top:8px}
+    .sv-row{display:flex;align-items:center;margin-bottom:5px;gap:5px}
+    .sv-row label{font-size:9px;color:var(--muted);width:40px;flex-shrink:0}
+    .sv-row input[type=range]{flex:1;height:3px;cursor:pointer;accent-color:#3b82f6}
+    .sv-row .svv{font-size:9px;color:var(--muted);width:32px;text-align:right;flex-shrink:0}
+    .sv-btn{width:100%;padding:8px;background:#1d4ed8;color:white;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:background .15s;margin-top:6px}
+    .sv-btn:hover{background:#1e40af}
+    .sv-btn:disabled{background:#94a3b8;cursor:not-allowed}
+    .sv-link{width:100%;padding:6px;background:transparent;color:#3b82f6;border:1px solid #bfdbfe;border-radius:5px;font-size:10px;cursor:pointer;margin-top:4px;transition:background .15s}
+    .sv-link:hover{background:#eff6ff}
+    .apikey-row{display:flex;gap:4px;margin-top:6px;align-items:center}
+    .apikey-row input{flex:1;padding:5px 7px;border:1px solid var(--border);border-radius:4px;font-size:10px}
+    .apikey-row button{padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:transparent;font-size:10px;cursor:pointer;white-space:nowrap;color:var(--muted)}
+    .sv-status{font-size:9px;margin-top:5px;padding:4px 6px;border-radius:4px;text-align:center;display:none}
+    .sv-status.loading{background:#eff6ff;color:#1d4ed8;display:block}
+    .sv-status.error{background:#fee2e2;color:#dc2626;display:block}
+    .sv-status.ok{background:#dcfce7;color:#16a34a;display:block}
+
+    /* BG adjust panel */
+    .bg-adjust-panel{margin-top:8px;background:#f8f9fa;border-radius:6px;padding:8px;display:none}
+    .bg-adjust-panel.open{display:block}
+    .bg-slider-row{display:flex;align-items:center;margin-bottom:5px;gap:5px}
+    .bg-slider-row label{font-size:9px;color:var(--muted);width:44px;flex-shrink:0}
+    .bg-slider-row input[type=range]{flex:1;height:3px;cursor:pointer;accent-color:#3b82f6}
+    .bg-slider-row .bvl{font-size:9px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+    /* Straighten overlay */
+    #straightenOverlay{position:absolute;inset:0;z-index:50;display:none;cursor:crosshair;background:rgba(59,130,246,.06);border:2px solid #3b82f6}
+    .str-dot{position:absolute;width:10px;height:10px;background:#3b82f6;border-radius:50%;transform:translate(-50%,-50%);border:2px solid white;pointer-events:none}
+    .str-line{position:absolute;background:#3b82f6;width:2px;transform-origin:top center;pointer-events:none;opacity:.7}
+    .str-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.7);color:white;font-size:12px;padding:10px 16px;border-radius:8px;white-space:nowrap;pointer-events:none;text-align:center;line-height:1.6}
+
+    /* ===== MODAL ===== */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center}
+    .modal-overlay.hidden{display:none}
+    .modal{background:white;border-radius:10px;padding:24px;width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal h2{font-size:16px;font-weight:700;margin-bottom:18px}
+    .fg{margin-bottom:13px}
+    .fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;letter-spacing:.04em}
+    .fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;color:var(--text);transition:border .15s}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:#3b82f6}
+    .fg textarea{height:55px;resize:vertical}
+    .shape-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:4px}
+    .shape-opt{aspect-ratio:1;border:2px solid var(--border);border-radius:5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;transition:all .15s;background:transparent;padding:3px}
+    .shape-opt:hover,.shape-opt.sel{border-color:#3b82f6;background:#eff6ff}
+    .shape-opt .sico{font-size:16px;line-height:1}
+    .shape-opt .slabel{font-size:8px;color:var(--muted);margin-top:2px}
+    .color-grid{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+    .cswatch{width:26px;height:26px;border-radius:5px;cursor:pointer;border:3px solid transparent;transition:all .15s}
+    .cswatch.sel{border-color:#3b82f6}
+    .upload-area{border:2px dashed var(--border);border-radius:6px;padding:14px;text-align:center;cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s}
+    .upload-area:hover{border-color:#3b82f6;color:#3b82f6;background:#eff6ff}
+    .modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+    .sz-row{display:flex;gap:8px;align-items:center}
+    .sz-row input{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px}
+    .sz-row span{color:var(--muted)}
+
+    /* ===== GHOST ===== */
+    .drag-ghost{position:fixed;pointer-events:none;opacity:.65;z-index:9999;border:2px dashed #3b82f6;border-radius:4px;background:rgba(59,130,246,.08);display:none}
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .hidden{display:none!important}
+
+    /* Color input */
+    input[type=color]{width:40px;height:32px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:2px}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <a href="aicare-top-prototype.html" class="back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    サイトに戻る
+  </a>
+  <h1>🏪 店舗デザイン プレビューツール</h1>
+  <div class="hdr-actions">
+    <button class="btn btn-outline" onclick="clearCanvas()">キャンバスをリセット</button>
+    <button class="btn btn-outline" onclick="undo()" title="Cmd+Z">↩ 元に戻す</button>
+    <button class="btn btn-primary" onclick="exportPNG()">📄 PDF書き出し</button>
+    <button class="btn btn-outline" onclick="startTour()" style="margin-left:8px;border-color:#3b82f6;color:#3b82f6;font-weight:700">? 使い方</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="sidebar-add-bar" id="sidebarAddBar">
+      <span class="add-bar-label" id="addBarLabel"></span>
+      <button class="add-bar-btn" onclick="openModal(null)">＋ 追加</button>
+    </div>
+    <div class="preset-list" id="presetList"></div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrapper" id="canvasWrapper">
+    <div class="canvas-toolbar">
+      <button class="zoom-btn" onclick="zoom(-0.1)" title="縮小">－</button>
+      <div class="zoom-label" id="zoomLabel">100%</div>
+      <button class="zoom-btn" onclick="zoom(0.1)" title="拡大">＋</button>
+      <button class="zoom-btn" onclick="resetZoom()" title="リセット">⌂</button>
+      <div class="canvas-sep"></div>
+      <button class="zoom-btn" onclick="fitCanvas()" title="全体表示" style="font-size:11px">FIT</button>
+    </div>
+
+    <div class="canvas-scene" id="canvasScene">
+      <div class="store-front" id="storeFront">
+        <div id="storeBackground" style="width:600px;height:700px;position:absolute;top:0;left:0;transform-origin:center center"></div>
+        <div id="straightenOverlay" onclick="onStraightenClick(event)"></div>
+        <div id="elementsLayer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <!-- Element Properties -->
+    <div class="rp-section">
+      <div class="no-sel" id="noSel">プリセットをキャンバスにドラッグして配置</div>
+      <div id="elProps" class="hidden">
+        <h3>プロパティ</h3>
+        <div class="prop-row"><label>X</label><input type="number" id="pX" onchange="setElProp('x',+this.value)"></div>
+        <div class="prop-row"><label>Y</label><input type="number" id="pY" onchange="setElProp('y',+this.value)"></div>
+        <div class="prop-row"><label>幅</label><input type="number" id="pW" onchange="setElProp('width',+this.value)"></div>
+        <div class="prop-row"><label>高さ</label><input type="number" id="pH" onchange="setElProp('height',+this.value)"></div>
+        <div class="prop-row">
+          <label>透過</label>
+          <input type="range" id="pOp" min="10" max="100" oninput="setElProp('opacity',this.value/100);document.getElementById('pOpV').textContent=this.value+'%'">
+          <span class="vl" id="pOpV">100%</span>
+        </div>
+        <div class="prop-row">
+          <label>回転</label>
+          <input type="range" id="pRot" min="0" max="359" oninput="setElProp('rotation',+this.value);document.getElementById('pRotN').value=Math.round(this.value);document.getElementById('pRotV').textContent=Math.round(this.value)+'°'">
+          <span class="vl" id="pRotV">0°</span>
+        </div>
+        <div class="prop-row">
+          <label>角度</label>
+          <input type="number" id="pRotN" min="0" max="359" onchange="setElProp('rotation',((+this.value)%360+360)%360);document.getElementById('pRot').value=((+this.value)%360+360)%360;document.getElementById('pRotV').textContent=Math.round(((+this.value)%360+360)%360)+'°'">
+        </div>
+        <div class="prop-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <label style="width:auto">ブレンドモード</label>
+          <select id="pBlend" class="prop-select" onchange="setElProp('blendMode',this.value)">
+            <option value="normal">通常 (Normal)</option>
+            <option value="multiply">乗算 (Multiply)</option>
+            <option value="screen">スクリーン (Screen)</option>
+            <option value="overlay">オーバーレイ (Overlay)</option>
+            <option value="darken">暗く (Darken)</option>
+            <option value="lighten">明るく (Lighten)</option>
+            <option value="color-dodge">覆い焼き (Dodge)</option>
+            <option value="color-burn">焼き込み (Burn)</option>
+            <option value="hard-light">ハードライト</option>
+            <option value="soft-light">ソフトライト</option>
+            <option value="difference">差の絶対値</option>
+            <option value="exclusion">除外 (Exclusion)</option>
+          </select>
+        </div>
+        <!-- 背景色 -->
+        <div style="margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;letter-spacing:.05em">背景色</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px" id="bgColorSwatches"></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+            <span style="font-size:9px;color:var(--muted)">カスタム</span>
+            <input type="color" id="pBgColorPicker" value="#ffffff" style="width:34px;height:22px;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:1px" onchange="setElBgColor(this.value)">
+            <button onclick="setElBgColor('transparent')" id="pBgNoneBtn" style="font-size:9px;padding:2px 6px;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--muted)">なし</button>
+          </div>
+          <div id="pBgColorPreview" style="margin-top:5px;height:16px;border-radius:3px;border:1px solid var(--border);background:transparent;font-size:8px;color:var(--muted);display:flex;align-items:center;justify-content:center">透明</div>
+        </div>
+        <div class="layer-btns">
+          <button onclick="layerOp('front')">最前面</button>
+          <button onclick="layerOp('back')">最背面</button>
+          <button onclick="layerOp('up')">前へ</button>
+          <button onclick="layerOp('down')">後ろへ</button>
+        </div>
+        <button id="distortResetBtn" class="btn" style="width:100%;margin-top:8px;font-size:11px;padding:6px;background:#7c3aed;color:#fff;border:none;display:none" onclick="resetDistort()">⬡ 変形をリセット</button>
+        <button class="btn btn-danger" style="width:100%;margin-top:4px;font-size:11px;padding:6px" onclick="deleteSelected()">この要素を削除</button>
+      </div>
+    </div>
+
+    <!-- Background -->
+    <div class="rp-section">
+      <h3>背景画像</h3>
+      <label class="bg-upload-label">
+        <input type="file" accept="image/*" style="display:none" onchange="loadBg(this)">
+        📷 店舗写真をアップロード
+      </label>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <button class="btn btn-outline" style="flex:1;font-size:10px;padding:5px" onclick="resetBg()">デフォルトに戻す</button>
+        <button class="btn btn-outline" style="flex:1;font-size:10px;padding:5px" onclick="toggleBgAdjust()" id="bgAdjustToggle">🔧 画像調整</button>
+      </div>
+      <!-- 調整パネル -->
+      <div class="bg-adjust-panel" id="bgAdjustPanel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:700;color:var(--text)">背景調整</span>
+          <button onclick="resetBgTransform()" style="font-size:9px;padding:2px 6px;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--muted)">リセット</button>
+        </div>
+        <div class="bg-slider-row">
+          <label>傾き補正</label>
+          <input type="range" id="bgRot" min="-30" max="30" value="0" step="0.5" oninput="setBgProp('rot',+this.value);document.getElementById('bgRotV').textContent=this.value+'°'">
+          <span class="bvl" id="bgRotV">0°</span>
+        </div>
+        <div class="bg-slider-row">
+          <label>水平遠近</label>
+          <input type="range" id="bgPX" min="-20" max="20" value="0" step="0.5" oninput="setBgProp('perspX',+this.value);document.getElementById('bgPXV').textContent=this.value+'°'">
+          <span class="bvl" id="bgPXV">0°</span>
+        </div>
+        <div class="bg-slider-row">
+          <label>垂直遠近</label>
+          <input type="range" id="bgPY" min="-20" max="20" value="0" step="0.5" oninput="setBgProp('perspY',+this.value);document.getElementById('bgPYV').textContent=this.value+'°'">
+          <span class="bvl" id="bgPYV">0°</span>
+        </div>
+        <div class="bg-slider-row">
+          <label>スケール</label>
+          <input type="range" id="bgSc" min="80" max="160" value="100" oninput="setBgProp('scale',this.value/100);document.getElementById('bgScV').textContent=this.value+'%'">
+          <span class="bvl" id="bgScV">100%</span>
+        </div>
+        <div class="bg-slider-row">
+          <label>X位置</label>
+          <input type="range" id="bgTX" min="-150" max="150" value="0" oninput="setBgProp('tx',+this.value);document.getElementById('bgTXV').textContent=this.value">
+          <span class="bvl" id="bgTXV">0</span>
+        </div>
+        <div class="bg-slider-row">
+          <label>Y位置</label>
+          <input type="range" id="bgTY" min="-150" max="150" value="0" oninput="setBgProp('ty',+this.value);document.getElementById('bgTYV').textContent=this.value">
+          <span class="bvl" id="bgTYV">0</span>
+        </div>
+        <!-- 2点正面化ボタン -->
+        <button onclick="startStraighten()" style="width:100%;margin-top:6px;padding:7px;background:#1d4ed8;color:white;border:none;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.04em">
+          🎯 2点クリックで正面化
+        </button>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;line-height:1.5">建物の縦線に沿って2点をクリック→自動で傾き補正</div>
+      </div>
+    </div>
+
+    <!-- Selected Flyer -->
+    <div class="rp-section">
+      <h3>選択中のチラシ</h3>
+      <div id="flyerPanel">
+        <div style="font-size:11px;color:var(--muted)">チラシ未選択</div>
+      </div>
+    </div>
+
+    <!-- Address Street View -->
+    <div class="addr-section">
+      <h3>📍 住所から背景を設定</h3>
+      <textarea class="addr-input" id="svAddress" rows="2" placeholder="例: 滋賀県大津市梅林1-3-10"></textarea>
+      <div class="sv-sliders">
+        <div class="sv-row">
+          <label>方角</label>
+          <input type="range" id="svHeading" min="0" max="359" value="0" oninput="document.getElementById('svHeadingV').textContent=this.value+'°';updateSVPreview()">
+          <span class="svv" id="svHeadingV">0°</span>
+        </div>
+        <div class="sv-row">
+          <label>仰俯角</label>
+          <input type="range" id="svPitch" min="-30" max="30" value="0" oninput="document.getElementById('svPitchV').textContent=this.value+'°';updateSVPreview()">
+          <span class="svv" id="svPitchV">0°</span>
+        </div>
+        <div class="sv-row">
+          <label>画角</label>
+          <input type="range" id="svFov" min="30" max="110" value="80" oninput="document.getElementById('svFovV').textContent=this.value+'°';updateSVPreview()">
+          <span class="svv" id="svFovV">80°</span>
+        </div>
+      </div>
+      <div id="svStatus" class="sv-status"></div>
+      <button class="sv-btn" id="svSearchBtn" onclick="searchStreetView()">🔍 Street View を背景に設定</button>
+      <button class="sv-link" onclick="openInMaps()">🗺 Google Maps で確認</button>
+      <!-- API Key -->
+      <div style="margin-top:8px">
+        <details>
+          <summary style="font-size:9px;color:var(--muted);cursor:pointer">Google Maps API キー設定</summary>
+          <div style="margin-top:6px">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:4px;line-height:1.5">Street View Static API キー（<a href="https://console.cloud.google.com/" target="_blank" style="color:#3b82f6">Google Cloud Console</a>で取得）</div>
+            <div class="apikey-row">
+              <input type="password" id="svApiKey" placeholder="AIza..." oninput="saveApiKey()">
+              <button onclick="clearApiKey()">クリア</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- Layer List -->
+    <div class="rp-section">
+      <h3>配置要素一覧</h3>
+      <div id="layerList" style="display:flex;flex-direction:column;gap:2px">
+        <div style="font-size:11px;color:var(--muted)">なし</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAG GHOST -->
+<div class="drag-ghost" id="dragGhost"></div>
+
+<!-- PRESET MODAL -->
+<div class="modal-overlay hidden" id="presetModal">
+  <div class="modal">
+    <h2 id="modalTitle">プリセットを追加</h2>
+    <div class="fg">
+      <label>名前</label>
+      <input type="text" id="mName" placeholder="例: ロゴサイン A">
+    </div>
+    <div class="fg">
+      <label>カテゴリ</label>
+      <select id="mCat" onchange="onCatChange()">
+        <option value="sign">看板</option>
+        <option value="door">ドア</option>
+        <option value="standSign">立て看板</option>
+        <option value="flyer">チラシ・DM</option>
+        <option value="fabric">のぼり・幕</option>
+        <option value="silhouette">人物シルエット</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>説明（任意）</label>
+      <input type="text" id="mDesc" placeholder="例: アクリル製 横長">
+    </div>
+    <div class="fg">
+      <label>シェイプ</label>
+      <div class="shape-grid" id="shapePicker"></div>
+    </div>
+    <div class="fg">
+      <label>カラー</label>
+      <div class="color-grid" id="colorPicker"></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--muted)">カスタム:</span>
+        <input type="color" id="customColor" value="#111111" onchange="selectColor(this.value)">
+      </div>
+    </div>
+    <div class="fg">
+      <label>テキスト（任意）</label>
+      <input type="text" id="mText" placeholder="サインに表示するテキスト">
+    </div>
+    <div class="fg">
+      <label>デフォルトサイズ（幅 × 高さ px）</label>
+      <div class="sz-row">
+        <input type="number" id="mW" placeholder="幅" value="120">
+        <span>×</span>
+        <input type="number" id="mH" placeholder="高さ" value="60">
+      </div>
+    </div>
+    <div class="fg" id="flyerImgGrp">
+      <label>画像をアップロード（任意・SVGの代わりに表示）</label>
+      <div class="upload-area" onclick="document.getElementById('flyerImgInp').click()" id="flyerImgArea">クリックして画像をアップロード</div>
+      <input type="file" id="flyerImgInp" accept="image/*" style="display:none" onchange="loadFlyerImg(this)">
+      <div id="flyerImgPreview" style="margin-top:6px"></div>
+      <button onclick="clearFlyerImg()" id="flyerImgClearBtn" style="display:none;margin-top:4px;font-size:10px;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;color:var(--muted)">画像を削除</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-danger hidden" id="mDelBtn" onclick="deletePreset()">削除</button>
+      <button class="btn btn-primary" onclick="savePreset()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  SHAPES — SVG generators (all use width/height attrs)
+// ═══════════════════════════════════════════════════════
+const SHAPES = {
+  // ── SIGNS ──
+  rect(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none"><rect width="100" height="50" rx="4" fill="${c}"/>${t?`<text x="50" y="25" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif" font-weight="600">${esc(t)}</text>`:''}</svg>`},
+  roundRect(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 50" preserveAspectRatio="none"><rect width="100" height="50" rx="14" fill="${c}"/>${t?`<text x="50" y="25" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif">${esc(t)}</text>`:''}</svg>`},
+  square(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 80"><rect width="80" height="80" rx="5" fill="${c}"/>${t?`<text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">${esc(t)}</text>`:''}</svg>`},
+  circle(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 80"><ellipse cx="40" cy="40" rx="38" ry="38" fill="${c}"/>${t?`<text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">${esc(t)}</text>`:''}</svg>`},
+  projecting(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 50 120"><rect x="5" y="10" width="40" height="110" rx="4" fill="${c}"/><rect x="18" y="0" width="14" height="16" rx="2" fill="${c}" opacity=".7"/>${t?`<text x="25" y="65" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-family="sans-serif" writing-mode="tb">${esc(t)}</text>`:''}</svg>`},
+  oval(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 120 60"><ellipse cx="60" cy="30" rx="58" ry="28" fill="${c}"/>${t?`<text x="60" y="30" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="13" font-family="sans-serif">${esc(t)}</text>`:''}</svg>`},
+  // ── DOORS ──
+  slidingDoor(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 180 240"><rect width="180" height="240" fill="#9ab4c0" rx="2"/><rect x="4" y="4" width="82" height="232" fill="${c}" opacity=".75" rx="1"/><rect x="94" y="4" width="82" height="232" fill="${c}" opacity=".75" rx="1"/><line x1="84" y1="100" x2="84" y2="140" stroke="#ddd" stroke-width="3" stroke-linecap="round"/><line x1="96" y1="100" x2="96" y2="140" stroke="#ddd" stroke-width="3" stroke-linecap="round"/><rect width="180" height="240" fill="none" stroke="#7a9aaa" stroke-width="4" rx="2"/></svg>`},
+  woodDoor(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 220"><rect width="100" height="220" rx="3" fill="${c}"/><rect x="6" y="8" width="38" height="85" rx="3" fill="rgba(255,255,255,.14)"/><rect x="54" y="8" width="38" height="85" rx="3" fill="rgba(255,255,255,.14)"/><rect x="6" y="104" width="86" height="108" rx="3" fill="rgba(255,255,255,.08)"/><circle cx="78" cy="110" r="4" fill="#c8a020"/></svg>`},
+  steelDoor(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 220"><rect width="100" height="220" rx="1" fill="${c}"/><circle cx="7" cy="10" r="2.5" fill="#555"/><circle cx="93" cy="10" r="2.5" fill="#555"/><circle cx="7" cy="210" r="2.5" fill="#555"/><circle cx="93" cy="210" r="2.5" fill="#555"/><rect x="72" y="92" width="5" height="36" rx="2.5" fill="#777"/><line x1="8" y1="110" x2="92" y2="110" stroke="rgba(255,255,255,.12)" stroke-width="1"/></svg>`},
+  // ── STAND SIGNS ──
+  aBoard(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 140"><polygon points="40,5 2,130 18,130 40,18" fill="${c}" opacity=".9"/><polygon points="40,5 78,130 62,130 40,18" fill="${c}"/><rect x="37" y="3" width="6" height="18" rx="2" fill="${c}"/><line x1="4" y1="128" x2="76" y2="128" stroke="${c}" stroke-width="4" stroke-linecap="round"/>${t?`<text x="40" y="75" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  banner(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 60 180"><rect x="12" y="0" width="36" height="158" rx="3" fill="${c}"/><rect x="12" y="0" width="36" height="158" rx="3" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/><rect x="21" y="156" width="18" height="14" rx="2" fill="#888"/><rect x="10" y="168" width="40" height="8" rx="3" fill="#999"/>${t?`<text x="30" y="78" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="10" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  chalkboard(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 90 130"><rect x="4" y="0" width="82" height="106" rx="4" fill="${c}"/><rect x="8" y="4" width="74" height="98" rx="2" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" stroke-dasharray="4,3"/><line x1="22" y1="104" x2="14" y2="128" stroke="#888" stroke-width="4" stroke-linecap="round"/><line x1="68" y1="104" x2="76" y2="128" stroke="#888" stroke-width="4" stroke-linecap="round"/><line x1="14" y1="118" x2="76" y2="118" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>${t?`<text x="45" y="52" dominant-baseline="middle" text-anchor="middle" fill="rgba(255,255,255,.88)" font-size="12" font-family="sans-serif" font-weight="600">${esc(t)}</text>`:''}</svg>`},
+  // ── FLYERS ──
+  flyerV(c,t,img){return img?`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 60 85"><rect width="60" height="85" fill="white" stroke="#ddd" stroke-width="1"/><image href="${img}" x="0" y="0" width="60" height="85" preserveAspectRatio="xMidYMid slice"/></svg>`:`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 60 85"><rect width="60" height="85" fill="white" stroke="#ddd" stroke-width="1"/><rect y="0" width="60" height="30" fill="${c||'#e8734a'}"/><rect x="5" y="36" width="50" height="2" rx="1" fill="#ddd"/><rect x="5" y="43" width="35" height="2" rx="1" fill="#eee"/><rect x="5" y="50" width="45" height="2" rx="1" fill="#eee"/><rect x="5" y="57" width="28" height="2" rx="1" fill="#eee"/>${t?`<text x="30" y="16" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="7" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  flyerH(c,t,img){return img?`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 85 60"><rect width="85" height="60" fill="white" stroke="#ddd" stroke-width="1"/><image href="${img}" x="0" y="0" width="85" height="60" preserveAspectRatio="xMidYMid slice"/></svg>`:`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 85 60"><rect width="85" height="60" fill="white" stroke="#ddd" stroke-width="1"/><rect y="0" width="30" height="60" fill="${c||'#0D2B5E'}"/><rect x="35" y="12" width="45" height="3" rx="1" fill="#ddd"/><rect x="35" y="22" width="30" height="2" rx="1" fill="#eee"/><rect x="35" y="30" width="40" height="2" rx="1" fill="#eee"/></svg>`},
+  poster(c,t,img){return img?`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 70 99"><rect width="70" height="99" fill="white" stroke="#ddd" stroke-width="1"/><image href="${img}" x="0" y="0" width="70" height="99" preserveAspectRatio="xMidYMid slice"/></svg>`:`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 70 99"><rect width="70" height="99" fill="white" stroke="#ddd" stroke-width="1"/><rect y="0" width="70" height="42" fill="${c||'#0D2B5E'}"/><rect x="5" y="48" width="60" height="3" rx="1" fill="#ddd"/><rect x="5" y="57" width="42" height="2" rx="1" fill="#eee"/><rect x="5" y="64" width="55" height="2" rx="1" fill="#eee"/><rect x="5" y="71" width="36" height="2" rx="1" fill="#eee"/>${t?`<text x="35" y="21" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="8" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  // ── SILHOUETTES ──
+  manFront(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 40 110" preserveAspectRatio="xMidYMax meet"><ellipse cx="20" cy="8" rx="7.5" ry="8" fill="${c}"/><rect x="17" y="15" width="6" height="5" fill="${c}"/><path d="M6,20 C10,23 14,25 20,25 C26,25 30,23 34,20 L37,55 L3,55 Z" fill="${c}"/><path d="M8,23 L1,50 Q0,54 4,54 L10,27" fill="${c}"/><path d="M32,23 L39,50 Q40,54 36,54 L30,27" fill="${c}"/><path d="M9,55 L6,100 Q6,104 12,104 L16,55" fill="${c}"/><path d="M31,55 L34,100 Q34,104 28,104 L24,55" fill="${c}"/></svg>`},
+  womanFront(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 36 110" preserveAspectRatio="xMidYMax meet"><ellipse cx="18" cy="7" rx="7" ry="7.5" fill="${c}"/><ellipse cx="18" cy="4" rx="8.5" ry="6" fill="${c}"/><rect x="15" y="13" width="6" height="5" fill="${c}"/><path d="M5,18 C8,21 12,24 18,24 C24,24 28,21 31,18 L33,52 L3,52 Z" fill="${c}"/><path d="M7,21 L1,47 Q0,51 3.5,51 L9,25" fill="${c}"/><path d="M29,21 L35,47 Q36,51 32.5,51 L27,25" fill="${c}"/><path d="M3,52 L0,78 L36,78 L33,52 Z" fill="${c}"/><path d="M5,78 L4,106 Q4,109 9,109 L13,78" fill="${c}"/><path d="M31,78 L32,106 Q32,109 27,109 L23,78" fill="${c}"/></svg>`},
+  manWalk(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 50 110" preserveAspectRatio="xMidYMax meet"><ellipse cx="28" cy="8" rx="7.5" ry="8" fill="${c}"/><rect x="25" y="15" width="6" height="5" fill="${c}"/><path d="M14,20 C18,23 22,25 28,25 C34,25 38,23 42,20 L44,55 L12,55 Z" fill="${c}"/><path d="M16,23 L4,50 Q3,54 7,54 L18,27" fill="${c}"/><path d="M40,23 L48,46 Q49,50 45,51 L38,27" fill="${c}"/><path d="M17,55 L7,100 Q6,104 12,104 L21,55" fill="${c}"/><path d="M39,55 L46,97 Q47,101 41,101 L34,55" fill="${c}"/></svg>`},
+  child(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 34 88" preserveAspectRatio="xMidYMax meet"><ellipse cx="17" cy="9" rx="9" ry="9" fill="${c}"/><rect x="14" y="17" width="6" height="4" fill="${c}"/><path d="M4,21 C8,24 11,26 17,26 C23,26 26,24 30,21 L31,50 L3,50 Z" fill="${c}"/><path d="M6,23 L1,45 Q0,48 3,48 L9,26" fill="${c}"/><path d="M28,23 L33,45 Q34,48 31,48 L25,26" fill="${c}"/><path d="M8,50 L5,84 Q5,87 11,87 L14,50" fill="${c}"/><path d="M26,50 L29,84 Q29,87 23,87 L20,50" fill="${c}"/></svg>`},
+  womanWalk(c){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 44 110" preserveAspectRatio="xMidYMax meet"><ellipse cx="24" cy="7" rx="7" ry="7.5" fill="${c}"/><ellipse cx="24" cy="4" rx="8" ry="6" fill="${c}"/><rect x="21" y="13" width="6" height="5" fill="${c}"/><path d="M10,18 C14,21 18,23 24,23 C30,23 34,21 38,18 L40,48 L8,48 Z" fill="${c}"/><path d="M12,21 L4,45 Q3,49 7,49 L14,25" fill="${c}"/><path d="M36,21 L42,40 Q43,44 39,45 L34,25" fill="${c}"/><path d="M8,48 L4,74 L44,74 L40,48 Z" fill="${c}"/><path d="M7,74 L3,105 Q3,108 8,108 L13,74" fill="${c}"/><path d="M37,74 L43,102 Q44,106 38,106 L33,74" fill="${c}"/></svg>`},
+  // ── NOBORI / FABRIC ──
+  nobori(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 60 180"><rect x="2" y="0" width="4" height="180" rx="2" fill="#888"/><path d="M6,3 L56,3 L42,177 L6,177 Z" fill="${c}" opacity=".92"/><rect x="6" y="3" width="50" height="174" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1"/>${t?`<text x="29" y="90" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="9" font-family="sans-serif" font-weight="700" writing-mode="tb" glyph-orientation-vertical="0">${esc(t)}</text>`:''}</svg>`},
+  signSheet(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 120 80" preserveAspectRatio="none"><rect width="120" height="80" fill="${c}" opacity=".88"/><rect x="3" y="3" width="114" height="74" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>${t?`<text x="60" y="40" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  cutting(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 140 50" preserveAspectRatio="none"><rect width="140" height="50" fill="rgba(200,200,200,.1)" stroke="#bbb" stroke-width="1" stroke-dasharray="5,3"/>${t?`<text x="70" y="26" dominant-baseline="middle" text-anchor="middle" fill="${c}" font-size="22" font-family="sans-serif" font-weight="900" letter-spacing="3">${esc(t)}</text>`:`<text x="70" y="28" dominant-baseline="middle" text-anchor="middle" fill="${c}" font-size="22" font-family="sans-serif" font-weight="900" letter-spacing="4">SHOP</text>`}</svg>`},
+  sticker(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="${c}"/><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>${t?`<text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="11" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  dmCard(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 55"><rect width="80" height="55" fill="white" stroke="#ddd" stroke-width="1"/><rect width="34" height="55" fill="${c||'#0D2B5E'}"/><line x1="38" y1="22" x2="77" y2="22" stroke="#eee" stroke-width="1"/><line x1="38" y1="29" x2="77" y2="29" stroke="#eee" stroke-width="1"/><line x1="38" y1="36" x2="70" y2="36" stroke="#eee" stroke-width="1"/><line x1="38" y1="43" x2="77" y2="43" stroke="#eee" stroke-width="1"/><rect x="42" y="9" width="14" height="10" rx="1" fill="#ddd"/>${t?`<text x="17" y="28" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="7" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  cardItem(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 70 42"><rect width="70" height="42" rx="3" fill="white" stroke="#ddd" stroke-width="1"/><rect width="70" height="14" rx="3" fill="${c||'#111'}"/><rect x="0" y="11" width="70" height="3" fill="${c||'#111'}"/><rect x="5" y="20" width="30" height="2" rx="1" fill="#ccc"/><rect x="5" y="26" width="20" height="1.5" rx="1" fill="#e0e0e0"/><rect x="5" y="31" width="25" height="1.5" rx="1" fill="#e0e0e0"/>${t?`<text x="35" y="7" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="6" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  pamphlet(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 90 130" preserveAspectRatio="none"><rect width="90" height="130" fill="white" stroke="#ddd" stroke-width="1"/><line x1="30" y1="0" x2="30" y2="130" stroke="#ddd" stroke-width="1"/><line x1="60" y1="0" x2="60" y2="130" stroke="#ddd" stroke-width="1"/><rect width="30" height="130" fill="${c||'#0D2B5E'}"/><rect x="3" y="50" width="24" height="2" rx="1" fill="rgba(255,255,255,.4)"/><rect x="3" y="57" width="18" height="1.5" rx="1" fill="rgba(255,255,255,.3)"/><rect x="3" y="63" width="22" height="1.5" rx="1" fill="rgba(255,255,255,.3)"/><rect x="34" y="12" width="22" height="12" rx="2" fill="#e8e8e8"/><rect x="34" y="30" width="22" height="2" rx="1" fill="#ccc"/><rect x="34" y="36" width="18" height="1.5" rx="1" fill="#e0e0e0"/><rect x="64" y="12" width="22" height="12" rx="2" fill="#e8e8e8"/>${t?`<text x="15" y="30" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="7" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  makuH(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 200 60" preserveAspectRatio="none"><line x1="20" y1="0" x2="20" y2="8" stroke="#888" stroke-width="2"/><line x1="60" y1="0" x2="60" y2="8" stroke="#888" stroke-width="2"/><line x1="100" y1="0" x2="100" y2="8" stroke="#888" stroke-width="2"/><line x1="140" y1="0" x2="140" y2="8" stroke="#888" stroke-width="2"/><line x1="180" y1="0" x2="180" y2="8" stroke="#888" stroke-width="2"/><rect x="0" y="8" width="200" height="50" fill="${c}" rx="1"/><rect x="0" y="8" width="200" height="5" fill="rgba(0,0,0,.18)"/><rect x="0" y="8" width="200" height="50" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>${t?`<text x="100" y="33" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+  yokodanmaku(c,t){return`<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 220 65" preserveAspectRatio="none"><rect x="0" y="4" width="8" height="61" rx="3" fill="#888"/><rect x="212" y="4" width="8" height="61" rx="3" fill="#888"/><rect x="8" y="4" width="204" height="52" fill="${c}"/><rect x="8" y="4" width="204" height="6" fill="rgba(0,0,0,.2)"/><rect x="8" y="4" width="204" height="52" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>${t?`<text x="110" y="30" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif" font-weight="700">${esc(t)}</text>`:''}</svg>`},
+};
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function getPreviewSVG(p){
+  // 画像アップロード済みならそれを表示（全カテゴリ対応）
+  if(p.flyerImg) return `<img src="${p.flyerImg}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:2px;">`;
+  const fn=SHAPES[p.shape];
+  if(!fn) return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 60 40"><rect width="60" height="40" rx="4" fill="${p.color||'#ccc'}"/></svg>`;
+  if(p.category==='silhouette') return fn(p.color||'#333');
+  return fn(p.color||'#111', p.text||'');
+}
+
+// ═══════════════════════════════════════════════════════
+//  STORE FRONT SVG
+// ═══════════════════════════════════════════════════════
+const DEFAULT_BG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="700" viewBox="0 0 600 700">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d5dce6"/>
+      <stop offset="100%" stop-color="#c8d2dd"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2f1ee"/>
+      <stop offset="100%" stop-color="#ececea"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bec0be"/>
+      <stop offset="100%" stop-color="#aaa"/>
+    </linearGradient>
+  </defs>
+  <!-- Sky -->
+  <rect width="600" height="700" fill="url(#sky)"/>
+  <!-- Building facade -->
+  <rect x="30" y="18" width="540" height="635" fill="url(#wall)" rx="2"/>
+  <!-- Panel lines (vertical) -->
+  <line x1="110" y1="18" x2="110" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <line x1="190" y1="18" x2="190" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <line x1="270" y1="18" x2="270" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <line x1="350" y1="18" x2="350" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <line x1="430" y1="18" x2="430" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <line x1="510" y1="18" x2="510" y2="653" stroke="#e4e3e0" stroke-width="1.5"/>
+  <!-- Subtle horizontal -->
+  <line x1="30" y1="220" x2="570" y2="220" stroke="#eae9e6" stroke-width="1"/>
+  <!-- Door recess (recessed inset) -->
+  <rect x="208" y="385" width="184" height="268" fill="#b8c4cc" rx="2"/>
+  <!-- Door inner area -->
+  <rect x="213" y="390" width="174" height="260" fill="#c4d0d8" rx="1"/>
+  <!-- Left glass panel -->
+  <rect x="217" y="394" width="80" height="252" fill="#9fbfcc" rx="1" opacity=".85"/>
+  <line x1="250" y1="394" x2="250" y2="646" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+  <!-- Left handle -->
+  <rect x="291" y="510" width="4" height="28" rx="2" fill="#ccc"/>
+  <!-- Right glass panel -->
+  <rect x="303" y="394" width="80" height="252" fill="#9fbfcc" rx="1" opacity=".85"/>
+  <line x1="345" y1="394" x2="345" y2="646" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+  <!-- Right handle -->
+  <rect x="305" y="510" width="4" height="28" rx="2" fill="#ccc"/>
+  <!-- Door top bar -->
+  <rect x="204" y="374" width="192" height="18" fill="#a8b8c0"/>
+  <!-- Ceiling light -->
+  <ellipse cx="300" cy="374" rx="10" ry="5" fill="#fffff0" opacity=".9"/>
+  <ellipse cx="300" cy="373" rx="16" ry="8" fill="#fffff8" opacity=".25"/>
+  <!-- Upper window right -->
+  <rect x="462" y="42" width="84" height="58" fill="#b8cad4" rx="2"/>
+  <rect x="465" y="45" width="78" height="52" fill="#a8bece" rx="1"/>
+  <line x1="504" y1="45" x2="504" y2="97" stroke="#8aa2b2" stroke-width="1"/>
+  <!-- Subtle wall shadow left edge -->
+  <rect x="30" y="18" width="5" height="635" fill="rgba(0,0,0,.04)"/>
+  <!-- Subtle wall shadow right edge -->
+  <rect x="565" y="18" width="5" height="635" fill="rgba(0,0,0,.06)"/>
+  <!-- Building top edge -->
+  <rect x="28" y="14" width="544" height="8" fill="#e0dfdc" rx="1"/>
+  <!-- Ground -->
+  <rect x="0" y="650" width="600" height="50" fill="url(#ground)"/>
+  <!-- Ground line -->
+  <line x1="0" y1="651" x2="600" y2="651" stroke="#aaa" stroke-width="2"/>
+  <!-- Ground shadow from building -->
+  <rect x="30" y="648" width="540" height="6" fill="rgba(0,0,0,.1)" rx="1"/>
+</svg>`;
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const SK = 'aikeara_brand_v1';
+let S = {
+  activeCategory: 'sign',
+  presets: [],
+  elements: [],   // {id,presetId,x,y,width,height,opacity,z}
+  selectedId: null,
+  zoom: 1,
+  maxZ: 10,
+  bgImage: null,  // data URL or null
+  editingPresetId: null,
+  currentShape: 'rect',
+  currentColor: '#111111',
+  flyerImgData: null,
+  undoStack: [],
+};
+
+const CATEGORIES = {
+  sign:       {name:'看板',        icon:'🪧'},
+  door:       {name:'ドア',        icon:'🚪'},
+  standSign:  {name:'立て看板',    icon:'📋'},
+  flyer:      {name:'チラシ・DM',  icon:'📄'},
+  fabric:     {name:'のぼり・幕',  icon:'🎌'},
+  silhouette: {name:'人物',        icon:'🚶'},
+};
+
+const SHAPE_OPTS = [
+  // Signs
+  {id:'rect',        ico:'▬',  label:'横長'},
+  {id:'roundRect',   ico:'▭',  label:'角丸'},
+  {id:'square',      ico:'■',  label:'正方形'},
+  {id:'circle',      ico:'●',  label:'円形'},
+  {id:'projecting',  ico:'|',  label:'突出し'},
+  {id:'oval',        ico:'⬭',  label:'楕円'},
+  {id:'signSheet',   ico:'🪟', label:'サインシート'},
+  {id:'cutting',     ico:'✂',  label:'カッティング'},
+  {id:'sticker',     ico:'🔵', label:'シール・ステッカー'},
+  // Doors
+  {id:'slidingDoor', ico:'⊟',  label:'引き戸'},
+  {id:'woodDoor',    ico:'🪵',  label:'木製'},
+  {id:'steelDoor',   ico:'⬜',  label:'スチール'},
+  // Stand signs
+  {id:'aBoard',      ico:'🔻', label:'A型'},
+  {id:'banner',      ico:'🏳', label:'バナー'},
+  {id:'chalkboard',  ico:'📋', label:'黒板'},
+  // Flyers / DM
+  {id:'flyerV',      ico:'📄', label:'縦A4'},
+  {id:'flyerH',      ico:'📰', label:'横A4'},
+  {id:'poster',      ico:'🗒', label:'ポスター'},
+  {id:'dmCard',      ico:'✉',  label:'DM・ポストカード'},
+  {id:'cardItem',    ico:'💳', label:'カード'},
+  {id:'pamphlet',    ico:'📑', label:'パンフレット'},
+  // Fabric
+  {id:'nobori',      ico:'🎌', label:'のぼり旗'},
+  {id:'makuH',       ico:'🏮', label:'幕'},
+  {id:'yokodanmaku', ico:'📜', label:'横断幕'},
+  // Silhouettes
+  {id:'manFront',    ico:'🚶', label:'男性'},
+  {id:'womanFront',  ico:'🚶', label:'女性'},
+  {id:'manWalk',     ico:'🚶', label:'男歩行'},
+  {id:'child',       ico:'🧒', label:'子ども'},
+  {id:'womanWalk',   ico:'🚶', label:'女歩行'},
+];
+
+const COLORS = ['#111111','#1a2d4a','#0D2B5E','#2d5a3d','#6B4226','#A0785A','#c1440e','#8B6914','#555555','#888888','#ffffff','#f5f0eb'];
+
+const DEFAULT_PRESETS = [
+  {id:'s1',category:'sign',name:'ロゴサイン A',desc:'横長・シンプル',shape:'rect',color:'#111111',text:'AIKEARA-BO',width:160,height:50},
+  {id:'s2',category:'sign',name:'ロゴサイン B',desc:'角丸・ナチュラル',shape:'roundRect',color:'#6B4226',text:'あいけあらぼ',width:150,height:52},
+  {id:'s3',category:'sign',name:'サークルサイン',desc:'円形・アクセント',shape:'circle',color:'#0D2B5E',text:'1F',width:70,height:70},
+  {id:'s4',category:'sign',name:'突出しサイン',desc:'縦型・壁付け',shape:'projecting',color:'#111111',text:'OPEN',width:50,height:120},
+  {id:'s5',category:'sign',name:'楕円サイン',desc:'楕円・ゆるやか',shape:'oval',color:'#2d5a3d',text:'AIKEARA',width:140,height:60},
+  {id:'d1',category:'door',name:'ガラス引き戸',desc:'透明ガラス・アルミ枠',shape:'slidingDoor',color:'#7ba7bc',text:'',width:180,height:240},
+  {id:'d2',category:'door',name:'木製ドア',desc:'ナチュラルウッド',shape:'woodDoor',color:'#A0785A',text:'',width:100,height:220},
+  {id:'d3',category:'door',name:'スチールドア',desc:'インダストリアル',shape:'steelDoor',color:'#2a2a2a',text:'',width:100,height:220},
+  {id:'st1',category:'standSign',name:'A型看板',desc:'スタンダード',shape:'aBoard',color:'#111111',text:'MENU',width:80,height:140},
+  {id:'st2',category:'standSign',name:'バナースタンド',desc:'縦長・インパクト',shape:'banner',color:'#0D2B5E',text:'OPEN',width:60,height:180},
+  {id:'st3',category:'standSign',name:'チョークボード',desc:'黒板・手書き風',shape:'chalkboard',color:'#1a2d1a',text:'DAILY',width:90,height:130},
+  {id:'f1',category:'flyer',name:'A4チラシ（縦）',desc:'スタンダード縦型',shape:'flyerV',color:'#c1440e',text:'CAMPAIGN',width:60,height:85},
+  {id:'f2',category:'flyer',name:'A4チラシ（横）',desc:'スタンダード横型',shape:'flyerH',color:'#0D2B5E',text:'',width:85,height:60},
+  {id:'f3',category:'flyer',name:'ポスター B2',desc:'大判・インパクト',shape:'poster',color:'#1a2d4a',text:'POSTER',width:70,height:99},
+  {id:'p1',category:'silhouette',name:'男性（正面）',desc:'スーツ・正面',shape:'manFront',color:'#333333',text:'',width:45,height:120},
+  {id:'p2',category:'silhouette',name:'女性（正面）',desc:'正面向き',shape:'womanFront',color:'#333333',text:'',width:42,height:120},
+  {id:'p3',category:'silhouette',name:'男性（歩行）',desc:'歩いている',shape:'manWalk',color:'#444444',text:'',width:50,height:120},
+  {id:'p4',category:'silhouette',name:'女性（歩行）',desc:'歩いている',shape:'womanWalk',color:'#444444',text:'',width:46,height:120},
+  {id:'p5',category:'silhouette',name:'子ども',desc:'こども・正面',shape:'child',color:'#555555',text:'',width:36,height:88},
+  // ── チラシ・DM extras ──
+  {id:'f4',category:'flyer',name:'DM・ポストカード',desc:'横型・宛名面あり',shape:'dmCard',color:'#0D2B5E',text:'',width:80,height:55},
+  {id:'f5',category:'flyer',name:'カード（横型）',desc:'ポイントカード等',shape:'cardItem',color:'#111111',text:'',width:70,height:42},
+  {id:'f6',category:'flyer',name:'パンフレット（三つ折）',desc:'三面・縦型',shape:'pamphlet',color:'#2d5a3d',text:'',width:90,height:130},
+  // ── のぼり・幕 ──
+  {id:'nb1',category:'fabric',name:'のぼり旗 A',desc:'縦長・スタンダード',shape:'nobori',color:'#c1440e',text:'OPEN',width:60,height:180},
+  {id:'nb2',category:'fabric',name:'のぼり旗 B',desc:'ネイビー',shape:'nobori',color:'#0D2B5E',text:'',width:60,height:180},
+  {id:'mk1',category:'fabric',name:'幕（横長）',desc:'店舗前掛け幕',shape:'makuH',color:'#111111',text:'あいけあらぼ',width:200,height:60},
+  {id:'yd1',category:'fabric',name:'横断幕',desc:'ポール付き横断幕',shape:'yokodanmaku',color:'#0D2B5E',text:'GRAND OPEN',width:220,height:65},
+  // ── 看板 extras ──
+  {id:'s6',category:'sign',name:'サインシート',desc:'ウィンドウ・壁面用',shape:'signSheet',color:'#0D2B5E',text:'OPEN',width:120,height:80},
+  {id:'s7',category:'sign',name:'カッティングシート',desc:'ロゴ・文字カット',shape:'cutting',color:'#111111',text:'SHOP',width:140,height:50},
+  {id:'s8',category:'sign',name:'シール・ステッカー',desc:'円形シール',shape:'sticker',color:'#c1440e',text:'NEW',width:70,height:70},
+];
+
+function loadState(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SK)||'{}');
+    S.presets=d.presets||JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+  }catch(e){S.presets=JSON.parse(JSON.stringify(DEFAULT_PRESETS))}
+}
+function savePresetState(){localStorage.setItem(SK,JSON.stringify({presets:S.presets}))}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  loadState();
+  renderBackground();
+  renderCategories();
+  renderPresets();
+  initCanvasEvents();
+  updateZoom();
+  initBgColorSwatches();
+});
+
+// ═══════════════════════════════════════════════════════
+//  BACKGROUND
+// ═══════════════════════════════════════════════════════
+function renderBackground(){
+  const bg=document.getElementById('storeBackground');
+  if(S.bgImage){
+    bg.innerHTML=`<img src="${S.bgImage}" style="width:600px;height:700px;object-fit:cover;display:block;">`;
+  } else {
+    bg.innerHTML=DEFAULT_BG_SVG;
+  }
+}
+function loadBg(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{S.bgImage=e.target.result;renderBackground();};
+  r.readAsDataURL(f);
+}
+function resetBg(){S.bgImage=null;renderBackground();resetBgTransform();}
+
+// ── Background transform ──
+let bgT={rot:0,perspX:0,perspY:0,scale:1,tx:0,ty:0};
+function applyBgTransform(){
+  const bg=document.getElementById('storeBackground');
+  bg.style.transform=
+    `perspective(1200px) `+
+    `rotateX(${bgT.perspX}deg) `+
+    `rotateY(${bgT.perspY}deg) `+
+    `rotate(${bgT.rot}deg) `+
+    `scale(${bgT.scale}) `+
+    `translate(${bgT.tx}px,${bgT.ty}px)`;
+}
+function setBgProp(key,val){bgT[key]=val;applyBgTransform();}
+function resetBgTransform(){
+  bgT={rot:0,perspX:0,perspY:0,scale:1,tx:0,ty:0};
+  applyBgTransform();
+  ['bgRot','bgPX','bgPY','bgSc','bgTX','bgTY'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value=id==='bgSc'?100:0;
+  });
+  ['bgRotV','bgPXV','bgPYV','bgTXV','bgTYV'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.textContent='0°';
+  });
+  const sc=document.getElementById('bgScV');if(sc) sc.textContent='100%';
+  const txv=document.getElementById('bgTXV');if(txv) txv.textContent='0';
+  const tyv=document.getElementById('bgTYV');if(tyv) tyv.textContent='0';
+}
+function toggleBgAdjust(){
+  const panel=document.getElementById('bgAdjustPanel');
+  panel.classList.toggle('open');
+  const btn=document.getElementById('bgAdjustToggle');
+  btn.textContent=panel.classList.contains('open')?'🔧 閉じる':'🔧 画像調整';
+}
+function syncBgSliders(){
+  document.getElementById('bgRot').value=bgT.rot;
+  document.getElementById('bgRotV').textContent=bgT.rot.toFixed(1)+'°';
+  document.getElementById('bgPX').value=bgT.perspX;
+  document.getElementById('bgPXV').textContent=bgT.perspX+'°';
+  document.getElementById('bgPY').value=bgT.perspY;
+  document.getElementById('bgPYV').textContent=bgT.perspY+'°';
+  document.getElementById('bgSc').value=Math.round(bgT.scale*100);
+  document.getElementById('bgScV').textContent=Math.round(bgT.scale*100)+'%';
+  document.getElementById('bgTX').value=bgT.tx;
+  document.getElementById('bgTXV').textContent=bgT.tx;
+  document.getElementById('bgTY').value=bgT.ty;
+  document.getElementById('bgTYV').textContent=bgT.ty;
+}
+
+// ═══════════════════════════════════════════════════════
+//  STREET VIEW BACKGROUND
+// ═══════════════════════════════════════════════════════
+let svLatLng=null; // {lat,lng} after geocoding
+
+const DEFAULT_API_KEY='AIzaSyCmoOxjJhvN0cdH4w2Vq-RNwWcpQ3OlYWI';
+function getApiKey(){return localStorage.getItem('sv_api_key')||DEFAULT_API_KEY;}
+function saveApiKey(){
+  const v=document.getElementById('svApiKey').value.trim();
+  if(v) localStorage.setItem('sv_api_key',v);
+}
+function clearApiKey(){
+  localStorage.removeItem('sv_api_key');
+  document.getElementById('svApiKey').value='';
+}
+function svStatus(type,msg){
+  const el=document.getElementById('svStatus');
+  el.className='sv-status '+type;el.textContent=msg;
+}
+
+function getSvParams(){
+  return {
+    heading:+document.getElementById('svHeading').value,
+    pitch:+document.getElementById('svPitch').value,
+    fov:+document.getElementById('svFov').value,
+  };
+}
+
+function buildSvUrl(lat,lng,{heading,pitch,fov},key){
+  return `https://maps.googleapis.com/maps/api/streetview?size=600x700&location=${lat},${lng}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${key}`;
+}
+
+// Google Maps コピペ含む住所を正規化して候補リスト生成
+function buildAddrCandidates(raw){
+  // 1. 全角数字・英字→半角、全種ダッシュ類→半角ハイフン
+  let s=raw
+    .replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(/[ａ-ｚＡ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(/[－−–—―‐]/g,'-')  // U+FF0D, U+2212, U+2013, U+2014, U+2015, U+2010
+    .replace(/　/g,' ').trim();
+  // 2. 〒 + 郵便番号を除去
+  s=s.replace(/〒\s*\d{3}-\d{4}\s*/g,'').replace(/^\d{3}-\d{4}\s+/,'').trim();
+  const base=s;
+  // 3. 階・号室を除去
+  const noFloor=base
+    .replace(/\s+[Bb]?\d+[Ff](?:\s|$).*/,'')
+    .replace(/\s+\d+[階号].*/,'').trim();
+  // 4. 建物名を除去（番地の後の日本語文字列）
+  const noBuilding=noFloor.replace(/(\d+-\d+)\s+\S.*$/,'$1').trim();
+  // 5. 番地を除去（町名まで）
+  const noNum=noBuilding.replace(/\d+[-]?\d*[^぀-鿿]*$/,'').trim();
+  // 6. 都道府県+市区町村のみ
+  const cityOnly=base.replace(/((?:都|道|府|県).+?(?:市|区|町|村)).*$/,'$1').trim();
+  return [...new Set([base,noFloor,noBuilding,noNum,cityOnly,raw].filter(v=>v&&v.length>3))];
+}
+
+async function geocodeWithGoogle(addr,key){
+  const url=`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addr)}&language=ja&region=jp&key=${key}`;
+  const res=await fetch(url);
+  const d=await res.json();
+  if(d.status==='OK'&&d.results.length){
+    return{lat:d.results[0].geometry.location.lat,lng:d.results[0].geometry.location.lng,status:'OK'};
+  }
+  console.warn('[Geocode]',d.status,'→',addr);
+  return{status:d.status||'UNKNOWN'};
+}
+
+async function searchStreetView(){
+  const addr=document.getElementById('svAddress').value.trim();
+  if(!addr){svStatus('error','住所を入力してください');return;}
+  const key=getApiKey();
+  if(!key){svStatus('error','API キーを設定してください（下の「API キー設定」を開いて入力）');return;}
+
+  svStatus('loading','📍 住所を検索中...');
+  document.getElementById('svSearchBtn').disabled=true;
+
+  try{
+    // Google Geocoding API — 複数バリアントでフォールバック
+    const candidates=buildAddrCandidates(addr);
+    console.log('[Street View] 候補住所:',candidates);
+    let latLng=null;
+    let lastStatus='';
+    for(const c of candidates){
+      const r=await geocodeWithGoogle(c,key);
+      if(r&&r.status==='OK'){latLng=r;break;}
+      lastStatus=r?.status||'';
+    }
+    if(!latLng){
+      const hint=lastStatus==='REQUEST_DENIED'?'APIキーが拒否されました。キーの制限設定を確認してください。':
+                 lastStatus==='ZERO_RESULTS'?'住所が見つかりませんでした。建物名・部屋番号を省いて入力してみてください。':
+                 `住所が見つかりませんでした (${lastStatus})。都道府県・市区町村から入力してみてください。`;
+      svStatus('error',hint);document.getElementById('svSearchBtn').disabled=false;return;
+    }
+
+    const lat=latLng.lat;
+    const lng=latLng.lng;
+    svLatLng={lat,lng};
+
+    svStatus('loading','🏙 Street View を取得中...');
+
+    // Fetch SV metadata to get default heading facing the building
+    const metaUrl=`https://maps.googleapis.com/maps/api/streetview/metadata?location=${lat},${lng}&key=${key}`;
+    let autoHeading=0;
+    try{
+      const metaRes=await fetch(metaUrl);
+      const meta=await metaRes.json();
+      if(meta.status==='OK'&&meta.heading!==undefined){
+        // The metadata heading points FROM the camera TO the subject
+        // We want to face the building: add 180° to get reverse direction
+        autoHeading=Math.round((meta.heading+180)%360);
+        document.getElementById('svHeading').value=autoHeading;
+        document.getElementById('svHeadingV').textContent=autoHeading+'°';
+      }
+    }catch(e){}
+
+    const params=getSvParams();
+    const imgUrl=buildSvUrl(lat,lng,params,key);
+
+    // Test if image loads (Street View might not exist at location)
+    await new Promise((resolve,reject)=>{
+      const img=new Image();
+      img.crossOrigin='anonymous';
+      img.onload=()=>{
+        // Check if it's the "no image" placeholder (very small)
+        if(img.naturalWidth<100) reject(new Error('no_streetview'));
+        else resolve();
+      };
+      img.onerror=()=>reject(new Error('load_error'));
+      img.src=imgUrl;
+    });
+
+    // Set as background
+    S.bgImage=imgUrl;
+    renderBackground();
+    svStatus('ok',`✅ 設定完了（方角: ${autoHeading}°）スライダーで調整できます`);
+  }catch(e){
+    if(e.message==='no_streetview') svStatus('error','この住所の Street View が見つかりませんでした。');
+    else svStatus('error','取得エラー。APIキーとネットワークを確認してください。');
+  }
+  document.getElementById('svSearchBtn').disabled=false;
+}
+
+function updateSVPreview(){
+  // Live update background if we already have lat/lng
+  const key=getApiKey();
+  if(!svLatLng||!key) return;
+  const params=getSvParams();
+  S.bgImage=buildSvUrl(svLatLng.lat,svLatLng.lng,params,key);
+  renderBackground();
+}
+
+function openInMaps(){
+  const addr=document.getElementById('svAddress').value.trim();
+  if(svLatLng){
+    window.open(`https://www.google.com/maps/@${svLatLng.lat},${svLatLng.lng},3a,75y,${getSvParams().heading}h,${90+getSvParams().pitch}t/data=!3m1!1e1`,'_blank');
+  } else if(addr){
+    window.open(`https://www.google.com/maps/search/${encodeURIComponent(addr)}`,'_blank');
+  } else {
+    alert('住所を入力してください');
+  }
+}
+
+// Init: restore saved API key
+window.addEventListener('DOMContentLoaded',()=>{
+  const k=getApiKey();
+  if(k) document.getElementById('svApiKey').value=k;
+},{once:false});
+
+// ── 2点正面化 ──
+let strPts=[];
+function startStraighten(){
+  strPts=[];
+  const ov=document.getElementById('straightenOverlay');
+  ov.innerHTML=`<div class="str-hint">① 縦線の上の点をクリック<br><span style="font-size:10px;opacity:.8">Escでキャンセル</span></div>`;
+  ov.style.display='block';
+  // Open adjust panel if not open
+  document.getElementById('bgAdjustPanel').classList.add('open');
+  document.getElementById('bgAdjustToggle').textContent='🔧 閉じる';
+}
+function onStraightenClick(e){
+  const ov=e.currentTarget;
+  const rect=ov.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  const y=e.clientY-rect.top;
+  strPts.push({x,y});
+  // Draw dot
+  const dot=document.createElement('div');
+  dot.className='str-dot';
+  dot.style.left=x+'px';dot.style.top=y+'px';
+  ov.appendChild(dot);
+  if(strPts.length===1){
+    // Update hint
+    ov.querySelector('.str-hint').innerHTML='② 同じ縦線の下の点をクリック<br><span style="font-size:10px;opacity:.8">Escでキャンセル</span>';
+  } else if(strPts.length===2){
+    const [p1,p2]=strPts;
+    // Draw line between points
+    const dx=p2.x-p1.x;
+    const dy=p2.y-p1.y;
+    const len=Math.sqrt(dx*dx+dy*dy);
+    const angleDeg=Math.atan2(dx,dy)*180/Math.PI; // angle from vertical
+    // Draw visual line
+    const line=document.createElement('div');
+    line.className='str-line';
+    line.style.left=p1.x+'px';
+    line.style.top=p1.y+'px';
+    line.style.height=len+'px';
+    line.style.transform=`rotate(${Math.atan2(dx,dy)*180/Math.PI - (dx>=0?0:180)}deg) translateX(-50%)`;
+    ov.appendChild(line);
+    // Apply correction: subtract angle from vertical to bgT.rot
+    bgT.rot=bgT.rot-angleDeg;
+    // Clamp
+    bgT.rot=Math.max(-30,Math.min(30,bgT.rot));
+    applyBgTransform();
+    syncBgSliders();
+    // Show result and close after short delay
+    ov.querySelector('.str-hint').innerHTML=`✅ 補正完了: ${angleDeg.toFixed(1)}°`;
+    setTimeout(()=>endStraighten(),900);
+  }
+}
+function endStraighten(){
+  const ov=document.getElementById('straightenOverlay');
+  ov.style.display='none';
+  ov.innerHTML='';
+  strPts=[];
+}
+// ── UNDO ──
+function pushUndo(){
+  S.undoStack.push(JSON.parse(JSON.stringify(S.elements)));
+  if(S.undoStack.length>10) S.undoStack.shift();
+}
+function undo(){
+  if(!S.undoStack.length) return;
+  const snap=S.undoStack.pop();
+  document.getElementById('elementsLayer').innerHTML='';
+  S.elements=snap;
+  S.elements.forEach(el=>addCanvasEl(el));
+  deselect();
+  updateLayerList();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('straightenOverlay').style.display==='block') endStraighten();
+  const tag=document.activeElement?.tagName?.toLowerCase();
+  if(!['input','textarea','select'].includes(tag)){
+    if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSelected();}
+    if((e.metaKey||e.ctrlKey)&&e.key==='z'){e.preventDefault();undo();}
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  CATEGORIES & PRESETS
+// ═══════════════════════════════════════════════════════
+function renderCategories(){
+  const el=document.getElementById('catTabs');
+  el.innerHTML='';
+  Object.entries(CATEGORIES).forEach(([k,v])=>{
+    const btn=document.createElement('button');
+    btn.className='cat-tab'+(S.activeCategory===k?' active':'');
+    btn.innerHTML=`<span>${v.icon}</span>${v.name}`;
+    btn.onclick=()=>{S.activeCategory=k;renderCategories();renderPresets()};
+    el.appendChild(btn);
+  });
+  const lbl=document.getElementById('addBarLabel');
+  if(lbl) lbl.textContent=CATEGORIES[S.activeCategory]?.name||'';
+}
+
+function renderPresets(){
+  const el=document.getElementById('presetList');
+  el.innerHTML='';
+  const items=S.presets.filter(p=>p.category===S.activeCategory);
+  if(!items.length){
+    el.innerHTML='<div style="font-size:11px;color:var(--muted);padding:12px;text-align:center">プリセットがありません<br>「+ 追加」で作成</div>';
+    return;
+  }
+  items.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='preset-item';
+    div.draggable=false;
+    div.innerHTML=`
+      <div class="preset-thumb">${getPreviewSVG(p)}</div>
+      <div class="preset-meta">
+        <div class="name">${p.name}</div>
+        <div class="desc">${p.desc||''}</div>
+      </div>
+      <div class="preset-btns">
+        <button class="preset-add-btn" title="キャンバスに追加">＋</button>
+        <button class="preset-edit-btn" title="編集">✎</button>
+      </div>`;
+    div.querySelector('.preset-add-btn').addEventListener('click',e=>{e.stopPropagation();addPresetToCanvas(p.id);});
+    div.querySelector('.preset-edit-btn').addEventListener('click',e=>{e.stopPropagation();openModal(p.id)});
+    div.addEventListener('mousedown',e=>{if(!e.target.closest('.preset-btns'))startSidebarDrag(e,p.id)});
+    el.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAG FROM SIDEBAR
+// ═══════════════════════════════════════════════════════
+let dragPresetId=null,ghost=null;
+function startSidebarDrag(e,pid){
+  e.preventDefault();
+  dragPresetId=pid;
+  ghost=document.getElementById('dragGhost');
+  const p=S.presets.find(x=>x.id===pid);
+  ghost.style.width=p.width+'px';
+  ghost.style.height=p.height+'px';
+  ghost.innerHTML=getPreviewSVG(p);
+  ghost.style.display='block';
+  moveGhost(e);
+}
+function moveGhost(e){
+  if(!dragPresetId)return;
+  const p=S.presets.find(x=>x.id===dragPresetId);
+  ghost.style.left=(e.clientX-p.width/2)+'px';
+  ghost.style.top=(e.clientY-p.height/2)+'px';
+}
+// ＋ボタンでキャンバス中央に配置
+let _addOffset=0;
+function addPresetToCanvas(pid){
+  pushUndo();
+  const p=S.presets.find(x=>x.id===pid);if(!p)return;
+  _addOffset=(_addOffset+20)%100;
+  const el={
+    id:'el_'+Date.now(),
+    presetId:p.id,
+    x:Math.round(300-p.width/2+_addOffset),
+    y:Math.round(350-p.height/2+_addOffset),
+    width:p.width,height:p.height,
+    opacity:1,rotation:0,blendMode:'normal',bgColor:'transparent',
+    z:++S.maxZ,
+  };
+  S.elements.push(el);addCanvasEl(el);selectEl(el.id);
+  if(p.category==='flyer') updateFlyerPanel(p);
+}
+
+function dropPreset(e){
+  if(!dragPresetId){return}
+  pushUndo();
+  const p=S.presets.find(x=>x.id===dragPresetId);
+  const pos=screenToCanvas(e.clientX,e.clientY);
+  const el={
+    id:'el_'+Date.now(),
+    presetId:p.id,
+    x:Math.round(pos.x-p.width/2),
+    y:Math.round(pos.y-p.height/2),
+    width:p.width,
+    height:p.height,
+    opacity:1,
+    rotation:0,
+    blendMode:'normal',
+    bgColor:'transparent',
+    z:++S.maxZ,
+  };
+  S.elements.push(el);
+  addCanvasEl(el);
+  selectEl(el.id);
+  if(p.category==='flyer') updateFlyerPanel(p);
+  dragPresetId=null;
+  ghost.style.display='none';
+}
+function screenToCanvas(sx,sy){
+  const wrapper=document.getElementById('canvasWrapper');
+  const wr=wrapper.getBoundingClientRect();
+  const cx=wr.left+wr.width/2;
+  const cy=wr.top+wr.height/2;
+  return {
+    x:(sx-cx)/S.zoom+300,
+    y:(sy-cy)/S.zoom+350,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  CANVAS ELEMENTS
+// ═══════════════════════════════════════════════════════
+function addCanvasEl(el){
+  const p=S.presets.find(x=>x.id===el.presetId);
+  const layer=document.getElementById('elementsLayer');
+  const div=document.createElement('div');
+  div.className='canvas-el';
+  div.id='cel_'+el.id;
+  div.style.cssText=`left:${el.x}px;top:${el.y}px;width:${el.width}px;height:${el.height}px;opacity:${el.opacity};z-index:${el.z};transform:rotate(${el.rotation||0}deg);mix-blend-mode:${el.blendMode||'normal'}`;
+  div.innerHTML=`
+    <div class="el-content">${getPreviewSVG(p)}</div>
+    <button class="el-del" onclick="deleteEl('${el.id}')">×</button>
+    <div class="el-label">${p.name}</div>
+    <div class="distort-hint">⌥ドラッグで変形 | ⌥⇧で45°スナップ</div>
+    <div class="rot-line"></div>
+    <div class="rot-handle" title="ドラッグで回転"></div>
+    <div class="rh ne" data-h="ne"></div>
+    <div class="rh nw" data-h="nw"></div>
+    <div class="rh se" data-h="se"></div>
+    <div class="rh sw" data-h="sw"></div>
+    <div class="rh n"  data-h="n"></div>
+    <div class="rh s"  data-h="s"></div>
+    <div class="rh e"  data-h="e"></div>
+    <div class="rh w"  data-h="w"></div>`;
+  div.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('rot-handle')) startRotation(e,el.id);
+    else if(e.target.classList.contains('rh')) startResize(e,el.id,e.target.dataset.h);
+    else if(!e.target.classList.contains('el-del')) startElDrag(e,el.id);
+  });
+  div.addEventListener('click',e=>{
+    if(!e.target.classList.contains('el-del')&&!e.target.classList.contains('rh')&&!e.target.classList.contains('rot-handle')) selectEl(el.id);
+  });
+  layer.appendChild(div);
+  updateLayerList();
+}
+
+function refreshElDOM(elId){
+  const el=S.elements.find(x=>x.id===elId);if(!el)return;
+  const div=document.getElementById('cel_'+elId);if(!div)return;
+  const content=div.querySelector('.el-content');
+  div.style.opacity=el.opacity;div.style.zIndex=el.z;
+  div.style.mixBlendMode=el.blendMode||'normal';
+
+  if(el.corners){
+    // バウンディングボックスをコンテナに、matrix3dはコンテンツのみに適用
+    const xs=el.corners.map(c=>c.x),ys=el.corners.map(c=>c.y);
+    const minX=Math.min(...xs),minY=Math.min(...ys);
+    const boxW=Math.max(...xs)-minX,boxH=Math.max(...ys)-minY;
+    div.style.left=minX+'px';div.style.top=minY+'px';
+    div.style.width=boxW+'px';div.style.height=boxH+'px';
+    div.style.transform='none';div.style.transformOrigin='50% 50%';
+    div.style.backgroundColor='transparent';
+    div.classList.add('distorted');
+    // コンテンツに matrix3d
+    if(content){
+      const rel=el.corners.map(c=>({x:c.x-minX,y:c.y-minY}));
+      const mat=computeMatrix3d(el.distortW,el.distortH,rel);
+      content.style.cssText=`position:absolute;left:0;top:0;width:${el.distortW}px;height:${el.distortH}px;transform-origin:0 0;transform:matrix3d(${mat.join(',')});background:${el.bgColor||'transparent'}`;
+    }
+    // コーナーハンドルを実際の頂点位置に移動
+    ['nw','ne','sw','se'].forEach((h,i)=>{
+      const rh=div.querySelector(`.rh[data-h="${h}"]`);if(!rh)return;
+      const c=el.corners[i];
+      rh.style.left=(c.x-minX)+'px';rh.style.top=(c.y-minY)+'px';
+      rh.style.right='auto';rh.style.bottom='auto';
+    });
+  } else {
+    div.style.left=el.x+'px';div.style.top=el.y+'px';
+    div.style.width=el.width+'px';div.style.height=el.height+'px';
+    div.style.transform=`rotate(${el.rotation||0}deg)`;div.style.transformOrigin='50% 50%';
+    div.style.backgroundColor=el.bgColor||'transparent';
+    div.classList.remove('distorted');
+    if(content) content.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;transform:none;background:transparent';
+    // ハンドル位置リセット
+    div.querySelectorAll('.rh').forEach(rh=>{rh.style.left='';rh.style.top='';rh.style.right='';rh.style.bottom='';rh.style.transform='';});
+  }
+}
+function refreshAllEls(){S.elements.forEach(e=>refreshElDOM(e.id))}
+
+// ── SELECT ──
+function selectEl(id){
+  document.querySelectorAll('.canvas-el').forEach(d=>d.classList.remove('selected'));
+  S.selectedId=id;
+  if(id){
+    const div=document.getElementById('cel_'+id);
+    if(div) div.classList.add('selected');
+    showProps();
+  } else {
+    hideProps();
+  }
+  updateLayerList();
+}
+function deselect(){selectEl(null)}
+
+function showProps(){
+  const el=S.elements.find(x=>x.id===S.selectedId);if(!el)return;
+  document.getElementById('noSel').classList.add('hidden');
+  document.getElementById('elProps').classList.remove('hidden');
+  document.getElementById('pX').value=el.x;
+  document.getElementById('pY').value=el.y;
+  document.getElementById('pW').value=el.width;
+  document.getElementById('pH').value=el.height;
+  const op=Math.round(el.opacity*100);
+  document.getElementById('pOp').value=op;
+  document.getElementById('pOpV').textContent=op+'%';
+  const rot=Math.round(el.rotation||0);
+  document.getElementById('pRot').value=rot;
+  document.getElementById('pRotN').value=rot;
+  document.getElementById('pRotV').textContent=rot+'°';
+  document.getElementById('pBlend').value=el.blendMode||'normal';
+  syncBgColorUI(el.bgColor||'transparent');
+  const rb=document.getElementById('distortResetBtn');
+  if(rb) rb.style.display=el.corners?'block':'none';
+}
+function hideProps(){
+  document.getElementById('noSel').classList.remove('hidden');
+  document.getElementById('elProps').classList.add('hidden');
+}
+function setElProp(key,val){
+  const el=S.elements.find(x=>x.id===S.selectedId);if(!el)return;
+  el[key]=val;
+  refreshElDOM(el.id);
+}
+
+// ── Element background color ──
+const BG_SWATCHES=['transparent','#ffffff','#f5f0eb','#111111','#1a2d4a','#0D2B5E','#2d5a3d','#6B4226','#c1440e','#8B6914','#e8e4df','#d4c5b0'];
+function initBgColorSwatches(){
+  const wrap=document.getElementById('bgColorSwatches');if(!wrap)return;
+  wrap.innerHTML='';
+  BG_SWATCHES.forEach(c=>{
+    const sw=document.createElement('div');
+    sw.dataset.c=c;
+    sw.style.cssText=`width:18px;height:18px;border-radius:3px;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .12s;position:relative;`;
+    if(c==='transparent'){
+      // Checkerboard for transparent
+      sw.style.background='repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 0 0/8px 8px';
+      sw.title='透明（なし）';
+    } else {
+      sw.style.background=c;
+      if(c==='#ffffff') sw.style.border='2px solid #ddd';
+    }
+    sw.onclick=()=>setElBgColor(c);
+    wrap.appendChild(sw);
+  });
+}
+function setElBgColor(color){
+  const el=S.elements.find(x=>x.id===S.selectedId);if(!el)return;
+  el.bgColor=color;
+  refreshElDOM(el.id);
+  syncBgColorUI(color);
+}
+function syncBgColorUI(color){
+  // Swatches highlight
+  document.querySelectorAll('#bgColorSwatches div').forEach(sw=>{
+    sw.style.borderColor=sw.dataset.c===color?'#3b82f6':'transparent';
+    if(sw.dataset.c==='#ffffff'&&color!=='#ffffff') sw.style.borderColor='#ddd';
+  });
+  // Picker value
+  const picker=document.getElementById('pBgColorPicker');
+  if(picker&&color!=='transparent') picker.value=color;
+  // Preview bar
+  const preview=document.getElementById('pBgColorPreview');
+  if(preview){
+    preview.style.background=color==='transparent'
+      ?'repeating-conic-gradient(#ccc 0% 25%,#fff 0% 50%) 0 0/8px 8px'
+      :color;
+    preview.textContent=color==='transparent'?'透明':'';
+    preview.style.color=color==='#111111'||color==='#1a2d4a'||color==='#0D2B5E'?'white':'';
+  }
+  // "なし" button highlight
+  const noneBtn=document.getElementById('pBgNoneBtn');
+  if(noneBtn) noneBtn.style.borderColor=color==='transparent'?'#3b82f6':'var(--border)';
+}
+
+// ── DELETE ──
+function deleteEl(id){
+  pushUndo();
+  S.elements=S.elements.filter(x=>x.id!==id);
+  document.getElementById('cel_'+id)?.remove();
+  if(S.selectedId===id) deselect();
+  updateLayerList();
+}
+function deleteSelected(){if(S.selectedId) deleteEl(S.selectedId)}
+function clearCanvas(){
+  pushUndo();
+  S.elements=[];
+  document.getElementById('elementsLayer').innerHTML='';
+  deselect();
+  updateLayerList();
+}
+
+// ── LAYERS ──
+function layerOp(op){
+  const el=S.elements.find(x=>x.id===S.selectedId);if(!el)return;
+  const zs=S.elements.map(x=>x.z).sort((a,b)=>a-b);
+  if(op==='front') el.z=S.maxZ+1,S.maxZ++;
+  else if(op==='back') el.z=Math.max(1,(zs[0]||1)-1);
+  else if(op==='up') el.z=el.z+1;
+  else if(op==='down') el.z=Math.max(1,el.z-1);
+  refreshElDOM(el.id);
+  updateLayerList();
+}
+function updateLayerList(){
+  const ll=document.getElementById('layerList');
+  if(!S.elements.length){ll.innerHTML='<div style="font-size:11px;color:var(--muted)">なし</div>';return}
+  ll.innerHTML='';
+  [...S.elements].sort((a,b)=>b.z-a.z).forEach(el=>{
+    const p=S.presets.find(x=>x.id===el.presetId)||{name:'?',category:'sign'};
+    const div=document.createElement('div');
+    div.className='layer-list-item'+(el.id===S.selectedId?' active-layer':'');
+    div.innerHTML=`<span class="li-icon">${CATEGORIES[p.category]?.icon||'📦'}</span><span class="li-name">${p.name}</span>`;
+    div.onclick=()=>selectEl(el.id);
+    ll.appendChild(div);
+  });
+}
+
+// ── FLYER PANEL ──
+function updateFlyerPanel(p){
+  const fp=document.getElementById('flyerPanel');
+  if(!p){fp.innerHTML='<div style="font-size:11px;color:var(--muted)">チラシ未選択</div>';return}
+  fp.innerHTML=`<div class="flyer-card">
+    <div class="fname">${p.name}</div>
+    <div class="flyer-thumb-box">
+      ${p.flyerImg?`<img src="${p.flyerImg}" alt="${p.name}">`:`<div style="padding:10px;font-size:10px;color:var(--muted);text-align:center">${getPreviewSVG(p)}</div>`}
+    </div>
+    <div style="margin-top:6px;color:var(--muted)">${p.desc||''}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAG ELEMENT ON CANVAS
+// ═══════════════════════════════════════════════════════
+let elDrag=null;
+function startElDrag(e,id){
+  e.stopPropagation();
+  pushUndo();
+  selectEl(id);
+  const el=S.elements.find(x=>x.id===id);
+  elDrag=el.corners
+    ?{id,sx:e.clientX,sy:e.clientY,distort:true,origCorners:el.corners.map(c=>({...c}))}
+    :{id,sx:e.clientX,sy:e.clientY,ox:el.x,oy:el.y};
+  document.getElementById('cel_'+id).style.cursor='grabbing';
+}
+
+// ═══════════════════════════════════════════════════════
+//  ROTATION
+// ═══════════════════════════════════════════════════════
+let rotDrag=null;
+function startRotation(e,id){
+  e.stopPropagation();e.preventDefault();
+  pushUndo();
+  selectEl(id);
+  const div=document.getElementById('cel_'+id);
+  const rect=div.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  const el=S.elements.find(x=>x.id===id);
+  rotDrag={
+    id,cx,cy,
+    startAngle:Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI,
+    origRot:el.rotation||0,
+  };
+  document.body.style.cursor='grab';
+}
+function handleRotation(e){
+  if(!rotDrag)return;
+  const el=S.elements.find(x=>x.id===rotDrag.id);if(!el)return;
+  const angle=Math.atan2(e.clientY-rotDrag.cy,e.clientX-rotDrag.cx)*180/Math.PI;
+  const delta=angle-rotDrag.startAngle;
+  // Shift key: snap to 15° increments
+  let rot=((rotDrag.origRot+delta)%360+360)%360;
+  if(e.shiftKey) rot=Math.round(rot/15)*15;
+  el.rotation=rot;
+  refreshElDOM(el.id);
+  showProps();
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESIZE
+// ═══════════════════════════════════════════════════════
+let rzDrag=null;
+// corner index: 0=TL(nw) 1=TR(ne) 2=BL(sw) 3=BR(se)
+const CORNER_HANDLE={nw:0,ne:1,sw:2,se:3};
+const PERSPECTIVE_MIRROR={0:1,1:0,2:3,3:2};
+
+function getRotatedCorners(el){
+  const{x,y,width:w,height:h,rotation:rot}=el;
+  const cx=x+w/2,cy=y+h/2,r=(rot||0)*Math.PI/180;
+  return[[x,y],[x+w,y],[x,y+h],[x+w,y+h]].map(([px,py])=>{
+    const dx=px-cx,dy=py-cy;
+    return{x:cx+dx*Math.cos(r)-dy*Math.sin(r),y:cy+dx*Math.sin(r)+dy*Math.cos(r)};
+  });
+}
+
+// ─── matrix3d helpers (homography) ───
+function _adj(m){return[m[4]*m[8]-m[5]*m[7],m[2]*m[7]-m[1]*m[8],m[1]*m[5]-m[2]*m[4],m[5]*m[6]-m[3]*m[8],m[0]*m[8]-m[2]*m[6],m[2]*m[3]-m[0]*m[5],m[3]*m[7]-m[4]*m[6],m[1]*m[6]-m[0]*m[7],m[0]*m[4]-m[1]*m[3]];}
+function _mm(a,b){var c=Array(9);for(var i=0;i<3;i++)for(var j=0;j<3;j++){var s=0;for(var k=0;k<3;k++)s+=a[3*i+k]*b[3*k+j];c[3*i+j]=s;}return c;}
+function _mv(m,v){return[m[0]*v[0]+m[1]*v[1]+m[2]*v[2],m[3]*v[0]+m[4]*v[1]+m[5]*v[2],m[6]*v[0]+m[7]*v[1]+m[8]*v[2]];}
+function _basis(x1,y1,x2,y2,x3,y3,x4,y4){var m=[x1,x2,x3,y1,y2,y3,1,1,1];var v=_mv(_adj(m),[x4,y4,1]);return _mm(m,[v[0],0,0,0,v[1],0,0,0,v[2]]);}
+function computeMatrix3d(w,h,c){
+  var s=_basis(0,0,w,0,0,h,w,h);
+  var d=_basis(c[0].x,c[0].y,c[1].x,c[1].y,c[2].x,c[2].y,c[3].x,c[3].y);
+  var t=_mm(d,_adj(s));for(var i=0;i<9;i++)t[i]/=t[8];
+  return[t[0],t[3],0,t[6],t[1],t[4],0,t[7],0,0,1,0,t[2],t[5],0,t[8]];
+}
+
+function resetDistort(){
+  const el=S.elements.find(x=>x.id===S.selectedId);if(!el||!el.corners)return;
+  pushUndo();
+  const xs=el.corners.map(c=>c.x),ys=el.corners.map(c=>c.y);
+  el.x=Math.round(Math.min(...xs));el.y=Math.round(Math.min(...ys));
+  el.width=Math.round(Math.max(...xs)-Math.min(...xs));
+  el.height=Math.round(Math.max(...ys)-Math.min(...ys));
+  el.rotation=0;el.corners=null;el.distortW=null;el.distortH=null;
+  refreshElDOM(el.id);showProps();
+}
+
+function startResize(e,id,handle){
+  e.stopPropagation();e.preventDefault();
+  pushUndo();
+  const el=S.elements.find(x=>x.id===id);
+  rzDrag={id,handle,sx:e.clientX,sy:e.clientY,ox:el.x,oy:el.y,ow:el.width,oh:el.height,
+    origCorners:el.corners?el.corners.map(c=>({...c})):null};
+}
+function handleResize(e){
+  if(!rzDrag)return;
+  const el=S.elements.find(x=>x.id===rzDrag.id);if(!el)return;
+  const dx=(e.clientX-rzDrag.sx)/S.zoom;
+  const dy=(e.clientY-rzDrag.sy)/S.zoom;
+  const{handle,ox,oy,ow,oh}=rzDrag;
+  const ci=CORNER_HANDLE[handle];
+
+  // ⌥ or already distorted + corner handle → distort/perspective
+  if(ci!==undefined&&(e.altKey||el.corners)){
+    if(!el.corners){
+      el.distortW=ow;el.distortH=oh;
+      el.corners=getRotatedCorners(el);
+      el.rotation=0;
+      rzDrag.origCorners=el.corners.map(c=>({...c}));
+    }
+    const orig=rzDrag.origCorners;
+    let cdx=dx,cdy=dy;
+    if(e.shiftKey){
+      const len=Math.sqrt(dx*dx+dy*dy);
+      if(len>0){const a=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4);cdx=Math.cos(a)*len;cdy=Math.sin(a)*len;}
+    }
+    el.corners=orig.map((c,i)=>i===ci?{x:c.x+cdx,y:c.y+cdy}:{...c});
+    refreshElDOM(el.id);showProps();
+    return;
+  }
+
+  // Normal resize (no ⌥, no existing distort)
+  if(el.corners) return;
+  let nx=ox,ny=oy,nw=ow,nh=oh;
+  if(handle.includes('e')) nw=Math.max(20,ow+dx);
+  if(handle.includes('s')) nh=Math.max(20,oh+dy);
+  if(handle.includes('w')){nw=Math.max(20,ow-dx);nx=ox+ow-nw}
+  if(handle.includes('n')){nh=Math.max(20,oh-dy);ny=oy+oh-nh}
+  if(!e.shiftKey&&ow&&oh){
+    const ratio=ow/oh;
+    if(handle==='e'||handle==='w') nh=Math.max(20,nw/ratio);
+    else if(handle==='n'||handle==='s') nw=Math.max(20,nh*ratio);
+    else{
+      const s=Math.max(nw/ow,nh/oh);
+      nw=Math.max(20,ow*s);nh=Math.max(20,oh*s);
+      if(handle.includes('n')) ny=oy+oh-nh;
+      if(handle.includes('w')) nx=ox+ow-nw;
+    }
+  }
+  el.x=Math.round(nx);el.y=Math.round(ny);el.width=Math.round(nw);el.height=Math.round(nh);
+  refreshElDOM(el.id);showProps();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CANVAS EVENTS
+// ═══════════════════════════════════════════════════════
+function initCanvasEvents(){
+  const wrapper=document.getElementById('canvasWrapper');
+
+  // Wheel zoom
+  wrapper.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const d=e.deltaY>0?-0.05:0.05;
+    S.zoom=Math.max(.2,Math.min(3,S.zoom+d));
+    updateZoom();
+  },{passive:false});
+
+  // Click on wrapper to deselect
+  wrapper.addEventListener('click',e=>{
+    if(e.target===wrapper||e.target.id==='canvasScene'||e.target.id==='storeBackground'||e.target.tagName==='svg'||e.target.tagName==='rect'&&e.target.closest('#storeBackground')) deselect();
+  });
+
+  // Global mousemove/mouseup
+  document.addEventListener('mousemove',e=>{
+    moveGhost(e);
+    if(rotDrag){ handleRotation(e); return; }
+    if(elDrag){
+      const dx=(e.clientX-elDrag.sx)/S.zoom;
+      const dy=(e.clientY-elDrag.sy)/S.zoom;
+      const el=S.elements.find(x=>x.id===elDrag.id);
+      if(elDrag.distort){
+        el.corners=elDrag.origCorners.map(c=>({x:c.x+dx,y:c.y+dy}));
+      } else {
+        el.x=Math.round(elDrag.ox+dx);el.y=Math.round(elDrag.oy+dy);
+      }
+      refreshElDOM(el.id);showProps();
+    }
+    handleResize(e);
+  });
+  document.addEventListener('mouseup',e=>{
+    if(rotDrag){rotDrag=null;document.body.style.cursor=''}
+    if(elDrag){document.getElementById('cel_'+elDrag.id).style.cursor='move';elDrag=null;updateLayerList()}
+    if(rzDrag){rzDrag=null}
+    if(dragPresetId){
+      const wr=wrapper.getBoundingClientRect();
+      if(e.clientX>=wr.left&&e.clientX<=wr.right&&e.clientY>=wr.top&&e.clientY<=wr.bottom) dropPreset(e);
+      else{dragPresetId=null;ghost.style.display='none'}
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  ZOOM
+// ═══════════════════════════════════════════════════════
+function updateZoom(){
+  document.getElementById('canvasScene').style.transform=`translate(-50%,-50%) scale(${S.zoom})`;
+  document.getElementById('zoomLabel').textContent=Math.round(S.zoom*100)+'%';
+}
+function zoom(d){S.zoom=Math.max(.2,Math.min(3,S.zoom+d));updateZoom()}
+function resetZoom(){S.zoom=1;updateZoom()}
+function fitCanvas(){
+  const wr=document.getElementById('canvasWrapper');
+  const fw=wr.clientWidth-40,fh=wr.clientHeight-60;
+  S.zoom=Math.min(fw/600,fh/700,.95);
+  updateZoom();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PRESET MODAL
+// ═══════════════════════════════════════════════════════
+function openModal(pid){
+  S.editingPresetId=pid;
+  S.flyerImgData=null;
+  document.getElementById('presetModal').classList.remove('hidden');
+  document.getElementById('flyerImgPreview').innerHTML='';
+
+  // Reset
+  const p=pid?S.presets.find(x=>x.id===pid):null;
+  document.getElementById('modalTitle').textContent=pid?'プリセットを編集':'プリセットを追加';
+  document.getElementById('mName').value=p?p.name:'';
+  document.getElementById('mCat').value=p?p.category:S.activeCategory;
+  document.getElementById('mDesc').value=p?p.desc||'':'';
+  document.getElementById('mText').value=p?p.text||'':'';
+  document.getElementById('mW').value=p?p.width:120;
+  document.getElementById('mH').value=p?p.height:60;
+  document.getElementById('mDelBtn').classList.toggle('hidden',!pid);
+  S.currentShape=p?p.shape:'rect';
+  S.currentColor=p?p.color:'#111111';
+  if(p&&p.flyerImg) S.flyerImgData=p.flyerImg;
+
+  buildShapePicker();
+  buildColorPicker();
+  onCatChange();
+
+  // 画像プレビュー初期化（全カテゴリ対応）
+  document.getElementById('flyerImgInp').value='';
+  if(p&&p.flyerImg){
+    document.getElementById('flyerImgPreview').innerHTML=`<img src="${p.flyerImg}" style="max-width:100%;max-height:100px;margin-top:4px;border-radius:4px;">`;
+    document.getElementById('flyerImgClearBtn').style.display='inline-block';
+    document.getElementById('flyerImgArea').textContent='画像を変更';
+  } else {
+    document.getElementById('flyerImgClearBtn').style.display='none';
+    document.getElementById('flyerImgArea').textContent='クリックして画像をアップロード';
+  }
+}
+function closeModal(){document.getElementById('presetModal').classList.add('hidden')}
+
+function onCatChange(){
+  buildShapePicker();
+}
+
+const CAT_SHAPES = {
+  sign:      ['rect','roundRect','square','circle','projecting','oval','signSheet','cutting','sticker'],
+  door:      ['slidingDoor','woodDoor','steelDoor'],
+  standSign: ['aBoard','banner','chalkboard'],
+  flyer:     ['flyerV','flyerH','poster','dmCard','cardItem','pamphlet'],
+  fabric:    ['nobori','makuH','yokodanmaku'],
+  silhouette:['manFront','womanFront','manWalk','womanWalk','child'],
+};
+function buildShapePicker(){
+  const cat=document.getElementById('mCat').value;
+  const allowed=CAT_SHAPES[cat]||[];
+  const grid=document.getElementById('shapePicker');
+  grid.innerHTML='';
+  SHAPE_OPTS.filter(o=>allowed.includes(o.id)).forEach(o=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='shape-opt'+(S.currentShape===o.id?' sel':'');
+    btn.innerHTML=`<span class="sico">${o.ico}</span><span class="slabel">${o.label}</span>`;
+    btn.onclick=()=>selectShape(o.id);
+    grid.appendChild(btn);
+  });
+  if(!allowed.includes(S.currentShape)&&allowed.length) S.currentShape=allowed[0];
+}
+function selectShape(id){
+  S.currentShape=id;
+  document.querySelectorAll('.shape-opt').forEach(b=>b.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+}
+
+function buildColorPicker(){
+  const grid=document.getElementById('colorPicker');
+  grid.innerHTML='';
+  COLORS.forEach(c=>{
+    const sw=document.createElement('div');
+    sw.className='cswatch'+(S.currentColor===c?' sel':'');
+    sw.style.background=c;
+    sw.style.border=c==='#ffffff'?'3px solid #ddd':sw.style.border;
+    sw.onclick=()=>selectColor(c);
+    grid.appendChild(sw);
+  });
+  document.getElementById('customColor').value=S.currentColor;
+}
+function selectColor(c){
+  S.currentColor=c;
+  document.querySelectorAll('.cswatch').forEach(s=>s.classList.remove('sel'));
+  document.getElementById('customColor').value=c;
+  buildColorPicker();
+}
+
+function loadFlyerImg(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    S.flyerImgData=e.target.result;
+    document.getElementById('flyerImgPreview').innerHTML=`<img src="${S.flyerImgData}" style="max-width:100%;max-height:100px;margin-top:4px;border-radius:4px;">`;
+    document.getElementById('flyerImgClearBtn').style.display='inline-block';
+    document.getElementById('flyerImgArea').textContent='画像を変更';
+  };
+  r.readAsDataURL(f);
+}
+function clearFlyerImg(){
+  S.flyerImgData=null;
+  document.getElementById('flyerImgPreview').innerHTML='';
+  document.getElementById('flyerImgInp').value='';
+  document.getElementById('flyerImgClearBtn').style.display='none';
+  document.getElementById('flyerImgArea').textContent='クリックして画像をアップロード';
+}
+
+function savePreset(){
+  const name=document.getElementById('mName').value.trim();
+  if(!name){alert('名前を入力してください');return}
+  const preset={
+    id:S.editingPresetId||'p_'+Date.now(),
+    category:document.getElementById('mCat').value,
+    name,
+    desc:document.getElementById('mDesc').value.trim(),
+    shape:S.currentShape,
+    color:S.currentColor,
+    text:document.getElementById('mText').value.trim(),
+    width:parseInt(document.getElementById('mW').value)||120,
+    height:parseInt(document.getElementById('mH').value)||60,
+    flyerImg:S.flyerImgData||null,
+  };
+  if(S.editingPresetId){
+    const idx=S.presets.findIndex(p=>p.id===S.editingPresetId);
+    if(idx>=0) S.presets[idx]=preset;
+    // Update any placed elements using this preset
+    S.elements.filter(e=>e.presetId===S.editingPresetId).forEach(e=>{
+      const div=document.getElementById('cel_'+e.id);
+      if(div) div.querySelector('svg') && (div.innerHTML=`${getPreviewSVG(preset)}<button class="el-del" onclick="deleteEl('${e.id}')">×</button><div class="el-label">${preset.name}</div><div class="rh ne" data-h="ne"></div><div class="rh nw" data-h="nw"></div><div class="rh se" data-h="se"></div><div class="rh sw" data-h="sw"></div><div class="rh n" data-h="n"></div><div class="rh s" data-h="s"></div><div class="rh e" data-h="e"></div><div class="rh w" data-h="w"></div>`);
+    });
+  } else {
+    S.presets.push(preset);
+  }
+  savePresetState();
+  closeModal();
+  renderPresets();
+}
+
+function deletePreset(){
+  if(!S.editingPresetId)return;
+  if(!confirm('このプリセットを削除しますか？配置済みの要素は残ります。'))return;
+  S.presets=S.presets.filter(p=>p.id!==S.editingPresetId);
+  savePresetState();
+  closeModal();
+  renderPresets();
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════
+async function exportPNG(){
+  deselect();
+  const target=document.getElementById('storeFront');
+  // Hide UI chrome during capture
+  const hide=[...document.querySelectorAll('.el-del,.el-label,.rh,.rot-handle,.rot-line')];
+  hide.forEach(x=>{x._vis=x.style.visibility;x.style.visibility='hidden'});
+  try{
+    const cvs=await html2canvas(target,{
+      scale:2,useCORS:true,allowTaint:true,
+      backgroundColor:null,width:600,height:700,
+    });
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[600,700]});
+    pdf.addImage(cvs.toDataURL('image/png'),'PNG',0,0,600,700);
+    pdf.save('store-design.pdf');
+  }catch(err){
+    alert('PDF書き出しに失敗しました: '+err.message);
+  }finally{
+    hide.forEach(x=>{x.style.visibility=x._vis||''});
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     TOUR / 使い方ガイド
+════════════════════════════════════════════════════════ -->
+<style>
+#tourBg{position:fixed;inset:0;z-index:99900;cursor:default}
+#tourHL{
+  position:fixed;z-index:99901;pointer-events:none;
+  border-radius:8px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.58),0 0 0 3px #3b82f6,0 0 16px 4px rgba(59,130,246,.45);
+  transition:top .28s ease,left .28s ease,width .28s ease,height .28s ease;
+}
+#tourTip{
+  position:fixed;z-index:99902;
+  background:#fff;border-radius:12px;
+  padding:18px 20px 14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.22);
+  width:272px;
+  font-family:var(--font);
+  transition:top .28s ease,left .28s ease;
+}
+#tourTip h4{font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:.02em}
+#tourTip p{font-size:11.5px;line-height:1.65;color:#444;margin-bottom:12px}
+#tourTip p b{color:var(--text);font-weight:700}
+.tour-nav{display:flex;align-items:center;gap:6px}
+.tour-nav button{flex:1;padding:7px 0;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s}
+#tourPrev{background:#f1f5f9;color:#555}#tourPrev:hover{background:#e2e8f0}
+#tourNext{background:#1d4ed8;color:#fff}#tourNext:hover{background:#1e40af}
+#tourClose{flex:0 0 auto;padding:7px 10px;background:#f1f5f9;color:#999;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer}
+.tour-dots{display:flex;gap:5px;align-items:center;margin-bottom:10px}
+.tour-dot{width:7px;height:7px;border-radius:50%;background:#e0e0e0;transition:background .2s}
+.tour-dot.on{background:#3b82f6}
+</style>
+
+<div id="tourBg" style="display:none" onclick="closeTour()"></div>
+<div id="tourHL" style="display:none"></div>
+<div id="tourTip" style="display:none">
+  <div class="tour-dots" id="tourDots"></div>
+  <h4 id="tourTitle"></h4>
+  <p id="tourBody"></p>
+  <div class="tour-nav">
+    <button id="tourPrev" onclick="tourStep(-1)">← 前へ</button>
+    <button id="tourNext" onclick="tourStep(1)">次へ →</button>
+    <button id="tourClose" onclick="closeTour()">✕</button>
+  </div>
+</div>
+
+<script>
+const TOUR_STEPS=[
+  {sel:'.sidebar',side:'right',
+   title:'① パーツを選ぶ',
+   body:'カテゴリタブ（看板・ドア・のぼり・幕など）から種類を選択。パーツカードを<b>キャンバスへドラッグ</b>して配置します。「＋ プリセットを追加」でオリジナル素材も登録できます。'},
+  {sel:'#canvasWrapper',side:'left',
+   title:'② キャンバス操作',
+   body:'配置した要素は<b>ドラッグで移動</b>、角のハンドルで<b>リサイズ</b>、上の丸いハンドルで<b>回転</b>。<b>Delete</b>キーで削除、<b>Cmd+Z</b>で最大10回アンドゥ。ズームは ＋/－ または FIT ボタン。'},
+  {sel:'.right-panel .rp-section:first-child',side:'left',
+   title:'③ プロパティ編集',
+   body:'要素を選択すると右パネルで<b>透過・回転・ブレンドモード</b>（乗算/スクリーン/オーバーレイ等）・<b>背景色</b>を編集できます。レイヤー順の前後移動も可能です。'},
+  {sel:'.right-panel .rp-section:nth-child(2)',side:'left',
+   title:'④ 背景画像・補正',
+   body:'店舗写真をアップロードして背景に設定。「画像調整」で<b>傾き・遠近・スケール</b>を補正。「🎯 2点クリックで正面化」ボタンで建物縦線を2点指定して自動補正も可能です。'},
+  {sel:'.addr-section',side:'left',
+   title:'⑤ Street View 背景',
+   body:'住所を入力して「🔍 Street View を背景に設定」を押すと<b>建物正面の画像を自動取得</b>してセット。方角・仰俯角・画角のスライダーで画角を微調整できます。'},
+  {sel:'.hdr-actions',side:'bottom',
+   title:'⑥ 書き出し・その他',
+   body:'「📄 PDF書き出し」でツールUIを除いたキャンバスのみをPDF保存。「↩ 元に戻す」で最大10回操作を巻き戻せます。左サイドバーの「＋ プリセットを追加」でフォントや画像付きカスタムパーツも作成可能です。'},
+];
+let tourIdx=0;
+
+function startTour(){tourIdx=0;showTourStep();}
+function closeTour(){
+  document.getElementById('tourBg').style.display='none';
+  document.getElementById('tourHL').style.display='none';
+  document.getElementById('tourTip').style.display='none';
+}
+function tourStep(d){
+  tourIdx=Math.max(0,Math.min(TOUR_STEPS.length-1,tourIdx+d));
+  showTourStep();
+}
+function showTourStep(){
+  const step=TOUR_STEPS[tourIdx];
+  const target=document.querySelector(step.sel);
+  if(!target){tourStep(tourIdx<TOUR_STEPS.length-1?1:-1);return;}
+
+  // Dots
+  const dots=document.getElementById('tourDots');
+  dots.innerHTML=TOUR_STEPS.map((_,i)=>`<div class="tour-dot${i===tourIdx?' on':''}"></div>`).join('');
+
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourBody').innerHTML=step.body;
+  document.getElementById('tourPrev').style.display=tourIdx===0?'none':'';
+  document.getElementById('tourNext').textContent=tourIdx===TOUR_STEPS.length-1?'完了':'次へ →';
+  document.getElementById('tourNext').onclick=tourIdx===TOUR_STEPS.length-1?closeTour:()=>tourStep(1);
+
+  // Show overlay
+  document.getElementById('tourBg').style.display='block';
+
+  // Highlight target
+  const r=target.getBoundingClientRect();
+  const pad=6;
+  const hl=document.getElementById('tourHL');
+  hl.style.cssText=`top:${r.top-pad}px;left:${r.left-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px;display:block`;
+
+  // Position tooltip
+  const tip=document.getElementById('tourTip');
+  tip.style.display='block';
+  const TW=280,TH=210,M=16;
+  const vw=window.innerWidth,vh=window.innerHeight;
+  let tx,ty;
+  if(step.side==='right'){
+    tx=r.right+pad+M; ty=Math.min(r.top,vh-TH-M);
+    if(tx+TW>vw) {tx=r.left-pad-TW-M;}
+  } else if(step.side==='left'){
+    tx=r.left-pad-TW-M; ty=Math.min(r.top,vh-TH-M);
+    if(tx<M) {tx=r.right+pad+M;}
+  } else { // bottom
+    tx=Math.max(M,Math.min(r.left,vw-TW-M));
+    ty=r.bottom+pad+M;
+    if(ty+TH>vh) ty=r.top-pad-TH-M;
+  }
+  ty=Math.max(M,Math.min(ty,vh-TH-M));
+  tip.style.left=tx+'px'; tip.style.top=ty+'px';
+}
+// Keyboard nav in tour
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('tourBg').style.display==='none') return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') {e.preventDefault();tourStep(1);}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') {e.preventDefault();tourStep(-1);}
+  if(e.key==='Escape'){e.stopImmediatePropagation();closeTour();}
+},{capture:true});
+</script>
+</body>
+</html>

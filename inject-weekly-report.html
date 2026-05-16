@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>週報データ注入</title>
+</head>
+<body>
+<p>週報を追加してリダイレクトします...</p>
+<script>
+(function() {
+  const KEY = 'aicare-projects-v3';
+  let app;
+  try {
+    app = JSON.parse(localStorage.getItem(KEY) || '{}');
+  } catch(e) {
+    app = {};
+  }
+  if (!Array.isArray(app.weekly_reports)) app.weekly_reports = [];
+
+  const newReport = {
+    id: 'wr_' + Date.now(),
+    title: '2026年4月第2週 週報',
+    weekStart: '2026-04-06',
+    weekEnd: '2026-04-12',
+    summary: '業務効率化アプリの開発と、ブランドコンセプトを盛り込んだサイトAboutページの制作を完了した。',
+    completedThisWeek: `## 今週の成果
+
+### 1. 業務効率化アプリの作成
+- 日常業務の効率化を目的としたWebアプリを開発
+- UIの設計〜実装まで一貫して対応
+- ローカルストレージを活用したデータ管理を実装
+
+### 2. サイト About ページの制作（ブランドコンセプト含む）
+- eye care lab のブランドの考え方・世界観を言語化
+- ブランドが大切にする価値観・ビジョンをページに落とし込み
+- デザインとコピーライティングを統合したAboutページを完成`,
+    currentStatus: `- 業務効率化アプリ：開発完了・運用フェーズへ
+- サイト About：公開済み・継続的なブラッシュアップ予定`,
+    nextWeekPlan: `- 業務効率化アプリの実運用フィードバック収集
+- Aboutページの反響確認・改善
+- 次フェーズの開発タスク整理`,
+    risks: '特になし',
+    status: 'published',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  // 同じ週のレポートが既にあれば上書きしない（重複防止）
+  const exists = app.weekly_reports.find(r => r.weekStart === '2026-04-06');
+  if (!exists) {
+    app.weekly_reports.unshift(newReport);
+  }
+
+  app.updatedAt = new Date().toISOString();
+  localStorage.setItem(KEY, JSON.stringify(app));
+
+  // リダイレクト
+  window.location.href = '/weekly-reports.html#/view/' + (exists ? exists.id : newReport.id);
+})();
+</script>
+</body>
+</html>

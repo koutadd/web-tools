@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>DESIGN.md デモ — AICARE web-tools</title>
+<style>
+/*
+  DESIGN.md: Claude (Anthropic) スタイル
+  参照: /DESIGN.md — Section 2, 3, 4, 5, 6
+*/
+
+/* ── リセット & ベース ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Claude カラーパレット */
+  --anthropic-black:  #141413;
+  --terracotta:       #c96442;
+  --coral:            #d97757;
+  --parchment:        #f5f4ed;
+  --ivory:            #faf9f5;
+  --warm-sand:        #e8e6dc;
+  --dark-surface:     #30302e;
+  --olive-gray:       #5e5d59;
+  --stone-gray:       #87867f;
+  --charcoal-warm:    #4d4c48;
+  --dark-warm:        #3d3d3a;
+  --warm-silver:      #b0aea5;
+  --border-cream:     #f0eee6;
+  --border-warm:      #e8e6dc;
+  --focus-blue:       #3898ec;
+}
+
+html {
+  background: var(--parchment);
+  color: var(--anthropic-black);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+body { min-height: 100vh; }
+
+/* ── Nav ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--parchment);
+  border-bottom: 1px solid var(--border-cream);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 56px;
+}
+.nav-logo {
+  font-family: Georgia, serif;
+  font-size: 17px; font-weight: 500;
+  color: var(--anthropic-black);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.nav-links { display: flex; align-items: center; gap: 24px; }
+.nav-link {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 15px; color: var(--olive-gray);
+  text-decoration: none; transition: color 0.15s;
+}
+.nav-link:hover { color: var(--anthropic-black); }
+.nav-cta {
+  background: var(--terracotta); color: var(--ivory);
+  border: none; border-radius: 8px;
+  padding: 7px 16px; font-size: 15px;
+  font-family: -apple-system, Arial, sans-serif;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s;
+  box-shadow: #c96442 0px 0px 0px 0px, #c96442 0px 0px 0px 1px;
+}
+.nav-cta:hover { background: var(--coral); }
+
+/* ── Hero (Light) ── */
+.hero {
+  background: var(--parchment);
+  padding: 100px 40px 96px;
+  text-align: center;
+}
+.hero-overline {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 12px; font-weight: 400;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--stone-gray); margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 500; line-height: 1.10;
+  color: var(--anthropic-black);
+  max-width: 780px; margin: 0 auto 24px;
+  letter-spacing: -0.02em;
+}
+.hero h1 em { color: var(--terracotta); font-style: normal; }
+.hero-sub {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 20px; line-height: 1.60;
+  color: var(--olive-gray);
+  max-width: 560px; margin: 0 auto 40px;
+}
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--terracotta); color: var(--ivory);
+  border: none; border-radius: 12px;
+  padding: 12px 24px; font-size: 16px;
+  font-family: -apple-system, Arial, sans-serif; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--coral); }
+.btn-secondary {
+  background: var(--warm-sand); color: var(--charcoal-warm);
+  border: none; border-radius: 8px;
+  padding: 11px 20px; font-size: 15px;
+  font-family: -apple-system, Arial, sans-serif;
+  cursor: pointer; text-decoration: none;
+  box-shadow: var(--warm-sand) 0px 0px 0px 0px, #d1cfc5 0px 0px 0px 1px;
+  transition: box-shadow 0.15s;
+}
+.btn-secondary:hover { box-shadow: var(--warm-sand) 0px 0px 0px 0px, #b0aea5 0px 0px 0px 1px; }
+
+/* ── Feature Section (Light) ── */
+.section-light {
+  background: var(--parchment);
+  padding: 80px 40px;
+}
+.section-dark {
+  background: var(--anthropic-black);
+  padding: 80px 40px;
+}
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-heading-light {
+  font-family: Georgia, serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 500; line-height: 1.20;
+  color: var(--anthropic-black);
+  margin-bottom: 16px;
+}
+.section-heading-dark {
+  font-family: Georgia, serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 500; line-height: 1.20;
+  color: var(--ivory);
+  margin-bottom: 16px;
+}
+.section-sub-light {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 17px; line-height: 1.60;
+  color: var(--olive-gray);
+  margin-bottom: 48px; max-width: 600px;
+}
+.section-sub-dark {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 17px; line-height: 1.60;
+  color: var(--warm-silver);
+  margin-bottom: 48px; max-width: 600px;
+}
+
+/* ── Card Grid ── */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.card-light {
+  background: var(--ivory);
+  border: 1px solid var(--border-cream);
+  border-radius: 8px; padding: 28px;
+  box-shadow: rgba(0,0,0,0.05) 0px 4px 24px;
+}
+.card-dark {
+  background: var(--dark-surface);
+  border: 1px solid #30302e;
+  border-radius: 8px; padding: 28px;
+}
+.card-badge {
+  display: inline-block;
+  background: rgba(201,100,66,0.12);
+  color: var(--terracotta);
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.12px;
+  padding: 4px 10px; border-radius: 24px;
+  margin-bottom: 16px;
+}
+.card-badge-dark {
+  display: inline-block;
+  background: rgba(201,100,66,0.18);
+  color: var(--coral);
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.12px;
+  padding: 4px 10px; border-radius: 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: Georgia, serif;
+  font-size: 20.8px; font-weight: 500; line-height: 1.20;
+  color: var(--anthropic-black);
+  margin-bottom: 10px;
+}
+.card-title-dark {
+  font-family: Georgia, serif;
+  font-size: 20.8px; font-weight: 500; line-height: 1.20;
+  color: var(--ivory);
+  margin-bottom: 10px;
+}
+.card-body {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 15px; line-height: 1.60;
+  color: var(--olive-gray);
+}
+.card-body-dark {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 15px; line-height: 1.60;
+  color: var(--warm-silver);
+}
+
+/* ── Color Swatches ── */
+.swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 32px; }
+.swatch {
+  border-radius: 8px; overflow: hidden;
+  box-shadow: rgba(0,0,0,0.05) 0px 4px 12px;
+}
+.swatch-color { height: 60px; }
+.swatch-info {
+  background: var(--ivory);
+  border: 1px solid var(--border-cream);
+  border-top: none;
+  padding: 10px 12px;
+}
+.swatch-name {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: var(--charcoal-warm);
+}
+.swatch-hex {
+  font-family: 'Courier New', monospace;
+  font-size: 12px; color: var(--stone-gray);
+  letter-spacing: -0.02em;
+}
+
+/* ── Typography Demo ── */
+.type-row { padding: 16px 0; border-bottom: 1px solid var(--border-cream); }
+.type-row:last-child { border-bottom: none; }
+.type-meta {
+  font-family: 'Courier New', monospace;
+  font-size: 11px; color: var(--stone-gray);
+  margin-bottom: 6px;
+}
+
+/* ── Brand Switcher ── */
+.brand-switcher {
+  background: var(--dark-surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px; padding: 28px 32px;
+  margin: 48px 0 0;
+}
+.brand-switcher h3 {
+  font-family: Georgia, serif;
+  font-size: 20px; font-weight: 500;
+  color: var(--ivory); margin-bottom: 8px;
+}
+.brand-switcher p {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 14px; color: var(--warm-silver);
+  margin-bottom: 20px;
+}
+.brand-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.brand-chip {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--warm-silver);
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 13px; padding: 5px 12px;
+  border-radius: 20px; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.brand-chip:hover, .brand-chip.active {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--ivory);
+}
+.cmd-block {
+  background: var(--anthropic-black);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 14px 18px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px; color: #4ade80;
+  user-select: all; cursor: text;
+}
+.cmd-label {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 12px; color: var(--stone-gray);
+  margin-bottom: 8px;
+}
+
+/* ── Footer ── */
+.footer {
+  background: var(--anthropic-black);
+  padding: 40px;
+  text-align: center;
+}
+.footer-text {
+  font-family: -apple-system, Arial, sans-serif;
+  font-size: 14px; color: var(--stone-gray);
+}
+.footer-text a { color: var(--coral); text-decoration: none; }
+.footer-text a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 64px 20px 56px; }
+  .section-light, .section-dark { padding: 56px 20px; }
+  .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">eye care lab</a>
+  <div class="nav-links">
+    <a class="nav-link" href="#">コンポーネント</a>
+    <a class="nav-link" href="#">カラー</a>
+    <a class="nav-link" href="#">タイポグラフィ</a>
+    <a class="nav-cta" href="https://getdesign.md" target="_blank">getdesign.md</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <p class="hero-overline">DESIGN.md Demo — Claude Style</p>
+  <h1>AIエージェントが<em>そのブランドのUI</em>を作る</h1>
+  <p class="hero-sub">getdesign.md を導入すると、AIコーディングエージェントが選んだブランドのデザインシステムに沿ってUIを実装します。</p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://getdesign.md" target="_blank">getdesign.md を開く</a>
+    <a class="btn-secondary" href="#">ブランド一覧を見る</a>
+  </div>
+</section>
+
+<!-- Feature Cards Light -->
+<section class="section-light">
+  <div class="section-inner">
+    <h2 class="section-heading-light">どうやって動くのか</h2>
+    <p class="section-sub-light">3ステップで、AIがブランドのスタイルでUIを生成します。</p>
+    <div class="card-grid">
+      <div class="card-light">
+        <span class="card-badge">Step 1</span>
+        <h3 class="card-title">ブランドを選ぶ</h3>
+        <p class="card-body">66ブランドのDESIGN.mdから使いたいスタイルを選択します。Vercel・Stripe・Linear・Claude など。</p>
+      </div>
+      <div class="card-light">
+        <span class="card-badge">Step 2</span>
+        <h3 class="card-title">npxで追加する</h3>
+        <p class="card-body"><code style="font-family:monospace;font-size:13px;background:var(--warm-sand);padding:2px 6px;border-radius:4px;">npx getdesign@latest add stripe</code> を実行するだけ。プロジェクトにDESIGN.mdが生成されます。</p>
+      </div>
+      <div class="card-light">
+        <span class="card-badge">Step 3</span>
+        <h3 class="card-title">エージェントに伝える</h3>
+        <p class="card-body">Claude CodeやCursorがDESIGN.mdを読み、そのブランドのカラー・タイポ・コンポーネント仕様でコードを書きます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dark Section -->
+<section class="section-dark">
+  <div class="section-inner">
+    <h2 class="section-heading-dark">現在のDESIGN.md: <span style="color:var(--coral)">Claude Style</span></h2>
+    <p class="section-sub-dark">このページ自体がClaude Anthropicスタイルで実装されたデモです。Parchment背景・Terracottaアクセント・Georgiaセリフ体。</p>
+    <div class="card-grid">
+      <div class="card-dark">
+        <span class="card-badge-dark">カラー</span>
+        <h3 class="card-title-dark">Parchment + Terracotta</h3>
+        <p class="card-body-dark">羊皮紙色のベース (#f5f4ed) にテラコッタアクセント (#c96442)。クールな青みは一切使わない。</p>
+      </div>
+      <div class="card-dark">
+        <span class="card-badge-dark">タイポ</span>
+        <h3 class="card-title-dark">Serif for 見出し</h3>
+        <p class="card-body-dark">Anthropic Serif (Georgia代替) をweight 500で統一。セリフ体が本のタイトルのような格調を演出。</p>
+      </div>
+      <div class="card-dark">
+        <span class="card-badge-dark">シャドウ</span>
+        <h3 class="card-title-dark">Ring Shadow システム</h3>
+        <p class="card-body-dark">0px 0px 0px 1px のリングシャドウ。ドロップシャドウではなくボーダーのように機能する独自の深さ表現。</p>
+      </div>
+    </div>
+
+    <!-- Brand Switcher -->
+    <div class="brand-switcher">
+      <h3>ブランドを切り替える</h3>
+      <p>下のブランドを選んで npx コマンドを実行すると DESIGN.md が切り替わります。</p>
+      <div class="brand-chips">
+        <span class="brand-chip active" onclick="switchBrand('claude')">claude</span>
+        <span class="brand-chip" onclick="switchBrand('vercel')">vercel</span>
+        <span class="brand-chip" onclick="switchBrand('linear.app')">linear</span>
+        <span class="brand-chip" onclick="switchBrand('cursor')">cursor</span>
+        <span class="brand-chip" onclick="switchBrand('stripe')">stripe</span>
+        <span class="brand-chip" onclick="switchBrand('spotify')">spotify</span>
+        <span class="brand-chip" onclick="switchBrand('supabase')">supabase</span>
+        <span class="brand-chip" onclick="switchBrand('raycast')">raycast</span>
+        <span class="brand-chip" onclick="switchBrand('figma')">figma</span>
+        <span class="brand-chip" onclick="switchBrand('notion')">notion</span>
+      </div>
+      <p class="cmd-label">▸ ターミナルで実行 (--force で上書き)</p>
+      <div class="cmd-block" id="cmd-output">npx getdesign@latest add claude --force</div>
+    </div>
+  </div>
+</section>
+
+<!-- Color Palette -->
+<section class="section-light">
+  <div class="section-inner">
+    <h2 class="section-heading-light">Claude カラーパレット</h2>
+    <p class="section-sub-light">全てのグレーに黄褐色のアンダートーンが入る。クールな色調はフォーカスブルーのみ。</p>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#141413"></div>
+        <div class="swatch-info"><div class="swatch-name">Anthropic Black</div><div class="swatch-hex">#141413</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#c96442"></div>
+        <div class="swatch-info"><div class="swatch-name">Terracotta Brand</div><div class="swatch-hex">#c96442</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#d97757"></div>
+        <div class="swatch-info"><div class="swatch-name">Coral Accent</div><div class="swatch-hex">#d97757</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f5f4ed"></div>
+        <div class="swatch-info"><div class="swatch-name">Parchment</div><div class="swatch-hex">#f5f4ed</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#faf9f5"></div>
+        <div class="swatch-info"><div class="swatch-name">Ivory</div><div class="swatch-hex">#faf9f5</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#e8e6dc"></div>
+        <div class="swatch-info"><div class="swatch-name">Warm Sand</div><div class="swatch-hex">#e8e6dc</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#30302e"></div>
+        <div class="swatch-info"><div class="swatch-name">Dark Surface</div><div class="swatch-hex">#30302e</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#5e5d59"></div>
+        <div class="swatch-info"><div class="swatch-name">Olive Gray</div><div class="swatch-hex">#5e5d59</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#87867f"></div>
+        <div class="swatch-info"><div class="swatch-name">Stone Gray</div><div class="swatch-hex">#87867f</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#3898ec"></div>
+        <div class="swatch-info"><div class="swatch-name">Focus Blue</div><div class="swatch-hex">#3898ec</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Typography -->
+<section class="section-dark">
+  <div class="section-inner">
+    <h2 class="section-heading-dark">タイポグラフィスケール</h2>
+    <p class="section-sub-dark">Serif weight 500 で全見出しを統一。Bodyは1.60のゆったりした行間。</p>
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.02);">
+      <div class="type-row" style="padding:20px 24px">
+        <p class="type-meta">Display / Hero — Georgia 500, 64px, lh 1.10</p>
+        <p style="font-family:Georgia,serif;font-size:clamp(32px,5vw,64px);font-weight:500;line-height:1.10;color:var(--ivory)">予防眼科の未来</p>
+      </div>
+      <div class="type-row" style="padding:20px 24px">
+        <p class="type-meta">Section Heading — Georgia 500, 52px, lh 1.20</p>
+        <p style="font-family:Georgia,serif;font-size:clamp(28px,4vw,52px);font-weight:500;line-height:1.20;color:var(--ivory)">視界を守る技術</p>
+      </div>
+      <div class="type-row" style="padding:20px 24px">
+        <p class="type-meta">Sub Heading — Georgia 500, 32px, lh 1.10</p>
+        <p style="font-family:Georgia,serif;font-size:clamp(22px,3vw,32px);font-weight:500;line-height:1.10;color:var(--ivory)">アイケアラボとは</p>
+      </div>
+      <div class="type-row" style="padding:20px 24px">
+        <p class="type-meta">Body Large — sans-serif 400, 20px, lh 1.60</p>
+        <p style="font-family:-apple-system,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.60;color:var(--warm-silver)">科学的な根拠をベースに、予防眼科の考え方を広く届けることが私たちのミッションです。</p>
+      </div>
+      <div class="type-row" style="padding:20px 24px">
+        <p class="type-meta">Body — sans-serif 400, 16px, lh 1.60</p>
+        <p style="font-family:-apple-system,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.60;color:var(--warm-silver)">視界の劣化は生活の質に直結します。早期の気づきと習慣的なチェックが最大の予防策です。</p>
+      </div>
+      <div class="type-row" style="padding:20px 24px;border-bottom:none">
+        <p class="type-meta">Label / Badge — sans-serif 500, 12px, ls 0.12px</p>
+        <span style="font-family:-apple-system,Arial,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.12px;color:var(--coral);background:rgba(201,100,66,0.15);padding:4px 10px;border-radius:24px;">PREVIEW</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Buttons Demo -->
+<section class="section-light">
+  <div class="section-inner">
+    <h2 class="section-heading-light">ボタンバリエーション</h2>
+    <p class="section-sub-light">リングシャドウで深さを表現。ドロップシャドウは使わない。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+      <button style="background:#c96442;color:#faf9f5;border:none;border-radius:12px;padding:12px 24px;font-size:16px;font-family:-apple-system,Arial,sans-serif;font-weight:500;cursor:pointer;">Terracotta CTA</button>
+      <button style="background:#e8e6dc;color:#4d4c48;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-family:-apple-system,Arial,sans-serif;cursor:pointer;box-shadow:#e8e6dc 0px 0px 0px 0px,#d1cfc5 0px 0px 0px 1px;">Warm Sand</button>
+      <button style="background:#ffffff;color:#141413;border:none;border-radius:12px;padding:10px 20px;font-size:15px;font-family:-apple-system,Arial,sans-serif;cursor:pointer;box-shadow:#fff 0px 0px 0px 0px,#d1cfc5 0px 0px 0px 1px;">White Surface</button>
+      <button style="background:#30302e;color:#faf9f5;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-family:-apple-system,Arial,sans-serif;cursor:pointer;">Dark Charcoal</button>
+      <button style="background:#141413;color:#b0aea5;border:1px solid #30302e;border-radius:12px;padding:9px 16px;font-size:15px;font-family:-apple-system,Arial,sans-serif;cursor:pointer;">Dark Primary</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p class="footer-text">
+    DESIGN.md powered by <a href="https://getdesign.md" target="_blank">getdesign.md</a> ·
+    現在のスタイル: <span style="color:var(--coral)">Claude (Anthropic)</span> ·
+    <a href="index.html">← web-tools トップ</a>
+  </p>
+</footer>
+
+<script>
+function switchBrand(brand) {
+  document.querySelectorAll('.brand-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  const cmd = brand === 'claude'
+    ? `npx getdesign@latest add claude --force`
+    : `npx getdesign@latest add ${brand} --force\ncp ${brand}/DESIGN.md ./DESIGN.md`;
+  document.getElementById('cmd-output').textContent = cmd;
+}
+</script>
+
+</body>
+</html>

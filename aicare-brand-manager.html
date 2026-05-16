@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アイケアラボ ブランドマネージャー</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f4ed;
+      --sidebar-bg: #1a1a18;
+      --sidebar-text: #c8c6be;
+      --sidebar-hover: #2a2a27;
+      --sidebar-active: #30302e;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-sub: #5e5d59;
+      --text-mute: #87867f;
+      --accent: #c96442;
+      --accent-light: #f0ede5;
+      --white: #ffffff;
+      --user-bubble: #141413;
+      --ai-bubble: #ffffff;
+      --input-bg: #ffffff;
+      --shadow: 0 1px 8px rgba(0,0,0,0.08);
+    }
+    html, body { height: 100%; overflow: hidden; font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px; min-width: 260px;
+      background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid #2a2a27;
+    }
+    .sidebar-header {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid #2a2a27;
+      flex-shrink: 0;
+    }
+    .sidebar-logo {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #5e5d59;
+      margin-bottom: 12px;
+    }
+    .new-chat-btn {
+      width: 100%;
+      padding: 9px 14px;
+      background: transparent;
+      border: 1px solid #3a3a37;
+      border-radius: 6px;
+      color: var(--sidebar-text);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .new-chat-btn:hover { background: var(--sidebar-hover); }
+    .new-chat-btn svg { opacity: 0.6; flex-shrink: 0; }
+
+    .sidebar-section-label {
+      padding: 14px 16px 6px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #3a3a37;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .conv-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 8px 16px;
+    }
+    .conv-list::-webkit-scrollbar { width: 4px; }
+    .conv-list::-webkit-scrollbar-track { background: transparent; }
+    .conv-list::-webkit-scrollbar-thumb { background: #3a3a37; border-radius: 4px; }
+    .conv-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--sidebar-text);
+      font-size: 13px;
+      line-height: 1.4;
+      transition: background 0.12s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .conv-item:hover { background: var(--sidebar-hover); }
+    .conv-item.active { background: var(--sidebar-active); color: #fff; }
+    .conv-item-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conv-item-del {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: #5e5d59;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      transition: opacity 0.15s, color 0.15s;
+    }
+    .conv-item:hover .conv-item-del { opacity: 1; }
+    .conv-item-del:hover { color: #e57373; }
+
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #2a2a27;
+      flex-shrink: 0;
+    }
+    .api-key-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .api-key-label { font-size: 11px; color: #5e5d59; white-space: nowrap; }
+    .api-key-input {
+      flex: 1;
+      background: #0e0e0c;
+      border: 1px solid #2a2a27;
+      border-radius: 4px;
+      color: #5e5d59;
+      font-size: 11px;
+      padding: 5px 8px;
+      font-family: monospace;
+    }
+    .api-key-input:focus { outline: none; border-color: #3a3a37; color: #c8c6be; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      height: 52px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .topbar-model {
+      font-size: 11px;
+      color: var(--text-mute);
+      background: var(--border);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    /* ── MESSAGES ── */
+    .messages-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 0 16px;
+    }
+    .messages-wrap::-webkit-scrollbar { width: 6px; }
+    .messages-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .messages-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Welcome state */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 40px;
+    }
+    .welcome-icon {
+      width: 56px; height: 56px;
+      background: var(--text);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .welcome-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .welcome-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 28px;
+    }
+    .starter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .starter-btn {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      line-height: 1.5;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .starter-btn:hover { border-color: var(--text); color: var(--text); }
+
+    /* Message rows */
+    .msg { display: flex; gap: 14px; align-items: flex-start; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 13px; font-weight: 600;
+    }
+    .msg.user .msg-avatar { background: var(--user-bubble); color: #fff; }
+    .msg.ai .msg-avatar { background: var(--accent); color: #fff; }
+    .msg-bubble {
+      max-width: 80%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+    }
+    .msg.user .msg-bubble {
+      background: var(--user-bubble);
+      color: #fff;
+      border-radius: 12px 4px 12px 12px;
+    }
+    .msg.ai .msg-bubble {
+      background: var(--ai-bubble);
+      color: var(--text);
+      border-radius: 4px 12px 12px 12px;
+      box-shadow: var(--shadow);
+    }
+    .msg.ai .msg-bubble h2, .msg.ai .msg-bubble h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+    .msg.ai .msg-bubble h2:first-child, .msg.ai .msg-bubble h3:first-child { margin-top: 0; }
+    .msg.ai .msg-bubble p { margin-bottom: 10px; }
+    .msg.ai .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg.ai .msg-bubble ul, .msg.ai .msg-bubble ol { padding-left: 20px; margin-bottom: 10px; }
+    .msg.ai .msg-bubble li { margin-bottom: 4px; }
+    .msg.ai .msg-bubble strong { font-weight: 600; }
+    .msg.ai .msg-bubble code {
+      background: var(--accent-light);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    .msg.ai .msg-bubble hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+
+    /* typing indicator */
+    .typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .typing-dot {
+      width: 7px; height: 7px;
+      background: var(--text-mute);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+    /* ── INPUT AREA ── */
+    .input-area {
+      padding: 16px 24px 20px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .input-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: flex-end;
+      gap: 0;
+      padding: 10px 12px 10px 16px;
+    }
+    .input-wrap:focus-within { border-color: #b0aea5; }
+    #chat-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: transparent;
+      line-height: 1.6;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 2px 0;
+    }
+    #chat-input::placeholder { color: var(--text-mute); }
+    .send-btn {
+      width: 34px; height: 34px;
+      background: var(--text);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+    .send-btn:hover { opacity: 0.75; }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .input-hint { max-width: 720px; margin: 8px auto 0; font-size: 11px; color: var(--text-mute); text-align: center; }
+
+    /* attach button */
+    .attach-btn {
+      width: 32px; height: 32px;
+      background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; flex-shrink: 0;
+      color: var(--text-mute); transition: color 0.15s, background 0.15s;
+    }
+    .attach-btn:hover { color: var(--text); background: var(--border); }
+
+    /* input bottom bar: attach + previews + send */
+    .input-bottom {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 10px 10px 10px;
+    }
+    .input-bottom-left { display: flex; align-items: center; gap: 6px; flex: 1; flex-wrap: wrap; }
+
+    /* image previews inside input */
+    .img-preview-item {
+      position: relative; width: 52px; height: 52px; flex-shrink: 0;
+    }
+    .img-preview-item img {
+      width: 52px; height: 52px;
+      object-fit: cover; border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .img-preview-del {
+      position: absolute; top: -5px; right: -5px;
+      width: 17px; height: 17px; border-radius: 50%;
+      background: #444; color: #fff; border: none;
+      font-size: 10px; cursor: pointer; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* images in bubbles */
+    .msg-images { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .msg-images img {
+      max-width: 220px; max-height: 180px;
+      border-radius: 8px; object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .msg.ai .msg-images img { border-color: var(--border); }
+
+    /* ── DOCS SECTION ── */
+    .sidebar-docs {
+      border-top: 1px solid #2a2a27;
+      padding: 12px 8px 8px;
+      flex-shrink: 0;
+    }
+    .sidebar-docs-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 8px 8px;
+    }
+    .sidebar-docs-label {
+      font-size: 11px; letter-spacing: 0.1em; color: #3a3a37; text-transform: uppercase;
+    }
+    .docs-add-btn {
+      background: none; border: 1px solid #3a3a37; border-radius: 4px;
+      color: #5e5d59; font-size: 11px; padding: 3px 8px; cursor: pointer;
+      font-family: inherit; transition: color 0.15s, border-color 0.15s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .docs-add-btn:hover { color: var(--sidebar-text); border-color: #5e5d59; }
+    .doc-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 6px; cursor: pointer;
+      color: var(--sidebar-text); font-size: 12px;
+      transition: background 0.12s;
+    }
+    .doc-item:hover { background: var(--sidebar-hover); }
+    .doc-item-icon { color: #5e5d59; flex-shrink: 0; }
+    .doc-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .doc-item-del {
+      opacity: 0; background: none; border: none;
+      color: #5e5d59; cursor: pointer; padding: 2px 4px;
+      border-radius: 3px; flex-shrink: 0; transition: opacity 0.15s, color 0.15s;
+    }
+    .doc-item:hover .doc-item-del { opacity: 1; }
+    .doc-item-del:hover { color: #e57373; }
+
+    /* ── DOC MODAL ── */
+    .doc-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .doc-modal {
+      background: #fff; border-radius: 14px;
+      width: 100%; max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    .doc-modal-header {
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .doc-modal-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .doc-modal-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-mute); font-size: 18px; line-height: 1;
+      padding: 2px 6px; border-radius: 4px;
+    }
+    .doc-modal-close:hover { background: var(--border); }
+    .doc-modal-body { padding: 18px 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+    .doc-field label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--text-sub); margin-bottom: 6px;
+    }
+    .doc-field input, .doc-field textarea {
+      width: 100%; font-family: inherit; font-size: 13px;
+      color: var(--text); background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 12px; outline: none; resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .doc-field input:focus, .doc-field textarea:focus { border-color: #b0aea5; }
+    .doc-field textarea { min-height: 180px; line-height: 1.6; }
+    .doc-field-hint { font-size: 11px; color: var(--text-mute); margin-top: 5px; }
+    .doc-modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+      flex-shrink: 0;
+    }
+    .doc-btn-cancel {
+      padding: 8px 18px; border: 1px solid var(--border); border-radius: 8px;
+      background: #fff; color: var(--text-sub); font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .doc-btn-cancel:hover { background: var(--bg); }
+    .doc-btn-save {
+      padding: 8px 22px; border: none; border-radius: 8px;
+      background: var(--text); color: #fff; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .doc-btn-save:hover { opacity: 0.8; }
+    .docs-empty { font-size: 12px; color: #3a3a37; padding: 4px 10px 8px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .sidebar { width: 0; min-width: 0; display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Aicare Lab</div>
+      <button class="new-chat-btn" onclick="newChat()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        新しい会話
+      </button>
+    </div>
+    <div class="sidebar-section-label">会話履歴</div>
+    <div class="conv-list" id="conv-list"></div>
+    <!-- 資料セクション -->
+    <div class="sidebar-docs">
+      <div class="sidebar-docs-header">
+        <span class="sidebar-docs-label">資料</span>
+        <button class="docs-add-btn" onclick="openDocModal(null)">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          追加
+        </button>
+      </div>
+      <div id="doc-list"></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="api-key-row">
+        <span class="api-key-label">API KEY</span>
+        <input class="api-key-input" id="api-key-input" type="password" placeholder="AIza..." autocomplete="off" oninput="saveApiKey()" />
+      </div>
+    </div>
+  </aside>
+
+  <!-- 資料モーダル -->
+  <div id="doc-overlay" class="doc-overlay" style="display:none;" onclick="if(event.target===this)closeDocModal()">
+    <div class="doc-modal">
+      <div class="doc-modal-header">
+        <div class="doc-modal-title" id="doc-modal-title">資料を追加</div>
+        <button class="doc-modal-close" onclick="closeDocModal()">✕</button>
+      </div>
+      <div class="doc-modal-body">
+        <div class="doc-field">
+          <label>資料名 *</label>
+          <input type="text" id="doc-name-input" placeholder="例：競合分析レポート、新商品説明など" />
+        </div>
+        <div class="doc-field">
+          <label>内容（テキストを貼り付け or 入力）</label>
+          <textarea id="doc-content-input" placeholder="ここに資料のテキスト内容を貼り付けてください。PDFや資料をコピーしてそのままペーストでOKです。"></textarea>
+          <div class="doc-field-hint">ここに追加した内容はAIが会話中に参照します。</div>
+        </div>
+      </div>
+      <div class="doc-modal-footer">
+        <button class="doc-btn-cancel" onclick="closeDocModal()">キャンセル</button>
+        <button class="doc-btn-save" onclick="saveDoc()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">アイケアラボ ブランドマネージャー</div>
+      <div class="topbar-model">gemini-2.0-flash (無料)</div>
+    </div>
+
+    <div class="messages-wrap" id="messages-wrap">
+      <!-- Welcome or messages -->
+      <div id="welcome-screen" class="welcome">
+        <div class="welcome-icon">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="5" fill="white"/>
+            <path d="M13 3v3M13 20v3M3 13h3M20 13h3M5.8 5.8l2.1 2.1M18.1 18.1l2.1 2.1M5.8 20.2l2.1-2.1M18.1 7.9l2.1-2.1" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="welcome-title">アイケアラボ ブランドマネージャー</div>
+        <div class="welcome-sub">
+          ブランドの方向性・コピー・ターゲット・トーンなど、<br>
+          何でも聞いてください。データはすべて把握しています。
+        </div>
+        <div class="starter-grid">
+          <button class="starter-btn" onclick="sendStarter(this)">アイケアラボのブランドコンセプトを教えて</button>
+          <button class="starter-btn" onclick="sendStarter(this)">ターゲット顧客像を詳しく説明して</button>
+          <button class="starter-btn" onclick="sendStarter(this)">ブランドのトーン＆マナーを整理して</button>
+          <button class="starter-btn" onclick="sendStarter(this)">競合との差別化ポイントは？</button>
+        </div>
+      </div>
+      <div id="messages-inner" class="messages-inner" style="display:none;"></div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap" style="flex-direction:column; padding:0; gap:0;">
+        <!-- textarea -->
+        <textarea id="chat-input" rows="1" placeholder="ブランドについて何でも聞いてください…" onkeydown="handleKey(event)" oninput="autoResize(this)" style="flex:1; border:none; outline:none; resize:none; font-family:inherit; font-size:14px; color:var(--text); background:transparent; line-height:1.6; max-height:200px; overflow-y:auto; padding:14px 14px 4px 16px; width:100%;"></textarea>
+        <!-- bottom bar -->
+        <div class="input-bottom">
+          <div class="input-bottom-left">
+            <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="画像を添付">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M16 9.5l-6.5 6.5a4.5 4.5 0 01-6.364-6.364L9.5 3.27a3 3 0 114.243 4.243L7.45 13.804a1.5 1.5 0 01-2.121-2.121L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFiles(this)" />
+            <div id="img-previews" style="display:contents;"></div>
+          </div>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" title="送信">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path d="M7.5 12V3M3 7l4.5-4.5L12 7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-hint">⌘+Enter で送信 / Enter で改行 / クリップで画像添付</div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+// ── BRAND KNOWLEDGE ────────────────────────────────────────
+const BRAND_KNOWLEDGE = `
+あなたはアイケアLaBoのブランドマネージャーAIです。
+以下のブランド設計フレームワーク全集（7フェーズ・22フレームワーク）を完全に把握しています。
+マーケター・クリエイター・経営者・FCオーナー・スタッフのどの立場の質問にも的確に答えてください。
+回答は日本語で、具体的・実践的に。抽象論より事実と示唆を重視してください。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【基本情報】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ブランド名：アイケアLaBo（AiCare Lab）
+業態：眼の整体院（脳眼リハビリ・視機能トレーニング・予防眼科）
+ポジション：「眼の整体」というカテゴリーを日本で創造したパイオニア・リーダー
+代表：樫村（パーソナルブランド＝企業ブランドの起点。X: @MIZUKI_KOYUBI）
+規模：全国約50店舗（直営＋FC）。2026年100店舗、2028年M&Aエグジット目標
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 1｜外部環境（PEST分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Politics（政治）
+・追い風：健康経営優良法人認定制度の拡大（経産省）、働き方改革による従業員健康管理義務化、医療DX推進（オンライン診療緩和）、予防医療への公的支出増
+・注視：柔道整復師の施術範囲に関する規制動向、FC法（中小小売商業振興法）の改正リスク
+
+Economy（経済）
+・追い風：企業の健康経営投資（1社あたり年間数百万〜数千万）、自費診療市場の拡大（保険外ヘルスケア市場3兆円超）、インバウンド回復によるウェルネスツーリズム
+・注視：景気後退局面での自費サービスの優先順位低下、物価上昇による出店コスト増
+
+Society（社会）
+・最大の追い風：スマホ平均利用時間4時間超/日、VDT症候群の社会問題化、子どもの近視増加（文科省調査）、高齢化による眼疾患増、「予防」志向の高まり、セルフケア市場拡大
+・機会：リモートワーク定着によるPC作業時間増、eスポーツ市場拡大
+
+Technology（技術）
+・活用：AI（AIO/MEO最適化、顧客管理、スタッフ育成）、VR/AR眼トレアプリ、LINEミニアプリ、MCP連携
+・機会：IKグラスフォーカス（視力矯正メガネ）、遠隔モニタリング、ウェアラブル連携
+・脅威：低価格な視力回復アプリの台頭
+
+示唆：「スマホ社会が生んだ眼の問題を、予防の力で解決する」ポジションは政治・経済・社会・技術すべてが追い風。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 1｜外部環境（5Forces分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+新規参入の脅威：中〜低｜整体・リラクゼーション業界からの参入は容易だが、「眼の整体」カテゴリー名称・ブランド認知・眼科医連携ネットワーク・予防眼科協会の権威性は模倣困難。FC50店舗の先行者優位も大きい
+供給者の交渉力：低｜施術は人的サービスが主で特殊機材への依存度が低い。人材（柔整師・AT）の確保が最大ボトルネック
+買い手の交渉力：中｜顧客は眼科・整体・セルフケア等で代替可能。だが「脳眼リハビリ」「視機能トレーニング」は明確な差別化。継続課金モデルでスイッチングコストを構築中
+代替品の脅威：中｜眼科（治療型で予防なし）・メガネ店（物販型）・マッサージ（非専門）・目薬/サプリ（セルフケア）・視力回復アプリ。ただし「眼の整体」は独自カテゴリー
+業界内競争：低｜「眼の整体」カテゴリーはアイケアLaBoが事実上の創造者・リーダー。同業の直接競合はほぼ不在。これがブランドの最大の資産
+
+最大の示唆：「業界内競争が低い＝カテゴリー自体を自分で作っている」。参入障壁を特許・教育認定・協会権威で意図的に高める必要あり。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 2｜市場・競合・自社（3C分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Customer（顧客）
+・メインターゲット：35〜55歳ビジネスパーソン（男女）。PC/スマホ長時間使用、眼精疲労・肩こり・頭痛を慢性的に抱えるが「眼が原因」とは気づいていない層
+・顧客インサイト：「目が疲れている」は自覚。「目のケアに通う」は未習慣。この"気づき→習慣化"がCJMの鍵
+・拡張ターゲット：子どもの近視を心配する親、eスポーツ選手、シニア（緑内障・白内障予防）
+
+Competitor（競合）
+・直接競合：ほぼ不在（「眼の整体」カテゴリーを独占）
+・間接競合：①眼科クリニック（治療型、予防なし）②リラクゼーション（りらくる等：眼の専門性なし）③メガネ店（Zoff/JINS：物販型）④セルフケア（目薬・ホットアイマスク・アプリ）
+・潜在競合：大手整体チェーンが「アイケアメニュー」を追加するリスク
+
+Company（自社）
+・強み：①「眼の整体」カテゴリー創造者 ②柔整師・AT国家資格＋ハワイ大学人体解剖認定 ③眼科医連携 ④脳眼リハビリ独自メソッド ⑤FC約50店舗の全国基盤 ⑥予防眼科協会の権威性 ⑦アイケアマネージャー育成制度
+・課題：ブランド認知がまだ成長途上、FC店舗の品質均一化、代表への依存度
+
+KSF：「眼の整体＝アイケアLaBo」という第一想起を確立すること。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 2｜市場・競合・自社（SWOT分析・クロスSWOT）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Strength（強み）：「眼の整体」カテゴリー創造者 ／ 国家資格（柔整師・AT）＋医学的裏付け ／ FC約50店舗の全国基盤 ／ 予防眼科協会の権威性 ／ 独自の脳眼リハビリメソッド ／ ROI年間1,000〜1,700%の訴求力 ／ 代表の発信力・ブランド人格
+Weakness（弱み）：一般消費者へのブランド認知がまだ低い ／ FC店舗の品質・体験の均一化が課題 ／ 代表への営業・ブランディング依存 ／ 月次財務管理の基盤整備中 ／ 中間管理職層の薄さ
+Opportunity（機会）：スマホ社会の進行・VDT症候群の社会問題化 ／ 健康経営市場の拡大 ／ 予防医療への公的投資増 ／ 海外展開（韓国・マレーシア） ／ IKグラスフォーカス新商品 ／ AI活用による業務効率化
+Threat（脅威）：大手整体チェーンのアイケア参入 ／ 低価格視力回復アプリの台頭 ／ 景気後退時の自費サービス優先度低下 ／ FC加盟店の離脱リスク ／ 柔整師人材の採用難
+
+クロスSWOT戦略：
+・SO（攻め）：スマホ社会×カテゴリー創造者→「眼の整体の第一人者」ブランド確立、健康経営市場×FC基盤→法人向け全国展開、海外市場×予防眼科協会→国際認定制度の構築
+・ST（差別化防御）：独自メソッド×参入脅威→施術の体系化・認定制度化、ROI訴求力×景気後退→「コストではなく投資」のブランド再定義、代表の発信力×アプリ台頭→「人の手×専門知識」の不可替性を訴求
+・WO（弱み克服）：認知度低×スマホ社会→X/SNSブランディング強化（1万フォロワー）、FC品質×AI活用→AIスタッフ育成・品質管理システム構築
+・WT（リスク回避）：代表依存×FC離脱→組織で勝つ仕組み（マニュアル・評価制度・AI活用）、財務基盤×景気後退→MoneyForward連携による月次管理体制の早期確立
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 2｜市場・競合・自社（VRIO分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+「眼の整体」カテゴリー名：V◎ R◎ I◎ O◎ → 持続的競争優位
+脳眼リハビリメソッド：V◎ R◎ I○ O◎ → 一時的優位→体系化で強化
+眼科医連携ネットワーク：V◎ R◎ I◎ O△ → 未活用の競争優位
+FC約50店舗基盤：V◎ R◎ I◎ O◎ → 持続的競争優位
+予防眼科協会：V◎ R◎ I◎ O△ → 未活用の競争優位
+代表・樫村のパーソナルブランド：V◎ R◎ I◎ O△ → 属人的→組織化が課題
+アイケアマネージャー認定制度：V◎ R◎ I○ O○ → 活用途上→教育事業拡大で強化
+
+最優先アクション：「O（組織）」が△の3資源（眼科医連携・予防眼科協会・代表ブランド）を組織として活かす仕組みを作ること。これがM&Aエグジット時の企業価値を直接押し上げる。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 2｜バリューチェーン分析】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+主活動：
+・集客：MEO（Googleビジネスプロフィール）、HotPepper Beauty、X/SNS、紹介、法人営業。「眼の整体」で検索1位を全国で獲得
+・初回カウンセリング：視機能チェック→「眼が原因」の気づき→施術提案。「気づき」の提供が最大の差別化
+・施術：脳眼リハビリ、眼筋ほぐし、視機能トレーニング。国家資格者による専門施術
+・継続提案：回数券・サブスク・次回予約。「予防」の概念で継続の必然性を創出。LTV最大化
+・紹介獲得：口コミ・紹介カード・Google口コミ。「眼が楽になった」体験は話したくなる
+
+支援活動：
+・人材採用・育成：面接スコアリング、動物占い活用、動画フィードバック、初回体験研修
+・FC本部運営：出店管理、加盟店支援、品質管理、GAS自動化
+・ブランド管理：ネイビー×ホワイトのデザイン言語、SNSブランディング、セミナー
+・IT・テクノロジー：Square/MoneyForward連携、Michibiki MEO/AIO、OpenClaw（AIみずき先生）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 3｜ターゲット（STP分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Segmentation（市場細分化）：
+・年代×働き方：①30-40代デスクワーカー ②40-50代管理職 ③50-60代シニアビジネス ④学生・子ども ⑤アスリート・eスポーツ
+・悩みの深さ：A.慢性疲労層（毎日疲れている） B.イベント層（最近特にひどい） C.予防層（まだ大丈夫だが心配）
+・支払い意思：高（月2万以上OK）・中（月1万前後）・低（単発のみ）
+
+Targeting（ターゲット選定）：
+・プライマリ：②40-50代管理職 × A慢性疲労層 × 支払い意思・高。「眼精疲労で仕事のパフォーマンスが落ちていることに気づいているが、どこに行けばいいかわからない」層。LTV最大・紹介発生率高
+・セカンダリ：①30-40代デスクワーカー × A/B層 × 支払い意思・中。ボリュームゾーン。HotPepper/MEO経由で獲得しやすい
+・戦略ターゲット：法人（健康経営推進企業の人事・総務部門）。1契約で複数従業員の継続利用。LTVが個人の数十倍
+
+Positioning（ポジション定義）：
+「PC・スマホで眼を酷使するビジネスパーソンにとって、アイケアLaBoは、脳と眼の専門知識に基づいた"眼の整体"によって、根本から視覚疲労を解消し、仕事のパフォーマンスを最大化する唯一のプロフェッショナルサービスです。」
+
+独自ポジション：「専門性が高い×継続性が高い」の右上象限を独占。眼科は専門性が高いが継続通院の仕組みがない。マッサージは継続性があるが眼の専門性がない。この空白地帯がアイケアLaBoのブルーオーシャン。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 3｜ペルソナ設計】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ペルソナA（主軸）：田中誠一・46歳・IT企業部長
+・生活：PC10時間/日、通勤電車でスマホ
+・悩み：夕方になると目がかすむ、頭痛薬が手放せない
+・未解決の理由：眼科行っても「異常なし」。目薬では根本解決しない
+・理想の未来：18時でも朝と同じクリアさで仕事したい
+・響くメッセージ：「目の疲れは目だけの問題じゃない」
+
+ペルソナB：佐藤美咲・38歳・広告代理店ディレクター
+・生活：Mac+iPhone漬け、夜はNetflix
+・悩み：肩こりがひどい、ドライアイ、集中力低下
+・未解決の理由：マッサージに通うが翌日には戻る
+・理想の未来：週末に目の疲れを持ち越さない
+・響くメッセージ：「肩こり・頭痛の原因、実は"眼"かも」
+
+ペルソナC：鈴木健太・52歳・中小企業経営者
+・生活：会議・資料・経営判断で終日画面
+・悩み：老眼が進行、重要な判断時に目がぼやける
+・未解決の理由：何をすればいいかわからない
+・理想の未来：5年後も現役で経営判断できる目でいたい
+・響くメッセージ：「経営者の眼は、会社の未来を見る道具」
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 4｜ブランドの核（ブランドアイデンティティプリズム）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Physique（外見）：ネイビー×ホワイトの清潔感、「眼の整体院」の看板、白衣ではなくポロシャツ、落ち着いた店内、視力検査ではない独自チェックツール
+Personality（人格）：知的で温かい専門家。押しつけがましくなく、でも確信を持っている。「可能性を引き出す」伴走者。厳しさと優しさのバランス
+Culture（文化）：「可能性の追求」「世界の眼を救う」。予防眼科という新しい文化を創る使命感。教育と再現性を重視する組織文化
+Relationship（関係性）：一生涯の眼の主治医。売って終わりではなく、予防パートナー。「眼のことならここ」という信頼関係
+Reflection（顧客像）：自分の健康に投資できる、ハイパフォーマーなビジネスパーソン。「目のケアに通っている」ことがセルフブランディングになる層
+Self-image（自己イメージ）：「自分の身体を最適化している人」。最新の健康法を取り入れ、パフォーマンスを追求する。目のケアは"できる人"の新常識
+
+プリズムの核心：「知的な予防医療の専門家」×「一生涯の眼のパートナー」。この2軸がすべてのブランドコミュニケーションの基準。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 4｜ブランドピラミッド】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ブランドエッセンス：世界の眼を救う
+パーソナリティ：知的・温かい・確信・伴走・可能性を引き出す
+情緒的便益：「眼が楽になった瞬間の感動」「自分の可能性が広がる実感」「専門家に守られている安心感」
+機能的便益：眼精疲労の根本改善 ／ 視機能の向上 ／ 頭痛・肩こりの軽減 ／ 仕事のパフォーマンスUP ／ 予防による長期的な眼の健康
+属性：国家資格者施術 ／ 脳眼リハビリ独自メソッド ／ 眼科医連携 ／ 全国50店舗 ／ 予防眼科協会認定 ／ ROI 1,000-1,700%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 4｜MVV（ミッション・ビジョン・バリュー）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Mission（使命）：世界の眼を救う
+
+Vision（目指す姿）：
+・2026年：全国100店舗達成。「眼の整体＝アイケアLaBo」の第一想起を確立
+・2028年：M&Aエグジット。予防眼科を日本の当たり前の文化に
+・長期：韓国・マレーシアを起点にグローバル展開。予防眼科の世界標準をつくる
+
+Value（価値観）：
+① 可能性の追求｜自分自身も、スタッフも、顧客も、限界を決めない
+② 一生涯顧客｜一回の売上より、一生涯のパートナーシップ
+③ 教育で再現性をつくる｜天才1人ではなく、仕組みで勝つ組織
+④ 強みを活かす｜天才性を早く見つけ、弱みは秀才レベルに引き上げる
+⑤ 理念経営｜売上のためではなく、社会的使命のために事業を拡大する
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 5｜届け方（4Pマーケティングミックス）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Product（商品）：
+・コアサービス：眼の整体施術（脳眼リハビリ）60分
+・拡張サービス：視機能トレーニング、眼トレWebアプリ（6モード）、法人向け出張ケア
+・新商品：IKグラスフォーカス（視力矯正メガネ：2026年8月ローンチ）
+・教育商品：アイケアマネージャー認定講座
+
+Price（価格）：
+・初回体験：特別価格で「気づき」を提供（集客フック）
+・回数券：5回・10回（継続の仕組み）
+・サブスク：月額制（LTV最大化・予防の習慣化）
+・ブランド指針：安売りしない。「投資」としての価格設定。ROI訴求で価値を正当化
+
+Place（チャネル）：
+・直営店舗：代々木・恵比寿等（ブランドの旗艦として品質基準を示す）
+・FC店舗：全国約50店舗（スケールのエンジン）
+・オンライン：眼トレWebアプリ、IKグラスフォーカスEC
+・法人：オフィス出張・健康経営パッケージ
+・海外：韓国・マレーシア（計画中）
+
+Promotion（販促）：
+・デジタル：MEO戦略（全店舗Googleビジネスプロフィール最適化）、X（@MIZUKI_KOYUBI）週7投稿、HotPepper Beauty
+・コンテンツ：セミナー、ラジオ・音声メディア、「眼と脳」の啓蒙コンテンツ
+・紹介：口コミ・Google口コミ（NPS設計）
+・法人営業：健康経営ROI提案資料、出張デモ
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 5｜カスタマージャーニーマップ（CJM）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+認知フェーズ：
+・行動：SNSで「眼の整体」を見る、知人から聞く
+・感情：「目のケアに通う発想なかった」（驚き）
+・接点：X、Instagram、MEO、紹介カード
+・施策：X週7投稿、MEO最適化、法人セミナー
+・KPI：認知率、インプレッション
+
+興味・検索フェーズ：
+・行動：Google検索、HP閲覧、口コミチェック
+・感情：「本当に効くの？」（疑い半分、期待半分）
+・接点：HP、HotPepper、Googleマップ口コミ
+・施策：HP改善、口コミ返信、MEOキーワード
+・KPI：HP訪問数、予約率
+
+来店・体験フェーズ（最大レバレッジポイント）：
+・行動：初回体験、カウンセリング、視機能チェック
+・感情：「目がこんなに楽になるの！」（感動）
+・接点：店舗（空間・接客・施術）
+・施策：初回体験設計（気づきの演出）、スコアリング
+・KPI：初回来店数、体験満足度
+
+継続・習慣化フェーズ：
+・行動：回数券/サブスク、定期来店、自宅眼トレ
+・感情：「明らかに調子が違う」（確信）
+・接点：LINE、アプリ、次回予約
+・施策：LINE配信、動画フィードバック、サブスク設計
+・KPI：継続率、LTV、来店頻度
+
+紹介・拡散フェーズ：
+・行動：口コミ投稿、友人に紹介、SNSシェア
+・感情：「これ教えてあげたい」（自発的）
+・接点：Googleレビュー、紹介制度
+・施策：紹介インセンティブ、口コミ依頼フロー
+・KPI：紹介率、NPS、口コミ数
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 5｜AISAS（購買行動モデル）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Attention：X投稿「眼精疲労の原因は"脳"にある」→「え？」という引っかかり ／ MEOで「眼の整体」検索上位
+Interest：HP・口コミで「ROI 1,000%」「目がこんなに変わる」→専門性と実績への信頼感
+Search：「眼の整体 口コミ」「アイケアLaBo 効果」→ Google口コミ4.5以上 ／ HotPepper評価
+Action：初回体験予約 → カウンセリング → 「気づき」→ 回数券/サブスク契約
+Share：Google口コミ投稿 ／ SNSシェア「目の整体行ってきた」 ／ 友人への紹介
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 5｜アンゾフマトリクス（成長戦略）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+市場浸透（最優先）：既存店舗のLTV最大化（サブスク転換）、MEO/口コミ強化で新規集客UP、法人営業で既存エリアの法人開拓、FC既存店の売上底上げ
+市場開拓：FC新規出店で全国100店舗（2026年目標）、海外展開（韓国・マレーシア）、法人市場の本格開拓（健康経営パッケージ）、子ども・学生市場
+新商品開発：IKグラスフォーカス（2026年8月）、眼トレWebアプリの有料化、アイケアマネージャー認定講座（教育商品）、オンライン眼トレプログラム
+多角化（中長期）：人材紹介事業（柔整師・セラピスト）、不動産事業（店舗物件の自社保有）、ウェルネスツーリズム（インバウンド）、予防眼科のSaaS/プラットフォーム
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 6｜組織でブランドを体現する（7S分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ハードの3S：
+・Strategy：「眼の整体」カテゴリー独占→FC全国展開→2028年M&Aエグジット。予防眼科を文化にする社会的使命と、EBITDA最大化の事業目標を両立
+・Structure：本部（代表＋秘書＋幹部）→直営店舗→FC店舗の3層。中間管理職層が薄い。本部主導のFC運営モデル。出店管理・品質管理はGAS自動化で効率化中
+・System：Square/MoneyForward連携（財務基盤整備中）、面接スコアリングシート、初回体験設計マニュアル、MEO運用マニュアル、動物占い活用ツール。評価制度・等級制度は構築中
+
+ソフトの4S：
+・Shared Value：「世界の眼を救う」「可能性の追求」「一生涯顧客」。理念経営の浸透はトップの発信力に依存→仕組み化が課題
+・Style：代表のビジョン駆動型。スピード重視、アイデア豊富、同時並行。「天才性を見抜き、強みを活かす」育成哲学
+・Staff：柔整師・ATの国家資格者が中心。採用スコアリング導入済み。天才性×秀才性の人材観。動物占いによるチーム相性分析を導入中
+・Skill：脳眼リハビリ施術スキル、カウンセリング（気づきの提供）、MEO運用、SNSブランディング。教育動画フィードバックで品質均一化を推進中
+
+最大ギャップ：「Shared Value」と「System」のズレ。理念は強いが、それを日常業務に落とす制度（評価・等級・インセンティブ）がまだ発展途上。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 6｜組織図・役割設計】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+代表：ビジョン・戦略・ブランド人格の体現、対外発信（X・セミナー）、M&A準備。ブランドの「顔」
+本部・幹部：FC運営、品質管理、出店管理、財務、人材採用・育成。ブランド基準の策定者・守護者
+秘書（モーリーさん）：代表サポート、スケジュール、動画FB管理、Claude研修。代表の生産性＝ブランド発信力の基盤
+直営店舗長：店舗運営、スタッフ育成、売上管理、顧客体験の最適化。ブランド体験のQC
+FC加盟オーナー：店舗投資・運営、本部ルールの遵守、地域マーケ。ブランドの最前線
+施術スタッフ：施術、カウンセリング、顧客対応。ブランドの「体験」そのもの
+
+構造課題：「本部・幹部」と「直営店舗長」の間にエリアマネージャー層が不在。100店舗時には必要。M&A前に組織の厚みを作ることが企業価値に直結。
+
+人材ポートフォリオ：
+・天才型：圧倒的な強みを持つ人材（施術の天才、営業の天才、発信の天才）→直営旗艦店・新規事業・代表直轄
+・秀才型：安定して高い水準を出せる人材（再現性が高い）→FC店舗長・本部運営・品質管理
+・育成型：ポテンシャルはあるがまだ発展途上→直営でOJT→FC店舗へ配置
+・マネジメント型：人を活かす力が高い→エリアマネージャー（新設推奨）・研修担当
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 7｜数字で検証する（KPIツリー・LTV/CAC分析）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KPIツリー：
+・売上構造：店舗売上（直営＋FC）＋その他売上（物販・教育・法人）
+・新規KPI：MEOインプレッション → HP訪問数 → 予約率 → 来店数 → 初回→継続転換率
+・既存KPI：継続率 → 月間来店頻度 → サブスク転換率 → 紹介発生率
+・法人KPI：提案数 → 契約率 → 従業員利用率 → 更新率
+・FC KPI：加盟問合せ数 → 面談率 → 契約率 → 開業率 → 店舗売上
+・ブランドKPI（非財務）：認知度（Xフォロワー数）→ 好意度（口コミ評価4.5以上の店舗比率）→ 推奨度（NPS）→ 第一想起率
+
+LTV分析：
+・計算式：平均客単価 × 月間来店頻度 × 継続月数
+・例：月1万×月2回×24ヶ月＝48万円
+・回数券→サブスクへの転換がLTVを劇的に上げる
+
+CAC分析：
+・計算式：マーケ費用 ÷ 新規顧客数
+・紹介のCACは事実上ゼロ→紹介率UPがブランド力の証明
+・LTV/CAC比率目標：3倍以上。ROI 1,000-1,700%の訴求（法人向け）はこの指標がベース
+
+ユニットエコノミクス（1店舗あたりモデル）：
+・粗利率目標：70%以上（人的サービスのため）
+・営業利益率目標：20-30%（FC加盟店が投資回収できる水準）
+・投資回収期間目標：18ヶ月以内
+
+1顧客あたり：
+・初回体験：来店→「気づき」→50%以上が回数券/サブスク契約（目標）
+・月間支払額：サブスク月1-2万円 ／ 回数券月1-1.5万円ペース
+・平均継続期間目標：12ヶ月以上（予防の習慣化がカギ）
+・紹介率目標：既存顧客の20%以上が1名以上を紹介
+
+収益源：
+・直営店売上：施術売上＋物販（IKグラスフォーカス等）。ブランドの品質基準。利益率最高
+・FC加盟金・ロイヤリティ：初期加盟金＋月額ロイヤリティ（売上%）。スケールの源泉
+・教育・認定収入：アイケアマネージャー講座、セミナー。ブランドの「権威性」を収益化
+・物販・EC：IKグラスフォーカス、サプリ等。ブランドの「拡張」
+・法人契約：健康経営パッケージ、出張施術。ブランドの「社会的信用」
+
+M&A時の企業価値：EBITDA × 倍率（目標5倍）。ブランド力が上がる→LTV高い→紹介で低CAC→利益率UP→企業価値UP。ブランド投資はM&A時のリターンが最も大きい。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【総括・次の一手（優先順）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+アイケアLaBoのブランドの本質的な強さ：「眼の整体」というカテゴリーを自ら創り、そのカテゴリーのルールを自ら定義している。PEST（社会の追い風）× 5Forces（競争の少なさ）× VRIO（模倣困難な資源）× ポジショニング（空白地帯の独占）が揃っている。
+
+最大の課題：「属人的な強み」を「組織の仕組み」に変換すること。
+
+次の一手（優先順）：
+1. ブランドアイデンティティプリズムの全社共有｜Phase 4の内容を社内研修・FC研修に落とし込む。全スタッフが「アイケアLaBoらしさ」を語れる状態をつくる
+2. ブランドKPIの設定・計測開始｜NPS、紹介率、口コミ評価、Xフォロワー数を月次で追跡する
+3. VRIOの「O」強化｜眼科医連携・予防眼科協会・代表ブランドを組織として活かす制度設計
+4. 各フレームワークの深掘り｜このドキュメントを起点に、各フレームワークを実数値で埋めていく
+`.trim();
+
+// ── STATE ────────────────────────────────────────────────
+let conversations = JSON.parse(localStorage.getItem('aicare_bm_convs') || '[]');
+let currentConvId = null;
+let isStreaming = false;
+let pendingImages = []; // [{dataUrl, mimeType, base64}]
+
+function saveConvs() {
+  localStorage.setItem('aicare_bm_convs', JSON.stringify(conversations));
+}
+
+// ── CONVERSATION MANAGEMENT ──────────────────────────────
+function newChat() {
+  currentConvId = null;
+  document.getElementById('welcome-screen').style.display = '';
+  document.getElementById('messages-inner').style.display = 'none';
+  document.getElementById('messages-inner').innerHTML = '';
+  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+}
+
+function createConversation(firstUserMsg) {
+  const id = Date.now().toString();
+  const title = firstUserMsg.slice(0, 28) + (firstUserMsg.length > 28 ? '…' : '');
+  const conv = { id, title, messages: [], createdAt: Date.now() };
+  conversations.unshift(conv);
+  saveConvs();
+  renderSidebar();
+  return id;
+}
+
+function renderSidebar() {
+  const list = document.getElementById('conv-list');
+  if (conversations.length === 0) {
+    list.innerHTML = '<div style="padding:12px 10px;font-size:12px;color:#3a3a37;">まだ会話がありません</div>';
+    return;
+  }
+  list.innerHTML = conversations.map(c => `
+    <div class="conv-item ${c.id === currentConvId ? 'active' : ''}" onclick="loadConv('${c.id}')">
+      <span class="conv-item-text">${escHtml(c.title)}</span>
+      <button class="conv-item-del" onclick="event.stopPropagation();deleteConv('${c.id}')" title="削除">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9 3L3 9M3 3l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function loadConv(id) {
+  const conv = conversations.find(c => c.id === id);
+  if (!conv) return;
+  currentConvId = id;
+  document.getElementById('welcome-screen').style.display = 'none';
+  const inner = document.getElementById('messages-inner');
+  inner.style.display = '';
+  inner.innerHTML = '';
+  conv.messages.forEach(m => appendMessage(m.role, m.content, false, m.images || []));
+  renderSidebar();
+  scrollToBottom();
+}
+
+function deleteConv(id) {
+  conversations = conversations.filter(c => c.id !== id);
+  saveConvs();
+  if (currentConvId === id) newChat();
+  renderSidebar();
+}
+
+// ── RENDER ───────────────────────────────────────────────
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderMarkdown(text) {
+  let html = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^---+$/gm,'<hr>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, m => '<ul>' + m + '</ul>');
+  // wrap non-tag lines in <p>
+  html = html.replace(/^(?!<[hup\/]).+$/gm, line => line ? `<p>${line}</p>` : '');
+  return html;
+}
+
+function appendMessage(role, content, animate = true, imageUrls = []) {
+  const inner = document.getElementById('messages-inner');
+  inner.style.display = '';
+  document.getElementById('welcome-screen').style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const initials = role === 'user' ? 'You' : 'BM';
+  const imagesHtml = imageUrls.length
+    ? `<div class="msg-images">${imageUrls.map(u => `<img src="${u}" />`).join('')}</div>`
+    : '';
+  const bubbleContent = role === 'ai' ? renderMarkdown(content) : escHtml(content);
+  div.innerHTML = `
+    <div class="msg-avatar">${initials}</div>
+    <div class="msg-bubble">${imagesHtml}${bubbleContent}</div>
+  `;
+  if (animate) div.style.opacity = '0';
+  inner.appendChild(div);
+  if (animate) requestAnimationFrame(() => { div.style.transition = 'opacity 0.25s'; div.style.opacity = '1'; });
+  scrollToBottom();
+  return div;
+}
+
+function appendTyping() {
+  const inner = document.getElementById('messages-inner');
+  inner.style.display = '';
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="msg-avatar">BM</div>
+    <div class="msg-bubble"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+  `;
+  inner.appendChild(div);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function scrollToBottom() {
+  const wrap = document.getElementById('messages-wrap');
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+// ── SEND ─────────────────────────────────────────────────
+async function sendMessage() {
+  if (isStreaming) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text && pendingImages.length === 0) return;
+
+  const images = [...pendingImages];
+  pendingImages = [];
+  renderPreviews();
+  input.value = '';
+  autoResize(input);
+  document.getElementById('send-btn').disabled = true;
+  isStreaming = true;
+
+  // init conversation
+  if (!currentConvId) {
+    currentConvId = createConversation(text || '(画像)');
+    renderSidebar();
+  }
+
+  const conv = conversations.find(c => c.id === currentConvId);
+  const userMsg = { role: 'user', content: text, images: images.map(i => i.dataUrl) };
+  conv.messages.push(userMsg);
+  saveConvs();
+  appendMessage('user', text, true, images.map(i => i.dataUrl));
+  appendTyping();
+  scrollToBottom();
+
+  // Build Gemini contents (history)
+  const geminiContents = conv.messages.slice(0, -1).map(m => {
+    const parts = [];
+    if (m.images) m.images.forEach(durl => {
+      const [meta, b64] = durl.split(',');
+      const mime = meta.match(/:(.*?);/)[1];
+      parts.push({ inline_data: { mime_type: mime, data: b64 } });
+    });
+    if (m.content) parts.push({ text: m.content });
+    return { role: m.role === 'ai' ? 'model' : 'user', parts };
+  });
+
+  // Current user message parts
+  const curParts = [];
+  images.forEach(img => {
+    curParts.push({ inline_data: { mime_type: img.mimeType, data: img.base64 } });
+  });
+  if (text) curParts.push({ text });
+  geminiContents.push({ role: 'user', parts: curParts });
+
+  try {
+    const res = await fetch('/api/brand-manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: getApiKey(),
+        system_instruction: { parts: [{ text: buildSystemInstruction() }] },
+        contents: geminiContents
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (!res.ok) {
+      const rawMsg = data?.error?.message || `Error ${res.status}`;
+      const errMsg = /quota|rate.?limit|RESOURCE_EXHAUSTED|free_tier/i.test(rawMsg)
+        ? 'APIキーのクォータが超過しています。しばらく待つか、有料APIキーを設定してください。'
+        : rawMsg;
+      appendMessage('ai', `⚠️ エラー: ${errMsg}`);
+    } else {
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '（応答なし）';
+      conv.messages.push({ role: 'ai', content: reply });
+      saveConvs();
+      appendMessage('ai', reply);
+    }
+  } catch (e) {
+    removeTyping();
+    appendMessage('ai', `⚠️ 通信エラー: ${e.message}`);
+  }
+
+  isStreaming = false;
+  document.getElementById('send-btn').disabled = false;
+  scrollToBottom();
+}
+
+function sendStarter(btn) {
+  document.getElementById('chat-input').value = btn.textContent;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+// ── IMAGE HANDLING ────────────────────────────────────────
+function handleFiles(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      pendingImages.push({ dataUrl, mimeType: file.type, base64 });
+      renderPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderPreviews() {
+  const wrap = document.getElementById('img-previews');
+  wrap.innerHTML = pendingImages.map((img, i) => `
+    <div class="img-preview-item">
+      <img src="${img.dataUrl}" />
+      <button class="img-preview-del" onclick="removeImage(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeImage(i) {
+  pendingImages.splice(i, 1);
+  renderPreviews();
+}
+
+// ── API KEY ───────────────────────────────────────────────
+const API_KEY_STORAGE = 'aicare_bm_apikey';
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (val) localStorage.setItem(API_KEY_STORAGE, val);
+  else localStorage.removeItem(API_KEY_STORAGE);
+}
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+// ── EXTRA DOCS ───────────────────────────────────────────
+const DOCS_KEY = 'aicare_bm_docs';
+let extraDocs = [];
+let editingDocId = null;
+
+function loadDocs() {
+  try { extraDocs = JSON.parse(localStorage.getItem(DOCS_KEY) || '[]'); } catch(e) { extraDocs = []; }
+}
+
+function saveDocs() {
+  localStorage.setItem(DOCS_KEY, JSON.stringify(extraDocs));
+}
+
+function renderDocList() {
+  const el = document.getElementById('doc-list');
+  if (!el) return;
+  if (extraDocs.length === 0) {
+    el.innerHTML = '<div class="docs-empty">まだ資料がありません</div>';
+    return;
+  }
+  el.innerHTML = extraDocs.map(d => `
+    <div class="doc-item" onclick="openDocModal('${d.id}')">
+      <svg class="doc-item-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M2 1.5h6l3 3V11.5a.5.5 0 01-.5.5h-8.5a.5.5 0 01-.5-.5v-10a.5.5 0 01.5-.5z" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M8 1.5v3h3" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span class="doc-item-name">${escHtml(d.name)}</span>
+      <button class="doc-item-del" onclick="event.stopPropagation();deleteDoc('${d.id}')" title="削除">✕</button>
+    </div>
+  `).join('');
+}
+
+function openDocModal(id) {
+  editingDocId = id;
+  const doc = id ? extraDocs.find(d => d.id === id) : null;
+  document.getElementById('doc-modal-title').textContent = id ? '資料を編集' : '資料を追加';
+  document.getElementById('doc-name-input').value = doc ? doc.name : '';
+  document.getElementById('doc-content-input').value = doc ? doc.content : '';
+  document.getElementById('doc-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('doc-name-input').focus(), 50);
+}
+
+function closeDocModal() {
+  document.getElementById('doc-overlay').style.display = 'none';
+  editingDocId = null;
+}
+
+function saveDoc() {
+  const name = document.getElementById('doc-name-input').value.trim();
+  const content = document.getElementById('doc-content-input').value.trim();
+  if (!name) { document.getElementById('doc-name-input').focus(); return; }
+  if (editingDocId) {
+    const idx = extraDocs.findIndex(d => d.id === editingDocId);
+    if (idx >= 0) extraDocs[idx] = { ...extraDocs[idx], name, content };
+  } else {
+    extraDocs.push({ id: 'doc-' + Date.now(), name, content });
+  }
+  saveDocs();
+  renderDocList();
+  closeDocModal();
+}
+
+function deleteDoc(id) {
+  if (!confirm('この資料を削除しますか？')) return;
+  extraDocs = extraDocs.filter(d => d.id !== id);
+  saveDocs();
+  renderDocList();
+}
+
+function buildSystemInstruction() {
+  let text = BRAND_KNOWLEDGE;
+  if (extraDocs.length > 0) {
+    text += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n【追加資料】\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    extraDocs.forEach(d => {
+      text += `\n▼ ${d.name}\n${d.content}\n`;
+    });
+  }
+  return text;
+}
+
+// ── INIT ─────────────────────────────────────────────────
+loadDocs();
+renderDocList();
+renderSidebar();
+const _savedKey = getApiKey();
+if (_savedKey) document.getElementById('api-key-input').value = _savedKey;
+</script>
+</body>
+</html>

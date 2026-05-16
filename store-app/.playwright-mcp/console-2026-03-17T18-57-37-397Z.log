@@ -1,0 +1,427 @@
+[  121993ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1773773979347:0
+[  122031ms] Event
+[  123699ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67?_rsc=ha3h2:0
+[  123929ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67?_rsc=ha3h2:0
+[  124165ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67?_rsc=ha3h2:0
+[  124436ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  124712ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/pages/_document.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  132594ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:345
+[  132982ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  133241ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  140059ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:345
+[  140422ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  140681ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  150666ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  150895ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  163278ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:345
+[  163679ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  163949ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  172282ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:345
+[  172695ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  172969ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  183766ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0
+[  183920ms] Error: Cannot find module './331.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/options.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/swc/index.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/config.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:103:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:102:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:154:22)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:23973)
+    at Object.<anonymous> (file:///Users/koutayamakawa/web-tools/store-app/.next/server/app/stores/[id]/page.js:2:24030)
+    at Module._compile (node:internal/modules/cjs/loader:1811:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1951:10)
+    at Module.load (node:internal/modules/cjs/loader:1532:32)
+    at Module._load (node:internal/modules/cjs/loader:1334:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at requirePage (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js:99:80)
+    at loadComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js:132:57)
+    at async DevServer.findPageComponentsImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:899:36)
+    at async DevServer.findPageComponents (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:706:16)
+    at async DevServer.renderPageComponent (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1460:24)
+    at async DevServer.renderToResponseImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/base-server.js:916:17)
+    at async (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:400:20)
+    at async Span.traceAsyncFn (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/next-dev-server.js:396:24)
+    at async invokeRender (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/lib/start-server.js:226:13)
+[  202402ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/client/dev/hot-reloader/pages/hot-reloader-pages.js:347
+[  203188ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1773774060439:0
+[  203211ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/main-app.js?v=1773774060439:0
+[  203211ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/app-pages-internals.js:0
+[  262230ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/stores/cmmuyiy7m0000dnb97534jb67:0

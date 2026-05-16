@@ -1,0 +1,3 @@
+[    5178ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmv11t650000xgck1sb52qsz:0
+[   23695ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/stores/cmmv11t650000xgck1sb52qsz:0
+[   43273ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3002/favicon.ico:0

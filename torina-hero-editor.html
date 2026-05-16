@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TORINA Hero Editor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --panel-w: 320px;
+    --bg: #0f1117;
+    --surface: #1a1d26;
+    --border: #2a2d3a;
+    --accent: #e84c2b;
+    --text: #e8e8ec;
+    --muted: #888;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', 'Noto Sans JP', sans-serif; font-size: 13px; display: flex; height: 100dvh; overflow: hidden; }
+
+  /* ── Preview ── */
+  #preview {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
+  .col {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: outline 0.15s;
+  }
+  .col.active { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .col img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .col-label {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  /* overlay */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.06) 100%);
+    pointer-events: none;
+  }
+
+  /* ── Panel ── */
+  #panel {
+    width: var(--panel-w);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #panel-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #panel-header h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.05em; }
+  .badge { background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.05em; }
+
+  #col-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-tab {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .col-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  #controls {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .ctrl-group { display: flex; flex-direction: column; gap: 10px; }
+  .ctrl-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .ctrl-label .val {
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(232,76,43,0.2);
+    transition: box-shadow 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 5px rgba(232,76,43,0.3); }
+
+  .bg-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bg-row label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; }
+  .bg-row input[type=color] {
+    width: 100%;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  #output-section {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #output-section label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
+  #output-box {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #a8d8a8;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    white-space: pre;
+    overflow-x: auto;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+
+  /* Reset indicator */
+  .copied { background: #2d6a4f !important; }
+</style>
+</head>
+<body>
+
+<!-- Preview -->
+<div id="preview">
+  <div id="overlay"></div>
+  <div class="col active" data-col="0" onclick="selectCol(0)">
+    <img id="img-0" src="https://resilire-careers.vercel.app/images/hero-1.png" alt="">
+    <div class="col-label">① 女性A</div>
+  </div>
+  <div class="col" data-col="1" onclick="selectCol(1)">
+    <img id="img-1" src="https://resilire-careers.vercel.app/images/hero-2.png" alt="">
+    <div class="col-label">② 男性</div>
+  </div>
+  <div class="col" data-col="2" onclick="selectCol(2)">
+    <img id="img-2" src="https://resilire-careers.vercel.app/images/hero-3.png" alt="">
+    <div class="col-label">③ 女性B</div>
+  </div>
+  <div class="col" data-col="3" onclick="selectCol(3)">
+    <img id="img-3" src="https://resilire-careers.vercel.app/images/hero-4.png" alt="">
+    <div class="col-label">④ 女性C</div>
+  </div>
+</div>
+
+<!-- Panel -->
+<div id="panel">
+  <div id="panel-header">
+    <h1>TORINA Hero Editor</h1>
+    <span class="badge">LIVE</span>
+  </div>
+
+  <div id="col-tabs">
+    <div class="col-tab active" onclick="selectCol(0)">① 女性A</div>
+    <div class="col-tab" onclick="selectCol(1)">② 男性</div>
+    <div class="col-tab" onclick="selectCol(2)">③ 女性B</div>
+    <div class="col-tab" onclick="selectCol(3)">④ 女性C</div>
+  </div>
+
+  <div id="controls">
+    <!-- X Position -->
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        <span>X 位置（左右）</span>
+        <span class="val" id="label-x">50%</span>
+      </div>
+      <input type="range" id="range-x" min="0" max="100" value="50" oninput="update()">
+    </div>
+
+    <!-- Y Position -->
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        <span>Y 位置（上下）</span>
+        <span class="val" id="label-y">25%</span>
+      </div>
+      <input type="range" id="range-y" min="0" max="100" value="25" oninput="update()">
+    </div>
+
+    <!-- Scale -->
+    <div class="ctrl-group">
+      <div class="ctrl-label">
+        <span>スケール（引き／寄り）</span>
+        <span class="val" id="label-scale">1.00</span>
+      </div>
+      <input type="range" id="range-scale" min="50" max="150" value="100" oninput="update()">
+    </div>
+
+    <!-- BG Color -->
+    <div class="bg-row">
+      <label>背景色（スケール縮小時に見える色）</label>
+      <input type="color" id="color-bg" value="#1b2a3c" oninput="update()">
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div id="output-section">
+    <label>▼ コード出力（HeroSection.tsxにコピー）</label>
+    <div id="output-box"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="copy-btn" onclick="copyCode()">コピー</button>
+      <button class="btn btn-secondary" onclick="resetCurrent()">リセット</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLS = [
+  { x: 50, y: 25, scale: 100, bg: '#1b2a3c' },
+  { x: 15, y: 20, scale: 78,  bg: '#1b2a3c' },
+  { x: 55, y: 15, scale: 100, bg: '#1b2a3c' },
+  { x: 45, y: 20, scale: 100, bg: '#1b2a3c' },
+]
+const DEFAULTS = JSON.parse(JSON.stringify(COLS))
+
+let active = 0
+
+function selectCol(i) {
+  active = i
+  document.querySelectorAll('.col').forEach((c, j) => c.classList.toggle('active', j === i))
+  document.querySelectorAll('.col-tab').forEach((t, j) => t.classList.toggle('active', j === i))
+  loadControls()
+}
+
+function loadControls() {
+  const c = COLS[active]
+  document.getElementById('range-x').value = c.x
+  document.getElementById('range-y').value = c.y
+  document.getElementById('range-scale').value = c.scale
+  document.getElementById('color-bg').value = c.bg
+  updateLabels()
+  applyToImg(active)
+  renderOutput()
+}
+
+function update() {
+  const c = COLS[active]
+  c.x     = +document.getElementById('range-x').value
+  c.y     = +document.getElementById('range-y').value
+  c.scale = +document.getElementById('range-scale').value
+  c.bg    = document.getElementById('color-bg').value
+  updateLabels()
+  applyToImg(active)
+  renderOutput()
+}
+
+function updateLabels() {
+  const c = COLS[active]
+  document.getElementById('label-x').textContent     = c.x + '%'
+  document.getElementById('label-y').textContent     = c.y + '%'
+  document.getElementById('label-scale').textContent = (c.scale / 100).toFixed(2)
+}
+
+function applyToImg(i) {
+  const c = COLS[i]
+  const img = document.getElementById('img-' + i)
+  const col = document.querySelector(`.col[data-col="${i}"]`)
+  img.style.objectPosition = `${c.x}% ${c.y}%`
+  img.style.transform      = `scale(${c.scale / 100})`
+  col.style.backgroundColor = c.bg
+}
+
+function renderOutput() {
+  const lines = COLS.map((c, i) => {
+    const labels = ['女性A', '男性', '女性B', '女性C']
+    const files  = ['hero-1', 'hero-2', 'hero-3', 'hero-4']
+    return `  // ${labels[i]}\n  { src: '/images/${files[i]}.png', facePos: '${c.x}% ${c.y}%', scale: ${(c.scale/100).toFixed(2)}, bg: '${c.bg}' },`
+  }).join('\n')
+  document.getElementById('output-box').textContent = `const HERO_PHOTOS = [\n${lines}\n]`
+}
+
+function copyCode() {
+  const text = document.getElementById('output-box').textContent
+  navigator.clipboard.writeText(text)
+  const btn = document.getElementById('copy-btn')
+  btn.textContent = 'コピーしました ✓'
+  btn.classList.add('copied')
+  setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied') }, 2000)
+}
+
+function resetCurrent() {
+  COLS[active] = JSON.parse(JSON.stringify(DEFAULTS[active]))
+  loadControls()
+}
+
+// Init
+function init() {
+  COLS.forEach((_, i) => applyToImg(i))
+  loadControls()
+}
+
+init()
+</script>
+</body>
+</html>

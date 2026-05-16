@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>サイトエディター V1</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--surface:#161920;--surface2:#1e2130;--border:#252836;--border2:#2e3245;
+  --accent:#e84c2b;--accent2:#ff6b4a;--text:#e8e9f0;--muted:#6b7080;--green:#4ade80;--yellow:#facc15;
+  --panel-l:220px;--panel-r:300px;--topbar:52px;
+  --font:'Inter',-apple-system,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px}
+
+/* ── TOPBAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar);
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:0;z-index:100;
+}
+.tb-logo{padding:0 20px;font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--text);white-space:nowrap;border-right:1px solid var(--border)}
+.tb-logo span{color:var(--accent)}
+.tb-url{
+  flex:1;padding:0 16px;
+  display:flex;align-items:center;gap:8px;
+}
+.tb-url input{
+  flex:1;height:30px;padding:0 10px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:6px;
+  color:var(--text);font-size:12px;font-family:var(--font);outline:none;
+}
+.tb-url input:focus{border-color:var(--accent)}
+#status-dot{width:7px;height:7px;border-radius:50%;background:#444;flex-shrink:0;transition:background .3s}
+#status-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+#status-dot.err{background:#f87171}
+#status-label{font-size:11px;color:var(--muted)}
+#autosave-label{font-size:11px;color:var(--muted);transition:color .3s;white-space:nowrap}
+#autosave-label.saving{color:var(--yellow)}
+#autosave-label.saved{color:var(--green)}
+.btn-dev{background:#1a3a2a;color:var(--green);border:1px solid #2d6a4f}
+.btn-dev.running{background:#2d6a4f;color:#fff}
+.tb-right{display:flex;align-items:center;gap:8px;padding:0 16px}
+.btn{
+  height:30px;padding:0 14px;border:none;border-radius:6px;
+  font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap;
+}
+.btn:hover{opacity:.85}
+.btn:active{opacity:.7}
+.btn-save{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.btn-deploy{background:var(--accent);color:#fff}
+.btn-settings{background:transparent;color:var(--muted);border:1px solid var(--border);padding:0 10px}
+.btn-small{height:26px;padding:0 10px;font-size:11px}
+
+/* ── LAYOUT ── */
+#layout{
+  position:fixed;top:var(--topbar);left:0;right:0;bottom:0;
+  display:flex;
+}
+
+/* ── LEFT SIDEBAR ── */
+#sidebar{
+  width:var(--panel-l);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;min-height:0;
+}
+.sb-section{padding:12px 16px 8px;font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted)}
+.sb-item{
+  padding:8px 16px;cursor:pointer;font-size:12px;color:var(--muted);
+  display:flex;align-items:center;gap:8px;border-left:2px solid transparent;
+  transition:all .12s;
+}
+.sb-item:hover{color:var(--text);background:var(--surface2)}
+.sb-item.active{color:var(--text);border-left-color:var(--accent);background:var(--surface2)}
+.sb-item .dot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.sb-item.active .dot{background:var(--accent)}
+
+/* ── CENTER (iframe) ── */
+#center{flex:1;position:relative;overflow:hidden;background:#111}
+#preview-iframe{width:100%;height:100%;border:none;display:block}
+
+/* ── RIGHT PANEL ── */
+#rpanel{
+  width:var(--panel-r);flex-shrink:0;
+  position:relative;
+  background:var(--surface);border-left:1px solid var(--border);
+}
+#rp-header{
+  position:absolute;top:0;left:0;right:0;height:44px;
+  padding:0 16px;border-bottom:1px solid var(--border);
+  font-size:12px;font-weight:600;color:var(--text);
+  background:var(--surface);z-index:1;
+  display:flex;align-items:center;justify-content:space-between;
+}
+#rp-content{
+  position:absolute;top:44px;left:0;right:0;bottom:0;
+  overflow-y:auto;padding:16px;
+}
+
+/* Editor components */
+.ep-section{margin-bottom:24px}
+.ep-title{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+
+/* Image upload grid */
+.img-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.img-slot{
+  aspect-ratio:3/4;background:var(--bg);border:1px solid var(--border2);
+  border-radius:8px;overflow:hidden;position:relative;cursor:pointer;
+  transition:border-color .15s;
+}
+.img-slot:hover{border-color:var(--accent)}
+.img-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.img-slot-label{
+  position:absolute;bottom:0;left:0;right:0;padding:6px;
+  background:linear-gradient(to top,rgba(0,0,0,.8),transparent);
+  font-size:9px;color:rgba(255,255,255,.7);text-align:center;font-weight:500;
+}
+.img-slot-badge{
+  position:absolute;top:4px;right:4px;
+  background:rgba(0,0,0,.6);color:rgba(255,255,255,.6);
+  font-size:8px;padding:2px 5px;border-radius:3px;
+}
+.img-slot:hover .img-slot-badge{background:var(--accent);color:#fff}
+
+/* Sliders */
+.slider-row{margin-bottom:14px}
+.slider-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;color:var(--muted);margin-bottom:6px;
+}
+.slider-val{
+  font-family:'SF Mono','Menlo',monospace;font-size:10px;
+  color:var(--text);background:var(--bg);padding:1px 6px;border-radius:3px;min-width:40px;text-align:right;
+}
+input[type=range]{
+  width:100%;height:3px;-webkit-appearance:none;
+  background:var(--border2);border-radius:2px;outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;
+  background:var(--accent);border-radius:50%;
+  box-shadow:0 0 0 3px rgba(232,76,43,.25);
+}
+
+/* Text fields */
+.text-field{margin-bottom:10px}
+.text-field label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.05em}
+.text-field input,.text-field textarea{
+  width:100%;padding:8px 10px;background:var(--bg);
+  border:1px solid var(--border2);border-radius:6px;
+  color:var(--text);font-size:12px;font-family:var(--font);outline:none;resize:vertical;
+}
+.text-field input:focus,.text-field textarea:focus{border-color:var(--accent)}
+.text-field textarea{min-height:64px;line-height:1.5}
+
+/* Color picker */
+.color-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.color-row label{font-size:11px;color:var(--muted);flex:1}
+.color-row input[type=color]{
+  width:36px;height:24px;border:1px solid var(--border2);border-radius:4px;
+  background:none;cursor:pointer;padding:2px;
+}
+
+/* Selected slot indicator */
+.slot-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.slot-tab{
+  padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border2);color:var(--muted);transition:all .12s;
+}
+.slot-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Deploy log */
+#deploy-log-wrap{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;padding:24px;
+}
+#deploy-log-wrap.show{display:flex}
+#deploy-log{
+  width:100%;max-width:720px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.dl-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dl-header span{font-weight:600;font-size:13px}
+.dl-body{
+  height:300px;overflow-y:auto;padding:14px 18px;
+  font-family:'SF Mono','Menlo',monospace;font-size:11px;line-height:1.7;
+  color:#a8d8a8;background:var(--bg);
+}
+.dl-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* Deploy complete popup */
+#deploy-complete{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+#deploy-complete.show{display:flex}
+#deploy-complete-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:40px 48px;text-align:center;max-width:440px;width:90%;
+  box-shadow:0 24px 64px rgba(0,0,0,.5);
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+#deploy-complete-icon{
+  width:64px;height:64px;border-radius:50%;background:#1a3a2a;border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:28px;
+  animation:iconPop .4s .1s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes iconPop{from{transform:scale(0)}to{transform:scale(1)}}
+#deploy-complete h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+#deploy-complete p{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+#deploy-complete-url{
+  display:block;background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 14px;font-size:11px;font-family:'SF Mono','Menlo',monospace;
+  color:var(--green);text-decoration:none;margin-bottom:24px;
+  word-break:break-all;transition:border-color .15s;
+}
+#deploy-complete-url:hover{border-color:var(--green)}
+.dc-actions{display:flex;gap:10px;justify-content:center}
+#dc-countdown{font-size:10px;color:var(--muted);margin-top:14px}
+
+/* Settings modal */
+#settings-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:none;align-items:center;justify-content:center;
+}
+#settings-modal.show{display:flex}
+.modal-box{
+  width:480px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:600}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em}
+.field input{
+  padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;
+  color:var(--text);font-size:12px;font-family:var(--font);outline:none;
+}
+.field input:focus{border-color:var(--accent)}
+.field small{font-size:10px;color:var(--muted)}
+
+/* Image editor modal */
+#img-editor-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:250;
+  display:none;align-items:center;justify-content:center;
+}
+#img-editor-modal.show{display:flex}
+.ie-box{
+  width:680px;max-height:92vh;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;display:flex;flex-direction:column;
+}
+.ie-header{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.ie-body{display:flex;flex:1;overflow:hidden;min-height:0}
+.ie-left{
+  flex-shrink:0;padding:20px 16px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.ie-right{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:0}
+#ie-canvas{border:1px solid var(--border2);border-radius:6px;display:block;cursor:crosshair}
+.ie-hint{font-size:10px;color:var(--muted);text-align:center}
+.ie-warn{font-size:11px;color:#facc15;text-align:center;padding:4px 8px;background:#2e1f00;border-radius:4px;border:1px solid #5a3d00}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#1a2e1a;border:1px solid #2d6a2d;color:var(--green);
+  padding:10px 20px;border-radius:8px;font-size:12px;font-weight:500;
+  z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div id="topbar">
+  <div class="tb-logo">サイトエディター <span>V1</span></div>
+  <!-- Preview URL bar — works like a browser address bar -->
+  <div class="tb-url">
+    <div id="status-dot" title="サーバー接続状態"></div>
+    <form onsubmit="navigatePreview(event)" style="flex:1;display:flex;align-items:center;gap:6px">
+      <input type="text" id="preview-url-input" placeholder="https://example.vercel.app" title="プレビューURL（Enterで移動）">
+      <button type="submit" class="btn btn-small btn-settings">移動</button>
+    </form>
+  </div>
+  <div class="tb-right">
+    <span id="autosave-label"></span>
+    <button class="btn btn-dev" id="btn-dev" onclick="toggleDev()">▶ Dev 起動</button>
+    <button class="btn btn-settings" onclick="openSettings()">⚙ 設定</button>
+    <button class="btn btn-deploy" id="btn-deploy-main" onclick="openDeploy()">🚀 デプロイ</button>
+  </div>
+</div>
+
+<!-- ── LAYOUT ── -->
+<div id="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-section">ページ</div>
+    <div class="sb-item active" onclick="setPage('home')"><div class="dot"></div>ホーム</div>
+    <div class="sb-item" onclick="setPage('about')"><div class="dot"></div>About</div>
+    <div class="sb-item" onclick="setPage('recruit')"><div class="dot"></div>採用情報</div>
+    <div class="sb-item" onclick="setPage('contact')"><div class="dot"></div>お問い合わせ</div>
+    <div class="sb-item" onclick="setPage('culture')"><div class="dot"></div>Culture</div>
+    <div class="sb-item" onclick="setPage('challenge')"><div class="dot"></div>Challenge</div>
+
+    <div class="sb-section" style="margin-top:8px">セクション</div>
+    <div class="sb-item active" data-section="hero" onclick="selectSection('hero')"><div class="dot"></div>Hero（FV）</div>
+    <div class="sb-item" data-section="slideshow" onclick="selectSection('slideshow')"><div class="dot"></div>スライドショー</div>
+    <div class="sb-item" data-section="mission" onclick="selectSection('mission')"><div class="dot"></div>Mission</div>
+    <div class="sb-item" data-section="hiring" onclick="selectSection('hiring')"><div class="dot"></div>採用CTA</div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center">
+    <iframe id="preview-iframe" src="about:blank" title="サイトプレビュー"></iframe>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="rpanel">
+    <div id="rp-header">
+      <span id="rp-title">Hero（FV）</span>
+    </div>
+    <div id="rp-content">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ── DEPLOY LOG ── -->
+<div id="deploy-log-wrap" onclick="closeDeploy(event)">
+  <div id="deploy-log">
+    <div class="dl-header">
+      <span>🚀 デプロイ</span>
+      <span id="deploy-status" style="font-size:12px;color:var(--muted)">待機中</span>
+    </div>
+    <div class="dl-body" id="deploy-output"></div>
+    <div class="dl-footer">
+      <button class="btn btn-settings" onclick="closeDeploy()">閉じる</button>
+      <button class="btn btn-deploy" id="deploy-run-btn" onclick="runDeploy()">デプロイ実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DEPLOY COMPLETE POPUP ── -->
+<div id="deploy-complete" onclick="if(event.target===this)closeDeployComplete()">
+  <div id="deploy-complete-card">
+    <div id="deploy-complete-icon">✓</div>
+    <h2>デプロイ完了！</h2>
+    <p>本番サイトへの反映が完了しました。<br>反映まで少し時間がかかる場合があります。</p>
+    <a id="deploy-complete-url" href="#" target="_blank" rel="noopener"></a>
+    <div class="dc-actions">
+      <button class="btn btn-settings" onclick="closeDeployComplete()">閉じる</button>
+      <button class="btn btn-deploy" onclick="window.open(document.getElementById('deploy-complete-url').href,'_blank')">🌐 サイトを確認</button>
+    </div>
+    <div id="dc-countdown"></div>
+  </div>
+</div>
+
+<!-- ── SETTINGS MODAL ── -->
+<div id="settings-modal" onclick="closeSettings(event)">
+  <div class="modal-box">
+    <div class="modal-header">⚙ 設定</div>
+    <div class="modal-body">
+      <div class="field">
+        <label>プロジェクトパス</label>
+        <input type="text" id="set-project" placeholder="/Users/.../resilire-careers">
+        <small>ローカルのNext.jsプロジェクトフォルダ</small>
+      </div>
+      <div class="field">
+        <label>プレビューURL</label>
+        <input type="text" id="set-preview" placeholder="http://localhost:3000">
+        <small>iframeで表示するURL（localhost:3000 または Vercel URL）</small>
+      </div>
+      <div class="field">
+        <label>デプロイコマンド</label>
+        <input type="text" id="set-deploy" placeholder="vercel --prod --yes">
+      </div>
+      <div class="field">
+        <label>OpenAI APIキー（AI画像補完用）</label>
+        <input type="password" id="set-openai" placeholder="sk-...">
+        <small>DALL-E 2 の outpainting に使用。設定しない場合はAI補完ボタンは動作しません。</small>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-settings" onclick="closeSettings()">キャンセル</button>
+      <button class="btn btn-save" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── IMAGE EDITOR MODAL ── -->
+<div id="img-editor-modal" onclick="closeImageEditor(event)">
+  <div class="ie-box" onclick="event.stopPropagation()">
+    <div class="ie-header">
+      <span id="ie-title" style="font-weight:600;font-size:13px">画像編集</span>
+      <button class="btn btn-settings" onclick="closeImageEditor()">✕ 閉じる</button>
+    </div>
+    <div class="ie-body">
+      <div class="ie-left">
+        <div class="ie-hint">ヒーロー列プレビュー</div>
+        <canvas id="ie-canvas" width="200" height="450"></canvas>
+        <div id="ie-empty-warn" class="ie-warn" style="display:none">⚠ 空白あり → AI補完推奨</div>
+      </div>
+      <div class="ie-right">
+        <div class="slider-row">
+          <div class="slider-label"><span>X 位置（左右）</span><span class="slider-val" id="ie-lbl-x">50%</span></div>
+          <input type="range" id="ie-rng-x" min="0" max="100" value="50" oninput="ieUpdate('x',+this.value)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Y 位置（上下）</span><span class="slider-val" id="ie-lbl-y">50%</span></div>
+          <input type="range" id="ie-rng-y" min="0" max="100" value="50" oninput="ieUpdate('y',+this.value)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>スケール</span><span class="slider-val" id="ie-lbl-s">1.00</span></div>
+          <input type="range" id="ie-rng-s" min="10" max="200" value="100" oninput="ieUpdate('scale',this.value/100)">
+        </div>
+        <div class="color-row" style="margin-bottom:20px">
+          <label>背景色</label>
+          <input type="color" id="ie-col-bg" value="#000000" oninput="ieUpdate('bg',this.value)">
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-save btn-small" style="width:100%" onclick="ieTriggerUpload()">📁 画像を変更</button>
+          <button class="btn btn-small" id="ie-ai-btn" onclick="outpaintFromEditor()"
+            style="width:100%;background:#1a3a2a;color:var(--green);border:1px solid #2d6a4f">✨ 背景を補完</button>
+          <div id="ie-progress" style="display:none;font-size:11px;color:var(--muted);text-align:center;padding:4px 0">処理中...</div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-deploy" style="width:100%" onclick="ieSaveAndClose()">💾 保存して閉じる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ── HIDDEN FILE INPUT ── -->
+<input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFileInput(event)">
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────────────
+let SERVER = 'http://localhost:4999'
+let connected = false
+let content = {
+  photos: [
+    { filename:'hero-1.png', x:50, y:25, scale:1.00, bg:'transparent' },
+    { filename:'hero-2.png', x:15, y:20, scale:0.78, bg:'#1b2a3c' },
+    { filename:'hero-3.png', x:55, y:15, scale:1.00, bg:'transparent' },
+    { filename:'hero-4.png', x:45, y:20, scale:1.00, bg:'transparent' },
+  ],
+  headline: ['採用で、','未来を','取りにいく。'],
+  description: '人で、会社は変わる。TORINAは採用を「待ち」から「戦略」へ変える、採用戦略パートナーです。',
+  services: [
+    { category:'AGENT',      title:'人材紹介',              description:'事業スピードに合わせた人材紹介。カルチャーフィットと候補者の成功を重視し、採用の質を最大化します。' },
+    { category:'CONSULTING', title:'採用戦略コンサルティング', description:'感覚に頼らない採用を設計。必要な人材像と自社の勝ち筋を定義し、採用基準を構築します。' },
+    { category:'RPO',        title:'採用業務代行',           description:'ソーシング・候補者対応・プロセス管理まで採用業務を一括代行。採用チームのリソースを解放します。' },
+    { category:'GROWTH',     title:'定着・オンボーディング',  description:'採用した人材が活躍できるオンボーディング・定着支援。採用後の成功確率を高めます。' },
+  ],
+  hiring: {
+    recruitSubtitle: '採用で、未来を取りにいく',
+    recruitBody:     '私たちと一緒に、すべての企業の採用を変えるメンバーを募集しています。採用の専門家として、企業の未来をつくるチームに加わりませんか。',
+    recruitCta:      '採用情報を見る',
+    contactDesc:     '採用に関するご相談・ご依頼など、こちらからお気軽にご連絡ください。',
+    contactCta:      'フォームでのお問い合わせ',
+  },
+  previewUrl: 'https://resilire-careers.vercel.app',
+  projectPath: '/Users/koutayamakawa/clones/resilire-careers',
+  deployCmd: 'vercel --prod --yes',
+}
+let currentSection = 'hero'
+let currentSlot = 0
+let activeUploadSlot = 0
+
+// ─── Server connection ───────────────────────────────────────────────────────
+async function connectServer() {
+  try {
+    const r = await fetch(`${SERVER}/api/content`, { signal: AbortSignal.timeout(3000) })
+    if (!r.ok) throw new Error()
+    const data = await r.json()
+    content = { ...content, ...data }
+    connected = true
+    setStatus(true)
+    toast('サーバー接続完了 ✓')
+    const urlInput = document.getElementById('preview-url-input')
+    if (urlInput) urlInput.value = content.previewUrl || ''
+    updatePreviewUrl(content.previewUrl)
+    renderSection()
+    // populate settings
+    document.getElementById('set-project').value = content.projectPath || ''
+    document.getElementById('set-preview').value  = content.previewUrl  || ''
+    document.getElementById('set-deploy').value   = content.deployCmd   || 'vercel --prod --yes'
+  } catch {
+    connected = false
+    setStatus(false)
+    const urlInput = document.getElementById('preview-url-input')
+    if (urlInput && !urlInput.value) urlInput.value = content.previewUrl || ''
+    updatePreviewUrl(content.previewUrl)
+    renderSection()
+  }
+}
+function setStatus(ok) {
+  const dot = document.getElementById('status-dot')
+  dot.className = ok ? 'ok' : 'err'
+  dot.title = ok ? 'サーバー接続中' : 'サーバー未接続'
+}
+
+// ─── Preview navigation ──────────────────────────────────────────────────────
+function navigatePreview(e) {
+  e.preventDefault()
+  let url = document.getElementById('preview-url-input').value.trim()
+  if (!url) return
+  if (!url.startsWith('http')) url = 'https://' + url
+  content.previewUrl = url
+  document.getElementById('preview-iframe').src = url
+  if (connected) {
+    fetch(`${SERVER}/api/settings`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ previewUrl: url })
+    }).catch(() => {})
+  }
+}
+
+// ─── Preview iframe ──────────────────────────────────────────────────────────
+function updatePreviewUrl(url) {
+  if (!url) return
+  document.getElementById('preview-iframe').src = url
+}
+
+// ─── Sidebar navigation ──────────────────────────────────────────────────────
+function setPage(page) {
+  document.querySelectorAll('#sidebar .sb-item').forEach(el => {
+    if (el.textContent.toLowerCase().includes(page) || el.getAttribute('onclick')?.includes(page))
+      el.classList.add('active')
+    else if (!el.getAttribute('data-section'))
+      el.classList.remove('active')
+  })
+  const pageMap = {
+    home:'', about:'about', recruit:'recruit',
+    contact:'contact', culture:'culture', challenge:'challenge'
+  }
+  const base = (content.previewUrl || '').replace(/\/$/, '')
+  const path  = pageMap[page] || ''
+  const fullUrl = base + (path ? '/' + path : '')
+  document.getElementById('preview-iframe').src = fullUrl
+  const urlInput = document.getElementById('preview-url-input')
+  if (urlInput) urlInput.value = fullUrl
+}
+
+function selectSection(name) {
+  currentSection = name
+  document.querySelectorAll('[data-section]').forEach(el =>
+    el.classList.toggle('active', el.getAttribute('data-section') === name))
+document.getElementById('rp-title').textContent =
+    {hero:'Hero（FV）',slideshow:'スライドショー',mission:'Mission',hiring:'採用CTA'}[name] || name
+  renderSection()
+}
+
+// ─── Right panel renderer ────────────────────────────────────────────────────
+function renderSection() {
+  const el = document.getElementById('rp-content')
+  try {
+    if      (currentSection === 'hero')      el.innerHTML = heroEditorHTML()
+    else if (currentSection === 'mission')   el.innerHTML = missionEditorHTML()
+    else if (currentSection === 'hiring')    el.innerHTML = hiringEditorHTML()
+    else if (currentSection === 'slideshow') el.innerHTML = slideshowEditorHTML()
+    else el.innerHTML = `<div style="color:var(--muted);padding:20px 0;font-size:12px;line-height:1.8">このセクションは編集未対応です</div>`
+  } catch(e) {
+    el.innerHTML = `<div style="color:#f87171;padding:16px;font-size:12px">レンダリングエラー: ${e.message}</div>`
+  }
+  if (currentSection === 'hero') attachHeroEvents()
+}
+
+function imgSrc(slot) {
+  return connected
+    ? `${SERVER}/api/image/${slot}?t=${Date.now()}`
+    : `https://resilire-careers.vercel.app/images/${content.photos[slot].filename}`
+}
+
+const SLOT_LABELS = ['① 女性A','② 男性','③ 女性B','④ 女性C']
+
+function heroEditorHTML() {
+  const p = content.photos
+  return `
+  <div class="ep-section">
+    <div class="ep-title">画像</div>
+    <div class="img-grid">
+      ${p.map((ph, i) => `
+        <div class="img-slot" onclick="openImageEditor(${i})" title="クリックして編集">
+          <img id="thumb-${i}" src="${imgSrc(i)}"
+               style="object-position:${ph.x}% ${ph.y}%;transform:scale(${ph.scale});transform-origin:center center">
+          <div class="img-slot-label">${SLOT_LABELS[i]}</div>
+          <div class="img-slot-badge" onclick="event.stopPropagation();openUpload(${i})">変更</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+
+  <div class="ep-section">
+    <div class="ep-title">スロット選択</div>
+    <div class="slot-tabs">
+      ${SLOT_LABELS.map((l, i) => `
+        <div class="slot-tab ${i===currentSlot?'active':''}" onclick="selectSlot(${i})">${i+1}</div>
+      `).join('')}
+    </div>
+    <div id="slot-controls"></div>
+  </div>
+
+  <div class="ep-section">
+    <div class="ep-title">ヘッドライン</div>
+    ${content.headline.map((l, i) => `
+      <div class="text-field">
+        <label>行 ${i+1}</label>
+        <input type="text" id="hl-${i}" value="${l}" oninput="content.headline[${i}]=this.value">
+      </div>
+    `).join('')}
+  </div>
+
+  <div class="ep-section">
+    <div class="ep-title">ディスクリプション</div>
+    <div class="text-field">
+      <textarea id="desc-field" oninput="content.description=this.value">${content.description}</textarea>
+    </div>
+  </div>
+  `
+}
+
+function slotControlsHTML(i) {
+  const p = content.photos[i]
+  return `
+    <div class="slider-row">
+      <div class="slider-label"><span>X 位置（左右）</span><span class="slider-val" id="lbl-x">${p.x}%</span></div>
+      <input type="range" id="rng-x" min="0" max="100" value="${p.x}" oninput="updateSlot(${i},'x',+this.value)">
+    </div>
+    <div class="slider-row">
+      <div class="slider-label"><span>Y 位置（上下）</span><span class="slider-val" id="lbl-y">${p.y}%</span></div>
+      <input type="range" id="rng-y" min="0" max="100" value="${p.y}" oninput="updateSlot(${i},'y',+this.value)">
+    </div>
+    <div class="slider-row">
+      <div class="slider-label"><span>スケール</span><span class="slider-val" id="lbl-s">${p.scale.toFixed(2)}</span></div>
+      <input type="range" id="rng-s" min="10" max="150" value="${Math.round(p.scale*100)}" oninput="updateSlot(${i},'scale',this.value/100)">
+    </div>
+    ${p.scale < 1 ? `<div style="font-size:10px;color:var(--yellow);margin:4px 0 8px">⚠ スケール1.0未満 → AI生成で背景を埋めてください</div>` : ''}
+    <div class="color-row">
+      <label>背景色</label>
+      <input type="color" id="col-bg" value="${p.bg === 'transparent' ? '#1b2a3c' : p.bg}"
+             oninput="updateSlot(${i},'bg',this.value)">
+    </div>
+    <button class="btn btn-small" id="outpaint-btn-${i}" onclick="outpaintSlot(${i})"
+            style="width:100%;margin-top:10px;background:#1a3a2a;color:var(--green);border:1px solid #2d6a4f">✨ AI で背景を生成</button>
+  `
+}
+
+function attachHeroEvents() {
+  selectSlot(currentSlot)
+}
+
+function selectSlot(i) {
+  currentSlot = i
+  document.querySelectorAll('.slot-tab').forEach((el, j) =>
+    el.classList.toggle('active', j === i))
+  const el = document.getElementById('slot-controls')
+  if (el) el.innerHTML = slotControlsHTML(i)
+}
+
+function updateSlot(i, key, val) {
+  content.photos[i][key] = val
+  // update label
+  const labels = { x: 'lbl-x', y: 'lbl-y', scale: 'lbl-s' }
+  if (labels[key]) {
+    const lbl = document.getElementById(labels[key])
+    if (lbl) lbl.textContent = key === 'scale' ? val.toFixed(2) : val + '%'
+  }
+  // update thumbnail
+  const thumb = document.getElementById(`thumb-${i}`)
+  if (thumb) {
+    const p = content.photos[i]
+    thumb.style.objectPosition  = `${p.x}% ${p.y}%`
+    thumb.style.transform       = `scale(${p.scale})`
+    thumb.style.transformOrigin = 'center center'
+    thumb.parentElement.style.backgroundColor = p.bg === 'transparent' ? '' : p.bg
+  }
+  // refresh scale warning when scale changes
+  if (key === 'scale') {
+    const el = document.getElementById('slot-controls')
+    if (el) el.innerHTML = slotControlsHTML(i)
+  }
+  scheduleAutoSave()
+}
+
+// ─── Image upload ────────────────────────────────────────────────────────────
+function openUpload(slot) {
+  activeUploadSlot = slot
+  document.getElementById('file-input').click()
+}
+
+function handleFileInput(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  e.target.value = ''
+  const ext = file.name.split('.').pop().toLowerCase()
+  const reader = new FileReader()
+  reader.onload = async ev => {
+    const dataUrl = ev.target.result
+    // Local preview immediately
+    const thumb = document.getElementById(`thumb-${activeUploadSlot}`)
+    if (thumb) thumb.src = dataUrl
+
+    if (connected) {
+      try {
+        const r = await fetch(`${SERVER}/api/upload/${activeUploadSlot}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl, ext })
+        })
+        const data = await r.json()
+        if (data.ok) {
+          content.photos[activeUploadSlot].filename = data.filename
+          toast(`画像を保存しました: ${data.filename}`)
+          setTimeout(async () => {
+            const t = document.getElementById(`thumb-${activeUploadSlot}`)
+            if (t) t.src = `${SERVER}/api/image/${activeUploadSlot}?t=${Date.now()}`
+            // Refresh image editor canvas if open for this slot
+            if (document.getElementById('img-editor-modal').classList.contains('show') && ie_slot === activeUploadSlot) {
+              ie_img = await loadImage(`${SERVER}/api/image/${activeUploadSlot}?t=${Date.now()}`).catch(()=>null)
+              drawEditorCanvas()
+            }
+          }, 500)
+        }
+      } catch { toast('画像の保存に失敗しました', 'err') }
+    } else {
+      toast('ローカルプレビューのみ（サーバー未接続）', 'warn')
+    }
+  }
+  reader.readAsDataURL(file)
+}
+
+// ─── HTML escape helper ──────────────────────────────────────────────────────
+function esc(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+// ─── Slideshow editor ────────────────────────────────────────────────────────
+function slideshowEditorHTML() {
+  if (!content.slideshow || typeof content.slideshow !== 'object') content.slideshow = {}
+  const s = content.slideshow
+  if (!Array.isArray(s.headline)) s.headline = ['採用で、', '未来を', '取りにいく。']
+  if (!s.headlineSize)       s.headlineSize       = 108
+  if (!s.taglineSize)        s.taglineSize        = 13
+  if (!s.subheadlineSize)    s.subheadlineSize    = 28
+  if (!s.bodySize)           s.bodySize           = 15
+  if (!s.headlineLeading)    s.headlineLeading    = 1.05
+  if (!s.subheadlineLeading) s.subheadlineLeading = 1.4
+  if (!s.bodyLeading)        s.bodyLeading        = 1.85
+  if (s.paddingTop    == null) s.paddingTop    = 120
+  if (s.paddingBottom == null) s.paddingBottom = 120
+  if (s.paddingLeft   == null) s.paddingLeft   = 40
+  if (s.paddingRight  == null) s.paddingRight  = 40
+  return `
+    <div class="ep-section">
+      <div class="ep-title">見出し（左）</div>
+      ${s.headline.map((l, i) => `
+        <div class="text-field">
+          <label>行 ${i+1}</label>
+          <input type="text" value="${esc(l)}" oninput="content.slideshow.headline[${i}]=this.value;scheduleAutoSave()">
+        </div>
+      `).join('')}
+      <div class="slider-row">
+        <div class="slider-label"><span>級数</span><span class="slider-val" id="sw-hl-size">${s.headlineSize}px</span></div>
+        <input type="range" min="48" max="160" value="${s.headlineSize}"
+          oninput="content.slideshow.headlineSize=+this.value;document.getElementById('sw-hl-size').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>行送り</span><span class="slider-val" id="sw-hl-lead">${s.headlineLeading}</span></div>
+        <input type="range" min="80" max="200" value="${Math.round(s.headlineLeading*100)}"
+          oninput="const v=(+this.value/100).toFixed(2);content.slideshow.headlineLeading=+v;document.getElementById('sw-hl-lead').textContent=v;scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">タグライン（バー横）</div>
+      <div class="text-field">
+        <input type="text" value="${esc(s.tagline)}" oninput="content.slideshow.tagline=this.value;scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>級数</span><span class="slider-val" id="sw-tg-size">${s.taglineSize}px</span></div>
+        <input type="range" min="10" max="24" value="${s.taglineSize}"
+          oninput="content.slideshow.taglineSize=+this.value;document.getElementById('sw-tg-size').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">サブ見出し（右）</div>
+      <div class="text-field">
+        <input type="text" value="${esc(s.subheadline)}" oninput="content.slideshow.subheadline=this.value;scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>級数</span><span class="slider-val" id="sw-sh-size">${s.subheadlineSize}px</span></div>
+        <input type="range" min="16" max="56" value="${s.subheadlineSize}"
+          oninput="content.slideshow.subheadlineSize=+this.value;document.getElementById('sw-sh-size').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>行送り</span><span class="slider-val" id="sw-sh-lead">${s.subheadlineLeading}</span></div>
+        <input type="range" min="80" max="200" value="${Math.round(s.subheadlineLeading*100)}"
+          oninput="const v=(+this.value/100).toFixed(2);content.slideshow.subheadlineLeading=+v;document.getElementById('sw-sh-lead').textContent=v;scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">本文（右）</div>
+      <div class="text-field">
+        <textarea rows="4" oninput="content.slideshow.body=this.value;scheduleAutoSave()">${esc(s.body)}</textarea>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>級数</span><span class="slider-val" id="sw-bd-size">${s.bodySize}px</span></div>
+        <input type="range" min="11" max="24" value="${s.bodySize}"
+          oninput="content.slideshow.bodySize=+this.value;document.getElementById('sw-bd-size').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>行送り</span><span class="slider-val" id="sw-bd-lead">${s.bodyLeading}</span></div>
+        <input type="range" min="100" max="300" value="${Math.round(s.bodyLeading*100)}"
+          oninput="const v=(+this.value/100).toFixed(2);content.slideshow.bodyLeading=+v;document.getElementById('sw-bd-lead').textContent=v;scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">セクション余白</div>
+      <div class="slider-row">
+        <div class="slider-label"><span>上</span><span class="slider-val" id="sw-pt">${s.paddingTop}px</span></div>
+        <input type="range" min="0" max="240" value="${s.paddingTop}"
+          oninput="content.slideshow.paddingTop=+this.value;document.getElementById('sw-pt').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>下</span><span class="slider-val" id="sw-pb">${s.paddingBottom}px</span></div>
+        <input type="range" min="0" max="240" value="${s.paddingBottom}"
+          oninput="content.slideshow.paddingBottom=+this.value;document.getElementById('sw-pb').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>左</span><span class="slider-val" id="sw-pl">${s.paddingLeft}px</span></div>
+        <input type="range" min="0" max="160" value="${s.paddingLeft}"
+          oninput="content.slideshow.paddingLeft=+this.value;document.getElementById('sw-pl').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>右</span><span class="slider-val" id="sw-pr">${s.paddingRight}px</span></div>
+        <input type="range" min="0" max="160" value="${s.paddingRight}"
+          oninput="content.slideshow.paddingRight=+this.value;document.getElementById('sw-pr').textContent=this.value+'px';scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">CTAボタン</div>
+      <div class="text-field">
+        <label>テキスト</label>
+        <input type="text" value="${esc(s.ctaText)}" oninput="content.slideshow.ctaText=this.value;scheduleAutoSave()">
+      </div>
+      <div class="text-field">
+        <label>リンク先</label>
+        <input type="text" value="${esc(s.ctaUrl)}" oninput="content.slideshow.ctaUrl=this.value;scheduleAutoSave()">
+      </div>
+    </div>
+  `
+}
+
+// ─── Mission editor ──────────────────────────────────────────────────────────
+function missionEditorHTML() {
+  if (!content.services || !Array.isArray(content.services)) content.services = []
+  if (content.services.length === 0)
+    return `<div style="color:var(--muted);font-size:12px;padding:16px 0">サービスデータがありません。サーバーに接続して再読み込みしてください。</div>`
+  return content.services.map((s, i) => `
+    <div class="ep-section" style="border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:14px">
+      <div class="ep-title" style="margin-bottom:10px">${esc(s.category)} — サービス ${i+1}</div>
+      <div class="text-field">
+        <label>カテゴリ</label>
+        <input type="text" value="${esc(s.category)}" oninput="content.services[${i}].category=this.value;scheduleAutoSave()">
+      </div>
+      <div class="text-field">
+        <label>タイトル</label>
+        <input type="text" value="${esc(s.title)}" oninput="content.services[${i}].title=this.value;scheduleAutoSave()">
+      </div>
+      <div class="text-field">
+        <label>説明文</label>
+        <textarea oninput="content.services[${i}].description=this.value;scheduleAutoSave()">${esc(s.description)}</textarea>
+      </div>
+    </div>
+  `).join('')
+}
+
+// ─── Hiring editor ───────────────────────────────────────────────────────────
+function hiringEditorHTML() {
+  if (!content.hiring || typeof content.hiring !== 'object') content.hiring = {}
+  const h = content.hiring
+  return `
+    <div class="ep-section">
+      <div class="ep-title">RECRUIT セクション</div>
+      <div class="text-field">
+        <label>サブタイトル</label>
+        <input type="text" value="${esc(h.recruitSubtitle)}" oninput="content.hiring.recruitSubtitle=this.value;scheduleAutoSave()">
+      </div>
+      <div class="text-field">
+        <label>本文</label>
+        <textarea oninput="content.hiring.recruitBody=this.value;scheduleAutoSave()">${esc(h.recruitBody)}</textarea>
+      </div>
+      <div class="text-field">
+        <label>CTAボタン</label>
+        <input type="text" value="${esc(h.recruitCta)}" oninput="content.hiring.recruitCta=this.value;scheduleAutoSave()">
+      </div>
+    </div>
+    <div class="ep-section">
+      <div class="ep-title">CONTACT US セクション</div>
+      <div class="text-field">
+        <label>説明文</label>
+        <textarea oninput="content.hiring.contactDesc=this.value;scheduleAutoSave()">${esc(h.contactDesc)}</textarea>
+      </div>
+      <div class="text-field">
+        <label>CTAボタン</label>
+        <input type="text" value="${esc(h.contactCta)}" oninput="content.hiring.contactCta=this.value;scheduleAutoSave()">
+      </div>
+    </div>
+  `
+}
+
+// ─── Save ────────────────────────────────────────────────────────────────────
+async function saveAll() {
+  if (!connected) { toast('サーバーに接続してください', 'err'); return }
+  try {
+    const r = await fetch(`${SERVER}/api/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        photos:      content.photos,
+        headline:    content.headline,
+        description: content.description,
+        services:    content.services,
+        hiring:      content.hiring,
+        slideshow:   content.slideshow,
+      })
+    })
+    const data = await r.json()
+    if (data.ok) toast('保存しました ✓')
+    else toast('保存エラー: ' + data.error, 'err')
+  } catch { toast('保存に失敗しました', 'err') }
+}
+
+// ─── Deploy ──────────────────────────────────────────────────────────────────
+function openDeploy() {
+  document.getElementById('deploy-log-wrap').classList.add('show')
+  document.getElementById('deploy-output').textContent = ''
+  document.getElementById('deploy-status').textContent = '待機中'
+  document.getElementById('deploy-run-btn').disabled = false
+}
+function closeDeploy(e) {
+  if (e && e.target !== document.getElementById('deploy-log-wrap')) return
+  document.getElementById('deploy-log-wrap').classList.remove('show')
+}
+
+async function runDeploy() {
+  if (!connected) { toast('サーバーに接続してください', 'err'); return }
+  const btn   = document.getElementById('deploy-run-btn')
+  const out   = document.getElementById('deploy-output')
+  const stat  = document.getElementById('deploy-status')
+  btn.disabled = true
+  stat.textContent = '実行中...'
+  out.textContent  = ''
+
+  const es = new EventSource(`${SERVER}/api/deploy`)
+  es.onmessage = e => {
+    const line = e.data
+    if (line.startsWith('[DONE:')) {
+      const code = line.match(/\d+/)?.[0]
+      es.close()
+      btn.disabled = false
+      if (code === '0') {
+        stat.textContent = '✓ 完了'
+        stat.style.color = 'var(--green)'
+        closeDeploy()
+        const vercelUrl = (content.previewUrl || '').replace(/\/$/, '')
+        showDeployComplete(vercelUrl)
+        setTimeout(() => {
+          const iframe = document.getElementById('preview-iframe')
+          if (iframe) iframe.src = vercelUrl
+          const urlInput = document.getElementById('preview-url-input')
+          if (urlInput) urlInput.value = vercelUrl
+        }, 5000)
+      } else {
+        stat.textContent = '✗ エラー (code ' + code + ')'
+        stat.style.color = '#f87171'
+      }
+      return
+    }
+    out.textContent += line + '\n'
+    out.scrollTop = out.scrollHeight
+  }
+  es.onerror = () => {
+    es.close()
+    btn.disabled = false
+    stat.textContent = '接続エラー'
+  }
+}
+
+// ─── Deploy complete popup ────────────────────────────────────────────────────
+let dcTimer = null
+function showDeployComplete(url) {
+  const el    = document.getElementById('deploy-complete')
+  const urlEl = document.getElementById('deploy-complete-url')
+  const cdEl  = document.getElementById('dc-countdown')
+  urlEl.href        = url
+  urlEl.textContent = url
+  el.classList.add('show')
+  let sec = 10
+  cdEl.textContent = `${sec}秒後に自動で閉じます`
+  clearInterval(dcTimer)
+  dcTimer = setInterval(() => {
+    sec--
+    if (sec <= 0) { clearInterval(dcTimer); closeDeployComplete() }
+    else cdEl.textContent = `${sec}秒後に自動で閉じます`
+  }, 1000)
+}
+function closeDeployComplete() {
+  clearInterval(dcTimer)
+  document.getElementById('deploy-complete').classList.remove('show')
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
+function openSettings() {
+  document.getElementById('set-project').value = content.projectPath || ''
+  document.getElementById('set-preview').value  = content.previewUrl  || ''
+  document.getElementById('set-deploy').value   = content.deployCmd   || 'vercel --prod --yes'
+  document.getElementById('set-openai').value   = content.openaiKey   || ''
+  document.getElementById('settings-modal').classList.add('show')
+}
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById('settings-modal')) return
+  document.getElementById('settings-modal').classList.remove('show')
+}
+async function saveSettings() {
+  const projectPath = document.getElementById('set-project').value.trim()
+  const previewUrl  = document.getElementById('set-preview').value.trim()
+  const deployCmd   = document.getElementById('set-deploy').value.trim()
+  const openaiKey   = document.getElementById('set-openai').value.trim()
+  content.projectPath = projectPath
+  content.previewUrl  = previewUrl
+  content.deployCmd   = deployCmd
+  content.openaiKey   = openaiKey
+  updatePreviewUrl(previewUrl)
+  closeSettings()
+  if (connected) {
+    try {
+      await fetch(`${SERVER}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectPath, previewUrl, deployCmd, openaiKey })
+      })
+      toast('設定を保存しました ✓')
+    } catch { toast('設定の保存に失敗しました', 'err') }
+  } else {
+    toast('設定をローカルに反映しました（サーバー未接続）')
+  }
+}
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.style.background = type === 'err' ? '#2e1a1a' : '#1a2e1a'
+  el.style.borderColor = type === 'err' ? '#6a2d2d' : '#2d6a2d'
+  el.style.color       = type === 'err' ? '#f87171' : 'var(--green)'
+  el.classList.add('show')
+  clearTimeout(toast._t)
+  toast._t = setTimeout(() => el.classList.remove('show'), 3000)
+}
+
+// ─── Image Editor Modal ──────────────────────────────────────────────────────
+let ie_slot = 0
+let ie_img  = null
+
+function ieTriggerUpload() {
+  activeUploadSlot = ie_slot
+  document.getElementById('file-input').click()
+}
+
+async function openImageEditor(slot) {
+  ie_slot = slot
+  const p  = content.photos[slot]
+  document.getElementById('ie-title').textContent = `画像編集 — ${SLOT_LABELS[slot]}`
+  document.getElementById('ie-rng-x').value = p.x
+  document.getElementById('ie-rng-y').value = p.y
+  document.getElementById('ie-rng-s').value = Math.round(p.scale * 100)
+  document.getElementById('ie-lbl-x').textContent = p.x + '%'
+  document.getElementById('ie-lbl-y').textContent = p.y + '%'
+  document.getElementById('ie-lbl-s').textContent = (+p.scale).toFixed(2)
+  document.getElementById('ie-col-bg').value = (p.bg === 'transparent' || !p.bg) ? '#000000' : p.bg
+  document.getElementById('img-editor-modal').classList.add('show')
+  ie_img = null
+  drawEditorCanvas()
+  try {
+    const src = connected ? `${SERVER}/api/image/${slot}?t=${Date.now()}` : imgSrc(slot)
+    ie_img = await loadImage(src)
+  } catch(_) {}
+  drawEditorCanvas()
+}
+
+function closeImageEditor(e) {
+  if (e && e.target.id !== 'img-editor-modal') return
+  document.getElementById('img-editor-modal').classList.remove('show')
+}
+
+function ieUpdate(key, val) {
+  content.photos[ie_slot][key] = (key === 'bg') ? val : +val
+  const lblMap = { x:'ie-lbl-x', y:'ie-lbl-y', scale:'ie-lbl-s' }
+  if (lblMap[key]) document.getElementById(lblMap[key]).textContent = key === 'scale' ? (+val).toFixed(2) : val + '%'
+  // sync main slot controls if visible
+  const syncMap = { x:'rng-x', y:'rng-y', scale:'rng-s' }
+  if (syncMap[key]) { const el = document.getElementById(syncMap[key]); if (el) el.value = key === 'scale' ? Math.round(val*100) : val }
+  drawEditorCanvas()
+  scheduleAutoSave()
+}
+
+function drawEditorCanvas() {
+  const canvas = document.getElementById('ie-canvas')
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  const W = canvas.width, H = canvas.height
+  const p = content.photos[ie_slot]
+  ctx.clearRect(0, 0, W, H)
+
+  // Checkerboard (transparent indicator)
+  const sz = 8
+  for (let row = 0; row < H; row += sz)
+    for (let col = 0; col < W; col += sz) {
+      ctx.fillStyle = ((col/sz + row/sz) % 2 === 0) ? '#2a2a2a' : '#3a3a3a'
+      ctx.fillRect(col, row, sz, sz)
+    }
+
+  // Background color
+  if (p.bg && p.bg !== 'transparent') {
+    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
+  }
+
+  let hasEmpty = true
+  if (ie_img) {
+    const iW = ie_img.naturalWidth, iH = ie_img.naturalHeight
+    const s = p.scale, px = p.x/100, py = p.y/100
+    const cov = Math.max(W/iW, H/iH)
+    const sw = iW*cov, sh = iH*cov
+    const dx = (W-sw)*px, dy = (H-sh)*py
+    const cdx = W*(1-s)/2 + dx*s
+    const cdy = H*(1-s)/2 + dy*s
+    const csw = sw*s, csh = sh*s
+    ctx.drawImage(ie_img, cdx, cdy, csw, csh)
+    hasEmpty = cdx > 0.5 || cdy > 0.5 || (cdx+csw) < W-0.5 || (cdy+csh) < H-0.5
+  }
+  document.getElementById('ie-empty-warn').style.display = hasEmpty ? 'block' : 'none'
+}
+
+// Build transparent mask canvas for AI (image at position, rest transparent)
+function buildMaskCanvas(size, img, cdx, cdy, csw, csh) {
+  const c = document.createElement('canvas')
+  c.width = size; c.height = size
+  const ctx = c.getContext('2d')
+  ctx.clearRect(0, 0, size, size)
+  ctx.drawImage(img, cdx, cdy, csw, csh)
+  return c
+}
+
+// Compute layout from photo params
+function photoLayout(p, img, size) {
+  const iW = img.naturalWidth, iH = img.naturalHeight
+  const s = p.scale, px = p.x/100, py = p.y/100
+  const cov = Math.max(size/iW, size/iH)
+  const sw = iW*cov, sh = iH*cov
+  const dx = (size-sw)*px, dy = (size-sh)*py
+  return { cdx: size*(1-s)/2+dx*s, cdy: size*(1-s)/2+dy*s, csw: sw*s, csh: sh*s }
+}
+
+// Smart fill: sample image edge pixels → detect background color → clean fill
+function buildSmartFill(size, img, cdx, cdy, csw, csh) {
+  const tmp = document.createElement('canvas')
+  tmp.width = size; tmp.height = size
+  const tc = tmp.getContext('2d')
+  tc.drawImage(img, cdx, cdy, csw, csh)
+  const d = tc.getImageData(0, 0, size, size).data
+  const border = 18
+  const L = Math.max(0, Math.floor(cdx)), T = Math.max(0, Math.floor(cdy))
+  const R = Math.min(size-1, Math.ceil(cdx+csw)), B = Math.min(size-1, Math.ceil(cdy+csh))
+  let rS=0, gS=0, bS=0, n=0
+  const smp = (x,y) => { if(x<0||x>=size||y<0||y>=size) return; const i=(y*size+x)*4; if(d[i+3]>128){rS+=d[i];gS+=d[i+1];bS+=d[i+2];n++} }
+  for (let x=L;x<=R;x++) for(let b=0;b<border;b++){smp(x,T+b);smp(x,B-b)}
+  for (let y=T;y<=B;y++) for(let b=0;b<border;b++){smp(L+b,y);smp(R-b,y)}
+  const r = n>0?Math.round(rS/n):120, g = n>0?Math.round(gS/n):120, b2 = n>0?Math.round(bS/n):120
+  const out = document.createElement('canvas')
+  out.width = size; out.height = size
+  const ctx = out.getContext('2d')
+  ctx.fillStyle = `rgb(${r},${g},${b2})`
+  ctx.fillRect(0, 0, size, size)
+  ctx.drawImage(img, cdx, cdy, csw, csh)
+  return out
+}
+
+// Apply result after successful outpaint (either AI or smart fill)
+async function applyOutpaintResult(slot, filename, img) {
+  content.photos[slot].filename = filename
+  content.photos[slot].scale = 1.0
+  content.photos[slot].x = 50; content.photos[slot].y = 50
+  if (slot === ie_slot) {
+    document.getElementById('ie-rng-s').value = 100
+    document.getElementById('ie-rng-x').value = 50; document.getElementById('ie-rng-y').value = 50
+    document.getElementById('ie-lbl-s').textContent = '1.00'
+    document.getElementById('ie-lbl-x').textContent = '50%'; document.getElementById('ie-lbl-y').textContent = '50%'
+    ie_img = await loadImage(`${SERVER}/api/image/${slot}?t=${Date.now()}`)
+    drawEditorCanvas()
+  }
+  const thumb = document.getElementById(`thumb-${slot}`)
+  if (thumb) thumb.src = `${SERVER}/api/image/${slot}?t=${Date.now()}`
+}
+
+async function outpaintFromEditor() {
+  if (!connected) { toast('サーバーに接続してください', 'err'); return }
+  const btn = document.getElementById('ie-ai-btn')
+  const prog = document.getElementById('ie-progress')
+  btn.disabled = true; prog.style.display = 'block'
+  btn.textContent = '処理中...'
+  try {
+    const size = 1024
+    const p = content.photos[ie_slot]
+    const { cdx, cdy, csw, csh } = photoLayout(p, ie_img, size)
+
+    // Try AI first
+    const maskCanvas = buildMaskCanvas(size, ie_img, cdx, cdy, csw, csh)
+    const r = await fetch(`${SERVER}/api/outpaint/${ie_slot}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ dataUrl: maskCanvas.toDataURL('image/png'), prompt: 'Professional business portrait, extend background naturally, photorealistic, seamless' })
+    })
+    const d = await r.json()
+    if (d.ok) {
+      await applyOutpaintResult(ie_slot, d.filename, ie_img)
+      toast('✨ AI背景生成が完了しました！')
+      return
+    }
+    // AI unavailable → smart fill
+    toast('AIキー未設定のためスマート補完を実行...')
+    const fillCanvas = buildSmartFill(size, ie_img, cdx, cdy, csw, csh)
+    const up = await fetch(`${SERVER}/api/upload/${ie_slot}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ dataUrl: fillCanvas.toDataURL('image/png'), ext: 'png' })
+    })
+    const ud = await up.json()
+    if (ud.ok) { await applyOutpaintResult(ie_slot, ud.filename, ie_img); toast('✨ スマート補完が完了しました') }
+    else toast('エラー: ' + (ud.error||'不明'), 'err')
+  } catch(e) { toast('失敗: ' + e.message, 'err') }
+  finally {
+    btn.disabled = false
+    btn.textContent = '✨ 背景を補完'
+    prog.style.display = 'none'
+  }
+}
+
+async function ieSaveAndClose() {
+  await saveAll()
+  renderSection()
+  document.getElementById('img-editor-modal').classList.remove('show')
+}
+
+// ─── Image load helper ───────────────────────────────────────────────────────
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error('画像の読み込みに失敗しました'))
+    img.src = src
+  })
+}
+
+async function outpaintSlot(slot) {
+  if (!connected) { toast('サーバーに接続してください', 'err'); return }
+  const btn = document.getElementById(`outpaint-btn-${slot}`)
+  if (btn) { btn.textContent = '処理中...'; btn.disabled = true }
+  try {
+    const img = await loadImage(`${SERVER}/api/image/${slot}?t=${Date.now()}`)
+    const size = 1024
+    // Frame image at 72% to leave room for background extension
+    const fr = 0.72
+    const sc = Math.min((size*fr)/img.width, (size*fr)/img.height)
+    const w = Math.round(img.width*sc), h = Math.round(img.height*sc)
+    const x = Math.round((size-w)/2), y = Math.round((size-h)/2)
+
+    // Try AI
+    const mask = buildMaskCanvas(size, img, x, y, w, h)
+    const r = await fetch(`${SERVER}/api/outpaint/${slot}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ dataUrl: mask.toDataURL('image/png'), prompt: 'Professional business portrait, extend background naturally, high quality' })
+    })
+    const d = await r.json()
+    if (d.ok) {
+      await applyOutpaintResult(slot, d.filename, img)
+      toast('✨ AI背景生成が完了しました！'); return
+    }
+    // Smart fill fallback
+    const fill = buildSmartFill(size, img, x, y, w, h)
+    const up = await fetch(`${SERVER}/api/upload/${slot}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ dataUrl: fill.toDataURL('image/png'), ext: 'png' })
+    })
+    const ud = await up.json()
+    if (ud.ok) { await applyOutpaintResult(slot, ud.filename, img); toast('✨ スマート補完が完了しました') }
+    else toast('エラー: ' + (ud.error||'不明'), 'err')
+  } catch(e) { toast('失敗: ' + e.message, 'err') }
+  finally { if (btn) { btn.textContent = '✨ AI で背景を生成'; btn.disabled = false } }
+}
+
+// ─── Undo / Redo ─────────────────────────────────────────────────────────────
+const undoStack = []
+const redoStack = []
+let _undoSnapshot = null  // state captured before current burst of edits
+let _isUndoing = false
+
+function pushUndoSnapshot() {
+  if (_isUndoing || _undoSnapshot !== null) return
+  _undoSnapshot = JSON.parse(JSON.stringify(content))
+}
+
+function commitUndo() {
+  if (_isUndoing || _undoSnapshot === null) return
+  undoStack.push(_undoSnapshot)
+  if (undoStack.length > 10) undoStack.shift()
+  redoStack.length = 0  // new edit clears redo history
+  _undoSnapshot = null
+}
+
+function undo() {
+  if (undoStack.length === 0) { toast('これ以上戻れません'); return }
+  _isUndoing = true
+  _undoSnapshot = null
+  redoStack.push(JSON.parse(JSON.stringify(content)))
+  if (redoStack.length > 10) redoStack.shift()
+  content = undoStack.pop()
+  renderSection()
+  doAutoSave().finally(() => { _isUndoing = false })
+  toast(`元に戻しました ↩  (あと${undoStack.length}回戻れます)`)
+}
+
+function redo() {
+  if (redoStack.length === 0) { toast('これ以上進めません'); return }
+  _isUndoing = true
+  _undoSnapshot = null
+  undoStack.push(JSON.parse(JSON.stringify(content)))
+  content = redoStack.pop()
+  renderSection()
+  doAutoSave().finally(() => { _isUndoing = false })
+  toast(`やり直しました ↪  (あと${redoStack.length}回進めます)`)
+}
+
+// ─── Auto-save ───────────────────────────────────────────────────────────────
+let autoSaveTimer = null
+
+function scheduleAutoSave() {
+  pushUndoSnapshot()
+  const lbl = document.getElementById('autosave-label')
+  if (lbl) { lbl.textContent = '保存中...'; lbl.className = 'saving' }
+  clearTimeout(autoSaveTimer)
+  autoSaveTimer = setTimeout(doAutoSave, 600)
+}
+
+let iframeReloadTimer = null
+async function doAutoSave() {
+  if (!connected) return
+  const lbl = document.getElementById('autosave-label')
+  try {
+    const r = await fetch(`${SERVER}/api/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        photos:      content.photos,
+        headline:    content.headline,
+        description: content.description,
+        services:    content.services,
+        hiring:      content.hiring,
+        slideshow:   content.slideshow,
+      })
+    })
+    const data = await r.json()
+    commitUndo()
+    if (lbl) { lbl.textContent = data.ok ? '保存済み ✓' : 'エラー'; lbl.className = data.ok ? 'saved' : '' }
+    if (data.ok) {
+      clearTimeout(iframeReloadTimer)
+      iframeReloadTimer = setTimeout(() => {
+        const iframe = document.getElementById('preview-iframe')
+        if (iframe) iframe.contentWindow.location.reload()
+      }, 2000)
+    }
+  } catch {
+    if (lbl) { lbl.textContent = '保存失敗'; lbl.className = '' }
+  }
+}
+
+// Input event delegation: any input/change in right panel triggers auto-save
+document.addEventListener('input', e => {
+  if (document.getElementById('rp-content')?.contains(e.target)) scheduleAutoSave()
+})
+document.addEventListener('change', e => {
+  if (document.getElementById('rp-content')?.contains(e.target)) scheduleAutoSave()
+})
+
+// ─── Dev server ──────────────────────────────────────────────────────────────
+let devRunning = false
+let devPollTimer = null
+
+async function checkDevStatus() {
+  if (!connected) return
+  try {
+    const r = await fetch(`${SERVER}/api/dev-status`, { signal: AbortSignal.timeout(1500) })
+    const data = await r.json()
+    if (data.running && !devRunning) {
+      devRunning = true
+      setDevBtn(true)
+      const iframe = document.getElementById('preview-iframe')
+      const urlInput = document.getElementById('preview-url-input')
+      iframe.src = 'http://localhost:3000'
+      if (urlInput) urlInput.value = 'http://localhost:3000'
+      toast('Dev サーバー起動完了 → localhost:3000 でリアルタイムプレビュー中')
+    } else if (!data.running && devRunning) {
+      devRunning = false
+      setDevBtn(false)
+    }
+  } catch {}
+}
+
+function setDevBtn(running) {
+  const btn = document.getElementById('btn-dev')
+  if (!btn) return
+  btn.textContent = running ? '● Dev 実行中' : '▶ Dev 起動'
+  btn.classList.toggle('running', running)
+}
+
+async function toggleDev() {
+  if (devRunning) {
+    // Switch iframe back to Vercel URL
+    const vercelUrl = content.previewUrl || ''
+    document.getElementById('preview-iframe').src = vercelUrl
+    const urlInput = document.getElementById('preview-url-input')
+    if (urlInput) urlInput.value = vercelUrl
+    return
+  }
+  if (!connected) { toast('サーバーに接続してください', 'err'); return }
+  try {
+    await fetch(`${SERVER}/api/start-dev`, { method: 'POST' })
+    toast('Dev サーバー起動中... (初回は30〜60秒かかります)')
+    setDevBtn(false)
+    document.getElementById('btn-dev').textContent = '起動中...'
+    // Poll until ready
+    let attempts = 0
+    clearInterval(devPollTimer)
+    devPollTimer = setInterval(async () => {
+      await checkDevStatus()
+      attempts++
+      if (devRunning || attempts > 60) clearInterval(devPollTimer)
+    }, 1500)
+  } catch { toast('Dev サーバーの起動に失敗しました', 'err') }
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+window.onload = () => {
+  renderSection()
+  connectServer()
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveAll() }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z' &&  e.shiftKey) { e.preventDefault(); redo() }
+})
+</script>
+</body>
+</html>

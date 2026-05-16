@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗ディスプレイ 購入リスト | Eyecare Labo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+    }
+
+    /* ── Common Nav ── */
+    #aicare-common-nav {
+      position: sticky; top: 0; z-index: 99999;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.18);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 20px;
+      height: 42px; min-height: 42px; max-height: 42px;
+      overflow-x: auto; overflow-y: hidden;
+      flex-wrap: nowrap; white-space: nowrap;
+      scrollbar-width: none; -ms-overflow-style: none;
+      font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+    }
+    #aicare-common-nav::-webkit-scrollbar { display: none; }
+    #aicare-common-nav > * { flex-shrink: 0; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+    #aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+    #aicare-common-nav a {
+      color: rgba(148,163,184,0.85); text-decoration: none;
+      padding: 3px 10px; border-radius: 4px;
+      border: 1px solid rgba(148,163,184,0.12);
+      transition: color 0.15s, background 0.15s;
+    }
+    #aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+    #aicare-common-nav a.cn-active {
+      color: #f59e0b !important;
+      border-color: rgba(245,158,11,0.35) !important;
+      background: rgba(245,158,11,0.08) !important;
+    }
+
+    /* ── Page Layout ── */
+    .page-header {
+      border-bottom: 1px solid #1c1c1c;
+      padding: 40px 32px 32px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .page-header .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #4a4a4a;
+      margin-bottom: 10px;
+    }
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: #f0f0f0;
+      margin-bottom: 6px;
+    }
+    .page-header .meta {
+      font-size: 12px;
+      color: #3a3a3a;
+    }
+
+    .main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: 52px; }
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #181818;
+    }
+    .section-head h2 {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #555;
+      font-weight: 400;
+    }
+    .badge {
+      font-size: 10px;
+      padding: 2px 9px;
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+    }
+    .badge-green  { background: rgba(52,211,153,0.08); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+    .badge-blue   { background: rgba(96,165,250,0.08); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+    .badge-amber  { background: rgba(251,191,36,0.08); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .badge-purple { background: rgba(167,139,250,0.08); color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+
+    /* ── Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 10px;
+    }
+    .card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 6px;
+      padding: 20px 22px 18px;
+      transition: border-color 0.15s;
+      position: relative;
+    }
+    .card:hover { border-color: #333; }
+    .card .shop {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .shop-rakuten { color: #cc3333; }
+    .shop-amazon  { color: #e88b00; }
+    .shop-other   { color: #5577aa; }
+    .card .star {
+      font-size: 10px;
+      color: #34d399;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .card h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ddd;
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .card a.btn {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: #666;
+      text-decoration: none;
+      border: 1px solid #2a2a2a;
+      border-radius: 3px;
+      padding: 5px 14px;
+      transition: all 0.15s;
+    }
+    .card a.btn:hover { color: #ddd; border-color: #555; background: #161616; }
+
+    /* ── Note ── */
+    .note {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-left: 3px solid #2a2a2a;
+      border-radius: 4px;
+      padding: 16px 20px;
+      font-size: 12px;
+      color: #444;
+      line-height: 1.8;
+      margin-top: 12px;
+    }
+    .note strong { color: #666; }
+
+    @media (max-width: 640px) {
+      .page-header { padding: 28px 20px 20px; }
+      .main { padding: 28px 20px 60px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AICARE COMMON NAV ── -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-stores.html">出展管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-store-design-tool.html" style="color:#2563eb !important;border-color:rgba(37,99,235,0.4) !important;background:rgba(37,99,235,0.08) !important;">🏪 店舗デザイン</a>
+  <a href="aicare-interior-design-tool.html" style="color:#7c3aed !important;border-color:rgba(124,58,237,0.4) !important;background:rgba(124,58,237,0.08) !important;">🛋 内装設計</a>
+  <a href="store-display-list.html" style="color:#34d399 !important;border-color:rgba(52,211,153,0.35) !important;background:rgba(52,211,153,0.08) !important;">🛒 ディスプレイ購入リスト</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html">制作管理シート</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-brand-manager.html" target="_blank" style="color:#c96442 !important;border-color:rgba(201,100,66,0.4) !important;background:rgba(201,100,66,0.08) !important;">⚙ BM</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-design-order.html" style="color:#f59e0b !important;border-color:rgba(245,158,11,0.35) !important;background:rgba(245,158,11,0.08) !important;">✦ デザイン発注</a>
+  <a href="yamakawa-tasks.html" style="color:#a78bfa !important;border-color:rgba(167,139,250,0.35) !important;background:rgba(167,139,250,0.08) !important;">✦ 山川タスク</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if(href && href === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+
+<!-- ── Header ── -->
+<div class="page-header">
+  <p class="eyebrow">Dr.Buddy / Eyecare Labo</p>
+  <h1>店舗ディスプレイ 購入リスト</h1>
+  <p class="meta">検索のたびにここに追加していく。Amazon・楽天・専門店まとめ。</p>
+</div>
+
+<div class="main">
+
+  <!-- ==========================================
+       SECTION 1: EYECARE LABO — 吊り下げ電飾
+       ========================================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Eyecare Labo — サイン</h2>
+      <span class="badge badge-green">天井から吊るす</span>
+    </div>
+    <div class="cards">
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten · サンシャイン</div>
+        <div class="star">★ イチオシ</div>
+        <h3>LEDチャンネル文字 側面発光<br>鏡面・ステンレス バックライト</h3>
+        <p>1cm単位でオーダーサイズ指定可。ステンレス側面＋白バックライトで参考画像に近い高級感。12V LED、送料無料。</p>
+        <a class="btn" href="https://item.rakuten.co.jp/sunshineled/ledsign_010/" target="_blank">楽天で見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten · サンシャイン</div>
+        <h3>LEDチャンネル文字 正面発光<br>カップリング文字・極厚アクリル</h3>
+        <p>正面が光るタイプ。フロントライトで文字が明るく目立つ。枠ありボックス型。</p>
+        <a class="btn" href="https://item.rakuten.co.jp/sunshineled/ledsign_025/" target="_blank">楽天で見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten · サンシャイン</div>
+        <h3>サンプルBOX — 発光タイプ確認用</h3>
+        <p>正面発光・側面発光・両面発光・ネオンチューブなど全タイプの実物見本セット。オーダー前に確認推奨。</p>
+        <a class="btn" href="https://item.rakuten.co.jp/sunshineled/sunsign_box/" target="_blank">楽天で見る →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SECTION 2: Dr.BUDDY — 床置き電飾
+       ========================================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Dr.Buddy — サイン</h2>
+      <span class="badge badge-blue">床から生やす</span>
+    </div>
+    <div class="cards">
+
+      <div class="card">
+        <div class="shop shop-amazon">Amazon</div>
+        <div class="star">★ イチオシ</div>
+        <h3>カスタムネオンサイン オーダーメイド<br>USB / DC12V 両対応</h3>
+        <p>「Dr.BUDDY」テキストをそのまま入稿してネオン風LEDサインを制作。シリコンチューブ製で本物ネオンに近い見た目。スタンドは別途。</p>
+        <a class="btn" href="https://www.amazon.co.jp/dp/B0BP1X9VJ7" target="_blank">Amazonで見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-amazon">Amazon · AiO JAPAN</div>
+        <h3>電飾スタンド看板（大サイズ）<br>ネオンサイン一体型</h3>
+        <p>スタンドとネオンサインが一体。高さ調整可（64〜88cm）。7色LED・11パターン。電池タイプで配線不要。</p>
+        <a class="btn" href="https://www.amazon.co.jp/dp/B0DG8NZXPJ" target="_blank">Amazonで見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten · サンシャイン</div>
+        <h3>LEDチャンネル文字 共用<br>スタンドベースで床置き化</h3>
+        <p>EYECAREと同じチャンネル文字をオーダーし、L字金具やスタンドベースで床から立てる方法。両サインで統一感が出る。</p>
+        <a class="btn" href="https://item.rakuten.co.jp/sunshineled/c/0000000108/" target="_blank">楽天で見る →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SECTION 3: 壁面パネル
+       ========================================== -->
+  <div class="section">
+    <div class="section-head">
+      <h2>壁面 — シルバー・ステンレス調パネル</h2>
+      <span class="badge badge-amber">背面壁</span>
+    </div>
+    <div class="cards">
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten · Shop O·S</div>
+        <div class="star">★ 本格仕様</div>
+        <h3>SUS304 HL ヘアライン ステンレス板<br>0.5mm × 1000 × 2000 オーダーカット</h3>
+        <p>本物のステンレス板。ヘアライン仕上げで参考画像と同系統の質感。サイズ指定カット対応。DIY〜業務用まで対応。</p>
+        <a class="btn" href="https://item.rakuten.co.jp/shopos/95/" target="_blank">楽天で見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-other">order-glass.com</div>
+        <h3>ステンレス内装用パネル<br>鏡面仕上げ / オーダーサイズ</h3>
+        <p>業務用大判パネル。鏡面仕上げでより反射感が強い高級タイプ。サイズ完全オーダー対応。</p>
+        <a class="btn" href="https://www.order-glass.com/shop/product/2909/" target="_blank">サイトで見る →</a>
+      </div>
+
+      <div class="card">
+        <div class="shop shop-rakuten">Rakuten</div>
+        <h3>ヘアラインステンレス調<br>カッティングシート（貼るだけ）</h3>
+        <p>既存壁に貼るだけの簡易版。コスト最小・施工簡単。仮設テスト用途にも使える。</p>
+        <a class="btn" href="https://search.rakuten.co.jp/search/mall/%E3%83%98%E3%82%A2%E3%83%A9%E3%82%A4%E3%83%B3+%E3%82%B9%E3%83%86%E3%83%B3%E3%83%AC%E3%82%B9+%E3%82%AB%E3%83%83%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B7%E3%83%BC%E3%83%88/" target="_blank">楽天で検索 →</a>
+      </div>
+
+    </div>
+
+    <div class="note">
+      <strong>施工メモ</strong><br>
+      ステンレス板は重量があるため壁への固定方法（両面テープ不可）を事前に確認すること。<br>
+      チャンネル文字の吊り下げ用ワイヤー・天井フックは別途ホームセンター調達。<br>
+      チャンネル文字オーダーはサンプルBOXで発光タイプを確認してから入稿推奨。
+    </div>
+  </div>
+
+  <!-- ==========================================
+       以降、家具・什器を追加していく
+       ========================================== -->
+  <!-- SECTION PLACEHOLDER: 家具・什器 -->
+
+</div><!-- /main -->
+
+</body>
+</html>

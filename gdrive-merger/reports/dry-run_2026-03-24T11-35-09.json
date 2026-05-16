@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2026-03-24T11:35:09.243Z",
+  "mode": "dry-run",
+  "summary": {
+    "move": 4,
+    "skipExact": 0,
+    "quarantine": 0,
+    "trash": 7,
+    "total": 11
+  },
+  "actions": [
+    {
+      "type": "MOVE",
+      "fileId": "1HH3M863IwUcTos5ldhAFI0IUZFzhKIHB",
+      "fileName": "アイケアラボ_窓面シートV6.pdf",
+      "fromFolderId": "1f8sNJpV_RFwwvzyolZojU9lCLxwi1Fkh",
+      "fromFolderPath": "133_デモ_デモ/アウトプット",
+      "toFolderId": "1b53ZmtzLUq7IPfib__5Q8r-AOsv709tI",
+      "toFolderPath": "133_川口駅前店_看板関係/アウトプット",
+      "reason": "正規フォルダに同名ファイルなし"
+    },
+    {
+      "type": "MOVE",
+      "fileId": "1sEXQvp8Y_peuHL8XD4EhrUl24APRrf4N",
+      "fileName": "アイケアラボ_窓面シートV6.pdf",
+      "fromFolderId": "1f8sNJpV_RFwwvzyolZojU9lCLxwi1Fkh",
+      "fromFolderPath": "133_デモ_デモ/アウトプット",
+      "toFolderId": "1b53ZmtzLUq7IPfib__5Q8r-AOsv709tI",
+      "toFolderPath": "133_川口駅前店_看板関係/アウトプット",
+      "reason": "正規フォルダに同名ファイルなし"
+    },
+    {
+      "type": "MOVE",
+      "fileId": "1Ld6Nb75u3UC1Asz1FuPbNHTYFambOJrK",
+      "fileName": "アイケアラボ_窓面シートV6.pdf",
+      "fromFolderId": "1f8sNJpV_RFwwvzyolZojU9lCLxwi1Fkh",
+      "fromFolderPath": "133_デモ_デモ/アウトプット",
+      "toFolderId": "1b53ZmtzLUq7IPfib__5Q8r-AOsv709tI",
+      "toFolderPath": "133_川口駅前店_看板関係/アウトプット",
+      "reason": "正規フォルダに同名ファイルなし"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1H0QVx4Ib9n_x7JYDCElwGtnVVfefn27A",
+      "fileName": "133_デモ_デモ",
+      "fromFolderId": "1H0QVx4Ib9n_x7JYDCElwGtnVVfefn27A",
+      "fromFolderPath": "133_デモ_デモ",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "MOVE",
+      "fileId": "1Dn7Zw_p9FlB_hQYNEBDOu0j63jDOcNDq",
+      "fileName": "スクリーンショット 2026-03-18 11.38.53.png",
+      "fromFolderId": "1dG8tKX-dIkulwQVUpPcNpELaBmTL615s",
+      "fromFolderPath": "139_大泉学園店_カッティング/アウトプット",
+      "toFolderId": "1htxCJLP7hT4C72eMqXySoo7rO3quC1UP",
+      "toFolderPath": "139_ベイシア栗橋_看板/アウトプット",
+      "reason": "正規フォルダに同名ファイルなし"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1KMOmqWbcmXwgpqdUTxQbJ7A0ikL9ocDp",
+      "fileName": "139_大泉学園店_カッティング",
+      "fromFolderId": "1KMOmqWbcmXwgpqdUTxQbJ7A0ikL9ocDp",
+      "fromFolderPath": "139_大泉学園店_カッティング",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1w58E7ynGygerTR2RGFwmmofPKtbcBkMo",
+      "fileName": "4_自由が丘店_のぼり",
+      "fromFolderId": "1w58E7ynGygerTR2RGFwmmofPKtbcBkMo",
+      "fromFolderPath": "4_自由が丘店_のぼり",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1yXDox3NtzCduvNFz1kNKNJ4xZ4rFN4ov",
+      "fileName": "128_川口駅前店",
+      "fromFolderId": "1yXDox3NtzCduvNFz1kNKNJ4xZ4rFN4ov",
+      "fromFolderPath": "128_川口駅前店",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1M-8ZmoAUPzMt_0OK45hfF_2wvSoamGe-",
+      "fileName": "116_朝霞台駅前店_店舗のロゴ作成ニ種類",
+      "fromFolderId": "1M-8ZmoAUPzMt_0OK45hfF_2wvSoamGe-",
+      "fromFolderPath": "116_朝霞台駅前店_店舗のロゴ作成ニ種類",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1j9hqd2W1p_qirPJEfQ4O-A0K9Y8dmJnC",
+      "fileName": "115_博多駅前店_チラシ三種類",
+      "fromFolderId": "1j9hqd2W1p_qirPJEfQ4O-A0K9Y8dmJnC",
+      "fromFolderPath": "115_博多駅前店_チラシ三種類",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    },
+    {
+      "type": "TRASH",
+      "fileId": "1Ie2xXDEKm2AYjdyvYmQBfG-6Ucj8kqNn",
+      "fileName": "114_大宮店_ グランドオープンチラシ",
+      "fromFolderId": "1Ie2xXDEKm2AYjdyvYmQBfG-6Ucj8kqNn",
+      "fromFolderPath": "114_大宮店_ グランドオープンチラシ",
+      "toFolderId": null,
+      "toFolderPath": "ゴミ箱",
+      "reason": "統合完了後に削除"
+    }
+  ]
+}

@@ -609,6 +609,12 @@
     @media (max-width: 768px) {
       .detail-grid { grid-template-columns: 1fr; }
     }
+    /* ── 参考画像ライトボックス（追加） ── */
+    #ref-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999;padding:24px;cursor:zoom-out;}
+    #ref-lightbox.open{display:flex;}
+    #ref-lightbox .ref-lb-inner{max-width:92vw;max-height:92vh;display:flex;align-items:center;justify-content:center;}
+    #ref-lightbox .ref-lb-inner img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+    #ref-lightbox .ref-lb-spin{color:#fff;font-size:.85rem;text-align:center;}
   </style>
 </head>
 <body>
@@ -2195,12 +2201,67 @@ function openDetailModal(iid) {
   document.getElementById('detail-store-label').textContent = item.store || '';
   document.getElementById('detail-item-label').textContent  = item.item  || '';
   renderDetailContent(item);
+  renderRefImages(item);
   updateCommentSectionStatus();
   setTimeout(() => loadComments(item), 100);
   document.getElementById('detail-modal').classList.add('open');
 }
 function closeDetailModal() {
   document.getElementById('detail-modal').classList.remove('open');
+}
+
+// ===== 参考画像ギャラリー（追加・既存不改変） =====
+let _refImgReqToken = 0;
+async function renderRefImages(item) {
+  const body = document.getElementById('detail-body');
+  if (!body) return;
+  const token = ++_refImgReqToken;
+  const secId = 'ref-img-sec';
+  body.insertAdjacentHTML('beforeend',
+    `<div class="detail-section" id="${secId}">
+       <div class="detail-section-title">参考画像（店舗フォルダ）</div>
+       <div id="ref-img-body" style="font-size:.72rem;color:var(--muted);">読み込み中...</div>
+     </div>`);
+  let data;
+  try { data = await gasGet({ action: 'getRefImages', store: item.store || '' }); }
+  catch (e) { data = { error: e.message }; }
+  if (token !== _refImgReqToken) return;
+  const host = document.getElementById('ref-img-body');
+  const sec  = document.getElementById(secId);
+  if (!host || !sec) return;
+  if (data && data.error) { host.textContent = '取得エラー: ' + data.error; return; }
+  const imgs = (data && data.images) || [];
+  if (!imgs.length) { sec.remove(); return; }
+  host.classList.add('gallery');
+  host.style.color = '';
+  host.innerHTML = imgs.map(im => `
+    <div class="gallery-img-wrap" title="${esc(im.name)}" onclick="openRefLightbox('${esc(im.id)}')">
+      ${im.thumb
+        ? `<img src="${im.thumb}" alt="${esc(im.name)}" loading="lazy">`
+        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:.7rem;color:var(--muted);">🖼️</div>`}
+    </div>`).join('');
+}
+async function openRefLightbox(id) {
+  let lb = document.getElementById('ref-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'ref-lightbox';
+    lb.addEventListener('click', () => closeRefLightbox());
+    document.body.appendChild(lb);
+  }
+  lb.innerHTML = '<div class="ref-lb-inner"><div class="ref-lb-spin">読み込み中...</div></div>';
+  lb.classList.add('open');
+  let data;
+  try { data = await gasGet({ action: 'getRefImageFull', id: id }); }
+  catch (e) { data = { error: e.message }; }
+  if (!lb.classList.contains('open')) return;
+  const inner = lb.querySelector('.ref-lb-inner');
+  if (data && data.data) inner.innerHTML = `<img src="${data.data}" alt="参考画像">`;
+  else inner.innerHTML = `<div class="ref-lb-spin">表示できませんでした<br><a href="https://drive.google.com/file/d/${esc(id)}/view" target="_blank" rel="noopener" style="color:var(--teal);">Driveで開く</a></div>`;
+}
+function closeRefLightbox() {
+  const lb = document.getElementById('ref-lightbox');
+  if (lb) lb.classList.remove('open');
 }
 
 async function startProductionFromDetail(iid) {

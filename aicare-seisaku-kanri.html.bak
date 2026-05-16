@@ -1,0 +1,3949 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>制作管理シート | アイケアラボ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #f8fafc;
+      --bg2:      #f1f5f9;
+      --surface:  #ffffff;
+      --surface2: #f8fafc;
+      --surface3: #f1f5f9;
+      --border:   #e2e8f0;
+      --text:     #1e293b;
+      --muted:    #64748b;
+      --muted2:   #94a3b8;
+      --teal:     #0d9488;
+      --green:    #16a34a;
+      --red:      #dc2626;
+      --amber:    #d97706;
+      --orange:   #ea580c;
+      --blue:     #2563eb;
+      --purple:   #7c3aed;
+      --radius:   8px;
+      --mono:     'JetBrains Mono','Fira Code','Courier New',monospace;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; }
+
+    /* ── 共通ナビ ── */
+    #aicare-common-nav {
+      position: sticky; top: 0; z-index: 99999;
+      background: #040c18;
+      border-bottom: 1px solid rgba(245,158,11,0.18);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+      overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; white-space: nowrap;
+      scrollbar-width: none; font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+    }
+    #aicare-common-nav::-webkit-scrollbar { display: none; }
+    #aicare-common-nav > * { flex-shrink: 0; }
+    #aicare-common-nav .cn-label { color: rgba(255,255,255,.25); font-size: 10px; letter-spacing: .1em; padding-right: 4px; }
+    #aicare-common-nav .cn-sep  { color: rgba(255,255,255,.15); padding: 0 2px; }
+    #aicare-common-nav a { color: rgba(148,163,184,.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,.12); transition: color .15s, background .15s; }
+    #aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,.06); }
+    #aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,.35) !important; background: rgba(245,158,11,.08) !important; }
+
+    /* ── ページヘッダー ── */
+    .page-header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 14px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      position: sticky; top: 42px; z-index: 9998;
+    }
+    .page-badge { font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); background: rgba(20,184,166,.12); border: 1px solid rgba(20,184,166,.3); border-radius: 4px; padding: 3px 8px; font-family: var(--mono); }
+    .page-title { font-size: 1rem; font-weight: 700; }
+    .page-sub   { font-size: .72rem; color: var(--muted); }
+
+    /* ── メインレイアウト ── */
+    .main { max-width: 1200px; margin: 0 auto; padding: 20px 24px 80px; }
+
+    /* ── カード ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+    .card-head { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .card-head.no-click { cursor: default; }
+    .card-title { font-size: .72rem; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-family: var(--mono); }
+    .card-body  { padding: 16px; }
+
+    /* ── ボタン ── */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: .78rem; font-weight: 600; transition: all .15s; font-family: inherit; }
+    .btn-primary   { background: var(--teal);  color: #000; }
+    .btn-primary:hover { background: #0d9488; }
+    .btn-secondary { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+    .btn-green  { background: var(--green); color: #000; }
+    .btn-green:hover { background: #16a34a; }
+    .btn-sm { padding: 4px 10px; font-size: .7rem; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── フォーム ── */
+    .form-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .form-label { font-size: .72rem; color: var(--muted); min-width: 90px; font-family: var(--mono); }
+    .form-input { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; font-size: .78rem; color: var(--text); font-family: var(--mono); outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,.04); }
+    .form-input:focus { border-color: var(--teal); }
+    .form-hint  { font-size: .65rem; color: var(--muted2); margin-top: 4px; }
+
+    /* ── コードブロック ── */
+    .code-block { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 14px; font-family: var(--mono); font-size: .68rem; color: #5eead4; overflow-x: auto; white-space: pre; line-height: 1.6; max-height: 300px; overflow-y: auto; }
+    .copy-code-btn { margin-top: 8px; }
+
+    /* ── インフォボックス ── */
+    .info-box { background: rgba(20,184,166,.08); border: 1px solid rgba(20,184,166,.2); border-radius: 6px; padding: 10px 14px; font-size: .75rem; color: var(--muted); margin-bottom: 12px; }
+    .info-box strong { color: var(--text); }
+    .success-box { background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.25); border-radius: 6px; padding: 10px 14px; font-size: .78rem; color: var(--text); margin-bottom: 10px; }
+    .step-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: #000; font-size: .7rem; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+    .step-num.done { background: var(--green); }
+    .step-text { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+    .step-text strong { color: var(--text); }
+
+    /* ── フィルター ── */
+    .filter-bar { display: flex; align-items: center; gap: 8px; padding: 14px 0; flex-wrap: wrap; }
+    .filter-tab { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: .72rem; font-weight: 600; transition: all .15s; white-space: nowrap; }
+    .filter-tab:hover { border-color: var(--muted); color: var(--text); }
+    .filter-tab.active { background: var(--teal); border-color: var(--teal); color: #000; }
+    .filter-tab.active-all { background: var(--surface2); border-color: var(--muted); color: var(--text); }
+    .fcnt { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.1); font-size: .6rem; margin-left: 2px; }
+    .search-input { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: .78rem; color: var(--text); outline: none; width: 200px; font-family: inherit; box-shadow: inset 0 1px 2px rgba(0,0,0,.04); }
+    .search-input:focus { border-color: var(--teal); }
+    .filter-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .reload-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; color: var(--muted); font-size: .72rem; cursor: pointer; transition: all .15s; }
+    .reload-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── 店舗グループ ── */
+    .store-group { margin-bottom: 16px; }
+    .store-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; background: #f1f5f9; border: 1px solid var(--border);
+      border-radius: 6px 6px 0 0; cursor: pointer; user-select: none;
+    }
+    .store-header:hover { background: #e2e8f0; }
+    .store-name { font-size: .88rem; font-weight: 700; color: var(--text); }
+    .store-count { font-size: .65rem; color: var(--muted2); font-family: var(--mono); }
+    .store-toggle { margin-left: auto; color: var(--muted2); font-size: .7rem; transition: transform .2s; }
+    .store-toggle.closed { transform: rotate(-90deg); }
+    .store-items { border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; overflow: hidden; }
+
+    /* ── アイテム行 ── */
+    .item-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; border-bottom: 1px solid #f1f5f9;
+      background: #ffffff; cursor: pointer; transition: background .1s;
+    }
+    .item-row:last-child { border-bottom: none; }
+    /* ステータス別の行色 */
+    .item-row.st-row-依頼前   { background: #f8fafc; border-left: 3px solid #e2e8f0; }
+    .item-row.st-row-依頼済   { background: #eff6ff; border-left: 3px solid #93c5fd; }
+    .item-row.st-row-制作中   { background: #fefce8; border-left: 3px solid #fde047; }
+    .item-row.st-row-確認中   { background: #fff7ed; border-left: 3px solid #fb923c; }
+    .item-row.st-row-修正中   { background: #fdf4ff; border-left: 3px solid #c084fc; }
+    .item-row.completed       { background: #f0fdf4 !important; border-left: 3px solid #86efac; }
+    .item-row:hover { filter: brightness(.97); }
+    .item-row.completed:hover { background: #dcfce7 !important; filter: none; }
+    .item-row.completed .item-name { color: #15803d; }
+    .item-name { flex: 1; font-size: .82rem; font-weight: 600; word-break: break-word; }
+    .item-urgent { font-size: .6rem; color: var(--red); font-weight: 700; margin-left: 4px; }
+    .item-dl-chip {
+      font-size: .68rem; font-family: var(--mono); white-space: nowrap;
+      padding: 2px 8px; border-radius: 10px; border: 1px solid transparent;
+    }
+    .item-dl-chip.deadline-ok     { color: var(--muted); border-color: #e2e8f0; background: #f8fafc; }
+    .item-dl-chip.deadline-soon   { color: var(--amber); border-color: #fde68a; background: #fffbeb; font-weight:700; }
+    .item-dl-chip.deadline-urgent { color: var(--orange); border-color: #fed7aa; background: #fff7ed; font-weight:700; }
+    .item-dl-chip.deadline-over   { color: var(--red); border-color: #fecaca; background: #fff1f2; font-weight:700; }
+    .item-arrow { color: #cbd5e1; font-size: .9rem; flex-shrink: 0; }
+
+    /* ── ステータスバッジ ── */
+    .st-badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 9px; border-radius: 12px;
+      font-size: .62rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    }
+    .st-依頼前 { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+    .st-依頼済 { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .st-制作中 { background: #fefce8; color: #a16207; border: 1px solid #fde68a; }
+    .st-確認中 { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+    .st-修正中 { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    .st-完了   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .st-empty  { background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0; }
+
+    /* ── ステータスセレクト（モーダル内） ── */
+    .status-select {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 7px 10px; font-size: .8rem; color: var(--text); cursor: pointer;
+      outline: none; font-family: inherit; width: 100%; transition: border-color .15s;
+    }
+    .status-select:focus { border-color: var(--teal); }
+    .status-select.saving { opacity: .5; pointer-events: none; }
+    .status-select.saved  { border-color: var(--green); }
+
+    /* ── 詳細モーダル ── */
+    .detail-section { margin-bottom: 20px; }
+    .detail-section-title {
+      font-size: .65rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono);
+      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .detail-field { padding: 8px 12px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border); }
+    .detail-field label { display: block; font-size: .6rem; color: var(--muted2); margin-bottom: 3px; font-family: var(--mono); letter-spacing: .04em; }
+    .detail-field .value { font-size: .8rem; color: var(--text); word-break: break-word; line-height: 1.5; }
+    .detail-field .value.dl-ok     { color: var(--muted); }
+    .detail-field .value.dl-soon   { color: var(--amber); font-weight: 700; }
+    .detail-field .value.dl-urgent { color: var(--orange); font-weight: 700; }
+    .detail-field .value.dl-over   { color: var(--red); font-weight: 700; }
+    .detail-field.full { grid-column: 1 / -1; }
+    .detail-notes { white-space: pre-wrap; font-size: .78rem; line-height: 1.7; color: var(--text); background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+    .detail-urgent-flag { display: inline-flex; align-items: center; gap: 4px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 6px; padding: 4px 10px; font-size: .72rem; color: var(--red); font-weight: 700; margin-bottom: 10px; }
+
+    /* ── 画像ギャラリー ── */
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: 8px; }
+    .gallery-img-wrap { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1; background: var(--surface2); cursor: pointer; }
+    .gallery-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+    .gallery-img-wrap:hover img { transform: scale(1.05); }
+    .gallery-link { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--teal); font-size: .75rem; text-decoration: none; transition: background .15s; }
+    .gallery-link:hover { background: #f0fdfc; }
+
+    /* ── Driveボタン ── */
+    .drive-btn {
+      background: #f0fdfc; border: 1px solid rgba(13,148,136,.3);
+      color: var(--teal); border-radius: 6px; padding: 6px 12px;
+      font-size: .72rem; font-weight: 700; cursor: pointer; transition: all .15s;
+      white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .drive-btn:hover { background: #ccfbf1; }
+    .drive-done-badge { font-size: .65rem; color: var(--green); font-weight: 700; }
+
+    /* ── フォルダアクションボタン ── */
+    .folder-action-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .folder-action-btn {
+      flex: 1; min-width: 120px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 10px; border-radius: 8px; text-decoration: none;
+      font-size: .78rem; font-weight: 700; transition: all .15s; text-align: center;
+      border: 1px solid;
+    }
+    .folder-action-btn.output   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .folder-action-btn.output:hover { background: #dbeafe; }
+    .folder-action-btn.nyukou   { background: #f0fdf4; color: #15803d; border-color: #86efac; }
+    .folder-action-btn.nyukou:hover { background: #dcfce7; }
+    .folder-action-btn.nyukomae { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .folder-action-btn.nyukomae:hover { background: #ffedd5; }
+
+    /* ── 格納ガイドポップアップ ── */
+    .guide-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.7);
+      z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .guide-overlay.open { display: flex; }
+    .guide-modal {
+      background: #fff; border-radius: 12px; width: 100%; max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    }
+    .guide-hdr {
+      background: linear-gradient(135deg, #0d9488, #059669);
+      padding: 20px 24px; color: #fff;
+    }
+    .guide-hdr-badge { font-size: .65rem; font-weight: 700; letter-spacing: .1em; opacity: .8; margin-bottom: 4px; }
+    .guide-hdr-title { font-size: 1.1rem; font-weight: 800; }
+    .guide-hdr-sub   { font-size: .75rem; opacity: .85; margin-top: 4px; }
+    .guide-body { padding: 20px 24px; }
+    .guide-step {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .guide-step:last-of-type { border-bottom: none; }
+    .guide-step-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 800; margin-top: 1px;
+    }
+    .guide-step-num.pending { background: #f1f5f9; color: #64748b; border: 2px solid #e2e8f0; }
+    .guide-step-num.active  { background: #0d9488; color: #fff; }
+    .guide-step-num.done    { background: #16a34a; color: #fff; }
+    .guide-step-body { flex: 1; }
+    .guide-step-title { font-size: .82rem; font-weight: 700; margin-bottom: 4px; }
+    .guide-step-desc  { font-size: .72rem; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+    .guide-footer { padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .guide-close-btn { background: transparent; border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 16px; font-size: .75rem; color: #64748b; cursor: pointer; }
+
+    /* ── 納期・依頼日表示 ── */
+    .item-name-wrap { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .item-size-tag { font-size: .6rem; font-weight: 700; font-family: var(--mono); color: #0369a1; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 4px; padding: 1px 6px; white-space: nowrap; flex-shrink: 0; }
+    .item-dl-wrap {
+      display: flex; align-items: center; gap: 4px;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .item-dl-lbl {
+      font-size: .6rem; font-weight: 700; letter-spacing: .04em;
+      padding: 1px 5px; border-radius: 3px; opacity: .75;
+    }
+    .deadline-ok     .item-dl-lbl { background: #f1f5f9; color: #94a3b8; }
+    .deadline-soon   .item-dl-lbl { background: #fefce8; color: #a16207; }
+    .deadline-urgent .item-dl-lbl { background: #fff7ed; color: #c2410c; }
+    .deadline-over   .item-dl-lbl { background: #fff1f2; color: #be123c; }
+    .item-dl-val { font-size: .78rem; font-family: var(--mono); font-weight: 600; }
+    .deadline-ok     .item-dl-val { color: var(--muted); }
+    .deadline-soon   .item-dl-val { color: #a16207; }
+    .deadline-urgent .item-dl-val { color: #c2410c; }
+    .deadline-over   .item-dl-val { color: #be123c; }
+    .item-dl-badge {
+      font-size: .6rem; font-weight: 800; padding: 1px 6px; border-radius: 10px;
+    }
+    .deadline-soon   .item-dl-badge { background: #fde68a; color: #92400e; }
+    .deadline-urgent .item-dl-badge { background: #fed7aa; color: #9a3412; }
+    .deadline-over   .item-dl-badge { background: #fecaca; color: #991b1b; }
+    .item-rd { font-size: .62rem; color: var(--muted2); font-family: var(--mono); flex-shrink: 0; white-space: nowrap; }
+
+    /* ── deadline (旧互換) ── */
+    .deadline-ok     { color: var(--muted); }
+    .deadline-soon   { color: var(--amber); font-weight: 600; }
+    .deadline-urgent { color: var(--orange); font-weight: 700; }
+    .deadline-over   { color: var(--red); font-weight: 700; }
+
+    /* ── ソートバー ── */
+    .sort-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 0 8px; font-size: .7rem; flex-wrap: wrap;
+    }
+    .sort-lbl { color: var(--muted2); font-family: var(--mono); font-size: .65rem; }
+    .sort-btn {
+      padding: 3px 10px; border-radius: 12px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; font-size: .68rem;
+      transition: all .12s; display: flex; align-items: center; gap: 3px;
+    }
+    .sort-btn:hover { border-color: var(--muted); color: var(--text); }
+    .sort-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    .view-toggle {
+      margin-left: auto; display: flex; gap: 4px;
+    }
+    .view-btn {
+      width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted2); cursor: pointer; font-size: .88rem;
+      display: flex; align-items: center; justify-content: center; transition: all .12s;
+    }
+    .view-btn:hover { border-color: var(--muted); color: var(--text); }
+    .view-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+    /* ── カードビュー ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .item-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; cursor: pointer;
+      transition: box-shadow .15s, transform .15s;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .item-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-1px); }
+    .item-card.completed      { border-left: 3px solid #86efac; background: #f0fdf4; }
+    .item-card.st-card-依頼前 { border-left: 3px solid #e2e8f0; background: #f8fafc; }
+    .item-card.st-card-依頼済 { border-left: 3px solid #93c5fd; background: #eff6ff; }
+    .item-card.st-card-制作中 { border-left: 3px solid #fde047; background: #fefce8; }
+    .item-card.st-card-確認中 { border-left: 3px solid #fb923c; background: #fff7ed; }
+    .item-card.st-card-修正中 { border-left: 3px solid #c084fc; background: #fdf4ff; }
+    .item-card.completed .item-name { color: #15803d; }
+    .item-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .item-card-meta { display: flex; align-items: center; justify-content: space-between; }
+    .item-card-dl { display: flex; align-items: center; gap: 4px; }
+    .item-card-rd { font-size: .62rem; color: var(--muted2); font-family: var(--mono); }
+    .item-card-urgent { font-size: .6rem; color: var(--red); font-weight: 700; background: #fff1f2; border: 1px solid #fecaca; border-radius: 4px; padding: 1px 5px; }
+
+    /* カードビュー時のstore-group */
+    .card-store-group { margin-bottom: 20px; }
+
+    /* ── モーダル ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.6); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+    .modal-hdr { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+    .modal-title { font-size: .95rem; font-weight: 700; flex: 1; }
+    .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 2px 8px; border-radius: 4px; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px; }
+    .m-section { margin-bottom: 20px; }
+    .m-step-title { font-size: .72rem; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .m-snum { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--teal); color: #000; font-size: .65rem; font-weight: 800; flex-shrink: 0; }
+    .m-snum.done { background: var(--green); }
+
+    /* ── フォルダリンク ── */
+    .folder-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; margin-top: 6px; }
+    .folder-link { color: var(--teal); font-size: .78rem; text-decoration: none; flex: 1; word-break: break-all; }
+    .folder-link:hover { text-decoration: underline; }
+    .f-copy { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; font-size: .65rem; color: var(--muted); cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .f-copy:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── コピーメッセージ ── */
+    .copy-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin-top: 6px; position: relative; }
+    .copy-text { font-size: .88rem; line-height: 1.7; word-break: break-word; }
+    .copy-btn  { position: absolute; top: 8px; right: 8px; background: var(--teal); border: none; border-radius: 4px; padding: 4px 12px; font-size: .68rem; font-weight: 700; color: #000; cursor: pointer; }
+    .copy-btn:hover { background: #0d9488; }
+    .copy-btn.copied { background: var(--green); }
+
+    /* ── ローディング / 空 ── */
+    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; color: var(--muted); }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--surface3); border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+    .empty-icon  { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
+    /* ── 自動保存バー ── */
+    #save-bar { position: fixed; top: 42px; left: 0; right: 0; background: var(--teal); color: #000; font-size: .72rem; font-weight: 700; text-align: center; padding: 3px; transform: translateY(-100%); transition: transform .2s; z-index: 200; font-family: var(--mono); }
+    #save-bar.show { transform: translateY(0); }
+
+    /* ── トースト ── */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); color: var(--text); padding: 9px 20px; border-radius: 8px; font-size: .8rem; border: 1px solid var(--border); opacity: 0; pointer-events: none; transition: all .25s; z-index: 9999; white-space: nowrap; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.ok  { border-color: rgba(34,197,94,.4); }
+    #toast.err { border-color: rgba(239,68,68,.4); color: #fca5a5; }
+
+    /* ── 取り掛かりますボタン ── */
+    .start-btn {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 11px; border-radius: 14px;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; border: none; cursor: pointer;
+      font-size: .65rem; font-weight: 700; white-space: nowrap;
+      transition: all .15s; letter-spacing: .02em;
+    }
+    .start-btn:hover { background: linear-gradient(135deg, #6d28d9, #5b21b6); transform: scale(1.03); }
+
+    /* ── Slack投稿モーダル ── */
+    .slack-modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.65);
+      z-index: 2100; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .slack-modal-overlay.open { display: flex; }
+    .slack-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; width: 100%; max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    }
+    .slack-modal-hdr {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      padding: 16px 20px; display: flex; align-items: center; gap: 10px;
+    }
+    .slack-modal-hdr-title { color: #fff; font-size: .95rem; font-weight: 800; flex: 1; }
+    .slack-modal-hdr-sub   { color: rgba(255,255,255,.75); font-size: .72rem; }
+    .slack-modal-close {
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 1rem;
+    }
+    .slack-modal-close:hover { background: rgba(255,255,255,.25); }
+    .slack-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .slack-field { display: flex; flex-direction: column; gap: 5px; }
+    .slack-label {
+      font-size: .65rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono);
+    }
+    .slack-select {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 7px;
+      padding: 9px 12px; font-size: .82rem; color: var(--text); outline: none;
+      font-family: inherit; transition: border-color .15s; cursor: pointer;
+    }
+    .slack-select:focus { border-color: #7c3aed; }
+    .slack-preview {
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; font-size: .82rem; line-height: 1.7; color: var(--text);
+      border-left: 3px solid #7c3aed;
+    }
+    .slack-preview-channel {
+      font-size: .65rem; color: var(--muted2); font-family: var(--mono);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
+    }
+    .slack-preview-mention { color: #1d4ed8; font-weight: 600; }
+    .slack-preview-msg { font-size: .85rem; color: var(--text); line-height: 1.6; }
+    .slack-modal-footer {
+      padding: 14px 20px; border-top: 1px solid var(--border);
+      background: var(--surface2); display: flex; align-items: center; gap: 8px;
+    }
+    .slack-send-btn {
+      flex: 1; background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; border: none; border-radius: 7px; padding: 10px 20px;
+      font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .slack-send-btn:hover { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+    .slack-send-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .slack-cancel-btn {
+      background: transparent; border: 1px solid var(--border); border-radius: 7px;
+      padding: 10px 16px; font-size: .8rem; color: var(--muted); cursor: pointer;
+    }
+    .slack-cancel-btn:hover { color: var(--text); border-color: var(--muted); }
+    .slack-settings-link {
+      font-size: .68rem; color: var(--muted2); cursor: pointer; text-decoration: underline;
+      margin-left: auto; white-space: nowrap;
+    }
+    .slack-settings-link:hover { color: var(--muted); }
+
+    /* ── Slackアカウント設定モーダル ── */
+    .slack-settings-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; width: 100%; max-width: 640px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .slack-settings-hdr {
+      padding: 14px 20px; background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; position: sticky; top: 0;
+    }
+    .slack-settings-title { font-size: .9rem; font-weight: 700; flex: 1; }
+    .slack-settings-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+    .slack-acc-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 7px;
+    }
+    .slack-acc-name { font-size: .82rem; font-weight: 600; flex: 1; }
+    .slack-acc-token { font-size: .68rem; color: var(--muted2); font-family: var(--mono); }
+    .slack-del-btn {
+      background: transparent; border: 1px solid #fecaca; border-radius: 5px;
+      color: #ef4444; padding: 3px 8px; font-size: .65rem; cursor: pointer;
+    }
+    .slack-del-btn:hover { background: #fff1f2; }
+    .slack-inp {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 12px; font-size: .78rem; color: var(--text);
+      outline: none; font-family: var(--mono); width: 100%;
+    }
+    .slack-inp:focus { border-color: #7c3aed; }
+    .slack-section-title {
+      font-size: .65rem; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono);
+      margin-bottom: 8px;
+    }
+    .slack-add-form {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .slack-add-row { display: flex; gap: 8px; align-items: center; }
+
+    /* 製作者タグ */
+    .producer-tag { display:inline-flex; align-items:center; gap:3px; font-size:.62rem; color:var(--muted2); background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:1px 7px; white-space:nowrap; flex-shrink:0; }
+
+    /* コメントスレッド */
+    .comments-thread { display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; padding:2px 0; margin-bottom:6px; }
+    .comment-msg { display:flex; flex-direction:column; gap:2px; }
+    .comment-meta { display:flex; align-items:center; gap:6px; }
+    .comment-author { font-size:.7rem; font-weight:700; color:var(--text); }
+    .comment-time { font-size:.6rem; color:var(--muted2); font-family:var(--mono); }
+    .comment-text { font-size:.8rem; color:var(--text); line-height:1.6; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; word-break:break-word; white-space:pre-wrap; }
+    .comment-input-row { display:flex; gap:8px; align-items:flex-end; }
+    .comment-textarea { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 12px; font-size:.78rem; color:var(--text); outline:none; font-family:inherit; resize:vertical; min-height:56px; transition:border-color .15s; }
+    .comment-textarea:focus { border-color:var(--teal); }
+    .comment-send-btn { background:var(--teal); color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:.78rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .15s; }
+    .comment-send-btn:hover { background:#0f766e; }
+    .comment-send-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .comments-empty { font-size:.75rem; color:var(--muted2); text-align:center; padding:14px 0; }
+    .comment-acc-sel { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:.72rem; color:var(--text); outline:none; max-width:130px; }
+    /* ── 投稿者コンボボックス ── */
+    .poster-wrap { position:relative; width:160px; flex-shrink:0; }
+    .poster-inp { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font-size:.72rem; color:var(--text); outline:none; font-family:inherit; }
+    .poster-inp:focus { border-color:var(--teal); }
+    .poster-dropdown { position:absolute; bottom:calc(100% + 4px); left:0; width:220px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.12); max-height:200px; overflow-y:auto; z-index:9999; display:none; }
+    .poster-item { padding:7px 12px; font-size:.75rem; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .1s; }
+    .poster-item:hover, .poster-item.selected { background:rgba(13,148,136,.08); }
+    .poster-item .poster-via { font-size:.6rem; color:var(--muted2); font-family:var(--mono); margin-left:auto; }
+    .poster-item.worker-item { border-top:1px solid var(--border); }
+    .ws-connected-badge { display:inline-flex; align-items:center; gap:4px; font-size:.65rem; color:var(--green); background:rgba(22,163,74,.08); border:1px solid rgba(22,163,74,.2); border-radius:4px; padding:2px 8px; font-family:var(--mono); }
+    .ws-section { background:rgba(13,148,136,.04); border:1px solid rgba(13,148,136,.15); border-radius:8px; padding:12px; margin-bottom:16px; }
+    .ws-section-title { font-size:.7rem; font-weight:700; color:var(--teal); letter-spacing:.08em; text-transform:uppercase; font-family:var(--mono); margin-bottom:10px; }
+    /* ── 外部ツール連携カード ── */
+    .intg-card { }
+    .intg-card-hdr { display:flex; align-items:center; padding:16px 20px; cursor:pointer; transition:background .15s; }
+    .intg-card-hdr:hover { background:var(--surface2); }
+    .intg-card-body { padding:0 20px 16px; }
+    .intg-badge { font-size:.62rem; font-weight:700; padding:2px 8px; border-radius:20px; font-family:var(--mono); }
+    .intg-badge-off { background:var(--surface3); color:var(--muted2); border:1px solid var(--border); }
+    .intg-badge-on  { background:rgba(22,163,74,.12); color:var(--green); border:1px solid rgba(22,163,74,.3); }
+    .intg-arrow { font-size:.65rem; color:var(--muted2); transition:transform .2s; }
+    .intg-arrow.open { transform:rotate(180deg); }
+    .comment-sl-link { font-size:.65rem; color:var(--teal); text-decoration:none; }
+    .wiz-dot { width:26px;height:26px;border-radius:50%;background:var(--surface3);color:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;flex-shrink:0;transition:background .2s,color .2s; }
+    .wiz-dot.done { background:#4A154B;color:#fff; }
+    .wiz-line { flex:1;height:2px;background:var(--border);align-self:center; }
+    .comment-sl-link:hover { text-decoration:underline; }
+    /* ── 制作依頼フォーム ── */
+    .req-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+    .req-field { position:relative; display:flex; flex-direction:column; gap:4px; }
+    .req-field label { font-size:.68rem; color:var(--muted2); font-weight:700; }
+    .req-field input, .req-field select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:.75rem; color:var(--text); outline:none; font-family:inherit; }
+    .req-field input:focus { border-color:var(--teal); }
+    .req-dropdown { position:absolute; top:calc(100% + 2px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,.15); max-height:160px; overflow-y:auto; z-index:10000; display:none; }
+    .req-dropdown-item { padding:6px 10px; font-size:.73rem; cursor:pointer; transition:background .1s; }
+    .req-dropdown-item:hover { background:rgba(13,148,136,.1); }
+    .req-textarea { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:.75rem; color:var(--text); outline:none; font-family:inherit; resize:vertical; }
+    .req-textarea:focus { border-color:var(--teal); }
+    .req-submit-btn { width:100%; background:#1e40af; color:#fff; border:none; border-radius:8px; padding:12px; font-size:.82rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .req-submit-btn:hover { background:#1d4ed8; }
+    .req-submit-btn:disabled { opacity:.5; cursor:not-allowed; }
+    /* ── 複数行入力 ── */
+    .req-multi-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .req-multi-row input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:.75rem; color:var(--text); outline:none; font-family:inherit; }
+    .req-multi-row input:focus { border-color:var(--teal); }
+    .req-multi-row .qty-inp { max-width:110px; flex:0 0 110px; }
+    .req-add-row-btn { display:inline-flex; align-items:center; gap:4px; background:transparent; border:1px dashed var(--border); border-radius:6px; padding:4px 10px; font-size:.7rem; color:var(--muted); cursor:pointer; margin-top:2px; transition:all .15s; }
+    .req-add-row-btn:hover { border-color:var(--teal); color:var(--teal); }
+    .req-remove-row-btn { background:transparent; border:1px solid var(--border); border-radius:4px; width:22px; height:22px; cursor:pointer; color:var(--muted); font-size:.8rem; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .req-remove-row-btn:hover { background:#fff1f2; border-color:#fecaca; color:var(--red); }
+    /* ── 参考資料アップロード ── */
+    .req-upload-area { border:2px dashed var(--border); border-radius:8px; padding:16px; text-align:center; cursor:pointer; transition:all .15s; background:var(--surface); }
+    .req-upload-area:hover, .req-upload-area.dragover { border-color:var(--teal); background:rgba(13,148,136,.05); }
+    .req-upload-file-item { display:flex; align-items:center; gap:8px; padding:6px 10px; background:var(--surface3); border:1px solid var(--border); border-radius:6px; margin-bottom:4px; font-size:.72rem; }
+    .req-upload-file-item .file-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .req-upload-file-item .file-remove { background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; flex-shrink:0; }
+    .req-upload-progress { font-size:.68rem; color:var(--teal); margin-top:4px; }
+    .ai-box { background:var(--surface3); border-radius:8px; padding:12px; margin-bottom:14px; }
+    .ai-result { font-size:.72rem; color:var(--muted); line-height:1.8; white-space:pre-wrap; min-height:40px; margin-top:6px; }
+    .acc-edit-form { margin-top:8px; padding:10px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; display:flex; flex-direction:column; gap:7px; }
+    .acc-edit-row { display:grid; grid-template-columns:110px 1fr; gap:6px; align-items:center; }
+    .acc-edit-lbl { font-size:.65rem; color:var(--muted2); font-family:var(--mono); }
+    .notify-via-sel { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:5px 8px; font-size:.72rem; color:var(--text); outline:none; }
+
+    @media (max-width: 768px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── 共通ナビ ── -->
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html" class="cn-active">制作管理シート</a>
+  <a href="aicare-seisaku-gallery.html">制作物一覧</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+    else a.classList.remove('cn-active');
+  });
+})();
+</script>
+
+<!-- ── ページヘッダー ── -->
+<div class="page-header">
+  <span class="page-badge">Production</span>
+  <span class="page-title">制作管理シート</span>
+  <span class="page-sub">店舗制作物 ｜ スプレッドシート連動</span>
+  <button id="integrations-btn" onclick="openIntegrations()"
+    style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:8px;padding:7px 14px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;"
+    onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+    🔗 <span id="integrations-btn-label">ツールと連携する</span>
+  </button>
+  <button onclick="openRequestModal()"
+    style="margin-left:8px;display:inline-flex;align-items:center;gap:6px;background:#0f172a;color:#e2e8f0;border:1px solid #1e40af;border-radius:8px;padding:7px 14px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;"
+    onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#0f172a'">
+    ✉️ 制作依頼する
+  </button>
+  <a href="aicare-seisaku-gallery.html"
+     style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+            background:#0d9488;color:#fff;border-radius:8px;padding:7px 16px;
+            font-size:.78rem;font-weight:700;text-decoration:none;
+            box-shadow:0 2px 6px rgba(13,148,136,.3);transition:background .15s;"
+     onmouseover="this.style.background='#0f766e'"
+     onmouseout="this.style.background='#0d9488'">
+    🖼 制作物一覧
+  </a>
+</div>
+<div id="save-bar">保存中...</div>
+
+<div class="main">
+
+  <!-- ── セットアップカード ── -->
+  <div class="card" id="card-setup">
+    <div class="card-head no-click">
+      <span class="card-title">⚙️ 初回セットアップ（1回だけ）</span>
+      <button class="btn btn-sm btn-secondary" style="margin-left:auto;" onclick="toggleSetup()">閉じる</button>
+    </div>
+    <div class="card-body" id="setup-body">
+      <div class="info-box">
+        Google Apps Script を使ってスプレッドシートと連動します。<strong>OAuth2不要・クラウド設定不要</strong>で、以下の手順だけで動きます。
+      </div>
+
+      <!-- STEP 1: GAS コード -->
+      <div class="step-row">
+        <span class="step-num">1</span>
+        <div class="step-text">
+          <strong>スプレッドシートを開く</strong> →
+          上部メニュー「拡張機能」→「Apps Script」を開く
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="step-num">2</span>
+        <div class="step-text">
+          <strong>以下のコードを貼り付けて「保存」</strong>（既存の内容は全部削除してOK）
+        </div>
+      </div>
+      <div style="position:relative;">
+        <pre class="code-block" id="gas-code-block">// ===== 制作管理シート — Google Apps Script =====
+const SS_ID         = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
+const SHEET_NAME    = '店舗製作物'; // タブ名（製作物）
+const PARENT_FOLDER = '10bc1kJynMcL3Peh799wVL6nH38Q5kI7X';
+
+function doPost(e) {
+  let result;
+  try {
+    const p = JSON.parse(e.postData.contents);
+    if (p.action === 'uploadReference') {
+      result = uploadReference(p.store, p.item, p.fileName, p.mimeType, p.data);
+    } else {
+      result = { error: 'unknown post action: ' + p.action };
+    }
+  } catch(err) {
+    result = { error: err.message };
+  }
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  const p = e.parameter;
+  let result;
+  try {
+    if (p.action === 'getItems')         result = getItems();
+    else if (p.action === 'updateStatus')  result = updateStatus(+p.row, p.status);
+    else if (p.action === 'createFolders') result = createFolders(p.store, p.item);
+    else if (p.action === 'postToSlack')   result = postToSlack(p.token, p.channelId, p.storeName, p.itemName, p.posterName, p.mentionIds);
+    else if (p.action === 'updateProducer')  result = updateProducer(+p.row, p.name);
+    else if (p.action === 'getComments')     result = getComments(p.token, p.channelId, p.threadTs);
+    else if (p.action === 'postComment')     result = postComment(p.token, p.channelId, p.threadTs, p.text);
+    else if (p.action === 'notifyProducer')  result = notifyProducer(p.producerJson, p.message);
+    else if (p.action === 'storeSettings')   result = storeSettings(p.json);
+    else if (p.action === 'getGallery')         result = getGallery();
+    else if (p.action === 'getSlackMembers')    result = getSlackMembers(p.token);
+    else if (p.action === 'postChatworkComment') result = postChatworkComment(p.cwToken, p.cwRoomId, p.text, p.posterName);
+    else if (p.action === 'postDelivery')       result = postDelivery(p.token, p.channelId, p.store, p.storeNo, p.item, p.folderUrl, p.mentionId);
+    else if (p.action === 'postRequest')      result = postRequest(p.token, p.channelId, p.store, p.storeNo, p.item, p.size, p.format, p.requester, p.requestDate, p.deadline, p.notes, p.urgent, p.mentionId);
+    else if (p.action === 'addRequest')       result = addRequest(p.store, p.item, p.size, p.notes, p.format, p.requester, p.requestDate, p.deadline, p.urgent);
+    else if (p.action === 'getAiSuggestion')  result = getAiSuggestion(p.apiKey, p.mediaType, p.notes);
+    else result = { error: 'unknown action: ' + p.action };
+  } catch(err) {
+    result = { error: err.message };
+  }
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getSheet() {
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(SHEET_NAME);
+  if (sh) return sh;
+  const names = ss.getSheets().map(s => '"' + s.getName() + '"').join(', ');
+  throw new Error('シートが見つかりません: ' + names);
+}
+
+function getItems() {
+  ensureDailyReminder();
+  const sheet  = getSheet();
+  const values = sheet.getDataRange().getValues();
+  const sheetGid = sheet.getSheetId();
+  // 2パス: H=1でブロック開始、H=3でG列から店舗名取得
+  const blocks = [];
+  for (let i = 0; i < values.length; i++) {
+    const h = String(values[i][7] || '').trim();
+    const g = String(values[i][6] || '').trim();
+    if (h === '1') {
+      if (blocks.length > 0) blocks[blocks.length-1].end = i-1;
+      blocks.push({ start:i, end:-1, store:'', storeNo:String(values[i][3]||'') });
+    }
+    if (h === '3' && g && blocks.length > 0) blocks[blocks.length-1].store = g;
+  }
+  if (blocks.length > 0) blocks[blocks.length-1].end = values.length-1;
+
+  const items = [];
+  for (const b of blocks) {
+    if (!b.store) continue;
+    for (let i = b.start; i <= b.end; i++) {
+      const r    = values[i];
+      const iCol = String(r[8]  || '').trim(); // I: 制作アイテム
+      if (!iCol) continue;
+      items.push({
+        rowNum:      i+1,
+        store:       b.store,
+        storeNo:     b.storeNo,
+        item:        iCol,
+        size:        String(r[9]  || '').trim(), // J: サイズ
+        notes:       String(r[10] || '').trim(), // K: 要望
+        format:      String(r[11] || '').trim(), // L: 納品形式
+        requester:   String(r[12] || '').trim(), // M: 依頼者
+        requestDate: String(r[13] || '').trim(), // N: 依頼日
+        deadline:    String(r[14] || '').trim(), // O: 納期
+        producer:    String(r[15] || '').trim(), // P: 製作者
+        status:      String(r[16] || '').trim(), // Q: ステータス
+        urgent:      String(r[18] || '').trim(), // S: 急きもの
+        cellUrl:     'https://docs.google.com/spreadsheets/d/' + SS_ID + '/edit#gid=' + sheetGid + '&range=G' + (i+1),
+      });
+    }
+  }
+  return { items, sheetGid };
+}
+
+function updateStatus(rowNum, status) {
+  getSheet().getRange(rowNum, 17).setValue(status); // Q列=17番目
+  return { ok: true };
+}
+
+function createFolders(storeName, itemName) {
+  const itemFolderName = storeName + '_' + itemName;
+  const parent = DriveApp.getFolderById(PARENT_FOLDER);
+  // 「〇〇_storeName」形式の既存フォルダを優先検索してから使う
+  const sf   = findStoreFolder(parent, storeName);
+  const itf  = getOrCreate(sf,   itemFolderName);
+  const outf = getOrCreate(itf,  'アウトプット');
+  const prod = getOrCreate(itf,  '制作データ');
+  const nd   = getOrCreate(prod, '入稿データ');
+  const nm   = getOrCreate(prod, '入稿前データ');
+  return {
+    ok: true, itemFolderName,
+    storeFolderUrl:  sf.getUrl(),
+    itemFolderUrl:   itf.getUrl(),
+    outputFolderUrl: outf.getUrl(),
+    nyukouDataUrl:   nd.getUrl(),
+    nyukouMaeUrl:    nm.getUrl(),
+  };
+}
+
+// 店舗名の正規化：先頭の番号プレフィックス除去 + 末尾「店」吸収 + 空白除去
+function normalizeStoreName(s) {
+  return String(s == null ? '' : s)
+    .replace(/　/g, '')               // 全角スペース除去
+    .replace(/\s+/g, '')                  // 半角スペース・改行除去
+    .replace(/^\d{1,4}(_\d{1,3})?_/, '')  // "080_" / "000_2_" / "999_" を除去
+    .replace(/店$/, '');                  // 末尾の「店」を吸収
+}
+
+// 番号無視・店有無吸収で店舗フォルダを探す。
+// 番号付き正準フォルダ（先頭が数字_）を最優先し、無ければ裸一致、それも無ければ新規作成。
+function findStoreFolder(parent, storeName) {
+  const key = normalizeStoreName(storeName);
+  const all = parent.getFolders();
+  let numberedMatch = null; // 例: 080_立川店（最優先）
+  let looseMatch    = null; // 例: 立川店 / 立川
+  while (all.hasNext()) {
+    const f = all.next();
+    const n = f.getName();
+    if (normalizeStoreName(n) !== key) continue;
+    if (/^\d{1,4}(_\d{1,3})?_/.test(n)) {
+      if (!numberedMatch) numberedMatch = f;
+    } else if (!looseMatch) {
+      looseMatch = f;
+    }
+  }
+  if (numberedMatch) return numberedMatch;
+  if (looseMatch)    return looseMatch;
+  return parent.createFolder(storeName);
+}
+
+function getOrCreate(parent, name) {
+  const it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+
+function postDelivery(token, channelId, store, storeNo, item, folderUrl, mentionId) {
+  var histRes = JSON.parse(UrlFetchApp.fetch(
+    'https://slack.com/api/conversations.history?channel=' + channelId + '&limit=200',
+    { headers: { Authorization: 'Bearer ' + token } }
+  ).getContentText());
+  if (!histRes.ok) throw new Error('history: ' + histRes.error);
+  var threadTs = null;
+  var msgs = histRes.messages || [];
+  for (var i = 0; i < msgs.length; i++) {
+    if ((msgs[i].text || '').trim() === store) { threadTs = msgs[i].ts; break; }
+  }
+  if (!threadTs) {
+    var parent = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+      method: 'post', contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + token },
+      payload: JSON.stringify({ channel: channelId, text: store }),
+    }).getContentText());
+    if (!parent.ok) throw new Error('parent: ' + parent.error);
+    threadTs = parent.ts;
+  }
+  var atMark  = '@';
+  var mention = mentionId ? '<' + atMark + mentionId + '> ' : '';
+  var label   = (storeNo ? storeNo + '_' : '') + store + '_' + item;
+  var text    = mention + label + '\nこちら納品いたします！\n' + folderUrl;
+  var reply = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+    method: 'post', contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: JSON.stringify({ channel: channelId, thread_ts: threadTs, text: text }),
+  }).getContentText());
+  if (!reply.ok) throw new Error('reply: ' + reply.error);
+  return { ok: true, ts: reply.ts, threadTs: threadTs };
+}
+
+function getGallery() {
+  const parent = DriveApp.getFolderById(PARENT_FOLDER);
+  const storeIter = parent.getFolders();
+  const gallery = [];
+  while (storeIter.hasNext()) {
+    const sf = storeIter.next();
+    const storeName = sf.getName();
+    const itemIter = sf.getFolders();
+    while (itemIter.hasNext()) {
+      const itf = itemIter.next();
+      const ifName = itf.getName();
+      const item = ifName.startsWith(storeName + '_') ? ifName.slice(storeName.length + 1) : ifName;
+      const outIter = itf.getFoldersByName('アウトプット');
+      if (!outIter.hasNext()) continue;
+      const outf = outIter.next();
+      const pdfIter = outf.getFilesByType(MimeType.PDF);
+      const pdfs = [];
+      while (pdfIter.hasNext()) {
+        const f = pdfIter.next();
+        pdfs.push({ id: f.getId(), name: f.getName(), url: f.getUrl(), updatedAt: f.getLastUpdated().getTime() });
+      }
+      if (!pdfs.length) continue;
+      gallery.push({ store: storeName, item, folderUrl: itf.getUrl(), pdfs });
+    }
+  }
+  return { gallery };
+}
+
+function ensureDailyReminder() {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    if (props.getProperty('reminderSetup') === '1') return;
+    ScriptApp.getProjectTriggers().forEach(function(t) {
+      if (t.getHandlerFunction() === 'runDailyCheck') ScriptApp.deleteTrigger(t);
+    });
+    ScriptApp.newTrigger('runDailyCheck').timeBased().everyDays(1).atHour(9).create();
+    props.setProperty('reminderSetup', '1');
+  } catch(e) { /* 権限なしの場合は無視 */ }
+}
+
+function postToSlack(token, channelId, storeName, itemName, posterName, mentionIds) {
+  // メンション文字列を構築
+  var atMark2 = '@';
+  const mentions = (mentionIds || '').split(',').filter(Boolean)
+    .map(id => '<' + atMark2 + id.trim() + '>').join(' ');
+  const msg = mentions
+    ? mentions + ' これから、' + storeName + '_' + itemName + 'に取り掛かります。'
+    : 'これから、' + storeName + '_' + itemName + 'に取り掛かります。';
+
+  // 既存スレッド（親メッセージ）を検索
+  var histRes = JSON.parse(UrlFetchApp.fetch(
+    'https://slack.com/api/conversations.history?channel=' + channelId + '&limit=200',
+    { headers: { Authorization: 'Bearer ' + token } }
+  ).getContentText());
+  if (!histRes.ok) throw new Error('Slack history error: ' + histRes.error);
+
+  var threadTs = null;
+  var msgs = histRes.messages || [];
+  for (var i = 0; i < msgs.length; i++) {
+    if ((msgs[i].text || '').trim() === storeName) {
+      threadTs = msgs[i].ts;
+      break;
+    }
+  }
+
+  // なければ親メッセージを新規作成
+  if (!threadTs) {
+    var newMsg = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + token },
+      payload: JSON.stringify({ channel: channelId, text: storeName }),
+    }).getContentText());
+    if (!newMsg.ok) throw new Error('Slack post parent error: ' + newMsg.error);
+    threadTs = newMsg.ts;
+  }
+
+  // スレッドにリプライ
+  var reply = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: JSON.stringify({ channel: channelId, thread_ts: threadTs, text: msg }),
+  }).getContentText());
+  if (!reply.ok) throw new Error('Slack reply error: ' + reply.error);
+
+  return { ok: true, ts: reply.ts, threadTs: threadTs };
+}
+
+function updateProducer(rowNum, name) {
+  getSheet().getRange(rowNum, 16).setValue(name); // P列
+  return { ok: true };
+}
+
+function getComments(token, channelId, threadTs) {
+  var res = JSON.parse(UrlFetchApp.fetch(
+    'https://slack.com/api/conversations.replies?channel=' + encodeURIComponent(channelId) + '&ts=' + encodeURIComponent(threadTs),
+    { headers: { Authorization: 'Bearer ' + token } }
+  ).getContentText());
+  if (!res.ok) throw new Error('Slack replies: ' + res.error);
+  var msgs = (res.messages || []).slice(1); // 親メッセージを除く
+  return { messages: msgs.map(function(m) {
+    return { text: m.text, username: m.username || m.user || '不明', ts: m.ts };
+  })};
+}
+
+function postComment(token, channelId, threadTs, text, posterName) {
+  var payload = { channel: channelId, thread_ts: threadTs, text: text };
+  if (posterName) { payload.username = posterName; payload.icon_emoji = ':speech_balloon:'; }
+  var res = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+    method: 'post', contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: JSON.stringify(payload),
+  }).getContentText());
+  if (!res.ok) throw new Error('Slack post: ' + res.error);
+  return { ok: true, ts: res.ts };
+}
+
+function getSlackMembers(token) {
+  var res = JSON.parse(UrlFetchApp.fetch(
+    'https://slack.com/api/users.list?limit=200',
+    { headers: { Authorization: 'Bearer ' + token } }
+  ).getContentText());
+  if (!res.ok) throw new Error('Slack users.list: ' + res.error);
+  var members = (res.members || [])
+    .filter(function(m) { return !m.deleted && !m.is_bot && m.id !== 'USLACKBOT'; })
+    .map(function(m) {
+      return { id: m.id, name: m.name, displayName: (m.profile && m.profile.display_name) || '', realName: m.real_name || '' };
+    });
+  return { members: members };
+}
+
+function postChatworkComment(cwToken, cwRoomId, text, posterName) {
+  var body = posterName ? '[info][title]' + posterName + '[/title]' + text + '[/info]' : text;
+  UrlFetchApp.fetch('https://api.chatwork.com/v2/rooms/' + cwRoomId + '/messages', {
+    method: 'post',
+    headers: { 'X-ChatWorkToken': cwToken },
+    payload: { body: body },
+  });
+  return { ok: true };
+}
+
+function notifyProducer(producerJson, message) {
+  var p = JSON.parse(producerJson);
+  var results = [];
+  // Slack DM
+  if ((p.notifyVia === 'slack' || p.notifyVia === 'both') && p.slackToken && p.slackUserId) {
+    try {
+      var dm = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/conversations.open', {
+        method: 'post', contentType: 'application/json',
+        headers: { Authorization: 'Bearer ' + p.slackToken },
+        payload: JSON.stringify({ users: p.slackUserId }),
+      }).getContentText());
+      if (dm.ok) {
+        var pr = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+          method: 'post', contentType: 'application/json',
+          headers: { Authorization: 'Bearer ' + p.slackToken },
+          payload: JSON.stringify({ channel: dm.channel.id, text: message }),
+        }).getContentText());
+        results.push({ type: 'slack', ok: pr.ok });
+      }
+    } catch(e) { results.push({ type: 'slack', ok: false, error: e.message }); }
+  }
+  // Chatwork
+  if ((p.notifyVia === 'chatwork' || p.notifyVia === 'both') && p.chatworkToken && p.chatworkRoomId) {
+    try {
+      UrlFetchApp.fetch('https://api.chatwork.com/v2/rooms/' + p.chatworkRoomId + '/messages', {
+        method: 'post',
+        headers: { 'X-ChatWorkToken': p.chatworkToken },
+        payload: { body: message },
+      });
+      results.push({ type: 'chatwork', ok: true });
+    } catch(e) { results.push({ type: 'chatwork', ok: false, error: e.message }); }
+  }
+  return { ok: true, results: results };
+}
+
+function storeSettings(json) {
+  PropertiesService.getScriptProperties().setProperty('slackSettings', json);
+  return { ok: true };
+}
+
+function setupDailyReminder() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'runDailyCheck') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('runDailyCheck').timeBased().everyDays(1).atHour(9).create();
+  return { ok: true };
+}
+
+function runDailyCheck() {
+  var props = PropertiesService.getScriptProperties();
+  var settingsStr = props.getProperty('slackSettings');
+  if (!settingsStr) return;
+  var settings;
+  try { settings = JSON.parse(settingsStr); } catch(e) { return; }
+  var items = getItems().items;
+  var today = new Date(); today.setHours(0,0,0,0);
+  items.forEach(function(item) {
+    if (item.status === '完了' || !item.deadline || !item.producer) return;
+    var dl = parseGasDate(item.deadline);
+    if (!dl) return;
+    var diff = Math.floor((dl - today) / 86400000);
+    if ([0,1,3,5].indexOf(diff) < 0) return;
+    var producer = (settings.accounts || []).find(function(a) { return a.name === item.producer; });
+    if (!producer) return;
+    var labels = {0:'【本日締切！】', 1:'【明日締切】', 3:'【締切3日前】', 5:'【締切5日前】'};
+    var msg = labels[diff] + '\n' + item.store + '_' + item.item + '\n締切: ' + item.deadline + '\nステータス: ' + (item.status || '未設定');
+    try { notifyProducer(JSON.stringify(producer), msg); } catch(e) { Logger.log(e); }
+  });
+}
+
+function parseGasDate(s) {
+  if (!s) return null;
+  var m = String(s).match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  m = String(s).match(/^(\d{1,2})\/(\d{1,2})$/);
+  if (m) return new Date(new Date().getFullYear(), +m[1]-1, +m[2]);
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function postRequest(token, channelId, store, storeNo, item, size, format, requester, requestDate, deadline, notes, urgent, mentionId) {
+  var histRes = JSON.parse(UrlFetchApp.fetch(
+    'https://slack.com/api/conversations.history?channel=' + channelId + '&limit=200',
+    { headers: { Authorization: 'Bearer ' + token } }
+  ).getContentText());
+  if (!histRes.ok) throw new Error('history: ' + histRes.error);
+  var threadTs = null;
+  var msgs = histRes.messages || [];
+  for (var i = 0; i < msgs.length; i++) {
+    if ((msgs[i].text || '').trim() === store) { threadTs = msgs[i].ts; break; }
+  }
+  if (!threadTs) {
+    var par = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+      method: 'post', contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + token },
+      payload: JSON.stringify({ channel: channelId, text: store }),
+    }).getContentText());
+    if (!par.ok) throw new Error('parent: ' + par.error);
+    threadTs = par.ts;
+  }
+  var atMark3 = '@';
+  var mention = mentionId ? '<' + atMark3 + mentionId + '>' : '';
+  var label = (storeNo ? storeNo + '_' : '') + store + '_' + item;
+  var lines = [
+    mention,
+    '【制作依頼】' + label,
+    size      ? 'サイズ: ' + size : '',
+    format    ? '納品形式: ' + format : '',
+    deadline  ? '納期: ' + deadline : '',
+    requester ? '依頼者: ' + requester : '',
+    urgent === 'true' ? '[急ぎ] 急ぎ案件' : '',
+    notes     ? '要望: ' + notes : '',
+  ].filter(Boolean).join('\n');
+  var reply = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
+    method: 'post', contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: JSON.stringify({ channel: channelId, thread_ts: threadTs, text: lines }),
+  }).getContentText());
+  if (!reply.ok) throw new Error('reply: ' + reply.error);
+  return { ok: true, ts: reply.ts, threadTs: threadTs };
+}
+
+function addRequest(storeName, itemName, size, notes, format, requester, requestDate, deadline, urgent) {
+  var sheet  = getSheet();
+  var values = sheet.getDataRange().getValues();
+  var storeGRow = -1;
+  for (var i = 0; i < values.length; i++) {
+    var h = String(values[i][7] || '').trim();
+    var g = String(values[i][6] || '').trim();
+    if (h === '3' && g === storeName) { storeGRow = i; break; }
+  }
+  if (storeGRow === -1) throw new Error('店舗が見つかりません: ' + storeName);
+  var insertAt = values.length + 1;
+  for (var j = storeGRow + 1; j < values.length; j++) {
+    var hj = String(values[j][7] || '').trim();
+    if (hj === '1') { insertAt = j + 1; break; }
+  }
+  var rowData = new Array(19).fill('');
+  rowData[8]  = itemName || '';
+  rowData[9]  = size || '';
+  rowData[10] = notes || '';
+  rowData[11] = format || '';
+  rowData[12] = requester || '';
+  rowData[13] = requestDate || '';
+  rowData[14] = deadline || '';
+  rowData[18] = (urgent === 'true') ? '急' : '';
+  if (insertAt > values.length) {
+    sheet.appendRow(rowData);
+    return { ok: true, rowNum: values.length + 1 };
+  } else {
+    sheet.insertRowBefore(insertAt);
+    sheet.getRange(insertAt, 1, 1, 19).setValues([rowData]);
+    return { ok: true, rowNum: insertAt };
+  }
+}
+
+function uploadReference(storeName, itemName, fileName, mimeType, base64data) {
+  var parent = DriveApp.getFolderById(PARENT_FOLDER);
+  var refFolder = getOrCreate(parent, '参考資料');
+  // 店舗フォルダ > アイテムフォルダ
+  var storeFolder = getOrCreate(refFolder, storeName || '共通');
+  var label = (itemName || '').substring(0, 50);
+  var targetFolder = label ? getOrCreate(storeFolder, label) : storeFolder;
+  var blob = Utilities.newBlob(Utilities.base64Decode(base64data), mimeType || 'application/octet-stream', fileName);
+  var file = targetFolder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { ok: true, url: file.getUrl(), id: file.getId() };
+}
+
+function getAiSuggestion(apiKey, mediaType, notes) {
+  if (!apiKey) throw new Error('API Keyが設定されていません');
+  var prompt = 'あなたは印刷・サインデザイン制作の専門アシスタントです。\n媒体: ' + mediaType + '\n要望・参考情報: ' + (notes || '特になし') + '\n\nこの制作物について日本語で簡潔に以下をアドバイスしてください：\n・代表的なサイズ候補（2〜3例）\n・デザインのポイント\n・制作時の注意点';
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
+  var res = UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  var data = JSON.parse(res.getContentText());
+  var cand = (data.candidates || [])[0] || {};
+  var text = ((((cand.content || {}).parts || [])[0]) || {}).text || 'AIの返答を取得できませんでした';
+  return { ok: true, suggestion: text };
+}</pre>
+        <button class="btn btn-primary btn-sm copy-code-btn" onclick="copyGasCode()">コードをコピー</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="step-row">
+          <span class="step-num">3</span>
+          <div class="step-text">
+            「デプロイ」→「新しいデプロイ」→「種類を選択」で <strong>ウェブアプリ</strong> を選択<br>
+            ・実行するユーザー: <strong>自分</strong><br>
+            ・アクセスできるユーザー: <strong>全員</strong><br>
+            → 「デプロイ」ボタンを押す → Googleアカウントを承認する
+          </div>
+        </div>
+        <div class="step-row">
+          <span class="step-num">4</span>
+          <div class="step-text">
+            表示された <strong>「ウェブアプリのURL」</strong> をコピーして下の欄に貼り付ける
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="form-row">
+          <span class="form-label">GAS URL</span>
+          <input class="form-input" id="gas-url-input" type="text"
+            placeholder="https://script.google.com/macros/s/.../exec">
+          <button class="btn btn-primary" onclick="saveGasUrl()">保存・接続</button>
+        </div>
+        <p class="form-hint" id="gas-url-hint"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── メインコンテンツ ── -->
+  <div id="main-content" style="display:none;">
+    <!-- ソートバー＋ビュー切り替え -->
+    <div class="sort-bar">
+      <span class="sort-lbl">並び替え</span>
+      <button class="sort-btn active" id="sort-btn-dl" onclick="setSort('deadline',this)">
+        納期順 <span id="sort-dl-arrow">↑</span>
+      </button>
+      <button class="sort-btn" id="sort-btn-st" onclick="setSort('status',this)">ステータス</button>
+      <button class="sort-btn" id="sort-btn-store" onclick="setSort('store',this)">店舗名</button>
+      <button class="sort-btn" id="sort-btn-rd" onclick="setSort('requestDate',this)">依頼日</button>
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-list" onclick="setView('list',this)" title="リスト表示">☰</button>
+        <button class="view-btn" id="view-card" onclick="setView('card',this)" title="カード表示">⊞</button>
+      </div>
+    </div>
+
+    <!-- カラムヘッダー（リストビューのみ） -->
+    <div id="list-header" style="display:flex;gap:6px;align-items:center;padding:4px 0 2px;font-size:.62rem;color:var(--muted2);font-family:var(--mono);">
+      <span style="flex:1;padding-left:14px;">制作アイテム名</span>
+      <span style="min-width:72px;text-align:center;">ステータス</span>
+      <span style="min-width:130px;text-align:left;padding-left:4px;">納期</span>
+      <span style="min-width:100px;padding-right:28px;">依頼日</span>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-tab active" onclick="setFilter('__active__',this)">
+        対応中 <span class="fcnt" id="cnt-active">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('依頼前',this)">
+        依頼前 <span class="fcnt" id="cnt-依頼前">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('依頼済',this)">
+        依頼済 <span class="fcnt" id="cnt-依頼済">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('制作中',this)">
+        制作中 <span class="fcnt" id="cnt-制作中">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('確認中',this)">
+        確認中 <span class="fcnt" id="cnt-確認中">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('修正中',this)">
+        修正中 <span class="fcnt" id="cnt-修正中">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('完了',this)">
+        完了 <span class="fcnt" id="cnt-完了">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('__all__',this)">全て</button>
+      <div class="filter-right">
+        <input class="search-input" id="search-input" type="text"
+          placeholder="店舗・制作物で検索..." oninput="render()">
+        <button class="reload-btn" onclick="reload()">↻ 更新</button>
+        <button class="btn btn-sm btn-secondary" onclick="showSetup()">⚙️</button>
+      </div>
+    </div>
+    <div id="items-container"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── 格納ガイドモーダル ── -->
+<div class="guide-overlay" id="guide-modal">
+  <div class="guide-modal">
+    <div class="guide-hdr">
+      <div class="guide-hdr-badge">✅ 完了しました</div>
+      <div class="guide-hdr-title" id="guide-title">制作物名</div>
+      <div class="guide-hdr-sub" id="guide-store">店舗名</div>
+    </div>
+    <div class="guide-body" id="guide-body"></div>
+    <div class="guide-footer">
+      <button class="guide-close-btn" onclick="closeGuide()">あとで行う</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 案件詳細モーダル ── -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-hdr">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px;" id="detail-store-label"></div>
+        <div class="modal-title" id="detail-item-label"></div>
+      </div>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- ── Drive モーダル ── -->
+<div class="modal-overlay" id="drive-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="modal-title">Drive フォルダ</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ── Slack 投稿モーダル ── -->
+<div class="slack-modal-overlay" id="slack-post-modal">
+  <div class="slack-modal">
+    <div class="slack-modal-hdr">
+      <div>
+        <div class="slack-modal-hdr-title">🚀 取り掛かります</div>
+        <div class="slack-modal-hdr-sub" id="slack-task-label">—</div>
+      </div>
+      <button class="slack-modal-close" onclick="closeSlackModal()">✕</button>
+    </div>
+    <div class="slack-modal-body">
+      <!-- 投稿アカウント -->
+      <div class="slack-field">
+        <div class="slack-label">投稿アカウント</div>
+        <select class="slack-select" id="slack-account-sel">
+          <option value="">— アカウントを選択 —</option>
+        </select>
+      </div>
+      <!-- 製作者選択 -->
+      <div class="slack-field">
+        <div class="slack-label">製作者（担当者）</div>
+        <select class="slack-select" id="slack-producer-sel">
+          <option value="">— 選択なし —</option>
+        </select>
+      </div>
+      <!-- メッセージプレビュー -->
+      <div class="slack-field">
+        <div class="slack-label">投稿プレビュー</div>
+        <div class="slack-preview">
+          <div class="slack-preview-channel" id="slack-preview-channel">
+            <span>#</span><span id="slack-preview-ch-name">...</span>
+            <span style="margin-left:4px;">›</span>
+            <span id="slack-preview-thread-name" style="color:var(--text);font-weight:600;">—</span>
+            <span style="margin-left:4px;">のスレッド</span>
+          </div>
+          <div class="slack-preview-msg" id="slack-preview-msg">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="slack-modal-footer">
+      <button class="slack-cancel-btn" onclick="closeSlackModal()">キャンセル</button>
+      <button class="slack-send-btn" id="slack-send-btn" onclick="sendSlackPost()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        送信
+      </button>
+      <span class="slack-settings-link" onclick="openSlackSettings()">⚙️ アカウント設定</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Slack アカウント設定モーダル ── -->
+<div class="slack-modal-overlay" id="slack-settings-modal">
+  <div class="slack-settings-modal">
+    <div class="slack-settings-hdr">
+      <div class="slack-settings-title">⚙️ Slack 設定</div>
+      <button class="slack-modal-close" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);"
+              onclick="closeSlackSettings()">✕</button>
+    </div>
+    <div class="slack-settings-body">
+
+      <!-- ワークスペース連携 -->
+      <div class="ws-section">
+        <div class="ws-section-title">ワークスペース連携</div>
+        <!-- Slack -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:6px;">Slack</div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
+            <input class="slack-inp" id="ws-slack-token" type="password" placeholder="Bot Token（xoxb-...）メンバー取得・コメント投稿用" style="flex:1;">
+            <button class="btn btn-sm btn-secondary" onclick="fetchSlackMembers()">メンバー取得</button>
+          </div>
+          <div id="ws-slack-status" style="font-size:.65rem;color:var(--muted2);min-height:16px;"></div>
+        </div>
+        <!-- Chatwork -->
+        <div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:6px;">Chatwork（「ワーカー」アカウントで投稿）</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input class="slack-inp" id="ws-cw-token" type="password" placeholder="Chatwork API Token" style="flex:1;">
+            <input class="slack-inp" id="ws-cw-room" placeholder="コメント投稿先 Room ID" style="width:160px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- チャンネルID -->
+      <div>
+        <div class="slack-section-title">投稿先チャンネル</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="slack-inp" id="sl-channel-id" placeholder="Slack チャンネル ID（例: C0A1B2C3D）" style="flex:1;">
+          <input class="slack-inp" id="sl-channel-name" placeholder="表示名（例: 制作管理）" style="width:160px;">
+        </div>
+        <div style="font-size:.65rem;color:var(--muted2);margin-top:4px;">
+          チャンネルIDはSlackのURLや「チャンネル詳細」から確認できます
+        </div>
+      </div>
+
+      <!-- メンションユーザー -->
+      <div>
+        <div class="slack-section-title">メンション（固定）</div>
+        <div style="display:flex;flex-direction:column;gap:6px;" id="mention-users-list"></div>
+        <div style="margin-top:8px;font-size:.65rem;color:var(--muted2);">
+          Slack のユーザー ID（U から始まる文字列）を入力してください
+        </div>
+      </div>
+
+      <!-- アカウント一覧 -->
+      <div>
+        <div class="slack-section-title">投稿アカウント一覧</div>
+        <div id="slack-accounts-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+
+        <!-- アカウント追加フォーム -->
+        <div class="slack-add-form" style="margin-top:10px;">
+          <div style="font-size:.72rem;font-weight:700;color:var(--muted);">+ アカウントを追加</div>
+          <input class="slack-inp" id="new-acc-name" placeholder="表示名（例: 山川鴻太）">
+          <input class="slack-inp" id="new-acc-token" placeholder="Slack User Token（xoxp-... または xoxb-...）" type="password">
+          <input class="slack-inp" id="new-acc-slackuid" placeholder="Slack User ID（U... 通知用）">
+          <select class="notify-via-sel" id="new-acc-notify" style="margin-top:2px;">
+            <option value="slack">Slackのみ</option>
+            <option value="chatwork">Chatworkのみ</option>
+            <option value="both">両方</option>
+          </select>
+          <input class="slack-inp" id="new-acc-cwtoken" placeholder="Chatwork API Token（通知用）" type="password">
+          <input class="slack-inp" id="new-acc-cwroom" placeholder="Chatwork Room ID（通知先）">
+          <div class="slack-add-row">
+            <button class="btn btn-sm btn-primary" onclick="addSlackAccount()" style="flex:1;">追加</button>
+          </div>
+          <div style="font-size:.62rem;color:var(--muted2);line-height:1.5;">
+            User Tokenは Slack API → OAuth & Permissions で取得できます。<br>
+            必要な権限: <code>channels:history</code>, <code>chat:write</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- 締切リマインダー -->
+      <div>
+        <div class="slack-section-title">締切リマインダー通知</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:8px;line-height:1.6;">
+          GASが毎日9時に締切を確認し、製作者に通知します。<br>
+          通知タイミング: <strong>5日前・3日前・前日・当日</strong>（ステータス「完了」以外）<br>
+          製作者がSlackの場合はDM、Chatworkの場合はルームに通知します。
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-secondary" onclick="storeSettingsToGas()">① GASに設定を同期</button>
+          <div style="font-size:.65rem;color:var(--muted2);padding-top:6px;">同期後、GASエディタで <code>setupDailyReminder()</code> を1回実行してください</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px;border-top:1px solid var(--border);">
+        <button class="slack-cancel-btn" onclick="closeSlackSettings()">キャンセル</button>
+        <button class="slack-send-btn" onclick="saveSlackSettings()" style="flex:unset;padding:9px 20px;">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 外部ツール連携モーダル ── -->
+<div class="slack-modal-overlay" id="integrations-modal">
+  <div class="slack-modal" style="max-width:560px;">
+    <div class="slack-modal-hdr">
+      <div>
+        <div class="slack-modal-hdr-title">外部ツールと連携する</div>
+        <div class="slack-modal-hdr-sub">連携するとコメント投稿・通知・メンバー選択が使えます</div>
+      </div>
+      <button class="slack-modal-close" onclick="closeIntegrations()">✕</button>
+    </div>
+    <div class="slack-modal-body" style="padding:0;">
+
+      <!-- ── Slack カード ── -->
+      <div class="intg-card" id="intg-slack-card">
+        <div class="intg-card-hdr" onclick="toggleIntgSection('slack')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;background:#4A154B;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:.85rem;">Slack</div>
+              <div style="font-size:.68rem;color:var(--muted);">eyecarelabo.slack.com</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+            <span id="intg-slack-badge" class="intg-badge intg-badge-off">未連携</span>
+            <span class="intg-arrow" id="intg-slack-arrow">▼</span>
+          </div>
+        </div>
+        <div class="intg-card-body" id="intg-slack-body" style="display:none;">
+          <!-- 接続済み -->
+          <div id="intg-slack-connected" style="display:none;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="font-size:1.2rem;">✅</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;">連携済み</div>
+                <div id="intg-slack-member-count" style="font-size:.68rem;color:var(--muted);"></div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="disconnectSlack()">連携を解除する</button>
+          </div>
+          <!-- 未接続 -->
+          <div id="intg-slack-setup">
+
+            <!-- ── スタート画面 ── -->
+            <div id="slack-start-panel">
+              <p style="font-size:.73rem;color:var(--muted);margin:0 0 12px;line-height:1.6;">Slackと連携するとコメント投稿・メンバー通知が使えます。</p>
+              <button onclick="slackWizardGo(1)"
+                style="width:100%;background:#4A154B;color:#fff;border:none;border-radius:8px;padding:11px;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+                🧭 ステップに沿って接続する
+              </button>
+              <div style="text-align:center;">
+                <span onclick="slackWizardGo(4)" style="font-size:.68rem;color:var(--teal);cursor:pointer;text-decoration:underline;">
+                  すでに Bot Token をお持ちの方はこちら →
+                </span>
+              </div>
+            </div>
+
+            <!-- ── ウィザード ── -->
+            <div id="slack-wizard-panel" style="display:none;">
+              <!-- プログレス -->
+              <div style="display:flex;align-items:center;gap:0;margin-bottom:14px;">
+                <div class="wiz-dot" id="wdot1">①</div>
+                <div class="wiz-line"></div>
+                <div class="wiz-dot" id="wdot2">②</div>
+                <div class="wiz-line"></div>
+                <div class="wiz-dot" id="wdot3">③</div>
+                <div class="wiz-line"></div>
+                <div class="wiz-dot" id="wdot4">④</div>
+              </div>
+
+              <!-- ① Appを作成 -->
+              <div class="wiz-step" id="wstep1">
+                <div style="font-weight:700;font-size:.8rem;margin-bottom:8px;">① Slack App を新規作成</div>
+                <p style="font-size:.72rem;color:var(--muted);line-height:1.75;margin:0 0 10px;">
+                  下のボタンからSlack APIページを開きます。<br>
+                  「<strong style="color:var(--text);">From scratch</strong>」を選択してください。
+                </p>
+                <a href="https://api.slack.com/apps?new_app=1" target="_blank" rel="noopener"
+                  style="display:flex;align-items:center;justify-content:center;gap:6px;background:#4A154B;color:#fff;border-radius:8px;padding:10px;font-size:.78rem;font-weight:700;text-decoration:none;margin-bottom:10px;">
+                  Slack API を開く ↗
+                </a>
+                <div style="background:var(--surface3);border-radius:6px;padding:10px;font-size:.72rem;color:var(--muted);line-height:1.8;margin-bottom:12px;">
+                  App Name → <code style="background:var(--surface2);color:var(--text);padding:1px 5px;border-radius:3px;">制作管理</code><br>
+                  Workspace → <code style="background:var(--surface2);color:var(--text);padding:1px 5px;border-radius:3px;">eyecarelabo</code><br>
+                  → 「Create App」をクリック
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span onclick="slackWizardBack()" style="font-size:.68rem;color:var(--muted);cursor:pointer;">← 最初に戻る</span>
+                  <button onclick="slackWizardGo(2)" style="background:var(--teal);color:#000;border:none;border-radius:6px;padding:8px 18px;font-size:.75rem;font-weight:700;cursor:pointer;">作成した → 次へ ›</button>
+                </div>
+              </div>
+
+              <!-- ② スコープ追加 -->
+              <div class="wiz-step" id="wstep2" style="display:none;">
+                <div style="font-weight:700;font-size:.8rem;margin-bottom:8px;">② Bot スコープを追加</div>
+                <p style="font-size:.72rem;color:var(--muted);line-height:1.75;margin:0 0 10px;">
+                  左メニュー →「<strong style="color:var(--text);">OAuth &amp; Permissions</strong>」<br>
+                  →「<strong style="color:var(--text);">Bot Token Scopes</strong>」に以下を追加：
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
+                  <code style="background:#1e293b;color:#5eead4;padding:4px 8px;border-radius:4px;font-size:.68rem;">channels:history</code>
+                  <code style="background:#1e293b;color:#5eead4;padding:4px 8px;border-radius:4px;font-size:.68rem;">channels:read</code>
+                  <code style="background:#1e293b;color:#5eead4;padding:4px 8px;border-radius:4px;font-size:.68rem;">chat:write</code>
+                  <code style="background:#1e293b;color:#5eead4;padding:4px 8px;border-radius:4px;font-size:.68rem;">users:read</code>
+                </div>
+                <p style="font-size:.7rem;color:var(--muted2);margin:0 0 12px;">「Add an OAuth Scope」で1つずつ追加できます。</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span onclick="slackWizardGo(1)" style="font-size:.68rem;color:var(--muted);cursor:pointer;">‹ 前へ</span>
+                  <button onclick="slackWizardGo(3)" style="background:var(--teal);color:#000;border:none;border-radius:6px;padding:8px 18px;font-size:.75rem;font-weight:700;cursor:pointer;">追加した → 次へ ›</button>
+                </div>
+              </div>
+
+              <!-- ③ インストール -->
+              <div class="wiz-step" id="wstep3" style="display:none;">
+                <div style="font-weight:700;font-size:.8rem;margin-bottom:8px;">③ ワークスペースにインストール</div>
+                <p style="font-size:.72rem;color:var(--muted);line-height:1.75;margin:0 0 12px;">
+                  同じページ上部の<br>「<strong style="color:var(--text);">Install to 株式会社アイケアラボ</strong>」をクリックし、<br>
+                  Slackの承認画面で「<strong style="color:var(--text);">許可する</strong>」を押します。
+                </p>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span onclick="slackWizardGo(2)" style="font-size:.68rem;color:var(--muted);cursor:pointer;">‹ 前へ</span>
+                  <button onclick="slackWizardGo(4)" style="background:var(--teal);color:#000;border:none;border-radius:6px;padding:8px 18px;font-size:.75rem;font-weight:700;cursor:pointer;">インストールした → 次へ ›</button>
+                </div>
+              </div>
+
+              <!-- ④ Token貼り付け -->
+              <div class="wiz-step" id="wstep4" style="display:none;">
+                <div style="font-weight:700;font-size:.8rem;margin-bottom:8px;">④ Bot Token を貼り付け</div>
+                <p style="font-size:.72rem;color:var(--muted);line-height:1.75;margin:0 0 8px;">
+                  「OAuth &amp; Permissions」ページの<br>「<strong style="color:var(--text);">Bot User OAuth Token</strong>」をコピーして貼り付けてください。
+                </p>
+                <input class="slack-inp" id="wiz-token-input" type="password"
+                  placeholder="xoxb-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXXXXXXXX"
+                  style="width:100%;margin-bottom:8px;font-family:var(--mono);font-size:.72rem;">
+                <button class="slack-send-btn" style="width:100%;justify-content:center;" onclick="testAndConnectSlack()">
+                  接続テスト → 連携する
+                </button>
+                <div id="wiz-status" style="font-size:.72rem;margin-top:6px;min-height:16px;text-align:center;"></div>
+                <div style="text-align:center;margin-top:6px;">
+                  <span onclick="slackWizardGo(3)" style="font-size:.68rem;color:var(--muted);cursor:pointer;">‹ 前へ</span>
+                </div>
+              </div>
+
+            </div><!-- /slack-wizard-panel -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Chatwork カード ── -->
+      <div class="intg-card" id="intg-cw-card" style="border-top:1px solid var(--border);">
+        <div class="intg-card-hdr" onclick="toggleIntgSection('cw')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;background:#00a9bf;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.372 0 0 4.925 0 11c0 3.332 1.63 6.315 4.2 8.315V24l4.07-2.237A13.3 13.3 0 0 0 12 22c6.628 0 12-4.925 12-11S18.628 0 12 0zm1.25 14.75l-3-3.25L4.75 15l5.75-6.25 3 3.25 5.5-3.5-5.75 6.25z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:.85rem;">Chatwork</div>
+              <div style="font-size:.68rem;color:var(--muted);">ワーカーアカウントで投稿</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+            <span id="intg-cw-badge" class="intg-badge intg-badge-off">未連携</span>
+            <span class="intg-arrow" id="intg-cw-arrow">▼</span>
+          </div>
+        </div>
+        <div class="intg-card-body" id="intg-cw-body" style="display:none;">
+          <!-- 接続済み -->
+          <div id="intg-cw-connected" style="display:none;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="font-size:1.2rem;">✅</span>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;">連携済み</div>
+                <div id="intg-cw-room-label" style="font-size:.68rem;color:var(--muted);"></div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="disconnectChatwork()">連携を解除する</button>
+          </div>
+          <!-- 未接続 -->
+          <div id="intg-cw-setup">
+            <div style="background:var(--surface3);border-radius:6px;padding:12px;margin-bottom:10px;font-size:.75rem;color:var(--muted);line-height:1.8;">
+              <strong style="color:var(--text);">手順</strong><br>
+              1. <a href="https://www.chatwork.com/service/packages/chatwork/subpackages/api/token.php" target="_blank" rel="noopener" style="color:var(--teal);">Chatwork APIトークンページ</a> を開く<br>
+              2. APIトークンをコピーして貼り付け<br>
+              3. コメントを投稿するルームのIDを入力（URLの room/ 以降の数字）
+            </div>
+            <input class="slack-inp" id="wiz-cw-token" type="password"
+              placeholder="Chatwork API Token"
+              style="width:100%;margin-bottom:6px;">
+            <input class="slack-inp" id="wiz-cw-room"
+              placeholder="コメント投稿先 Room ID（数字）"
+              style="width:100%;margin-bottom:8px;">
+            <button class="slack-send-btn" style="width:100%;justify-content:center;background:#00a9bf;" onclick="testAndConnectChatwork()">
+              接続テスト → 連携する
+            </button>
+            <div id="wiz-cw-status" style="font-size:.72rem;margin-top:6px;min-height:16px;text-align:center;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── 制作依頼モーダル ── -->
+<div class="slack-modal-overlay" id="request-modal">
+  <div class="slack-modal" style="max-width:620px;max-height:90vh;overflow-y:auto;">
+    <div class="slack-modal-hdr" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);position:sticky;top:0;z-index:1;">
+      <div>
+        <div class="slack-modal-hdr-title">✉️ 制作依頼する</div>
+        <div class="slack-modal-hdr-sub">入力後に発注 → シートに記録 + Slackに通知されます</div>
+      </div>
+      <button class="slack-modal-close" onclick="closeRequestModal()">✕</button>
+    </div>
+    <div class="slack-modal-body" style="padding:20px;">
+
+      <div class="req-grid">
+        <div class="req-field">
+          <label>店舗名 *</label>
+          <input type="text" id="req-store" placeholder="アイケアLaBo武蔵小山店" autocomplete="off"
+            oninput="reqAC('store',this.value)" onfocus="reqAC('store',this.value)" onblur="reqACClose('store')">
+          <div class="req-dropdown" id="req-store-dd"></div>
+        </div>
+        <div class="req-field" style="grid-column:1/-1;">
+          <label>制作アイテム/媒体 *</label>
+          <div id="req-items-list">
+            <div class="req-multi-row">
+              <input type="text" class="req-item-inp" placeholder="チラシ、のぼり、看板..." autocomplete="off">
+              <button type="button" class="req-remove-row-btn" onclick="removeReqRow(this,'req-items-list')" style="display:none">×</button>
+            </div>
+          </div>
+          <button type="button" class="req-add-row-btn" onclick="addReqItemRow()">＋ アイテムを追加</button>
+        </div>
+        <div class="req-field" style="grid-column:1/-1;">
+          <label>サイズ / 媒体数</label>
+          <div id="req-sizes-list">
+            <div class="req-multi-row">
+              <input type="text" class="req-size-inp" placeholder="A4、W600×H1800mm..." autocomplete="off">
+              <input type="text" class="qty-inp" placeholder="数量（例: 100枚）" autocomplete="off">
+              <button type="button" class="req-remove-row-btn" onclick="removeReqRow(this,'req-sizes-list')" style="display:none">×</button>
+            </div>
+          </div>
+          <button type="button" class="req-add-row-btn" onclick="addReqSizeRow()">＋ サイズを追加</button>
+        </div>
+        <div class="req-field">
+          <label>納品形式</label>
+          <input type="text" id="req-format" placeholder="ai、PDF、PNG..." autocomplete="off"
+            oninput="reqAC('format',this.value)" onfocus="reqAC('format',this.value)" onblur="reqACClose('format')">
+          <div class="req-dropdown" id="req-format-dd"></div>
+        </div>
+        <div class="req-field">
+          <label>依頼者</label>
+          <input type="text" id="req-requester" placeholder="鷲巣" autocomplete="off"
+            oninput="reqAC('requester',this.value)" onfocus="reqAC('requester',this.value)" onblur="reqACClose('requester')">
+          <div class="req-dropdown" id="req-requester-dd"></div>
+        </div>
+        <div class="req-field">
+          <label>納期</label>
+          <input type="date" id="req-deadline">
+        </div>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <div style="font-size:.68rem;color:var(--muted2);font-weight:700;margin-bottom:4px;">要望・参考資料URL</div>
+        <textarea class="req-textarea" id="req-notes" rows="2" placeholder="要望や参考資料のURLを入力..."></textarea>
+      </div>
+
+      <!-- 参考資料ファイルアップロード -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:.68rem;color:var(--muted2);font-weight:700;margin-bottom:6px;">📎 参考資料アップロード</div>
+        <div id="req-upload-area" class="req-upload-area"
+          onclick="document.getElementById('req-ref-files').click()"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="handleReqFileDrop(event)">
+          <input type="file" id="req-ref-files" multiple accept="image/*,.pdf,.ai,.eps,.zip,.psd" style="display:none" onchange="handleReqFileSelect(this.files)">
+          <div style="color:var(--muted2);font-size:.75rem;">📁 クリックまたはドラッグ＆ドロップでファイルを追加</div>
+          <div style="font-size:.62rem;color:var(--muted2);margin-top:4px;">対応: 画像・PDF・AI・EPS・ZIP・PSD（各ファイル最大20MB）</div>
+        </div>
+        <div id="req-ref-preview" style="margin-top:6px;"></div>
+        <div id="req-upload-progress" class="req-upload-progress" style="display:none;"></div>
+        <div style="font-size:.6rem;color:var(--muted2);margin-top:4px;">※ アップロードはGoogleドライブ「参考資料」フォルダに保存され、依頼シートにURLが記録されます</div>
+      </div>
+
+      <label style="display:flex;align-items:center;gap:6px;font-size:.75rem;margin-bottom:14px;cursor:pointer;">
+        <input type="checkbox" id="req-urgent"> ⚡ 急ぎ案件
+      </label>
+
+      <!-- ベースデータ候補 -->
+      <div style="margin-bottom:14px;">
+        <button id="base-cand-btn" onclick="showBaseCandidates()"
+          style="display:inline-flex;align-items:center;gap:6px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.75rem;font-weight:700;cursor:pointer;color:var(--text);">
+          📂 このデータかも
+        </button>
+        <span style="font-size:.62rem;color:var(--muted2);margin-left:8px;">媒体・店舗名から過去の制作データ候補を表示します</span>
+        <div id="base-candidates-panel" style="display:none;margin-top:10px;background:var(--surface3);border-radius:8px;padding:10px;"></div>
+      </div>
+
+      <!-- AI分析ボックス -->
+      <div class="ai-box">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:.78rem;font-weight:700;">🤖 AI アドバイス</span>
+          <button onclick="getReqAiSuggestion()" id="ai-suggest-btn"
+            style="background:#1a1a2e;color:#a78bfa;border:1px solid #4c1d95;border-radius:6px;padding:4px 10px;font-size:.68rem;font-weight:700;cursor:pointer;">
+            媒体・要望を分析する
+          </button>
+          <span style="font-size:.62rem;color:var(--muted2);">Gemini Flash 無料枠を使用</span>
+        </div>
+        <div style="margin-top:8px;">
+          <input type="password" id="req-gemini-key" placeholder="Google AI Studio API Key（無料）"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:.65rem;color:var(--text);outline:none;font-family:var(--mono);"
+            oninput="localStorage.setItem('aicare_seisaku_gemini_v1', this.value)">
+          <div style="font-size:.6rem;color:var(--muted2);margin-top:2px;">aistudio.google.com/app/apikey で無料取得できます</div>
+        </div>
+        <div class="ai-result" id="ai-result">媒体名を入力してから「分析する」を押してください。</div>
+      </div>
+
+      <!-- Slack未連携ガイド（連携済みなら非表示） -->
+      <div id="req-slack-guide" style="display:none;border:1.5px solid #f59e0b;border-radius:10px;background:#fffbeb;padding:14px 14px 10px;margin-bottom:10px;">
+        <div style="font-size:.8rem;font-weight:700;color:#92400e;margin-bottom:8px;">⚠️ Slackと連携すると、発注時に自動で通知が飛びます</div>
+        <div style="font-size:.72rem;color:#78350f;line-height:1.7;">
+          <b>STEP 1</b>　下のボタンから連携設定を開く<br>
+          <b>STEP 2</b>　「Slack連携」カードの「接続する」をクリック<br>
+          <b>STEP 3</b>　Bot Token（xoxb-...）を貼り付けて「保存」<br>
+          <b>STEP 4</b>　連携済みバッジが出たらこの画面に戻って発注
+        </div>
+        <button onclick="openIntegrations()" style="margin-top:10px;width:100%;background:#f59e0b;color:#fff;border:none;border-radius:7px;padding:8px;font-size:.76rem;font-weight:700;cursor:pointer;">
+          🔗 ツールと連携する →
+        </button>
+      </div>
+
+      <button class="req-submit-btn" id="req-submit-btn" onclick="submitRequest()">
+        📤 発注する → シートに記録＋Slackに通知
+      </button>
+      <div id="req-submit-status" style="font-size:.72rem;text-align:center;margin-top:6px;min-height:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ── 定数 ─────────────────────────────────────────
+const LS_GAS_URL    = 'aicare_seisaku_gas_url_v1';
+const LS_FOLDER_KEY = 'aicare_seisaku_folders_v1';
+const LS_SHEET_GID  = 'aicare_seisaku_sheet_gid_v1';
+const SS_ID_FRONT   = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
+const STATUS_LIST        = ['', '依頼前', '依頼済', '制作中', '確認中', '修正中', '完了'];
+const SLACK_DELIVERY_CH  = 'C0ANHC8B6QY'; // 納品通知チャンネル
+const SLACK_PRODUCTION_CH = 'C0AQKU2KL2D'; // 制作進行チャンネル
+const WASHIZU_SLACK_ID   = 'U0AKKRTQ006'; // Yuta Washizu / 鷲巣祐太 — 変更禁止
+
+// ── 状態 ─────────────────────────────────────────
+let GAS_URL       = '';
+let _items        = [];
+let _filter       = '__active__';
+let _modalItem    = null;
+let _refreshTimer = null;
+let _view         = 'list';   // 'list' | 'card'
+let _sortKey      = 'deadline';
+let _sortAsc      = true;
+let _sheetGid     = localStorage.getItem(LS_SHEET_GID) || null;
+
+// ── 初期化 ────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(LS_GAS_URL);
+  if (saved) {
+    GAS_URL = saved;
+    document.getElementById('gas-url-input').value = saved;
+    document.getElementById('card-setup').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+    loadData();
+    startRefresh();
+  }
+  updateIntegrationsBtn();
+});
+
+// ── セットアップ ──────────────────────────────────
+function saveGasUrl() {
+  const url   = document.getElementById('gas-url-input').value.trim();
+  const hint  = document.getElementById('gas-url-hint');
+  if (!url.startsWith('https://script.google.com/macros/')) {
+    hint.textContent = '⚠️ GASのURLを正確に貼り付けてください';
+    hint.style.color = 'var(--red)';
+    return;
+  }
+  GAS_URL = url;
+  localStorage.setItem(LS_GAS_URL, url);
+  hint.textContent = '✓ 保存しました。シートを読み込みます...';
+  hint.style.color = 'var(--green)';
+  document.getElementById('card-setup').style.display = 'none';
+  document.getElementById('main-content').style.display = '';
+  loadData();
+  startRefresh();
+}
+
+function toggleSetup() {
+  const body = document.getElementById('setup-body');
+  const hdr  = document.getElementById('card-setup');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+}
+function showSetup() {
+  document.getElementById('card-setup').style.display = '';
+  document.getElementById('setup-body').style.display = '';
+}
+
+// ── GAS 呼び出し ──────────────────────────────────
+async function gasGet(params) {
+  const url = GAS_URL + '?' + new URLSearchParams(params).toString();
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// ── データ読み込み ────────────────────────────────
+async function loadData() {
+  const c = document.getElementById('items-container');
+  c.innerHTML = '<div class="loading"><div class="spinner"></div><span>シートを読み込み中...</span></div>';
+  try {
+    const data = await gasGet({ action: 'getItems' });
+    if (data.error) throw new Error(data.error);
+    // フォルダキャッシュをマージ
+    if (data.sheetGid != null) {
+      _sheetGid = data.sheetGid;
+      localStorage.setItem(LS_SHEET_GID, _sheetGid);
+    }
+    _items = data.items.map(item => {
+      const key = folderKey(item.store, item.item);
+      return { ...item, folderKey: key, driveInfo: getFolderCache(key) };
+    });
+    updateCounts();
+    render();
+  } catch(e) {
+    c.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">読み込みエラー</div><div style="font-size:.75rem;color:var(--muted);">${esc(e.message)}</div><div style="margin-top:12px;font-size:.72rem;color:var(--muted2);">GAS URLが正しいか確認してください（⚙️ボタン）</div></div>`;
+    toast('読み込みエラー: ' + e.message, 'err');
+  }
+}
+
+async function reload() {
+  await loadData();
+  toast('最新データを取得しました', 'ok');
+}
+
+// ── ステータス更新 ────────────────────────────────
+async function changeStatus(itemId, newStatus) {
+  const item = getItem(itemId);
+  if (!item) return;
+  const sel = document.getElementById('sel_' + itemId);
+  if (sel) { sel.classList.add('saving'); sel.disabled = true; }
+  saveBar(true);
+  try {
+    const res = await gasGet({ action: 'updateStatus', row: item.rowNum, status: newStatus });
+    if (res.error) throw new Error(res.error);
+    item.status = newStatus;
+    if (sel) { sel.classList.remove('saving'); sel.classList.add('saved'); sel.disabled = false; }
+    setTimeout(() => { if (sel) sel.classList.remove('saved'); }, 1500);
+    saveBar(false);
+    updateCounts();
+    render();
+    // 詳細モーダル内のDriveセクション更新
+    const driveContent = document.getElementById('detail-drive-content');
+    if (driveContent && _modalItem && _modalItem.rowNum === item.rowNum) {
+      driveContent.innerHTML = renderDriveSectionHtml(item);
+    }
+    toast('保存しました', 'ok');
+    if (newStatus === '完了') setTimeout(() => openGuide(item), 400);
+  } catch(e) {
+    if (sel) { sel.classList.remove('saving'); sel.disabled = false; sel.value = item.status; }
+    saveBar(false);
+    toast('保存失敗: ' + e.message, 'err');
+  }
+}
+
+// ── Driveフォルダ作成 ─────────────────────────────
+async function doCreateFolders() {
+  const item = _modalItem;
+  if (!item) return;
+  const btn = document.getElementById('btn-mkfolder');
+  if (btn) { btn.disabled = true; btn.textContent = '作成中...'; }
+  try {
+    const res = await gasGet({ action: 'createFolders', store: item.store, item: item.item });
+    if (res.error) throw new Error(res.error);
+    const info = {
+      itemFolderName:  res.itemFolderName,
+      storeFolderUrl:  res.storeFolderUrl,
+      itemFolderUrl:   res.itemFolderUrl,
+      outputFolderUrl: res.outputFolderUrl,
+      nyukouDataUrl:   res.nyukouDataUrl,
+      nyukouMaeUrl:    res.nyukouMaeUrl,
+      createdAt: new Date().toISOString(),
+    };
+    saveFolderCache(item.folderKey, info);
+    item.driveInfo = info;
+    renderModalContent(item);
+    toast('フォルダを作成しました！', 'ok');
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📁 Driveフォルダを作成する'; }
+    toast('作成失敗: ' + e.message, 'err');
+  }
+}
+
+// ── レンダリング ──────────────────────────────────
+function render() {
+  const c     = document.getElementById('items-container');
+  const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+
+  const filtered = _items.filter(item => {
+    if (_filter === '__active__' && item.status === '完了') return false;
+    if (_filter !== '__active__' && _filter !== '__all__' && item.status !== _filter) return false;
+    if (query) {
+      if (!(item.store + ' ' + item.item).toLowerCase().includes(query)) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    const msg = _filter === '__active__' ? '対応中の案件はありません。全て完了です！' : '該当する案件がありません';
+    const ico = _filter === '__active__' ? '✅' : '📋';
+    c.innerHTML = `<div class="empty"><div class="empty-icon">${ico}</div><div class="empty-title">${msg}</div></div>`;
+    return;
+  }
+
+  // ソート
+  const sorted = sortItems(filtered);
+
+  // カードビュー
+  if (_view === 'card') {
+    const groups = {};
+    sorted.forEach(item => {
+      if (!groups[item.store]) groups[item.store] = [];
+      groups[item.store].push(item);
+    });
+    c.innerHTML = Object.entries(groups).map(([store, items]) => {
+      const gid  = 'g_' + nk(store);
+      const done     = items.filter(i => i.status === '完了').length;
+      const notStart = items.filter(i => !i.status || i.status === '依頼前').length;
+      const inProg   = items.length - done - notStart;
+      const storeNo  = items[0]?.storeNo ? `<span style="font-size:.68rem;color:var(--muted2);font-family:var(--mono);margin-right:6px;">${esc(items[0].storeNo)}</span>` : '';
+      const countBadges = `<span style="font-size:.65rem;color:var(--muted2);">計${items.length}件</span>
+        ${done?`<span style="font-size:.62rem;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:1px 7px;">完了 ${done}</span>`:''}
+        ${inProg?`<span style="font-size:.62rem;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:10px;padding:1px 7px;">対応中 ${inProg}</span>`:''}
+        ${notStart?`<span style="font-size:.62rem;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;padding:1px 7px;">未着手 ${notStart}</span>`:''}`;
+      const cards = items.map(item => renderCard(item)).join('');
+      return `<div class="card-store-group">
+        <div class="store-header" onclick="toggleGroup('${esc(gid)}')">
+          ${storeNo}<span class="store-name">${esc(store)}</span>
+          <div style="display:flex;gap:5px;align-items:center;margin-left:10px;">${countBadges}</div>
+          <span class="store-toggle" id="tog_${esc(gid)}">▼</span>
+        </div>
+        <div id="${esc(gid)}" style="padding-top:10px;">
+          <div class="card-grid">${cards}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // リストビュー（店舗グループ化）
+  const groups = {};
+  sorted.forEach(item => {
+    if (!groups[item.store]) groups[item.store] = [];
+    groups[item.store].push(item);
+  });
+
+  c.innerHTML = Object.entries(groups).map(([store, items]) => {
+    const gid      = 'g_' + nk(store);
+    const rows     = items.map(item => renderRow(item)).join('');
+    const done     = items.filter(i => i.status === '完了').length;
+    const notStart = items.filter(i => !i.status || i.status === '依頼前').length;
+    const inProg   = items.length - done - notStart;
+    // 店舗番号を取得（storeNoフィールドがあれば使う）
+    const storeNo  = items[0]?.storeNo ? `<span style="font-size:.68rem;color:var(--muted2);font-family:var(--mono);margin-right:6px;">${esc(items[0].storeNo)}</span>` : '';
+    const countBadges = `
+      <span style="font-size:.65rem;color:var(--muted2);">計${items.length}件</span>
+      ${done?`<span style="font-size:.62rem;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:1px 7px;">完了 ${done}</span>`:''}
+      ${inProg?`<span style="font-size:.62rem;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:10px;padding:1px 7px;">対応中 ${inProg}</span>`:''}
+      ${notStart?`<span style="font-size:.62rem;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;padding:1px 7px;">未着手 ${notStart}</span>`:''}`;
+    return `<div class="store-group">
+      <div class="store-header" onclick="toggleGroup('${esc(gid)}')">
+        ${storeNo}<span class="store-name">${esc(store)}</span>
+        <div style="display:flex;gap:5px;align-items:center;margin-left:10px;">${countBadges}</div>
+        <span class="store-toggle" id="tog_${esc(gid)}">▼</span>
+      </div>
+      <div class="store-items" id="${esc(gid)}">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRow(item) {
+  const dl    = deadlineInfo(item.deadline);
+  const iid   = 'r' + item.rowNum;
+  const stCls = item.status ? 'st-' + item.status : 'st-empty';
+  const stLbl = item.status || '未設定';
+  const dlFmt = formatDate(item.deadline);
+  const rdFmt = formatDate(item.requestDate);
+  const urgentMark = item.urgent ? '<span class="item-urgent">⚡急ぎ</span>' : '';
+
+  // 納期ラベル
+  let dlHtml = '';
+  if (dlFmt) {
+    dlHtml = `<div class="item-dl-wrap ${dl.cls}">
+      <span class="item-dl-lbl">納期</span>
+      <span class="item-dl-val">${esc(dlFmt)}</span>
+      ${dl.badge ? `<span class="item-dl-badge">${esc(dl.badge)}</span>` : ''}
+    </div>`;
+  } else {
+    dlHtml = `<div class="item-dl-wrap deadline-ok"><span class="item-dl-val">—</span></div>`;
+  }
+  // 依頼日（控えめ）
+  const rdHtml = rdFmt
+    ? `<span class="item-rd">依頼 ${esc(rdFmt)}</span>`
+    : '';
+
+  const stRowCls = item.status === '完了' ? 'completed' : (item.status ? 'st-row-' + item.status : '');
+  return `<div class="item-row ${stRowCls}" onclick="openDetailModal('${esc(iid)}')">
+    <div class="item-name-wrap">
+      <span class="item-name">${esc(item.item)}${urgentMark}</span>
+      ${item.size ? `<span class="item-size-tag">${esc(item.size)}</span>` : ''}
+    </div>
+    <span class="st-badge ${esc(stCls)}">${esc(stLbl)}</span>
+    ${dlHtml}
+    ${rdHtml}
+    ${item.producer ? `<span class="producer-tag">👤 ${esc(item.producer)}</span>` : ''}
+    <button class="start-btn" onclick="event.stopPropagation();openSlackModal('${esc(iid)}')">🚀 取り掛かります</button>
+    <span class="item-arrow">›</span>
+  </div>`;
+}
+
+function renderCard(item) {
+  const dl    = deadlineInfo(item.deadline);
+  const iid   = 'r' + item.rowNum;
+  const stCls = item.status ? 'st-' + item.status : 'st-empty';
+  const stLbl = item.status || '未設定';
+  const dlFmt = formatDate(item.deadline);
+  const rdFmt = formatDate(item.requestDate);
+
+  let dlHtml = '';
+  if (dlFmt) {
+    dlHtml = `<div class="item-dl-wrap ${dl.cls}" style="font-size:.78rem;">
+      <span class="item-dl-lbl">納期</span>
+      <span class="item-dl-val">${esc(dlFmt)}</span>
+      ${dl.badge ? `<span class="item-dl-badge">${esc(dl.badge)}</span>` : ''}
+    </div>`;
+  }
+
+  const stCardCls = item.status === '完了' ? 'completed' : (item.status ? 'st-card-' + item.status : '');
+  return `<div class="item-card ${stCardCls}" onclick="openDetailModal('${esc(iid)}')">
+    <div class="item-card-header">
+      <div style="flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <div class="item-name" style="font-size:.85rem;">${esc(item.item)}</div>
+        ${item.size ? `<span class="item-size-tag">${esc(item.size)}</span>` : ''}
+      </div>
+      <span class="st-badge ${esc(stCls)}">${esc(stLbl)}</span>
+    </div>
+    ${item.urgent ? `<div class="item-card-urgent">⚡ 急ぎ</div>` : ''}
+    <div class="item-card-meta">
+      ${dlHtml}
+      ${rdFmt ? `<span class="item-card-rd">依頼 ${esc(rdFmt)}</span>` : ''}
+    </div>
+    ${item.notes ? `<div style="font-size:.68rem;color:var(--muted2);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${esc(item.notes.replace(/https?:\/\/\S+/g,'').trim())}</div>` : ''}
+    ${item.producer ? `<div style="font-size:.65rem;color:var(--muted2);margin-top:2px;">👤 ${esc(item.producer)}</div>` : ''}
+    <button class="start-btn" style="align-self:flex-start;margin-top:2px;"
+            onclick="event.stopPropagation();openSlackModal('${esc(iid)}')">🚀 取り掛かります</button>
+  </div>`;
+}
+
+// ── 詳細モーダル ──────────────────────────────────
+function openDetailModal(iid) {
+  const item = getItem(iid);
+  if (!item) return;
+  _modalItem = item;
+  document.getElementById('detail-store-label').textContent = item.store || '';
+  document.getElementById('detail-item-label').textContent  = item.item  || '';
+  renderDetailContent(item);
+  updateCommentSectionStatus();
+  setTimeout(() => loadComments(item), 100);
+  document.getElementById('detail-modal').classList.add('open');
+}
+function closeDetailModal() {
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+async function startProductionFromDetail(iid) {
+  // ステータスを「制作中」に変更してからSlackモーダルを開く
+  const item = getItem(iid);
+  if (!item) return;
+  if (item.status !== '制作中') {
+    await changeStatus(iid, '制作中');
+    // ステータス変更後、セレクトボックスも更新
+    const sel = document.getElementById('sel_' + iid);
+    if (sel) sel.value = '制作中';
+  }
+  openSlackModal(iid);
+}
+document.getElementById('detail-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('detail-modal')) closeDetailModal();
+});
+
+function renderDetailContent(item) {
+  const body = document.getElementById('detail-body');
+  const dl   = deadlineInfo(item.deadline);
+  const dlCls = dl.cls.replace('deadline-','dl-');
+  const iid   = 'r' + item.rowNum;
+  const sel   = STATUS_LIST.map(s =>
+    `<option value="${esc(s)}" ${item.status===s?'selected':''}>${s||'(未設定)'}</option>`
+  ).join('');
+
+  // 要望フィールドからURLや画像を抽出
+  const notes    = item.notes || '';
+  const urls     = extractUrls(notes);
+  const driveIds = urls.map(u => extractDriveId(u)).filter(Boolean);
+  const otherUrls= urls.filter(u => !extractDriveId(u));
+
+  // ギャラリーHTML
+  let galleryHtml = '';
+  if (driveIds.length || otherUrls.length) {
+    galleryHtml = `
+      <div class="detail-section">
+        <div class="detail-section-title">参考資料</div>
+        <div class="gallery">
+          ${driveIds.map(id => `
+            <div class="gallery-img-wrap" onclick="window.open('https://drive.google.com/file/d/${esc(id)}/view','_blank')">
+              <img src="https://drive.google.com/thumbnail?id=${esc(id)}&sz=w300" alt="参考資料"
+                onerror="this.parentNode.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;font-size:.7rem;color:var(--muted);\'>📄 Drive</div>'">
+            </div>`).join('')}
+          ${otherUrls.map(u => `
+            <a class="gallery-link" href="${esc(u)}" target="_blank" rel="noopener">🔗 リンク</a>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // 要望テキスト（URL除去）
+  const notesText = notes.replace(/https?:\/\/\S+/g, '').trim();
+
+  body.innerHTML = `
+    ${item.urgent ? `<div class="detail-urgent-flag">⚡ 急ぎ対応</div>` : ''}
+
+    <!-- 基本情報 -->
+    <div class="detail-section">
+      <div class="detail-section-title">基本情報</div>
+      <div class="detail-grid">
+        <div class="detail-field">
+          <label>依頼日</label>
+          <div class="value">${esc(formatDate(item.requestDate) || '—')}</div>
+        </div>
+        <div class="detail-field">
+          <label>納期</label>
+          <div class="value ${dlCls}">${esc(formatDate(item.deadline) || '—')}${dl.badge?` <small style="font-size:.65rem;">(${esc(dl.badge)})</small>`:''}
+          </div>
+        </div>
+        <div class="detail-field">
+          <label>サイズ</label>
+          <div class="value">${esc(item.size || '—')}</div>
+        </div>
+        <div class="detail-field">
+          <label>納品形式</label>
+          <div class="value">${esc(item.format || '—')}</div>
+        </div>
+        <div class="detail-field">
+          <label>依頼者</label>
+          <div class="value">${esc(item.requester || '—')}</div>
+        </div>
+        <div class="detail-field">
+          <label>製作者</label>
+          <div class="value">${esc(item.producer || '—')}</div>
+          ${!item.producer ? `<button class="start-btn" style="margin-top:8px;width:100%;" onclick="startProductionFromDetail('${esc(iid)}')">🚀 取り掛かります</button>` : ''}
+        </div>
+        ${notesText ? `<div class="detail-field full">
+          <label>要望・指示</label>
+          <div class="detail-notes">${esc(notesText)}</div>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <!-- 参考資料 -->
+    ${galleryHtml}
+
+    <!-- ステータス変更 -->
+    <div class="detail-section">
+      <div class="detail-section-title">ステータス変更</div>
+      <select class="status-select" id="sel_${esc(iid)}"
+        onchange="changeStatus('${esc(iid)}',this.value)">${sel}</select>
+      <p style="font-size:.65rem;color:var(--muted2);margin-top:4px;">変更後すぐにスプレッドシートに保存されます</p>
+    </div>
+
+    <!-- Driveフォルダ（完了時のみ） -->
+    ${item.status === '完了' ? `
+    <div class="detail-section">
+      <div class="detail-section-title">Drive フォルダ</div>
+      <div id="detail-drive-content">${renderDriveSectionHtml(item)}</div>
+    </div>` : `<div id="detail-drive-content"></div>`}
+
+    <!-- コメント -->
+    <div class="detail-section">
+      <div class="detail-section-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        コメント・やりとり
+        <span id="cmt-connection-status" style="display:flex;gap:4px;align-items:center;"></span>
+        <span id="cmt-thread-link" style="margin-left:auto;"></span>
+        <button onclick="openIntegrations()" style="margin-left:4px;background:#4A154B;border:none;border-radius:6px;padding:4px 10px;font-size:.65rem;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-weight:700;" title="Slack・Chatworkと連携する">🔗 ツールと連携</button>
+      </div>
+      <div id="cmt-list"><div class="comments-empty">読み込み中...</div></div>
+      <div id="cmt-unconnected-notice" style="display:none;background:var(--surface3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:.72rem;color:var(--muted);line-height:1.7;">
+        💡 ツール連動・通知を使いたい場合は連携設定をしてください。<br>
+        <span onclick="openIntegrations()" style="color:var(--teal);cursor:pointer;font-weight:700;text-decoration:underline;">→ Slack / Chatwork を設定する</span>
+      </div>
+      <div class="comment-input-row" id="comment-input-area" style="margin-top:8px;">
+        <div class="poster-wrap">
+          <input class="poster-inp" id="cmt-poster-input" type="text" placeholder="投稿者を検索..." autocomplete="off"
+            oninput="filterPosters(this.value)" onfocus="openPosterDropdown()">
+          <div class="poster-dropdown" id="cmt-poster-dropdown"></div>
+          <input type="hidden" id="cmt-poster-name">
+          <input type="hidden" id="cmt-poster-via">
+        </div>
+        <textarea class="comment-textarea" id="cmt-textarea" placeholder="コメントを入力..."></textarea>
+        <button class="comment-send-btn" onclick="postNewComment()">送信</button>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border);">
+      ${(()=>{
+        const td = getThreadCache(item.store, item.item);
+        if (!td) return '';
+        const ts = td.threadTs.replace('.','');
+        const url = `https://eyecarelabo.slack.com/archives/${td.channelId}/p${ts}`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer"
+          style="display:inline-flex;align-items:center;gap:5px;background:#4A154B;color:#fff;border-radius:6px;padding:6px 12px;font-size:.72rem;font-weight:700;text-decoration:none;transition:opacity .15s;"
+          onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+          Slackに移動
+        </a>`;
+      })()}
+      ${(()=>{
+        const url = item.cellUrl
+          ? item.cellUrl
+          : `https://docs.google.com/spreadsheets/d/${SS_ID_FRONT}/edit#gid=${_sheetGid||''}&range=G${item.rowNum}`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer"
+          style="display:inline-flex;align-items:center;gap:5px;background:#188038;color:#fff;border-radius:6px;padding:6px 12px;font-size:.72rem;font-weight:700;text-decoration:none;transition:opacity .15s;"
+          onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+          シートを確認
+        </a>`;
+      })()}
+      <span style="font-size:.62rem;color:var(--muted2);font-family:var(--mono);margin-left:auto;">スプレッドシート ${esc(item.rowNum)} 行目</span>
+    </div>`;
+}
+
+function renderDriveSectionHtml(item) {
+  if (item.status !== '完了') return '';
+  if (!item.driveInfo) {
+    return `<button class="drive-btn" onclick="openGuide(getItem('r${item.rowNum}'))">📁 格納フォルダを作成する</button>
+      <p style="font-size:.65rem;color:var(--muted2);margin-top:6px;">完了済みのため格納フォルダを作成できます</p>`;
+  }
+  const d   = item.driveInfo;
+  const msg = `${d.itemFolderName} の入稿データ格納が完了しました！！ ご確認よろしくお願いします！！`;
+  const cfg = loadSlackCfg();
+  const slackOk = !!(cfg.workspace?.slackBotToken && cfg.slackMembers?.length);
+  return `
+    <!-- フォルダ参照ボタン -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+      <a href="${esc(d.itemFolderUrl)}" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;gap:5px;background:#1a73e8;color:#fff;border-radius:6px;padding:7px 12px;font-size:.75rem;font-weight:700;text-decoration:none;">
+        📁 格納フォルダを参照する
+      </a>
+      ${d.storeFolderUrl ? `<a href="${esc(d.storeFolderUrl)}" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;gap:5px;background:var(--surface3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:.75rem;font-weight:700;text-decoration:none;">
+        🏪 店舗の格納フォルダに移動する
+      </a>` : ''}
+    </div>
+    <div class="folder-action-btns">
+      <a class="folder-action-btn output" href="${esc(d.outputFolderUrl)}" target="_blank" rel="noopener">
+        📂 アウトプット
+      </a>
+      <a class="folder-action-btn nyukou" href="${esc(d.nyukouDataUrl)}" target="_blank" rel="noopener">
+        📂 入稿データ
+      </a>
+      <a class="folder-action-btn nyukomae" href="${esc(d.nyukouMaeUrl)}" target="_blank" rel="noopener">
+        📂 入稿前データ
+      </a>
+    </div>
+    <div style="margin-top:6px;">${fl('📁', d.itemFolderUrl, 'メインフォルダ（全体）')}</div>
+    <div style="margin-top:14px;">
+      <div style="font-size:.65rem;color:var(--muted2);margin-bottom:4px;">完了連絡メッセージ</div>
+      <div class="copy-box">
+        <div class="copy-text" id="cpmsg">${esc(msg)}</div>
+        <button class="copy-btn" id="cpbtn" onclick="copyMsg()">コピー</button>
+      </div>
+    </div>
+    ${slackOk ? `
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <button id="delivery-notify-btn" onclick="postDeliveryNotification(${item.rowNum})"
+        style="display:inline-flex;align-items:center;gap:6px;background:#4A154B;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:.75rem;font-weight:700;cursor:pointer;">
+        📤 納品通知をSlackに送る
+      </button>
+      <div id="delivery-notify-status" style="font-size:.68rem;color:var(--muted);margin-top:4px;"></div>
+    </div>` : ''}`;
+}
+
+// URL抽出・DriveID抽出
+function extractUrls(text) {
+  return (text.match(/https?:\/\/\S+/g) || []);
+}
+function extractDriveId(url) {
+  let m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  m = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  return null;
+}
+
+// 日付フォーマット
+function formatDate(s) {
+  const d = parseDate(s);
+  if (!d) return s || '';
+  const days = ['日','月','火','水','木','金','土'];
+  return `${d.getMonth()+1}/${d.getDate()}（${days[d.getDay()]}）`;
+}
+
+// ── 格納ガイドポップアップ ────────────────────────
+function openGuide(item) {
+  if (!item) return;
+  _modalItem = item;
+  document.getElementById('guide-title').textContent = item.item;
+  document.getElementById('guide-store').textContent = item.store;
+  renderGuideBody(item);
+  document.getElementById('guide-modal').classList.add('open');
+}
+function closeGuide() {
+  document.getElementById('guide-modal').classList.remove('open');
+}
+document.getElementById('guide-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('guide-modal')) closeGuide();
+});
+
+function renderGuideBody(item) {
+  const body = document.getElementById('guide-body');
+  const d    = item.driveInfo;
+
+  if (!d) {
+    // フォルダ未作成 → 作成ガイド
+    body.innerHTML = `
+      <div class="guide-step">
+        <div class="guide-step-num active">1</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">Drive フォルダを自動作成する</div>
+          <div class="guide-step-desc">
+            「${item.store}」の「${item.item}」用フォルダを自動作成します。<br>
+            アウトプット・入稿データ・入稿前データが一括作成されます。
+          </div>
+          <button class="drive-btn" id="guide-mkfolder-btn" onclick="doCreateFoldersFromGuide()">
+            📁 フォルダを作成する
+          </button>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num pending">2</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">完成PDFを「アウトプット」に格納</div>
+          <div class="guide-step-desc">フォルダ作成後に操作できます</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num pending">3</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">入稿データURLを取引先に共有</div>
+          <div class="guide-step-desc">フォルダ作成後に操作できます</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num pending">4</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">完了メッセージをコピーして送信</div>
+          <div class="guide-step-desc">フォルダ作成後に操作できます</div>
+        </div>
+      </div>`;
+  } else {
+    // フォルダ作成済み → 各フォルダへのボタン
+    const msg = `${d.itemFolderName} の入稿データ格納が完了しました！！ ご確認よろしくお願いします！！`;
+    body.innerHTML = `
+      <div class="guide-step">
+        <div class="guide-step-num done">✓</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">Drive フォルダ作成済み</div>
+          <div class="guide-step-desc">フォルダが正常に作成されています</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num active">2</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">完成PDFを「アウトプット」に格納</div>
+          <div class="guide-step-desc">完成したPDFをアウトプットフォルダに入れてください</div>
+          <a class="folder-action-btn output" href="${esc(d.outputFolderUrl)}" target="_blank" rel="noopener"
+             style="display:inline-flex;min-width:unset;padding:8px 16px;text-decoration:none;">
+            📂 アウトプットを開く
+          </a>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num active">3</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">入稿データを格納・取引先に共有</div>
+          <div class="guide-step-desc">取引先にURLを渡してデータを格納してもらう</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="folder-action-btn nyukou" href="${esc(d.nyukouDataUrl)}" target="_blank" rel="noopener"
+               style="display:inline-flex;min-width:unset;padding:8px 16px;text-decoration:none;">
+              📂 入稿データ
+            </a>
+            <a class="folder-action-btn nyukomae" href="${esc(d.nyukouMaeUrl)}" target="_blank" rel="noopener"
+               style="display:inline-flex;min-width:unset;padding:8px 16px;text-decoration:none;">
+              📂 入稿前データ
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num active">4</div>
+        <div class="guide-step-body">
+          <div class="guide-step-title">完了メッセージをコピーして送信</div>
+          <div class="copy-box" style="margin-top:6px;position:relative;">
+            <div class="copy-text" id="guide-cpmsg">${esc(msg)}</div>
+            <button class="copy-btn" onclick="cp(document.getElementById('guide-cpmsg').textContent, this)">コピー</button>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+async function doCreateFoldersFromGuide() {
+  const item = _modalItem;
+  if (!item) return;
+  const btn = document.getElementById('guide-mkfolder-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '作成中...'; }
+  try {
+    const res = await gasGet({ action: 'createFolders', store: item.store, item: item.item });
+    if (res.error) throw new Error(res.error);
+    const info = {
+      itemFolderName:  res.itemFolderName || item.store + '_' + item.item,
+      storeFolderUrl:  res.storeFolderUrl,
+      itemFolderUrl:   res.itemFolderUrl,
+      outputFolderUrl: res.outputFolderUrl,
+      nyukouDataUrl:   res.nyukouDataUrl,
+      nyukouMaeUrl:    res.nyukouMaeUrl,
+      createdAt: new Date().toISOString(),
+    };
+    saveFolderCache(item.folderKey, info);
+    item.driveInfo = info;
+    renderGuideBody(item);
+    // 詳細モーダルのDriveセクションも更新
+    const dc = document.getElementById('detail-drive-content');
+    if (dc) dc.innerHTML = renderDriveSectionHtml(item);
+    toast('フォルダを作成しました！', 'ok');
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📁 フォルダを作成する'; }
+    toast('作成失敗: ' + e.message, 'err');
+  }
+}
+
+// ── Driveモーダル（旧：互換） ─────────────────────
+function openModal(item) {
+  if (!item) return;
+  _modalItem = item;
+  document.getElementById('modal-title').textContent =
+    `${item.store} ／ ${item.item}`;
+  renderModalContent(item);
+  document.getElementById('drive-modal').classList.add('open');
+}
+
+function renderModalContent(item) {
+  const body = document.getElementById('modal-body');
+  if (!item.driveInfo) {
+    body.innerHTML = `
+      <div class="m-section">
+        <div class="info-box" style="margin-bottom:12px;">
+          Google Driveに制作フォルダを自動作成します。<br>
+          <code style="font-size:.72rem;color:var(--teal);">
+            ${esc(item.store)}<br>
+            └ ${esc(item.store + '_' + item.item)}<br>
+            &nbsp;&nbsp;├ アウトプット<br>
+            &nbsp;&nbsp;└ 制作データ / 入稿データ・入稿前データ
+          </code>
+        </div>
+        <button class="btn btn-green" id="btn-mkfolder" onclick="doCreateFolders()">
+          📁 Driveフォルダを作成する
+        </button>
+      </div>`;
+    return;
+  }
+
+  const d = item.driveInfo;
+  const msg = `${d.itemFolderName} の入稿データ格納が完了しました！！ ご確認よろしくお願いします！！`;
+
+  body.innerHTML = `
+    <!-- 完了 -->
+    <div class="m-section">
+      <div class="m-step-title"><span class="m-snum done">✓</span> フォルダ作成済み</div>
+      ${fl('📁', d.itemFolderUrl, d.itemFolderName + '（メインフォルダ）')}
+    </div>
+
+    <!-- アウトプット -->
+    <div class="m-section">
+      <div class="m-step-title"><span class="m-snum">2</span> PDFを格納</div>
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">完成PDFを「アウトプット」に入れてください</p>
+      ${fl('📂', d.outputFolderUrl, 'アウトプット')}
+    </div>
+
+    <!-- 入稿データ -->
+    <div class="m-section">
+      <div class="m-step-title"><span class="m-snum">3</span> 入稿データを格納</div>
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">PDF納入後、このURLを取引先に共有して格納してもらう</p>
+      ${fl('📂', d.nyukouDataUrl, '入稿データ')}
+    </div>
+
+    <!-- 入稿前データ -->
+    <div class="m-section">
+      <div class="m-step-title"><span class="m-snum">4</span> 入稿前データを格納</div>
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">次に入稿前データを格納するよう案内</p>
+      ${fl('📂', d.nyukouMaeUrl, '入稿前データ')}
+    </div>
+
+    <!-- コピーメッセージ -->
+    <div class="m-section">
+      <div class="m-step-title"><span class="m-snum">5</span> 完了メッセージ</div>
+      <div class="copy-box">
+        <div class="copy-text" id="cpmsg">${esc(msg)}</div>
+        <button class="copy-btn" id="cpbtn" onclick="copyMsg()">コピー</button>
+      </div>
+    </div>`;
+}
+
+function fl(icon, url, label) {
+  return `<div class="folder-row">
+    <span>${icon}</span>
+    <a class="folder-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>
+    <button class="f-copy" onclick="cp('${esc(url)}',this)">URLコピー</button>
+  </div>`;
+}
+
+function closeModal() {
+  document.getElementById('drive-modal').classList.remove('open');
+  _modalItem = null;
+}
+document.getElementById('drive-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('drive-modal')) closeModal();
+});
+
+// ── ビュー切り替え ────────────────────────────────
+function setView(v, btn) {
+  _view = v;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const hdr = document.getElementById('list-header');
+  if (hdr) hdr.style.display = v === 'list' ? 'flex' : 'none';
+  render();
+}
+
+// ── ソート ────────────────────────────────────────
+function setSort(key, btn) {
+  if (_sortKey === key) { _sortAsc = !_sortAsc; }
+  else { _sortKey = key; _sortAsc = true; }
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // 矢印更新
+  const arrow = document.getElementById('sort-dl-arrow');
+  if (arrow && key === 'deadline') arrow.textContent = _sortAsc ? '↑' : '↓';
+  render();
+}
+
+function sortItems(items) {
+  return [...items].sort((a, b) => {
+    let va, vb;
+    if (_sortKey === 'deadline' || _sortKey === 'requestDate') {
+      va = parseDate(a[_sortKey])?.getTime() || 9e15;
+      vb = parseDate(b[_sortKey])?.getTime() || 9e15;
+    } else if (_sortKey === 'status') {
+      const order = ['依頼前','依頼済','制作中','確認中','修正中','','完了'];
+      va = order.indexOf(a.status); vb = order.indexOf(b.status);
+      if (va < 0) va = 99; if (vb < 0) vb = 99;
+    } else {
+      va = (a[_sortKey] || '').toString();
+      vb = (b[_sortKey] || '').toString();
+      return _sortAsc ? va.localeCompare(vb,'ja') : vb.localeCompare(va,'ja');
+    }
+    return _sortAsc ? va - vb : vb - va;
+  });
+}
+
+// ── フィルター ────────────────────────────────────
+function setFilter(f, btn) {
+  _filter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active','active-all'));
+  if (btn) btn.classList.add(f === '__all__' ? 'active-all' : 'active');
+  render();
+}
+
+function updateCounts() {
+  const cnts = {};
+  STATUS_LIST.forEach(s => cnts[s] = 0);
+  let active = 0;
+  _items.forEach(item => {
+    cnts[item.status] = (cnts[item.status]||0) + 1;
+    if (item.status !== '完了') active++;
+  });
+  const el = id => document.getElementById(id);
+  el('cnt-active').textContent = active;
+  STATUS_LIST.filter(Boolean).forEach(s => {
+    const e = el('cnt-' + s);
+    if (e) e.textContent = cnts[s] || 0;
+  });
+}
+
+// ── 納期計算 ─────────────────────────────────────
+function deadlineInfo(s) {
+  const d = parseDate(s);
+  if (!d) return { cls: 'deadline-ok', badge: '' };
+  const diff = Math.floor((d - Date.now()) / 86400000);
+  if (diff < 0)  return { cls: 'deadline-over',   badge: `${Math.abs(diff)}日超過` };
+  if (diff <= 2) return { cls: 'deadline-urgent',  badge: `あと${diff}日` };
+  if (diff <= 7) return { cls: 'deadline-soon',    badge: `あと${diff}日` };
+  return { cls: 'deadline-ok', badge: '' };
+}
+function parseDate(s) {
+  if (!s) return null;
+  // YYYY-MM-DD / YYYY/MM/DD
+  let m = s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  // M/D
+  m = s.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if (m) return new Date(new Date().getFullYear(), +m[1]-1, +m[2]);
+  // M月D日
+  m = s.match(/(\d{1,2})月(\d{1,2})日/);
+  if (m) return new Date(new Date().getFullYear(), +m[1]-1, +m[2]);
+  // フォールバック（"Wed Apr 01 2026..." 等）
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// ── 自動更新（1時間）─────────────────────────────
+function startRefresh() {
+  if (_refreshTimer) clearInterval(_refreshTimer);
+  _refreshTimer = setInterval(() => loadData(), 3600000);
+}
+
+// ── localStorage ─────────────────────────────────
+function getFolderCache(k) {
+  try { const raw=localStorage.getItem(LS_FOLDER_KEY); return (raw?JSON.parse(raw):{})[k]||null; } catch(_){ return null; }
+}
+function saveFolderCache(k, v) {
+  try { const raw=localStorage.getItem(LS_FOLDER_KEY); const c=raw?JSON.parse(raw):{}; c[k]=v; localStorage.setItem(LS_FOLDER_KEY, JSON.stringify(c)); } catch(_){}
+}
+
+// ── ヘルパー ──────────────────────────────────────
+function getItem(id) { return _items.find(i => (i.id||'r'+i.rowNum) === id); }
+function folderKey(store, item) { return (store+'_'+item).replace(/[^\w\u3000-\u9fff\u30a0-\u30ff\u3040-\u309f]/g,'_').slice(0,80); }
+function nk(s) { return (s||'').replace(/[^\w]/g,'_').slice(0,40); }
+function esc(s) { return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function toggleGroup(id) {
+  const el = document.getElementById(id);
+  const tog = document.getElementById('tog_' + id);
+  if (!el) return;
+  const hide = el.style.display !== 'none';
+  el.style.display = hide ? 'none' : '';
+  if (tog) tog.classList.toggle('closed', hide);
+}
+
+function cp(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const o = btn.textContent; btn.textContent = '✓'; btn.style.color='var(--green)';
+    setTimeout(() => { btn.textContent=o; btn.style.color=''; }, 1500);
+  });
+}
+function copyMsg() {
+  const msg = document.getElementById('cpmsg')?.textContent || '';
+  const btn = document.getElementById('cpbtn');
+  navigator.clipboard.writeText(msg).then(() => {
+    btn.textContent = 'コピー済！'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent='コピー'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyGasCode() {
+  const code = document.getElementById('gas-code-block')?.textContent || '';
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = event.target;
+    btn.textContent = 'コピー済！'; btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.textContent='コードをコピー'; btn.style.background=''; }, 2000);
+  });
+}
+
+let _toastT;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type?' '+type:'');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.className='', 2800);
+}
+
+let _saveT;
+function saveBar(show) {
+  const bar = document.getElementById('save-bar');
+  if (show) { bar.classList.add('show'); }
+  else { clearTimeout(_saveT); _saveT=setTimeout(()=>bar.classList.remove('show'), 800); }
+}
+
+// ═══════════════════════════════════════════════════════
+// ── Slack 投稿機能 ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+const LS_SLACK = 'aicare_seisaku_slack_v1';
+
+// デフォルト設定
+const DEFAULT_SLACK_SETTINGS = {
+  channelId:   '',
+  channelName: '制作管理',
+  accounts: [],
+  mentionUsers: [
+    { name: 'Yuta Washizu / 鷲巣祐太',     userId: WASHIZU_SLACK_ID },
+    { name: 'kouta yamakawa / 山川鴻太', userId: '' },
+  ],
+  workspace: { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' },
+  slackMembers: [],
+};
+
+let _slackSettings = null;
+let _slackItem     = null; // 現在モーダルに表示中のitem
+
+function loadSlackCfg() {
+  if (_slackSettings) return _slackSettings;
+  try {
+    const raw = localStorage.getItem(LS_SLACK);
+    _slackSettings = raw ? { ...DEFAULT_SLACK_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SLACK_SETTINGS };
+  } catch(_) {
+    _slackSettings = { ...DEFAULT_SLACK_SETTINGS };
+  }
+  if (!_slackSettings.mentionUsers?.length) {
+    _slackSettings.mentionUsers = DEFAULT_SLACK_SETTINGS.mentionUsers;
+  }
+  // WashizuのIDは定数で固定 — localStorageの値を無視して常に上書き
+  const washizuEntry = _slackSettings.mentionUsers.find(u => u.name.includes('Washizu') || u.name.includes('鷲巣'));
+  if (washizuEntry) washizuEntry.userId = WASHIZU_SLACK_ID;
+  if (!_slackSettings.workspace) _slackSettings.workspace = { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' };
+  if (!_slackSettings.slackMembers) _slackSettings.slackMembers = [];
+  return _slackSettings;
+}
+
+function persistSlackCfg() {
+  localStorage.setItem(LS_SLACK, JSON.stringify(_slackSettings));
+}
+
+// ── 外部ツール連携モーダル ──────────────────────────────
+async function postDeliveryNotification(rowNum) {
+  const item  = getItem('r' + rowNum);
+  if (!item) return;
+  const cfg   = loadSlackCfg();
+  const token = cfg.workspace?.slackBotToken;
+  if (!token) { toast('Slackが未連携です', 'err'); return; }
+
+  const driveUrl = item.driveInfo?.nyukouDataUrl || item.driveInfo?.itemFolderUrl || '';
+  const btn      = document.getElementById('delivery-notify-btn');
+  const statusEl = document.getElementById('delivery-notify-status');
+  if (btn) { btn.disabled = true; btn.textContent = '送信中...'; }
+
+  try {
+    const res = await gasGet({
+      action:    'postDelivery',
+      token,
+      channelId: SLACK_DELIVERY_CH,
+      store:     item.store,
+      storeNo:   item.storeNo || '',
+      item:      item.item,
+      folderUrl: driveUrl,
+      mentionId: WASHIZU_SLACK_ID,
+    });
+    if (res.error) throw new Error(res.error);
+    toast('納品通知をSlackに送信しました ✅', 'ok');
+    if (btn)      { btn.disabled = false; btn.textContent = '✅ 送信済み'; }
+    if (statusEl) statusEl.textContent = '送信完了';
+  } catch(e) {
+    toast('送信失敗: ' + e.message, 'err');
+    if (btn)      { btn.disabled = false; btn.textContent = '📤 納品通知をSlackに送る'; }
+    if (statusEl) statusEl.textContent = '❌ ' + e.message;
+  }
+}
+
+function slackWizardGo(step) {
+  const start = document.getElementById('slack-start-panel');
+  const panel = document.getElementById('slack-wizard-panel');
+  if (!start || !panel) return;
+  start.style.display = 'none';
+  panel.style.display  = '';
+  [1,2,3,4].forEach(n => {
+    const s = document.getElementById('wstep' + n);
+    if (s) s.style.display = n === step ? '' : 'none';
+    const d = document.getElementById('wdot' + n);
+    if (d) { d.classList.toggle('done', n <= step); }
+  });
+}
+function slackWizardBack() {
+  const start = document.getElementById('slack-start-panel');
+  const panel = document.getElementById('slack-wizard-panel');
+  if (start) start.style.display = '';
+  if (panel) panel.style.display = 'none';
+}
+
+function updateCommentSectionStatus() {
+  const cfg     = loadSlackCfg();
+  const slackOk = !!(cfg.workspace?.slackBotToken && cfg.slackMembers?.length);
+  const cwOk    = !!(cfg.workspace?.chatworkToken && cfg.workspace?.chatworkRoomId);
+  const anyOk   = slackOk || cwOk;
+
+  // 連携状態バッジ
+  const statusEl = document.getElementById('cmt-connection-status');
+  if (statusEl) {
+    const badges = [];
+    if (slackOk) badges.push(`<span style="background:#4A154B;color:#fff;border-radius:4px;padding:1px 7px;font-size:.6rem;font-weight:700;">Slack連携済み</span>`);
+    if (cwOk)    badges.push(`<span style="background:#00a9bf;color:#fff;border-radius:4px;padding:1px 7px;font-size:.6rem;font-weight:700;">Chatwork連携済み</span>`);
+    statusEl.innerHTML = badges.join('');
+  }
+
+  // 未連携バナー表示切替
+  const notice = document.getElementById('cmt-unconnected-notice');
+  if (notice) notice.style.display = anyOk ? 'none' : '';
+
+  // 未連携時はコメント入力欄をグレーアウト
+  const inputArea = document.getElementById('comment-input-area');
+  if (inputArea) {
+    if (anyOk) {
+      inputArea.style.opacity = '';
+      inputArea.style.pointerEvents = '';
+      inputArea.title = '';
+    } else {
+      inputArea.style.opacity = '0.4';
+      inputArea.style.pointerEvents = 'none';
+      inputArea.title = 'Slack または Chatwork と連携すると入力できます';
+    }
+  }
+}
+
+function openIntegrations() {
+  const cfg = loadSlackCfg();
+  _refreshIntgUI(cfg);
+  const slackOk = !!(cfg.workspace?.slackBotToken && cfg.slackMembers?.length);
+  const cwOk    = !!(cfg.workspace?.chatworkToken && cfg.workspace?.chatworkRoomId);
+  // 未連携のカードを自動展開して接続テスト欄をすぐ表示
+  const slackBody  = document.getElementById('intg-slack-body');
+  const slackArrow = document.getElementById('intg-slack-arrow');
+  const cwBody     = document.getElementById('intg-cw-body');
+  const cwArrow    = document.getElementById('intg-cw-arrow');
+  if (!slackOk) { slackBody.style.display = ''; slackArrow.classList.add('open'); }
+  if (!cwOk)    { cwBody.style.display = '';    cwArrow.classList.add('open'); }
+  document.getElementById('integrations-modal').classList.add('open');
+}
+function closeIntegrations() {
+  document.getElementById('integrations-modal').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const im = document.getElementById('integrations-modal');
+  if (im) im.addEventListener('click', e => { if (e.target === im) closeIntegrations(); });
+  updateIntegrationsBtn();
+});
+
+function _refreshIntgUI(cfg) {
+  const slackOk = !!(cfg.workspace?.slackBotToken && cfg.slackMembers?.length);
+  const cwOk    = !!(cfg.workspace?.chatworkToken && cfg.workspace?.chatworkRoomId);
+
+  // Slack
+  document.getElementById('intg-slack-badge').textContent  = slackOk ? `接続済み (${cfg.slackMembers.length}名)` : '未連携';
+  document.getElementById('intg-slack-badge').className    = 'intg-badge ' + (slackOk ? 'intg-badge-on' : 'intg-badge-off');
+  document.getElementById('intg-slack-connected').style.display = slackOk ? '' : 'none';
+  document.getElementById('intg-slack-setup').style.display     = slackOk ? 'none' : '';
+  if (slackOk) document.getElementById('intg-slack-member-count').textContent = `${cfg.slackMembers.length}名のメンバーが連携済みです`;
+  document.getElementById('wiz-token-input').value = cfg.workspace?.slackBotToken || '';
+  document.getElementById('wiz-status').textContent = '';
+  // 連携済みならウィザードをリセット
+  if (slackOk) slackWizardBack();
+
+  // Chatwork
+  document.getElementById('intg-cw-badge').textContent  = cwOk ? '接続済み' : '未連携';
+  document.getElementById('intg-cw-badge').className    = 'intg-badge ' + (cwOk ? 'intg-badge-on' : 'intg-badge-off');
+  document.getElementById('intg-cw-connected').style.display = cwOk ? '' : 'none';
+  document.getElementById('intg-cw-setup').style.display     = cwOk ? 'none' : '';
+  if (cwOk) document.getElementById('intg-cw-room-label').textContent = `Room ID: ${cfg.workspace.chatworkRoomId}`;
+  document.getElementById('wiz-cw-token').value = cfg.workspace?.chatworkToken || '';
+  document.getElementById('wiz-cw-room').value  = cfg.workspace?.chatworkRoomId || '';
+  document.getElementById('wiz-cw-status').textContent = '';
+}
+
+function toggleIntgSection(tool) {
+  const body  = document.getElementById(`intg-${tool}-body`);
+  const arrow = document.getElementById(`intg-${tool}-arrow`);
+  const open  = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  arrow.classList.toggle('open', !open);
+}
+
+function updateIntegrationsBtn() {
+  const cfg   = loadSlackCfg();
+  const slackOk = !!(cfg.workspace?.slackBotToken && cfg.slackMembers?.length);
+  const cwOk    = !!(cfg.workspace?.chatworkToken && cfg.workspace?.chatworkRoomId);
+  const lbl   = document.getElementById('integrations-btn-label');
+  if (!lbl) return;
+  const count = [slackOk, cwOk].filter(Boolean).length;
+  lbl.textContent = count ? `ツール連携中 ${count}/2` : 'ツールと連携する';
+}
+
+async function testAndConnectSlack() {
+  const token    = document.getElementById('wiz-token-input').value.trim();
+  const statusEl = document.getElementById('wiz-status');
+  if (!token) { statusEl.textContent = '⚠️ Bot Tokenを入力してください'; statusEl.style.color = 'var(--red)'; return; }
+  if (!token.startsWith('xoxb-')) { statusEl.textContent = '⚠️ xoxb- で始まるBot Tokenを入力してください'; statusEl.style.color = 'var(--red)'; return; }
+  statusEl.textContent = '接続テスト中...'; statusEl.style.color = 'var(--muted)';
+  try {
+    const res = await gasGet({ action: 'getSlackMembers', token });
+    if (res.error) throw new Error(res.error);
+    const members = res.members || [];
+    const cfg = loadSlackCfg();
+    if (!cfg.workspace) cfg.workspace = {};
+    cfg.workspace.slackBotToken = token;
+    cfg.slackMembers = members;
+    persistSlackCfg();
+    statusEl.textContent = `✅ 接続成功！${members.length}名を取得しました`;
+    statusEl.style.color = 'var(--green)';
+    updateIntegrationsBtn();
+    updateCommentSectionStatus();
+    setTimeout(() => _refreshIntgUI(cfg), 600);
+  } catch(e) {
+    statusEl.textContent = '❌ 接続失敗: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
+}
+
+async function testAndConnectChatwork() {
+  const token    = document.getElementById('wiz-cw-token').value.trim();
+  const roomId   = document.getElementById('wiz-cw-room').value.trim();
+  const statusEl = document.getElementById('wiz-cw-status');
+  if (!token)  { statusEl.textContent = '⚠️ APIトークンを入力してください'; statusEl.style.color = 'var(--red)'; return; }
+  if (!roomId) { statusEl.textContent = '⚠️ Room IDを入力してください'; statusEl.style.color = 'var(--red)'; return; }
+  statusEl.textContent = '接続テスト中...'; statusEl.style.color = 'var(--muted)';
+  try {
+    // テスト: テキスト投稿（接続確認メッセージ）
+    const res = await gasGet({ action: 'postChatworkComment', cwToken: token, cwRoomId: roomId, text: '【制作管理】Chatwork連携テスト — 接続成功しました', posterName: 'ワーカー' });
+    if (res.error) throw new Error(res.error);
+    const cfg = loadSlackCfg();
+    if (!cfg.workspace) cfg.workspace = {};
+    cfg.workspace.chatworkToken  = token;
+    cfg.workspace.chatworkRoomId = roomId;
+    persistSlackCfg();
+    statusEl.textContent = '✅ 接続成功！Chatworkにテストメッセージを送信しました';
+    statusEl.style.color = 'var(--green)';
+    updateIntegrationsBtn();
+    updateCommentSectionStatus();
+    setTimeout(() => _refreshIntgUI(cfg), 600);
+  } catch(e) {
+    statusEl.textContent = '❌ 接続失敗: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
+}
+
+function disconnectSlack() {
+  if (!confirm('Slack連携を解除しますか？')) return;
+  const cfg = loadSlackCfg();
+  cfg.workspace.slackBotToken = '';
+  cfg.slackMembers = [];
+  persistSlackCfg();
+  _refreshIntgUI(cfg);
+  updateIntegrationsBtn();
+  updateCommentSectionStatus();
+  toast('Slack連携を解除しました', 'ok');
+}
+
+function disconnectChatwork() {
+  if (!confirm('Chatwork連携を解除しますか？')) return;
+  const cfg = loadSlackCfg();
+  cfg.workspace.chatworkToken  = '';
+  cfg.workspace.chatworkRoomId = '';
+  persistSlackCfg();
+  _refreshIntgUI(cfg);
+  updateIntegrationsBtn();
+  updateCommentSectionStatus();
+  toast('Chatwork連携を解除しました', 'ok');
+}
+
+// ── Slack メンバー取得 ──────────────────────────────────
+async function fetchSlackMembers() {
+  const token = document.getElementById('ws-slack-token').value.trim();
+  if (!token) { toast('Slack Bot Tokenを入力してください', 'err'); return; }
+  const statusEl = document.getElementById('ws-slack-status');
+  statusEl.innerHTML = '<span style="font-size:.65rem;color:var(--muted);">取得中...</span>';
+  try {
+    const res = await gasGet({ action: 'getSlackMembers', token });
+    if (res.error) throw new Error(res.error);
+    const members = res.members || [];
+    const cfg = loadSlackCfg();
+    cfg.slackMembers = members;
+    persistSlackCfg();
+    statusEl.innerHTML = `<span class="ws-connected-badge">✓ ${members.length}名のメンバーを取得しました</span>`;
+    toast(`${members.length}名のSlackメンバーを取得しました`, 'ok');
+  } catch(e) {
+    statusEl.innerHTML = `<span style="font-size:.65rem;color:var(--red);">取得失敗: ${esc(e.message)}</span>`;
+    toast('メンバー取得失敗: ' + e.message, 'err');
+  }
+}
+
+// ── 投稿モーダル ──────────────────────────────────────
+function openSlackModal(iid) {
+  const item = getItem(iid);
+  if (!item) return;
+  _slackItem = item;
+
+  const cfg = loadSlackCfg();
+  const label = `${item.store} ＿ ${item.item}`;
+  document.getElementById('slack-task-label').textContent = label;
+
+  // アカウント選択肢
+  const sel = document.getElementById('slack-account-sel');
+  sel.innerHTML = '<option value="">— アカウントを選択 —</option>' +
+    cfg.accounts.map((a, i) =>
+      `<option value="${i}">${esc(a.name)}</option>`
+    ).join('');
+  if (cfg.accounts.length === 1) sel.value = '0';
+
+  // 製作者ドロップダウン
+  const prodSel = document.getElementById('slack-producer-sel');
+  if (prodSel) {
+    prodSel.innerHTML = '<option value="">— 選択なし —</option>' +
+      cfg.accounts.map((a, i) => `<option value="${i}" ${item.producer === a.name ? 'selected' : ''}>${esc(a.name)}</option>`).join('');
+  }
+
+  // プレビュー更新
+  updateSlackPreview(item);
+
+  // selが変わったらプレビューも更新
+  sel.onchange = () => updateSlackPreview(item);
+
+  document.getElementById('slack-post-modal').classList.add('open');
+}
+
+function updateSlackPreview(item) {
+  const cfg    = loadSlackCfg();
+  const chName = cfg.channelName || cfg.channelId || '?';
+  const mentions = cfg.mentionUsers
+    .filter(u => u.userId)
+    .map(u => `<span class="slack-preview-mention">@${esc(u.name.split('/')[1]?.trim() || u.name)}</span>`)
+    .join(' ');
+  const mentionText = cfg.mentionUsers
+    .filter(u => u.userId)
+    .map(u => `<@${u.userId}>`)
+    .join(' ');
+
+  document.getElementById('slack-preview-ch-name').textContent  = chName;
+  document.getElementById('slack-preview-thread-name').textContent = item.store;
+  document.getElementById('slack-preview-msg').innerHTML =
+    `${mentions || '<span style="color:var(--muted2);">（メンションID未設定）</span>'} ` +
+    `これから、<strong>${esc(item.store)}_${esc(item.item)}</strong>に取り掛かります。`;
+}
+
+function closeSlackModal() {
+  document.getElementById('slack-post-modal').classList.remove('open');
+  _slackItem = null;
+}
+
+document.getElementById('slack-post-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('slack-post-modal')) closeSlackModal();
+});
+
+// ── Slack 送信 ────────────────────────────────────────
+async function sendSlackPost() {
+  const cfg     = loadSlackCfg();
+  const accIdx  = document.getElementById('slack-account-sel').value;
+  const item    = _slackItem;
+
+  if (!item) return;
+  if (accIdx === '') { toast('投稿アカウントを選択してください', 'err'); return; }
+  if (!cfg.channelId) { toast('チャンネルIDが未設定です（設定ボタンから設定）', 'err'); return; }
+
+  const account  = cfg.accounts[+accIdx];
+  const accountToken = account?.slackToken || account?.token;
+  if (!accountToken) { toast('選択アカウントのTokenが未設定です', 'err'); return; }
+
+  const btn = document.getElementById('slack-send-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  try {
+    // GAS 経由で Slack API 呼び出し
+    const res = await gasGet({
+      action:      'postToSlack',
+      token:       accountToken,
+      channelId:   cfg.channelId,
+      storeName:   item.store,
+      itemName:    item.item,
+      posterName:  account.name,
+      mentionIds:  cfg.mentionUsers.filter(u=>u.userId).map(u=>u.userId).join(','),
+    });
+    if (res.error) throw new Error(res.error);
+
+    // スレッドをキャッシュ保存
+    if (res.threadTs) {
+      saveThreadCache(item.store, item.item, { channelId: cfg.channelId, threadTs: res.threadTs });
+    }
+    // 製作者を更新
+    const prodIdx = document.getElementById('slack-producer-sel')?.value;
+    if (prodIdx !== '' && prodIdx !== undefined) {
+      const producer = cfg.accounts[+prodIdx];
+      if (producer) {
+        await gasGet({ action: 'updateProducer', row: item.rowNum, name: producer.name });
+        item.producer = producer.name;
+        render();
+        // 製作者に通知
+        const notifyMsg = `【制作アサイン通知】\nあなたが「${item.store}_${item.item}」の製作者に設定されました。\n締切: ${item.deadline || '未設定'}\nよろしくお願いします！`;
+        await gasGet({ action: 'notifyProducer', producerJson: JSON.stringify(producer), message: notifyMsg }).catch(() => {});
+      }
+    }
+
+    toast('Slackに送信しました！', 'ok');
+    closeSlackModal();
+  } catch(e) {
+    toast('送信失敗: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 送信`;
+  }
+}
+
+// ── 設定モーダル ──────────────────────────────────────
+function openSlackSettings() {
+  const cfg = loadSlackCfg();
+  document.getElementById('sl-channel-id').value   = cfg.channelId || '';
+  document.getElementById('sl-channel-name').value = cfg.channelName || '';
+  document.getElementById('ws-slack-token').value  = cfg.workspace?.slackBotToken || '';
+  document.getElementById('ws-cw-token').value     = cfg.workspace?.chatworkToken || '';
+  document.getElementById('ws-cw-room').value      = cfg.workspace?.chatworkRoomId || '';
+  const mem = cfg.slackMembers || [];
+  document.getElementById('ws-slack-status').innerHTML = mem.length
+    ? `<span class="ws-connected-badge">✓ ${mem.length}名のメンバー取得済み</span>`
+    : '';
+  renderMentionUsers(cfg);
+  renderAccountList(cfg);
+  document.getElementById('slack-settings-modal').classList.add('open');
+}
+
+function closeSlackSettings() {
+  document.getElementById('slack-settings-modal').classList.remove('open');
+}
+
+document.getElementById('slack-settings-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('slack-settings-modal')) closeSlackSettings();
+});
+
+function renderMentionUsers(cfg) {
+  const list = document.getElementById('mention-users-list');
+  list.innerHTML = cfg.mentionUsers.map((u, i) => `
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="font-size:.78rem;font-weight:600;min-width:220px;">${esc(u.name)}</div>
+      <input class="slack-inp" style="flex:1;"
+        placeholder="Slack User ID（U...）"
+        value="${esc(u.userId)}"
+        oninput="updateMentionId(${i}, this.value)">
+    </div>`).join('');
+}
+
+function updateMentionId(idx, val) {
+  const cfg = loadSlackCfg();
+  if (cfg.mentionUsers[idx]) cfg.mentionUsers[idx].userId = val.trim();
+}
+
+function renderAccountList(cfg) {
+  const list = document.getElementById('slack-accounts-list');
+  if (!cfg.accounts.length) {
+    list.innerHTML = '<div style="font-size:.75rem;color:var(--muted2);">アカウントがありません</div>';
+    return;
+  }
+  list.innerHTML = cfg.accounts.map((a, i) => `
+    <div class="slack-acc-item" style="flex-direction:column;align-items:stretch;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="flex:1;">
+          <div class="slack-acc-name">${esc(a.name)}</div>
+          <div class="slack-acc-token">${(a.slackToken||a.token) ? '●●●' + (a.slackToken||a.token).slice(-4) : 'Slack Token未設定'}
+            / 通知: ${a.notifyVia || 'slack'}</div>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="toggleAccEdit(${i})">▼ 編集</button>
+        <button class="slack-del-btn" onclick="deleteSlackAccount(${i})">削除</button>
+      </div>
+      <div class="acc-edit-form" id="acc-edit-${i}" style="display:none;">
+        <div class="acc-edit-row"><div class="acc-edit-lbl">Slack Token</div><input class="slack-inp" value="${esc(a.slackToken||a.token||'')}" placeholder="xoxp-..." type="password" oninput="updateAcc(${i},'slackToken',this.value)"></div>
+        <div class="acc-edit-row"><div class="acc-edit-lbl">Slack UserID</div><input class="slack-inp" value="${esc(a.slackUserId||'')}" placeholder="U..." oninput="updateAcc(${i},'slackUserId',this.value)"></div>
+        <div class="acc-edit-row"><div class="acc-edit-lbl">通知先</div>
+          <select class="notify-via-sel" onchange="updateAcc(${i},'notifyVia',this.value)">
+            <option value="slack" ${(a.notifyVia||'slack')==='slack'?'selected':''}>Slackのみ</option>
+            <option value="chatwork" ${a.notifyVia==='chatwork'?'selected':''}>Chatworkのみ</option>
+            <option value="both" ${a.notifyVia==='both'?'selected':''}>両方</option>
+          </select>
+        </div>
+        <div class="acc-edit-row"><div class="acc-edit-lbl">CW Token</div><input class="slack-inp" value="${esc(a.chatworkToken||'')}" placeholder="Chatwork API Token" type="password" oninput="updateAcc(${i},'chatworkToken',this.value)"></div>
+        <div class="acc-edit-row"><div class="acc-edit-lbl">CW Room ID</div><input class="slack-inp" value="${esc(a.chatworkRoomId||'')}" placeholder="Room ID (数字)" oninput="updateAcc(${i},'chatworkRoomId',this.value)"></div>
+      </div>
+    </div>`).join('');
+}
+
+function addSlackAccount() {
+  const name  = document.getElementById('new-acc-name').value.trim();
+  const token = document.getElementById('new-acc-token').value.trim();
+  const uid   = document.getElementById('new-acc-slackuid').value.trim();
+  const notify = document.getElementById('new-acc-notify').value;
+  const cwt   = document.getElementById('new-acc-cwtoken').value.trim();
+  const cwr   = document.getElementById('new-acc-cwroom').value.trim();
+  if (!name) { toast('名前を入力してください', 'err'); return; }
+  const cfg = loadSlackCfg();
+  cfg.accounts.push({ name, slackToken: token, slackUserId: uid, notifyVia: notify, chatworkToken: cwt, chatworkRoomId: cwr });
+  renderAccountList(cfg);
+  ['new-acc-name','new-acc-token','new-acc-slackuid','new-acc-cwtoken','new-acc-cwroom'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  toast('追加しました（「保存」を押して確定）', 'ok');
+}
+
+function toggleAccEdit(idx) {
+  const el = document.getElementById('acc-edit-' + idx);
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+function updateAcc(idx, field, val) {
+  const cfg = loadSlackCfg();
+  if (cfg.accounts[idx]) cfg.accounts[idx][field] = val;
+}
+
+function deleteSlackAccount(idx) {
+  if (!confirm('このアカウントを削除しますか？')) return;
+  const cfg = loadSlackCfg();
+  cfg.accounts.splice(idx, 1);
+  renderAccountList(cfg);
+}
+
+function saveSlackSettings() {
+  const cfg = loadSlackCfg();
+  cfg.channelId   = document.getElementById('sl-channel-id').value.trim();
+  cfg.channelName = document.getElementById('sl-channel-name').value.trim();
+  if (!cfg.workspace) cfg.workspace = {};
+  cfg.workspace.slackBotToken  = document.getElementById('ws-slack-token').value.trim();
+  cfg.workspace.chatworkToken  = document.getElementById('ws-cw-token').value.trim();
+  cfg.workspace.chatworkRoomId = document.getElementById('ws-cw-room').value.trim();
+  // mentionUsersはoninputで随時反映済み
+  persistSlackCfg();
+  toast('Slack設定を保存しました', 'ok');
+  closeSlackSettings();
+  // 投稿モーダルが開いていればプレビューを更新
+  if (_slackItem) updateSlackPreview(_slackItem);
+  // アカウント選択肢も更新
+  const sel = document.getElementById('slack-account-sel');
+  if (sel) {
+    sel.innerHTML = '<option value="">— アカウントを選択 —</option>' +
+      cfg.accounts.map((a, i) =>
+        `<option value="${i}">${esc(a.name)}</option>`
+      ).join('');
+  }
+}
+
+// ── 投稿者コンボボックス ──────────────────────────────────
+let _posterItems = []; // {label, id, via}
+
+function buildPosterItems() {
+  const cfg = loadSlackCfg();
+  _posterItems = (cfg.slackMembers || []).map(m => ({
+    label: m.displayName || m.realName || m.name,
+    id:    m.id,
+    via:   'slack',
+  }));
+  if (cfg.workspace?.chatworkToken) {
+    _posterItems.push({ label: 'ワーカー', id: 'worker', via: 'chatwork' });
+  }
+}
+
+function openPosterDropdown() {
+  buildPosterItems();
+  renderPosterDropdown(_posterItems);
+  document.getElementById('cmt-poster-dropdown').style.display = 'block';
+  // 外クリックで閉じる
+  setTimeout(() => {
+    document.addEventListener('click', closePosterOnOutside);
+  }, 0);
+}
+
+function closePosterOnOutside(e) {
+  const wrap = document.getElementById('poster-search-wrap') || document.querySelector('.poster-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('cmt-poster-dropdown').style.display = 'none';
+    document.removeEventListener('click', closePosterOnOutside);
+  }
+}
+
+function filterPosters(q) {
+  if (!_posterItems.length) buildPosterItems();
+  const lower = q.toLowerCase();
+  const filtered = _posterItems.filter(p => p.label.toLowerCase().includes(lower));
+  renderPosterDropdown(filtered);
+  document.getElementById('cmt-poster-dropdown').style.display = 'block';
+}
+
+function renderPosterDropdown(items) {
+  const el = document.getElementById('cmt-poster-dropdown');
+  if (!items.length) {
+    el.innerHTML = '<div class="poster-item" style="color:var(--muted2);cursor:default;">該当なし</div>';
+    return;
+  }
+  el.innerHTML = items.map((p, i) => `
+    <div class="poster-item${p.id === 'worker' ? ' worker-item' : ''}"
+         onmousedown="selectPoster('${esc(p.label)}','${esc(p.id)}','${esc(p.via)}')">
+      <span>${esc(p.label)}</span>
+      <span class="poster-via">${p.via === 'chatwork' ? 'CW' : 'Slack'}</span>
+    </div>`).join('');
+}
+
+function selectPoster(label, id, via) {
+  document.getElementById('cmt-poster-input').value = label;
+  document.getElementById('cmt-poster-name').value  = label;
+  document.getElementById('cmt-poster-via').value   = via;
+  document.getElementById('cmt-poster-dropdown').style.display = 'none';
+  document.removeEventListener('click', closePosterOnOutside);
+}
+
+// ── Thread キャッシュ ─────────────────────────────────
+const LS_THREADS = 'aicare_seisaku_threads_v1';
+function getThreadCache(store, item) {
+  try { const r = localStorage.getItem(LS_THREADS); return (r ? JSON.parse(r) : {})[store + '_' + item] || null; } catch(_) { return null; }
+}
+function saveThreadCache(store, item, data) {
+  try { const r = localStorage.getItem(LS_THREADS); const c = r ? JSON.parse(r) : {}; c[store + '_' + item] = data; localStorage.setItem(LS_THREADS, JSON.stringify(c)); } catch(_) {}
+}
+
+// ── コメント読み込み・投稿 ────────────────────────────
+async function loadComments(item) {
+  const listEl  = document.getElementById('cmt-list');
+  const linkEl  = document.getElementById('cmt-thread-link');
+  if (!listEl) return;
+
+  const cfg = loadSlackCfg();
+
+  // 投稿者コンボ初期化
+  buildPosterItems();
+
+  const td = getThreadCache(item.store, item.item);
+  if (!td) {
+    listEl.innerHTML = '<div class="comments-empty">スレッドなし。「取り掛かります」送信後に連動します。</div>';
+    return;
+  }
+
+  // Slackで開くリンク
+  if (linkEl) {
+    linkEl.innerHTML = `<a class="comment-sl-link" href="https://app.slack.com/client/${esc(td.channelId)}/${esc(td.threadTs)}" target="_blank" rel="noopener">Slackで開く ↗</a>`;
+  }
+
+  listEl.innerHTML = '<div class="comments-empty" style="padding:8px 0;">読み込み中...</div>';
+
+  try {
+    const token = cfg.accounts.find(a => a.slackToken || a.token)?.slackToken || cfg.accounts.find(a => a.token)?.token;
+    if (!token) { listEl.innerHTML = '<div class="comments-empty">Slack Token が未設定です</div>'; return; }
+    const res = await gasGet({ action: 'getComments', token, channelId: td.channelId, threadTs: td.threadTs });
+    if (res.error) throw new Error(res.error);
+    const msgs = res.messages || [];
+    if (!msgs.length) { listEl.innerHTML = '<div class="comments-empty">コメントがまだありません</div>'; return; }
+    listEl.innerHTML = '<div class="comments-thread">' + msgs.map(m => {
+      const ts = m.ts ? new Date(+m.ts.split('.')[0] * 1000).toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      return `<div class="comment-msg">
+        <div class="comment-meta">
+          <span class="comment-author">${esc(m.username || m.user || '?')}</span>
+          <span class="comment-time">${ts}</span>
+        </div>
+        <div class="comment-text">${esc(m.text)}</div>
+      </div>`;
+    }).join('') + '</div>';
+  } catch(e) {
+    listEl.innerHTML = `<div class="comments-empty">読み込みエラー: ${esc(e.message)}</div>`;
+  }
+}
+
+async function postNewComment() {
+  const cfg        = loadSlackCfg();
+  const text       = document.getElementById('cmt-textarea')?.value?.trim();
+  const posterName = document.getElementById('cmt-poster-name')?.value;
+  const posterVia  = document.getElementById('cmt-poster-via')?.value;
+  const item       = _modalItem;
+  if (!text)       { toast('コメントを入力してください', 'err'); return; }
+  if (!item)       return;
+  if (!posterName) { toast('投稿者を選択してください', 'err'); return; }
+
+  const btn = document.querySelector('.comment-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '送信中...'; }
+
+  try {
+    if (posterVia === 'chatwork') {
+      // Chatworkワーカーとして投稿
+      const cwToken  = cfg.workspace?.chatworkToken;
+      const cwRoomId = cfg.workspace?.chatworkRoomId;
+      if (!cwToken || !cwRoomId) { toast('Chatworkの設定が未完了です（設定 → ワークスペース連携）', 'err'); return; }
+      const res = await gasGet({ action: 'postChatworkComment', cwToken, cwRoomId, text, posterName });
+      if (res.error) throw new Error(res.error);
+    } else {
+      // Slack Botとして投稿
+      const botToken = cfg.workspace?.slackBotToken || cfg.accounts.find(a => a.slackToken || a.token)?.slackToken;
+      if (!botToken) { toast('Slack Bot Tokenが未設定です（設定 → ワークスペース連携）', 'err'); return; }
+      const td = getThreadCache(item.store, item.item);
+      if (!td) { toast('Slackスレッドが見つかりません。先に「取り掛かります」を実行してください', 'err'); return; }
+      const res = await gasGet({ action: 'postComment', token: botToken, channelId: td.channelId, threadTs: td.threadTs, text, posterName });
+      if (res.error) throw new Error(res.error);
+    }
+    document.getElementById('cmt-textarea').value = '';
+    document.getElementById('cmt-poster-input').value = '';
+    document.getElementById('cmt-poster-name').value  = '';
+    document.getElementById('cmt-poster-via').value   = '';
+    await loadComments(item);
+    toast('コメントを送信しました', 'ok');
+  } catch(e) {
+    toast('送信失敗: ' + e.message, 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '送信'; }
+  }
+}
+
+// ── GASに設定を同期 ───────────────────────────────────
+async function storeSettingsToGas() {
+  const cfg = loadSlackCfg();
+  try {
+    const res = await gasGet({ action: 'storeSettings', json: JSON.stringify(cfg) });
+    if (res.error) throw new Error(res.error);
+    toast('GASに設定を同期しました。GASで setupDailyReminder() を1回実行してリマインダーを有効化してください', 'ok');
+  } catch(e) {
+    toast('同期失敗: ' + e.message, 'err');
+  }
+}
+
+// ── 制作依頼フォーム ─────────────────────────────────
+const LS_REQ_HIST   = 'aicare_seisaku_req_hist_v1';
+const LS_GEMINI_KEY = 'aicare_seisaku_gemini_v1';
+
+// ── 複数行フィールド管理 ──────────────────────────────
+function addReqItemRow() {
+  const list = document.getElementById('req-items-list');
+  const row = document.createElement('div');
+  row.className = 'req-multi-row';
+  row.innerHTML = `<input type="text" class="req-item-inp" placeholder="チラシ、のぼり、看板..." autocomplete="off">
+    <button type="button" class="req-remove-row-btn" onclick="removeReqRow(this,'req-items-list')">×</button>`;
+  list.appendChild(row);
+  updateRemoveBtns('req-items-list', '.req-remove-row-btn');
+  row.querySelector('input').focus();
+}
+
+function addReqSizeRow() {
+  const list = document.getElementById('req-sizes-list');
+  const row = document.createElement('div');
+  row.className = 'req-multi-row';
+  row.innerHTML = `<input type="text" class="req-size-inp" placeholder="A4、W600×H1800mm..." autocomplete="off">
+    <input type="text" class="qty-inp" placeholder="数量（例: 100枚）" autocomplete="off">
+    <button type="button" class="req-remove-row-btn" onclick="removeReqRow(this,'req-sizes-list')">×</button>`;
+  list.appendChild(row);
+  updateRemoveBtns('req-sizes-list', '.req-remove-row-btn');
+  row.querySelector('input').focus();
+}
+
+function removeReqRow(btn, listId) {
+  const list = document.getElementById(listId);
+  const rows = list.querySelectorAll('.req-multi-row');
+  if (rows.length <= 1) return;
+  btn.closest('.req-multi-row').remove();
+  updateRemoveBtns(listId, '.req-remove-row-btn');
+}
+
+function updateRemoveBtns(listId, btnSel) {
+  const list = document.getElementById(listId);
+  const rows = list.querySelectorAll('.req-multi-row');
+  rows.forEach(r => {
+    const btn = r.querySelector(btnSel);
+    if (btn) btn.style.display = rows.length > 1 ? '' : 'none';
+  });
+}
+
+function getReqItems() {
+  return [...document.querySelectorAll('#req-items-list .req-item-inp')]
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+function getReqSizes() {
+  return [...document.querySelectorAll('#req-sizes-list .req-multi-row')]
+    .map(r => {
+      const sz = r.querySelector('.req-size-inp')?.value.trim() || '';
+      const qt = r.querySelector('.qty-inp')?.value.trim() || '';
+      if (!sz && !qt) return null;
+      return qt ? sz + ' × ' + qt : sz;
+    }).filter(Boolean);
+}
+
+// ── 参考資料ファイルアップロード ──────────────────────
+let _refFiles = [];
+
+function handleReqFileSelect(files) {
+  for (const f of files) _refFiles.push(f);
+  renderRefPreview();
+  document.getElementById('req-ref-files').value = '';
+}
+
+function handleReqFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('req-upload-area').classList.remove('dragover');
+  handleReqFileSelect(e.dataTransfer.files);
+}
+
+function renderRefPreview() {
+  const el = document.getElementById('req-ref-preview');
+  if (!_refFiles.length) { el.innerHTML = ''; return; }
+  el.innerHTML = _refFiles.map((f, i) =>
+    `<div class="req-upload-file-item">
+      <span>📄</span>
+      <span class="file-name">${esc(f.name)}</span>
+      <span style="font-size:.62rem;color:var(--muted2);">${(f.size/1024/1024).toFixed(1)}MB</span>
+      <button type="button" class="file-remove" onclick="removeRefFile(${i})">✕</button>
+    </div>`
+  ).join('');
+}
+
+function removeRefFile(idx) {
+  _refFiles.splice(idx, 1);
+  renderRefPreview();
+}
+
+async function uploadRefFiles(storeName, itemName) {
+  if (!_refFiles.length) return [];
+  const gasUrl = localStorage.getItem(LS_GAS_URL);
+  if (!gasUrl) return [];
+  const urls = [];
+  const prog = document.getElementById('req-upload-progress');
+  prog.style.display = '';
+  for (let i = 0; i < _refFiles.length; i++) {
+    const f = _refFiles[i];
+    prog.textContent = `📤 アップロード中 (${i+1}/${_refFiles.length}): ${f.name}`;
+    try {
+      const b64 = await fileToBase64(f);
+      const res = await gasPost({ action: 'uploadReference', store: storeName, item: itemName,
+        fileName: f.name, mimeType: f.type, data: b64 });
+      if (res.url) urls.push(res.url);
+    } catch(e) { console.warn('upload failed:', f.name, e); }
+  }
+  prog.style.display = 'none';
+  return urls;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+async function gasPost(params) {
+  const gasUrl = localStorage.getItem(LS_GAS_URL);
+  if (!gasUrl) throw new Error('GAS URLが未設定です');
+  const res = await fetch(gasUrl, {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: { 'Content-Type': 'application/json' },
+    redirect: 'follow',
+  });
+  return res.json();
+}
+
+function openRequestModal() {
+  // Gemini key restore
+  const gkey = localStorage.getItem(LS_GEMINI_KEY) || '';
+  const gkEl = document.getElementById('req-gemini-key');
+  if (gkEl && gkey) gkEl.value = gkey;
+  // Slack連携状態に応じてガイド表示
+  const slackConnected = !!(loadSlackCfg().workspace?.slackBotToken);
+  const guide = document.getElementById('req-slack-guide');
+  if (guide) guide.style.display = slackConnected ? 'none' : '';
+  document.getElementById('request-modal').classList.add('open');
+}
+function closeRequestModal() {
+  document.getElementById('request-modal').classList.remove('open');
+}
+
+function getReqHistory() {
+  try { return JSON.parse(localStorage.getItem(LS_REQ_HIST) || '{}'); } catch(_) { return {}; }
+}
+function saveReqHistory(field, value) {
+  if (!value) return;
+  const h = getReqHistory();
+  if (!h[field]) h[field] = [];
+  if (!h[field].includes(value)) { h[field].unshift(value); h[field] = h[field].slice(0, 30); }
+  localStorage.setItem(LS_REQ_HIST, JSON.stringify(h));
+}
+
+function buildReqCandidates(field) {
+  const hist = getReqHistory()[field] || [];
+  const fromItems = {
+    store:     [...new Set((_items||[]).map(i=>i.store).filter(Boolean))],
+    item:      [...new Set((_items||[]).map(i=>i.item).filter(Boolean))],
+    size:      [...new Set((_items||[]).map(i=>i.size).filter(Boolean))],
+    format:    [...new Set((_items||[]).map(i=>i.format).filter(Boolean))],
+    requester: [...new Set((_items||[]).map(i=>i.requester).filter(Boolean))],
+  }[field] || [];
+  return [...new Set([...hist, ...fromItems])];
+}
+
+function reqAC(field, val) {
+  const dd = document.getElementById('req-' + field + '-dd');
+  if (!dd) return;
+  const all = buildReqCandidates(field);
+  const q   = (val || '').toLowerCase();
+  const filtered = q ? all.filter(c => c.toLowerCase().includes(q)) : all;
+  if (!filtered.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = filtered.slice(0, 20).map(c =>
+    `<div class="req-dropdown-item" onmousedown="reqACSelect('${field}','${c.replace(/'/g,"\\'")}')">
+      ${c}
+    </div>`
+  ).join('');
+  dd.style.display = 'block';
+}
+
+function reqACClose(field) {
+  setTimeout(() => {
+    const dd = document.getElementById('req-' + field + '-dd');
+    if (dd) dd.style.display = 'none';
+  }, 150);
+}
+
+function reqACSelect(field, value) {
+  const inp = document.getElementById('req-' + field);
+  if (inp) inp.value = value;
+  reqACClose(field);
+}
+
+async function getReqAiSuggestion() {
+  const apiKey = (document.getElementById('req-gemini-key')?.value || '').trim();
+  if (!apiKey) {
+    document.getElementById('ai-result').textContent = '⚠️ Gemini API Keyを入力してください。aistudio.google.com/app/apikey で無料取得できます。';
+    return;
+  }
+  const mediaType = (document.getElementById('req-item')?.value || '').trim();
+  if (!mediaType) {
+    document.getElementById('ai-result').textContent = '⚠️ 制作アイテム/媒体を入力してください。';
+    return;
+  }
+  const notes = (document.getElementById('req-notes')?.value || '').trim();
+  const btn = document.getElementById('ai-suggest-btn');
+  const resultEl = document.getElementById('ai-result');
+  if (btn) { btn.disabled = true; btn.textContent = '分析中...'; }
+  resultEl.textContent = '🤖 AIが分析中です...';
+  try {
+    const res = await gasGet({ action: 'getAiSuggestion', apiKey, mediaType, notes });
+    if (res.error) throw new Error(res.error);
+    resultEl.textContent = res.suggestion;
+    localStorage.setItem(LS_GEMINI_KEY, apiKey);
+  } catch(e) {
+    resultEl.textContent = '❌ エラー: ' + e.message;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '媒体・要望を分析する'; }
+  }
+}
+
+async function submitRequest() {
+  const store     = (document.getElementById('req-store')?.value || '').trim();
+  const items     = getReqItems();
+  const sizes     = getReqSizes();
+  const item      = items.join('、') || '';
+  const size      = sizes.join('、') || '';
+  const format    = (document.getElementById('req-format')?.value || '').trim();
+  const requester = (document.getElementById('req-requester')?.value || '').trim();
+  const deadline  = (document.getElementById('req-deadline')?.value || '').trim();
+  const notes     = (document.getElementById('req-notes')?.value || '').trim();
+  const urgent    = document.getElementById('req-urgent')?.checked ? 'true' : 'false';
+
+  if (!store) { toast('店舗名を入力してください', 'err'); return; }
+  if (!item)  { toast('制作アイテム/媒体を入力してください', 'err'); return; }
+
+  // 参考資料ファイルアップロード
+  let refUrls = [];
+  if (_refFiles.length) {
+    try { refUrls = await uploadRefFiles(store, item); }
+    catch(e) { console.warn('ref upload error', e); }
+  }
+  const notesWithRef = notes + (refUrls.length ? '\n\n【参考資料】\n' + refUrls.join('\n') : '');
+
+  const btn    = document.getElementById('req-submit-btn');
+  const statEl = document.getElementById('req-submit-status');
+  if (btn) { btn.disabled = true; btn.textContent = '発注中...'; }
+
+  const today = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit' }).replace(/\//g,'/');
+
+  const errors = [];
+
+  // 1. シートに行追加
+  try {
+    statEl.textContent = '📊 シートに記録中...';
+    const res = await gasGet({ action: 'addRequest', store, item, size, notes: notesWithRef, format, requester, requestDate: today, deadline, urgent });
+    if (res.error) throw new Error(res.error);
+    statEl.textContent = `✅ シート ${res.rowNum} 行目に記録完了`;
+  } catch(e) {
+    errors.push('シート記録失敗: ' + e.message);
+    statEl.textContent = '⚠️ シート記録失敗（Slack通知は続行）';
+  }
+
+  // 2. Slack通知
+  const cfg = loadSlackCfg();
+  const token = cfg.workspace?.slackBotToken;
+  if (token) {
+    try {
+      statEl.textContent += '\n📣 Slackに通知中...';
+      // @kouta yamakawa を探す
+      const members = cfg.slackMembers || [];
+      const kouta = members.find(m =>
+        [m.name, m.realName, m.displayName].some(n => n && (
+          n.toLowerCase().includes('yamakawa') || n.includes('山川')
+        ))
+      );
+      // storeNo を探す
+      const storeItem = (_items||[]).find(i => i.store === store);
+      const storeNo   = storeItem?.storeNo || '';
+      const res2 = await gasGet({
+        action: 'postRequest',
+        token,
+        channelId: SLACK_PRODUCTION_CH,
+        store, storeNo, item, size, format, requester,
+        requestDate: today, deadline, notes: notesWithRef, urgent,
+        mentionId: kouta?.id || '',
+      });
+      if (res2.error) throw new Error(res2.error);
+    } catch(e) {
+      errors.push('Slack通知失敗: ' + e.message);
+    }
+  } else {
+    statEl.textContent += '\n⚠️ Slack未連携 — 上の案内から連携するとSlack通知も届きます';
+    // ガイドパネルを強調表示
+    const guide = document.getElementById('req-slack-guide');
+    if (guide) {
+      guide.style.display = '';
+      guide.style.animation = 'none';
+      guide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // 履歴保存
+  if (store)     saveReqHistory('store', store);
+  items.forEach(i => saveReqHistory('item', i));
+  sizes.forEach(s => saveReqHistory('size', s));
+  if (format)    saveReqHistory('format', format);
+  if (requester) saveReqHistory('requester', requester);
+
+  if (btn) { btn.disabled = false; btn.textContent = '📤 発注する → シートに記録＋Slackに通知'; }
+
+  if (errors.length) {
+    toast('一部エラーあり: ' + errors.join(' / '), 'err');
+  } else {
+    toast('発注完了！シート記録 + Slack通知しました ✅', 'ok');
+    _refFiles = [];
+    renderRefPreview();
+    closeRequestModal();
+    // データを再読み込み
+    setTimeout(() => loadData(), 1500);
+  }
+}
+
+// ── このデータかも ─────────────────────────────────────
+let _galleryCache = null;
+const MEDIA_KW_LIST = ['チラシ','のぼり','サインシート','バナー','ポスター','DM','看板','シール','カード','パンフレット','ステッカー','ボード','カッティング','幕','横断'];
+
+function extractReqMediaKw(text) {
+  for (const kw of MEDIA_KW_LIST) { if (text.includes(kw)) return kw; }
+  return text;
+}
+
+async function showBaseCandidates() {
+  const mediaType = (document.getElementById('req-item')?.value || '').trim();
+  const store     = (document.getElementById('req-store')?.value || '').trim();
+  if (!mediaType && !store) { toast('店舗名か媒体を入力してから押してください', 'err'); return; }
+
+  const btn   = document.getElementById('base-cand-btn');
+  const panel = document.getElementById('base-candidates-panel');
+  if (btn) { btn.disabled = true; btn.textContent = '検索中...'; }
+  panel.style.display = '';
+  panel.innerHTML = '<div style="font-size:.72rem;color:var(--muted);">データを取得中...</div>';
+
+  try {
+    // ギャラリーデータ取得（キャッシュ優先）
+    if (!_galleryCache) {
+      const res = await gasGet({ action: 'getGallery' });
+      if (res.error) throw new Error(res.error);
+      _galleryCache = res.gallery || [];
+    }
+
+    const targetKw = mediaType ? extractReqMediaKw(mediaType) : null;
+
+    // フィルタ: 媒体キーワードが一致 OR 店舗名が一致
+    let candidates = _galleryCache.filter(g =>
+      (targetKw && g.item.includes(targetKw)) ||
+      (store && g.store === store)
+    );
+
+    // PDFをflat化して更新日時降順（最新が先）でソート
+    const allPdfs = [];
+    candidates.forEach(g => {
+      g.pdfs.forEach(pdf => {
+        allPdfs.push({ ...pdf, store: g.store, item: g.item, folderUrl: g.folderUrl });
+      });
+    });
+    allPdfs.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+    if (!allPdfs.length) {
+      panel.innerHTML = '<div style="font-size:.72rem;color:var(--muted2);">該当するデータが見つかりませんでした。</div>';
+    } else {
+      const top = allPdfs.slice(0, 12);
+      panel.innerHTML = `
+        <div style="font-size:.65rem;color:var(--muted2);margin-bottom:8px;">最新順で ${allPdfs.length} 件ヒット — タップで開く</div>
+        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;">
+          ${top.map(p => `
+            <a href="https://drive.google.com/file/d/${esc(p.id)}/view" target="_blank" rel="noopener"
+              style="flex-shrink:0;width:90px;text-decoration:none;">
+              <div style="width:90px;height:120px;border-radius:6px;border:1px solid var(--border);overflow:hidden;background:var(--surface2);">
+                <img src="https://drive.google.com/thumbnail?id=${esc(p.id)}&sz=w150" alt="${esc(p.name)}"
+                  style="width:100%;height:100%;object-fit:cover;"
+                  onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;font-size:.7rem;color:var(--muted);\'>📄PDF</div>'">
+              </div>
+              <div style="font-size:.58rem;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.store)}</div>
+              <div style="font-size:.6rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.item)}</div>
+            </a>`).join('')}
+        </div>`;
+    }
+  } catch(e) {
+    panel.innerHTML = `<div style="font-size:.72rem;color:var(--red);">❌ ${esc(e.message)}</div>`;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📂 このデータかも'; }
+  }
+}
+
+// request modal close on overlay click
+document.addEventListener('DOMContentLoaded', () => {
+  const rm = document.getElementById('request-modal');
+  if (rm) rm.addEventListener('click', e => { if (e.target === rm) closeRequestModal(); });
+});
+</script>
+</body>
+</html>

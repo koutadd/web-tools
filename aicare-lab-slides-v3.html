@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店管理アプリ — LINEログ解析×業務効率化提案</title>
+<style>
+  :root {
+    --navy: #1e3a5f;
+    --navy-mid: #2d5986;
+    --navy-light: #4a90c4;
+    --accent: #0d9488;
+    --accent-light: #ccfbf1;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-800: #1e293b;
+    --slide-w: 1100px;
+    --slide-h: 618px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    background: #0a1628;
+    display: flex; flex-direction: column;
+    align-items: center; min-height: 100vh;
+    padding: 24px 16px; gap: 16px;
+  }
+
+  .wrap { position: relative; width: var(--slide-w); max-width: 100%; }
+
+  .slides-container {
+    width: var(--slide-w); height: var(--slide-h); max-width: 100%;
+    position: relative; overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.7);
+  }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Nav */
+  .nav-row { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; }
+  .nav-btn { background: rgba(255,255,255,.1); border: none; color: #fff; width: 42px; height: 42px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+  .nav-btn:hover { background: rgba(255,255,255,.22); }
+  .slide-counter { color: rgba(255,255,255,.6); font-size: 13px; min-width: 60px; text-align: center; }
+  .dots { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.25); cursor: pointer; transition: background .2s, transform .2s; }
+  .dot.active { background: var(--accent); transform: scale(1.4); }
+
+  /* Notes */
+  .hint { font-size: 11px; color: rgba(255,255,255,.3); text-align: center; }
+
+  /* ── Slide commons ── */
+  .si {
+    width: 100%; height: 100%;
+    background: var(--white);
+    display: flex; flex-direction: column;
+    padding: 46px 60px;
+    position: relative; overflow: hidden;
+  }
+  .si::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
+  }
+  .snum { position: absolute; bottom: 20px; right: 26px; font-size: 11px; color: var(--gray-400); letter-spacing: .07em; }
+  .slabel { font-size: 10px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .stitle { font-size: 25px; font-weight: 900; color: var(--navy); line-height: 1.35; margin-bottom: 6px; }
+  .stitle small { font-size: 17px; font-weight: 700; }
+  .ssub { font-size: 13px; color: var(--gray-500); line-height: 1.6; margin-bottom: 18px; }
+  .div { width: 44px; height: 4px; background: var(--accent); border-radius: 2px; margin-bottom: 22px; }
+
+  /* Grids */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+  /* Badge */
+  .bx { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .bx-nav { background: var(--navy); color: white; }
+  .bx-acc { background: var(--accent); color: white; }
+  .bx-red { background: var(--danger); color: white; }
+  .bx-warn { background: var(--warn); color: white; }
+  .bx-gray { background: var(--gray-200); color: var(--gray-600); }
+
+  /* Cards */
+  .card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 16px; }
+  .card-teal { background: var(--accent-light); border: 1px solid var(--accent); border-radius: 10px; padding: 16px; }
+  .card-red { background: #fff1f2; border: 1px solid #fecaca; border-radius: 10px; padding: 16px; }
+  .card-green { background: #f0fdf4; border: 1px solid #86efac; border-radius: 10px; padding: 16px; }
+
+  /* ── SLIDE 1: 表紙 ── */
+  #s1 .si {
+    background: linear-gradient(135deg, #0f2240 0%, #1a3a6a 60%, #163258 100%);
+    padding: 52px 68px; justify-content: center;
+  }
+  #s1 .si::before { display: none; }
+  #s1 .deco { position: absolute; border-radius: 50%; background: white; opacity: .05; }
+  #s1 .chip { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 5px 14px; color: rgba(255,255,255,.8); font-size: 12px; letter-spacing: .06em; margin-bottom: 26px; }
+  #s1 .mtitle { font-size: 36px; font-weight: 900; color: white; line-height: 1.28; margin-bottom: 14px; letter-spacing: -.01em; }
+  #s1 .mtitle em { color: #5dd8c8; font-style: normal; }
+  #s1 .msub { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.75; max-width: 560px; margin-bottom: 32px; }
+  #s1 .meta { display: flex; gap: 22px; }
+  #s1 .mi { font-size: 12px; color: rgba(255,255,255,.45); }
+  #s1 .mi strong { color: rgba(255,255,255,.75); display: block; font-size: 13px; margin-bottom: 2px; font-weight: 600; }
+  #s1 .data-tag { display: flex; align-items: center; gap: 10px; background: rgba(13,148,136,.25); border: 1px solid rgba(93,216,200,.4); border-radius: 8px; padding: 8px 14px; margin-bottom: 24px; font-size: 13px; color: #5dd8c8; }
+
+  /* ── SLIDE 2: ログ実態数字 ── */
+  #s2 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  #s2 .kpi { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 12px; padding: 18px 14px; text-align: center; }
+  #s2 .kpi.danger { background: #fff1f2; border-color: #fecaca; }
+  #s2 .kpi.warn { background: #fffbeb; border-color: #fcd34d; }
+  #s2 .kpi.navy { background: #eff6ff; border-color: #93c5fd; }
+  #s2 .kpi.teal { background: var(--accent-light); border-color: var(--accent); }
+  #s2 .kpi-num { font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  #s2 .kpi.danger .kpi-num { color: var(--danger); }
+  #s2 .kpi.warn .kpi-num { color: #b45309; }
+  #s2 .kpi.navy .kpi-num { color: var(--navy); }
+  #s2 .kpi.teal .kpi-num { color: var(--accent); }
+  #s2 .kpi-label { font-size: 12px; color: var(--gray-600); }
+  #s2 .kpi-sub { font-size: 10px; color: var(--gray-400); margin-top: 3px; }
+  #s2 .info-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  #s2 .info-box { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px 14px; }
+  #s2 .info-box .ib-label { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; }
+  #s2 .info-box .ib-val { font-size: 18px; font-weight: 800; color: var(--navy); }
+  #s2 .info-box .ib-sub { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+  #s2 .source-note { font-size: 11px; color: var(--gray-400); text-align: right; margin-top: 8px; }
+
+  /* ── SLIDE 3: 現場課題 ── */
+  #s3 .issue { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 15px 16px; display: flex; align-items: flex-start; gap: 11px; }
+  #s3 .issue .ico { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+  #s3 .issue h3 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+  #s3 .issue p { font-size: 12px; color: var(--gray-500); line-height: 1.5; }
+  #s3 .issue .voice { margin-top: 7px; font-size: 11px; color: #92400e; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 5px 9px; border-radius: 0 5px 5px 0; font-style: italic; }
+
+  /* ── SLIDE 4: LINE限界 ── */
+  #s4 .lf { display: flex; flex-direction: column; gap: 5px; }
+  #s4 .lf-msg { background: #e0f2fe; border-radius: 10px 10px 10px 3px; padding: 8px 12px; font-size: 12px; color: #0c4a6e; max-width: 300px; }
+  #s4 .lf-msg.r { background: #dcfce7; color: #166534; border-radius: 10px 10px 3px 10px; align-self: flex-end; }
+  #s4 .lf-note { font-size: 10px; color: var(--gray-400); margin: 1px 0; }
+  #s4 .lf-bad { background: #fee2e2; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #991b1b; margin-top: 4px; }
+  #s4 .limit { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: var(--gray-800); line-height: 1.5; margin-bottom: 10px; }
+  #s4 .limit .n { width: 20px; height: 20px; border-radius: 50%; background: var(--danger); color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SLIDE 5: 何が変わるか ── */
+  #s5 .ba { display: grid; grid-template-columns: 1fr 34px 1fr; gap: 0; align-items: center; flex: 1; }
+  #s5 .ba-col { height: 100%; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 9px; }
+  #s5 .ba-col.bf { background: #fff1f2; border: 1.5px solid #fecaca; }
+  #s5 .ba-col.af { background: #f0fdf4; border: 1.5px solid #86efac; }
+  #s5 .ba-lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; margin-bottom: 4px; }
+  #s5 .ba-lbl.b { color: #dc2626; } #s5 .ba-lbl.a { color: #16a34a; }
+  #s5 .ba-row { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; line-height: 1.4; color: var(--gray-800); }
+  #s5 .ba-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  #s5 .arr { display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 18px; }
+
+  /* ── SLIDE 6: カテゴリ別削減 ── */
+  #s6 .cat-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  #s6 .cat-item { display: grid; grid-template-columns: 120px 1fr 80px 90px 90px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; }
+  #s6 .cat-item.h { background: var(--navy); color: white; font-size: 11px; font-weight: 600; padding: 8px 14px; }
+  #s6 .cat-item.d { background: var(--gray-50); border: 1px solid var(--gray-200); }
+  #s6 .cat-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  #s6 .bar-wrap { background: var(--gray-200); border-radius: 4px; height: 10px; overflow: hidden; }
+  #s6 .bar-fill { height: 100%; border-radius: 4px; }
+  #s6 .cnt { font-size: 14px; font-weight: 800; color: var(--danger); text-align: right; }
+  #s6 .del { font-size: 13px; font-weight: 600; color: var(--accent); text-align: center; }
+  #s6 .time-save { font-size: 13px; font-weight: 700; color: var(--navy); text-align: right; }
+  #s6 .assumption { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #92400e; margin-top: 8px; }
+
+  /* ── SLIDE 7: 月間削減見込み ── */
+  #s7 .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+  #s7 .summary-table th { background: var(--navy); color: white; padding: 9px 12px; font-weight: 600; font-size: 12px; }
+  #s7 .summary-table td { padding: 9px 12px; border-bottom: 1px solid var(--gray-200); }
+  #s7 .summary-table tr:nth-child(even) td { background: var(--gray-50); }
+  #s7 .summary-table .total-row td { background: #f0fdf4; font-weight: 700; border-top: 2px solid var(--accent); }
+  #s7 .num-col { text-align: right; font-variant-numeric: tabular-nums; }
+  #s7 .red { color: var(--danger); font-weight: 700; }
+  #s7 .grn { color: var(--accent); font-weight: 700; }
+  #s7 .big-result { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  #s7 .br-box { border-radius: 10px; padding: 14px; text-align: center; }
+  #s7 .br-box .br-num { font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+  #s7 .br-box .br-lab { font-size: 12px; color: var(--gray-500); }
+
+  /* ── SLIDE 8: オーナー閲覧 ── */
+  #s8 .role-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  #s8 .rc { flex: 1; border-radius: 10px; padding: 15px; border: 2px solid transparent; }
+  #s8 .rc.hq { background: #eff6ff; border-color: #93c5fd; }
+  #s8 .rc.owner { background: #f5f3ff; border-color: #c4b5fd; }
+  #s8 .rc-lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; margin-bottom: 7px; }
+  #s8 .rc-lbl.hq { color: #1d4ed8; } #s8 .rc-lbl.owner { color: #7c3aed; }
+  #s8 .rc-item { font-size: 12px; color: var(--gray-800); line-height: 1.6; display: flex; gap: 6px; margin-bottom: 3px; }
+  #s8 .caution { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 9px; padding: 11px 14px; font-size: 12px; color: #92400e; display: flex; gap: 9px; align-items: flex-start; }
+
+  /* ── SLIDE 9: デモ ── */
+  #s9 .demo-card { border-radius: 10px; overflow: hidden; border: 1.5px solid var(--gray-200); flex: 1; }
+  #s9 .dh { padding: 11px 15px; font-weight: 600; font-size: 13px; color: white; }
+  #s9 .dh.fc { background: #db2777; } #s9 .dh.dr { background: #2563eb; } #s9 .dh.ow { background: #7c3aed; }
+  #s9 .db { padding: 12px 15px; background: white; }
+  #s9 .dp { font-size: 12px; color: var(--gray-800); line-height: 1.5; display: flex; gap: 7px; margin-bottom: 6px; }
+  #s9 .dn { width: 16px; height: 16px; border-radius: 50%; background: var(--navy); color: white; font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s9 .url-strip { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+
+  /* ── SLIDE 10: 将来構想 ── */
+  #s10 .si {
+    background: linear-gradient(135deg, #0f2240 0%, #1a3660 100%);
+    padding: 46px 60px; justify-content: center;
+  }
+  #s10 .si::before { display: none; }
+  #s10 .fl { font-size: 10px; font-weight: 500; letter-spacing: .15em; color: #5dd8c8; margin-bottom: 18px; }
+  #s10 .ft { font-size: 27px; font-weight: 900; color: white; line-height: 1.3; margin-bottom: 18px; }
+  #s10 .ft em { color: #5dd8c8; font-style: normal; }
+  #s10 .fsteps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  #s10 .fst { display: flex; align-items: flex-start; gap: 12px; }
+  #s10 .fsn { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.15); color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s10 .fst-t { font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.55; }
+  #s10 .fst-t strong { color: white; font-weight: 600; }
+  #s10 .fn { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 9px; padding: 12px 16px; font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.6; }
+  #s10 .fn strong { color: rgba(255,255,255,.9); font-weight: 600; }
+  #s10 .app-row { position: absolute; right: 52px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; flex-direction: column; }
+  #s10 .app-row-h { display: flex; align-items: center; gap: 5px; }
+  #s10 .ab { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; padding: 9px 12px; text-align: center; font-size: 11px; color: rgba(255,255,255,.8); font-weight: 600; }
+  #s10 .ab.cur { background: rgba(13,148,136,.3); border-color: #5dd8c8; }
+  #s10 .ab.fut { background: rgba(255,255,255,.04); border-style: dashed; color: rgba(255,255,255,.45); font-weight: 400; }
+  #s10 .aa { color: rgba(255,255,255,.3); font-size: 11px; }
+
+  /* ── SLIDE 11: 締め ── */
+  #s11 .si {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3d6b 100%);
+    padding: 50px 66px; justify-content: center;
+  }
+  #s11 .si::before { display: none; }
+  #s11 .ct { font-size: 11px; font-weight: 500; letter-spacing: .14em; color: #5dd8c8; margin-bottom: 20px; }
+  #s11 .cl-title { font-size: 29px; font-weight: 900; color: white; line-height: 1.3; margin-bottom: 24px; }
+  #s11 .cl-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  #s11 .cs { display: flex; align-items: flex-start; gap: 12px; }
+  #s11 .csn { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.13); color: white; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  #s11 .cst { font-size: 14px; color: rgba(255,255,255,.78); line-height: 1.55; }
+  #s11 .cst strong { color: white; font-weight: 600; }
+  #s11 .cl-bot { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 600px; }
+  #s11 .cl-bot strong { color: white; font-weight: 600; }
+
+  /* Talk guide */
+  #s12 .si, #s13 .si { padding: 36px 50px; overflow-y: auto; }
+  .tg h3 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1.5px solid var(--gray-200); margin-top: 14px; }
+  .tg h3:first-child { margin-top: 0; }
+  .tl { font-size: 12px; color: var(--gray-800); line-height: 1.65; padding: 5px 0; border-bottom: 1px dashed var(--gray-200); display: flex; gap: 8px; }
+  .tl .ts { font-size: 10px; font-weight: 600; color: var(--accent); min-width: 46px; flex-shrink: 0; margin-top: 2px; }
+
+  @media (max-width: 1140px) {
+    :root { --slide-w: 92vw; --slide-h: calc(92vw * 0.562); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="slides-container">
+
+<!-- S1: 表紙 -->
+<div class="slide active" id="s1">
+<div class="si">
+  <div class="deco" style="width:380px;height:380px;right:-80px;bottom:-130px;"></div>
+  <div class="deco" style="width:180px;height:180px;right:230px;top:-70px;"></div>
+  <div class="chip">🏢 AICARE LAB — 社内説明資料（LINEログ解析版）</div>
+  <div class="data-tag">📊 LINEログ 80グループ / 5,764メッセージ を解析 — 2026.02〜04</div>
+  <div class="mtitle">
+    確認・修正・共有をもっとラクに。<br>
+    <span style="font-size:22px;color:rgba(255,255,255,.75);font-weight:600">LINEログ解析から見えた、<em>月31時間</em>の改善余地</span>
+  </div>
+  <div class="msub">
+    LINEログ80グループを定量的に解析し、確認コストを可視化しました。<br>
+    出店管理アプリを使うことで、どれだけ業務がラクになるかをご説明します。
+  </div>
+  <div class="meta">
+    <div class="mi"><strong>解析対象</strong>LINEログ 80グループ</div>
+    <div class="mi"><strong>総メッセージ数</strong>5,764件</div>
+    <div class="mi"><strong>対象期間</strong>2026年2月〜4月（約2ヶ月）</div>
+    <div class="mi"><strong>対象</strong>社内向け業務効率化説明</div>
+  </div>
+  <div class="snum" style="color:rgba(255,255,255,.25)">01 / 13</div>
+</div>
+</div>
+
+<!-- S2: ログから見えた事実 -->
+<div class="slide" id="s2">
+<div class="si">
+  <div class="slabel">LINEログ解析 — 確認コストの可視化</div>
+  <div class="stitle">3月単月で確認・修正・共有のやり取りが<span style="color:var(--navy)"> 843件</span>発生していた</div>
+  <div class="div"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi danger">
+      <div class="kpi-num">614</div>
+      <div class="kpi-label">進捗確認・状況確認</div>
+      <div class="kpi-sub">「どうなりましたか？」</div>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-num">115</div>
+      <div class="kpi-label">修正依頼</div>
+      <div class="kpi-sub">日計・集計・入力漏れ等</div>
+    </div>
+    <div class="kpi navy">
+      <div class="kpi-num">64</div>
+      <div class="kpi-label">再説明・再案内</div>
+      <div class="kpi-sub">同じ内容を繰り返す</div>
+    </div>
+    <div class="kpi navy" style="background:#f5f3ff;border-color:#c4b5fd">
+      <div class="kpi-num" style="color:#7c3aed">50</div>
+      <div class="kpi-label">遅延・謝罪</div>
+      <div class="kpi-sub">「遅くなり申し訳…」</div>
+    </div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-box">
+      <div class="ib-label">解析対象</div>
+      <div class="ib-val">80</div>
+      <div class="ib-sub">グループチャット（店舗・案件別）</div>
+    </div>
+    <div class="info-box">
+      <div class="ib-label">総メッセージ数（全期間）</div>
+      <div class="ib-val">5,764件</div>
+      <div class="ib-sub">2026/02/13〜04/10</div>
+    </div>
+    <div class="info-box">
+      <div class="ib-label">1ファイル平均テーマ並走数</div>
+      <div class="ib-val">5.4テーマ</div>
+      <div class="ib-sub">最大12テーマ同時並走 / 46グループで5以上</div>
+    </div>
+  </div>
+
+  <div class="source-note">※ キーワード検索によるメッセージ単位集計。3月単月のデータ（3/1〜3/31）を主指標として使用</div>
+  <div class="snum">02 / 13</div>
+</div>
+</div>
+
+<!-- S3: 課題 -->
+<div class="slide" id="s3">
+<div class="si">
+  <div class="slabel">現状の整理 — どこにコストがかかっているか</div>
+  <div class="stitle">並走テーマが多い分、確認・共有のやり取りが増えやすい<br><small>平均5.4テーマが同時進行 — 情報の一元化で整理できる</small></div>
+  <div class="div"></div>
+
+  <div class="g2" style="flex:1;gap:12px">
+    <div class="issue">
+      <div class="ico">📂</div>
+      <div>
+        <h3>情報の置き場所がバラバラ</h3>
+        <p>SATTOU/HPB/Square/公式LINE/研修/採用/物件…<br>最大12テーマがLINEに混在。最新情報を探すだけでも時間がかかる。</p>
+        <div class="voice">「あの件、どこのグループでしたっけ？」</div>
+      </div>
+    </div>
+    <div class="issue">
+      <div class="ico">❓</div>
+      <div>
+        <h3>担当・状況が見えない</h3>
+        <p>71グループで進捗確認が発生（全期間1,013件）。誰が何を持っているか、次に何をすべきかが分からない。</p>
+        <div class="voice">「採用、今どの段階でしたっけ？」</div>
+      </div>
+    </div>
+    <div class="issue">
+      <div class="ico">🔄</div>
+      <div>
+        <h3>修正依頼が後追いになりやすい</h3>
+        <p>3月で修正依頼115件が45グループで発生。日計修正・集計シート修正・提出漏れ確認を、入力前に防げるとラクになる。</p>
+        <div class="voice">「日計修正お願いします」</div>
+      </div>
+    </div>
+    <div class="issue">
+      <div class="ico">⚠️</div>
+      <div>
+        <h3>対応が遅れたときのフォローコストも積み重なる</h3>
+        <p>3月に遅延・謝罪に関するやり取りが50件（55グループで発生）。状況が見えていると、早めに動ける。</p>
+        <div class="voice">「確認中です、少々お待ちください」</div>
+      </div>
+    </div>
+  </div>
+  <div class="snum">03 / 13</div>
+</div>
+</div>
+
+<!-- S4: LINE限界 -->
+<div class="slide" id="s4">
+<div class="si">
+  <div class="slabel">背景 — チャット中心運用の特性</div>
+  <div class="stitle">チャットは便利だが、情報量が増えると<br><small>「あの情報どこだっけ」が起きやすくなる</small></div>
+  <div class="div"></div>
+
+  <div class="g2" style="flex:1">
+    <div>
+      <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px">実際に起きていたやり取りの例</p>
+      <div class="lf">
+        <div class="lf-msg">📋 日計の修正をお願いします</div>
+        <div class="lf-note">　本部 → 担当者</div>
+        <div class="lf-msg r">どの日付の分でしょうか？</div>
+        <div class="lf-note" style="text-align:right">担当者 → 本部　</div>
+        <div class="lf-msg">先週の◯日です。集計シートも</div>
+        <div class="lf-note">　本部 → 担当者</div>
+        <div class="lf-msg r">確認しました。修正しました🙇</div>
+        <div class="lf-note" style="text-align:right">担当者 → 本部　</div>
+        <div class="lf-bad">🕐 このような往復が積み重なると、月間で相当な時間になる（3月推定115件）</div>
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size:12px;color:var(--gray-500);font-weight:600;margin-bottom:10px">LINE・口頭運用の4つの構造的限界</p>
+      <div class="limit"><span class="n">1</span><div><strong>ログを遡らないと今の状況が分からない</strong><br><span style="font-size:11px;color:var(--gray-400)">新メンバーや担当変更時に特に深刻</span></div></div>
+      <div class="limit"><span class="n">2</span><div><strong>修正依頼・提出漏れ確認が後追いになる</strong><br><span style="font-size:11px;color:var(--gray-400)">締め後にズレが見つかるパターンが多発</span></div></div>
+      <div class="limit"><span class="n">3</span><div><strong>引き継ぎコストが高い</strong><br><span style="font-size:11px;color:var(--gray-400)">情報が個人のトーク履歴に埋まっている</span></div></div>
+      <div class="limit"><span class="n">4</span><div><strong>同じ内容を複数回案内することがある</strong><br><span style="font-size:11px;color:var(--gray-400)">3月に再説明・再案内が64件。ツール操作・研修日程などの情報を一元化すると減らせる</span></div></div>
+    </div>
+  </div>
+  <div class="snum">04 / 13</div>
+</div>
+</div>
+
+<!-- S5: 何が変わるか -->
+<div class="slide" id="s5">
+<div class="si">
+  <div class="slabel">After — このアプリで変わること</div>
+  <div class="stitle">「探して聞く」から「見れば分かる」へ</div>
+  <div class="div"></div>
+
+  <div class="ba" style="flex:1">
+    <div class="ba-col bf">
+      <div class="ba-lbl b">現状 — チャット中心の運用</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>進捗確認のやり取りが月500件超</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>修正依頼が後追いになりやすい（3月115件）</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>最大12テーマが並走し、情報が分散しやすい</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>誰待ち・何待ちが把握しにくい</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>担当変更時に情報が引き継ぎにくい</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#ef4444"></span>月推定48時間の確認コストが発生している</div>
+    </div>
+    <div class="arr">▶</div>
+    <div class="ba-col af">
+      <div class="ba-lbl a">✅ AFTER — 出店管理アプリ</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>ダッシュボードで進捗が一目で確認可能</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>未対応タスク・遅延が色分けで即把握</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>全テーマをアプリ1か所に集約・一元管理</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>誰待ち・何待ちがタスク単位で表示</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>クラウドに履歴蓄積、引き継ぎがラク</div>
+      <div class="ba-row"><span class="ba-dot" style="background:#22c55e"></span>月<strong style="color:var(--accent)">31時間削減</strong>見込み（65%削減想定）</div>
+    </div>
+  </div>
+  <div class="snum">05 / 13</div>
+</div>
+</div>
+
+<!-- S6: カテゴリ別削減 -->
+<div class="slide" id="s6">
+<div class="si">
+  <div class="slabel">効率化の内訳 — カテゴリ別の改善余地</div>
+  <div class="stitle">どの種類のやり取りが、どれだけ減らせるか</div>
+  <div class="div"></div>
+
+  <div class="cat-row" style="flex:1">
+    <div class="cat-item h">
+      <div style="color:rgba(255,255,255,.7);font-size:11px">カテゴリ</div>
+      <div style="color:rgba(255,255,255,.7);font-size:11px">件数の多さ</div>
+      <div style="color:rgba(255,255,255,.7);font-size:11px;text-align:right">3月件数</div>
+      <div style="color:rgba(255,255,255,.7);font-size:11px;text-align:center">削減率（想定）</div>
+      <div style="color:rgba(255,255,255,.7);font-size:11px;text-align:right">削減効果（分）</div>
+    </div>
+    <div class="cat-item d">
+      <div class="cat-name">進捗確認</div>
+      <div><div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#ef4444"></div></div></div>
+      <div class="cnt">614件</div>
+      <div class="del">70%削減</div>
+      <div class="time-save">−1,289分</div>
+    </div>
+    <div class="cat-item d">
+      <div class="cat-name">修正依頼</div>
+      <div><div class="bar-wrap"><div class="bar-fill" style="width:19%;background:#f59e0b"></div></div></div>
+      <div class="cnt">115件</div>
+      <div class="del">50%削減</div>
+      <div class="time-save">−288分</div>
+    </div>
+    <div class="cat-item d">
+      <div class="cat-name">再説明</div>
+      <div><div class="bar-wrap"><div class="bar-fill" style="width:10%;background:#3b82f6"></div></div></div>
+      <div class="cnt">64件</div>
+      <div class="del">60%削減</div>
+      <div class="time-save">−154分</div>
+    </div>
+    <div class="cat-item d">
+      <div class="cat-name">遅延・謝罪</div>
+      <div><div class="bar-wrap"><div class="bar-fill" style="width:8%;background:#8b5cf6"></div></div></div>
+      <div class="cnt">50件</div>
+      <div class="del">55%削減</div>
+      <div class="time-save">−110分</div>
+    </div>
+  </div>
+
+  <div class="assumption">
+    ⚠️ 仮定：進捗確認3分/件・修正依頼5分/件・再説明4分/件・遅延4分/件。削減率はアプリで「見ればわかる状態」になった場合の概算。実際の効果は運用状況による。
+  </div>
+  <div class="snum">06 / 13</div>
+</div>
+</div>
+
+<!-- S7: 月間削減見込み -->
+<div class="slide" id="s7">
+<div class="si">
+  <div class="slabel">業務時間試算 — 月間の改善見込み</div>
+  <div class="stitle">3月実績をベースに試算：アプリ導入で<span style="color:var(--accent)">月31時間分</span>の確認コスト削減が見込める</div>
+  <div class="div"></div>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>カテゴリ</th>
+        <th class="num-col">3月発生件数</th>
+        <th class="num-col">1件あたり時間</th>
+        <th class="num-col">月間損失（分）</th>
+        <th class="num-col">削減率（想定）</th>
+        <th class="num-col">削減時間（分）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>進捗確認・状況確認</td>
+        <td class="num-col red">614件</td>
+        <td class="num-col">3分</td>
+        <td class="num-col">1,842分</td>
+        <td class="num-col">70%</td>
+        <td class="num-col grn">−1,289分</td>
+      </tr>
+      <tr>
+        <td>修正依頼・入力漏れ</td>
+        <td class="num-col red">115件</td>
+        <td class="num-col">5分</td>
+        <td class="num-col">575分</td>
+        <td class="num-col">50%</td>
+        <td class="num-col grn">−288分</td>
+      </tr>
+      <tr>
+        <td>再説明・再案内</td>
+        <td class="num-col red">64件</td>
+        <td class="num-col">4分</td>
+        <td class="num-col">256分</td>
+        <td class="num-col">60%</td>
+        <td class="num-col grn">−154分</td>
+      </tr>
+      <tr>
+        <td>遅延フォロー・謝罪</td>
+        <td class="num-col red">50件</td>
+        <td class="num-col">4分</td>
+        <td class="num-col">200分</td>
+        <td class="num-col">55%</td>
+        <td class="num-col grn">−110分</td>
+      </tr>
+      <tr class="total-row">
+        <td><strong>合計</strong></td>
+        <td class="num-col"><strong>843件</strong></td>
+        <td class="num-col">—</td>
+        <td class="num-col"><strong>2,873分（≈ 47.9時間）</strong></td>
+        <td class="num-col"><strong>約65%</strong></td>
+        <td class="num-col grn"><strong>−1,841分（≈ 30.7時間）</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="big-result">
+    <div class="br-box" style="background:#f8fafc;border:1px solid #e2e8f0">
+      <div class="br-num" style="color:var(--navy)">48h</div>
+      <div class="br-lab">月間の確認コスト（3月実績ベース）</div>
+    </div>
+    <div class="br-box" style="background:var(--accent-light);border:1px solid var(--accent)">
+      <div class="br-num" style="color:var(--accent)">▲31h</div>
+      <div class="br-lab">月間削減見込み（65%想定）</div>
+    </div>
+    <div class="br-box" style="background:#eff6ff;border:1px solid #93c5fd">
+      <div class="br-num" style="color:var(--navy)">17h</div>
+      <div class="br-lab">削減後の残存コスト（想定）</div>
+    </div>
+  </div>
+
+  <div style="font-size:10px;color:var(--gray-400);text-align:right;margin-top:6px">
+    ※ 概算・仮置き値。実際の削減効果は運用方法・習熟度による。「仮定時間×件数×削減率」で試算。
+  </div>
+  <div class="snum">07 / 13</div>
+</div>
+</div>
+
+<!-- S8: オーナー閲覧 -->
+<div class="slide" id="s8">
+<div class="si">
+  <div class="slabel">効率化ポイント — オーナー閲覧</div>
+  <div class="stitle">オーナー様からも見られる設計<br><small>「説明しなくても伝わる」透明性</small></div>
+  <div class="div"></div>
+
+  <div class="role-row">
+    <div class="rc hq">
+      <div class="rc-lbl hq">🏢 本部用UI</div>
+      <div class="rc-item">✅ 全店舗の進捗ダッシュボード</div>
+      <div class="rc-item">✅ タスク・工程の詳細管理</div>
+      <div class="rc-item">✅ コメント・ファイル・フォト管理</div>
+      <div class="rc-item">✅ 全店舗横断での遅延把握</div>
+      <div style="margin-top:8px;font-size:11px;color:#1d4ed8;font-weight:600">管理・オペレーション機能がフル装備</div>
+    </div>
+    <div class="rc owner">
+      <div class="rc-lbl owner">👤 オーナー用UI（別ページ）</div>
+      <div class="rc-item">✅ 自分の店舗の進捗が一目で確認</div>
+      <div class="rc-item">✅「今やること」がヒーロー表示</div>
+      <div class="rc-item">✅ 提出書類の確認・チェック</div>
+      <div class="rc-item">✅ モバイル最適化で外出先も対応</div>
+      <div style="margin-top:8px;font-size:11px;color:#7c3aed;font-weight:600">迷わず使えるシンプル設計</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:stretch">
+    <div class="card-teal" style="flex:1;padding:13px 15px">
+      <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:5px">💬 「見えない」ことによる不信感・確認電話をなくす</div>
+      <div style="font-size:12px;color:var(--gray-600);line-height:1.5">「今どうなっているか」が共有されると、問い合わせ・都度説明が減る。オーナー側の不安も軽減できる</div>
+    </div>
+    <div class="caution" style="flex:1">
+      <span style="font-size:18px">⚠️</span>
+      <div>
+        <div style="font-weight:600;margin-bottom:3px;font-size:13px">今後の運用課題</div>
+        <div style="font-size:11px;line-height:1.5">どこまでオーナーに見せるか（フェーズ・タスク・コメント）の共有範囲は、運用しながら最適化していく設計課題です。最初から完璧に決めなくてOK。</div>
+      </div>
+    </div>
+  </div>
+  <div class="snum">08 / 13</div>
+</div>
+</div>
+
+<!-- S9: デモ案内 -->
+<div class="slide" id="s9">
+<div class="si">
+  <div class="slabel">デモのご案内</div>
+  <div class="stitle">実際のデモページで確認してください</div>
+  <div class="div"></div>
+
+  <div style="display:flex;gap:12px;flex:1;margin-bottom:12px">
+    <div class="demo-card">
+      <div class="dh fc">🏪 FCデモ</div>
+      <div class="db">
+        <div class="dp"><span class="dn">1</span>FC店舗の出店フロー・テンプレートを確認</div>
+        <div class="dp"><span class="dn">2</span>タスクの進捗・遅延の色分けを確認</div>
+        <div class="dp"><span class="dn">3</span>ダッシュボードの「遅延バッジ」を確認</div>
+        <div class="dp"><span class="dn">4</span>コメント・ファイル管理タブを確認</div>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="dh dr">🏬 直営デモ</div>
+      <div class="db">
+        <div class="dp"><span class="dn">1</span>直営店舗の工程・タスク構成を確認</div>
+        <div class="dp"><span class="dn">2</span>FC版と比較して違いを体感</div>
+        <div class="dp"><span class="dn">3</span>フェーズ進行・ステータス管理の使い心地</div>
+        <div class="dp"><span class="dn">4</span>写真・ファイルアップロード機能も確認</div>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="dh ow">👤 オーナーページ</div>
+      <div class="db">
+        <div class="dp"><span class="dn">1</span><strong>右上のリンクからアクセス</strong></div>
+        <div class="dp"><span class="dn">2</span>「今やること」ヒーロー表示を確認</div>
+        <div class="dp"><span class="dn">3</span>提出書類チェック機能を体験</div>
+        <div class="dp"><span class="dn">4</span>本部UIとの見せ方の違いを比較</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="url-strip">
+    <span style="font-size:16px">🔗</span>
+    <div style="flex:1">
+      <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px">本番URL</div>
+      <div style="font-family:monospace;font-size:12px;color:var(--navy-mid);font-weight:600">https://web-tools-black-iota.vercel.app/aicare-lab-app.html</div>
+    </div>
+    <div style="font-size:11px;color:var(--gray-400)">オーナーページへのリンクは画面右上</div>
+  </div>
+  <div class="snum">09 / 13</div>
+</div>
+</div>
+
+<!-- S10: みずきさんまとめ（クラウド） -->
+<div class="slide" id="s10-cloud">
+<div class="si">
+  <div class="slabel">クラウド管理の視点からのまとめ</div>
+  <div class="stitle">クラウドで一元管理だから、<br>確認がラクで、属人化しにくい</div>
+  <div class="div"></div>
+
+  <div class="g2" style="flex:1">
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;border-left:4px solid var(--navy)">
+      <span style="font-size:26px;flex-shrink:0">☁️</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:5px">情報がクラウドに一元化</div>
+        <div style="font-size:12px;color:var(--gray-500);line-height:1.5">誰がアクセスしても同じ最新情報。「手元に最新版がない」が起きない</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;border-left:4px solid var(--accent)">
+      <span style="font-size:26px;flex-shrink:0">👥</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:5px">関係者が同じ情報を見られる</div>
+        <div style="font-size:12px;color:var(--gray-500);line-height:1.5">本部・担当者・オーナーが役割に合ったビューで同一データを参照。情報のズレが起きにくい</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;border-left:4px solid var(--warn)">
+      <span style="font-size:26px;flex-shrink:0">🔄</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:5px">バックアップと復旧性がある</div>
+        <div style="font-size:12px;color:var(--gray-500);line-height:1.5">データがシステムに蓄積。属人管理より安全で、担当交代でも情報が引き継がれる</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;border-left:4px solid var(--accent)">
+      <span style="font-size:26px;flex-shrink:0">📱</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:5px">確認のためだけに人を止めなくていい</div>
+        <div style="font-size:12px;color:var(--gray-500);line-height:1.5">ブラウザがあればどこからでも確認可能。外出中でも、オーナー様でも</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:12px;margin-top:12px">
+    <span style="font-size:20px">💡</span>
+    <div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.6">
+      <strong style="color:#5dd8c8">クラウド管理の本質</strong>は「データが人ではなく組織に属する」こと。月31時間の削減は、この仕組みが生む現場の変化です。
+    </div>
+  </div>
+  <div class="snum">10 / 13</div>
+</div>
+</div>
+
+<!-- S10-future: 将来構想 -->
+<div class="slide" id="s10">
+<div class="si" style="background:linear-gradient(135deg,#0f2240 0%,#1a3660 100%);padding:44px 58px;justify-content:center;">
+  <div class="fl">Future Vision — 将来構想</div>
+  <div class="ft">出店管理から、<em>業務全体の一本化</em>へ。<br><span style="font-size:17px;color:rgba(255,255,255,.7);font-weight:600">人が本来やるべき仕事に集中できる環境を目指す</span></div>
+  <div class="fsteps">
+    <div class="fst"><div class="fsn">1</div><div class="fst-t"><strong>今：出店管理から始める</strong><br>確認往復・抜け漏れ・散らばりを解消。月31時間削減を実現する</div></div>
+    <div class="fst"><div class="fsn">2</div><div class="fst-t"><strong>次：業務全体を一本のアプリで管理したい</strong><br>日次報告・採用管理・スタッフ研修など、出店管理の延長線上に業務全体の一元化を目指す</div></div>
+    <div class="fst"><div class="fsn">3</div><div class="fst-t"><strong>目的は「管理を厳しくすること」ではない</strong><br>確認・事務処理・探し物などのムダを減らし、<strong>個々が強みを発揮できる状態</strong>をつくること</div></div>
+  </div>
+  <div class="fn">
+    情報が一元化されると、<strong>「確認するために人を止める」「ログを探すために時間を使う」</strong>ことが減ります。<br>
+    その先に、スタッフ一人ひとりが<strong>本来やるべき業務・価値を出せる仕事</strong>に集中できる環境があります。
+  </div>
+  <div class="app-row">
+    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:6px;text-align:center">現在 → 目指す姿</div>
+    <div class="app-row-h">
+      <div class="ab cur">📋<br>出店<br>管理</div>
+      <div class="aa">→</div>
+      <div class="ab fut">📊<br>日次<br>管理</div>
+      <div class="aa">→</div>
+      <div class="ab fut">👥<br>採用<br>管理</div>
+      <div class="aa">→</div>
+      <div class="ab fut" style="border-color:rgba(93,216,200,.35);color:rgba(93,216,200,.6)">🔗<br>全業務<br>一本化</div>
+    </div>
+  </div>
+  <div class="snum" style="color:rgba(255,255,255,.25)">11 / 13</div>
+</div>
+</div>
+
+<!-- S11: 締め -->
+<div class="slide" id="s11">
+<div class="si">
+  <div class="ct">CLOSING — まとめ</div>
+  <div class="cl-title">まずは使ってみて、<br><span style="color:#5dd8c8">現場に合わせて育てていく</span>アプリです</div>
+  <div class="cl-steps">
+    <div class="cs"><div class="csn">1</div><div class="cst"><strong>まず使ってみる</strong> — デモで操作感を確認。実際の業務で使うことが一番の評価</div></div>
+    <div class="cs"><div class="csn">2</div><div class="cst"><strong>共有範囲を運用しながら調整</strong> — オーナーへの見せ方は、使いながら最適化。最初から完璧でなくていい</div></div>
+    <div class="cs"><div class="csn">3</div><div class="cst"><strong>現場のフィードバックで改善</strong> — 使って気づいた課題を積み上げる。育てるプロセスも価値</div></div>
+    <div class="cs"><div class="csn">4</div><div class="cst"><strong>その先に業務一本化の基盤を</strong> — 出店管理を起点に、全業務の効率化基盤へ</div></div>
+  </div>
+  <div class="cl-bot">
+    このアプリが目指すのは「管理を厳しくすること」ではありません。<br>
+    <strong>確認・修正・共有のコストを下げ、人が本来価値を出す仕事に集中できる環境</strong>をつくることです。
+  </div>
+  <div class="snum" style="color:rgba(255,255,255,.25)">12 / 13</div>
+</div>
+</div>
+
+<!-- S12: 話し方ガイド -->
+<div class="slide" id="s12">
+<div class="si" style="padding:36px 50px;overflow-y:auto">
+  <div class="slabel">発表者ガイド</div>
+  <div class="stitle" style="font-size:20px;margin-bottom:6px">3分版 / 5分版 — 話し方の要約</div>
+  <div class="div" style="margin-bottom:16px"></div>
+  <div class="g2 tg" style="flex:1">
+    <div>
+      <h3>【3分版】S1-4 冒頭・課題 — 50秒</h3>
+      <div class="tl"><span class="ts">S1</span>「LINEログを解析したら、3月だけで843件の非効率なやり取りが見つかりました。今日はその内訳と、このアプリでどう解消するかをお話しします。」</div>
+      <div class="tl"><span class="ts">S2</span>「進捗確認614件、修正依頼115件、再説明64件、遅延謝罪50件。これが現場の実態です。」</div>
+      <div class="tl"><span class="ts">S3-4</span>「LINEに情報が埋まっているため、探す・聞く・修正する、が繰り返されています。」</div>
+      <h3>【3分版】S5-7 変化・試算 — 1分</h3>
+      <div class="tl"><span class="ts">S5</span>「このアプリで"見れば分かる"状態になります。ビフォーアフターで6つの変化があります。」</div>
+      <div class="tl"><span class="ts">S6-7</span>「カテゴリ別の削減見込みをまとめると、月48時間の損失から31時間削減できる見込みです（65%削減想定）。数字は概算ですが、現場ログに基づいた根拠のある試算です。」</div>
+      <h3>【3分版】S8-12 まとめ — 1分10秒</h3>
+      <div class="tl"><span class="ts">S8</span>「オーナー様にも見ていただけるUIがあり、都度説明しなくて済みます。共有範囲は今後整理します。」</div>
+      <div class="tl"><span class="ts">S9</span>「デモはFCと直営の2種類。右上にオーナーページへのリンクがあります。」</div>
+      <div class="tl"><span class="ts">S10-11</span>「将来的には業務全体を一本化したい。管理を厳しくするためではなく、人が本来の仕事に集中できる環境のためです。まず使いながら育てていきましょう。」</div>
+    </div>
+    <div>
+      <h3>【5分版】補足ポイント</h3>
+      <div class="tl"><span class="ts">S2</span>「843件の内訳をゆっくり読む。進捗確認が突出して多いことを強調。"1ファイル平均5.4テーマが並走"の数字は衝撃的なので、間を置いて伝える。」</div>
+      <div class="tl"><span class="ts">S4</span>「LINEの会話例を見せながら"このやり取り、115回繰り返されていた"と言い切る。」</div>
+      <div class="tl"><span class="ts">S7</span>「表を一行ずつ説明。"1件3分でも614件あったら30時間"という感覚値を伝える。概算・仮置きと明示しながら。」</div>
+      <div class="tl"><span class="ts">S9-cloud</span>「みずきさん向け：クラウドで一元管理する本質は"データが人でなく組織に属すること"。バックアップと復旧性もそこから来ている。」</div>
+      <div class="tl"><span class="ts">S10</span>「将来構想は夢の話にしない。"今の出店管理アプリの延長線上に、採用・日次・研修が繋がっていく現実的なロードマップ"として伝える。」</div>
+      <div class="tl"><span class="ts">S11</span>「締めの一文"月843件の非効率を減らし、人が本来価値を出す仕事に集中できる環境"を強調して終わる。」</div>
+      <h3>注意事項</h3>
+      <div class="tl"><span class="ts">全体</span>「数字は必ず"概算・仮置き"と添える。ただし弱くしない。"現場ログに基づいた根拠ある試算"として自信を持って伝える。」</div>
+      <div class="tl"><span class="ts">全体</span>「"完璧だからすごい"ではなく"今ある混乱をかなり減らせる"が伝わるトーンで。」</div>
+    </div>
+  </div>
+  <div class="snum">13 / 13</div>
+</div>
+</div>
+
+</div><!-- /slides-container -->
+
+<div class="nav-row" style="margin-top:14px">
+  <button class="nav-btn" onclick="go(-1)">◀</button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter" id="cnt">1 / 13</span>
+  <button class="nav-btn" onclick="go(1)">▶</button>
+</div>
+
+<div class="hint">← → キーで操作できます</div>
+</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const total = slides.length;
+let cur = 0;
+const dotsEl = document.getElementById('dots');
+const cntEl = document.getElementById('cnt');
+
+for (let i = 0; i < total; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(n) {
+  slides[cur].classList.remove('active');
+  dotsEl.children[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(total - 1, n));
+  slides[cur].classList.add('active');
+  dotsEl.children[cur].classList.add('active');
+  cntEl.textContent = (cur + 1) + ' / ' + total;
+}
+function go(d) { goTo(cur + d); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+});
+</script>
+</body>
+</html>

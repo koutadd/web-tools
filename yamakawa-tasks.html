@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山川タスク | eye care lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===================== COMMON NAV ===================== */
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px; height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label { color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em; padding-right: 4px; }
+#aicare-common-nav .cn-sep { color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none; }
+#aicare-common-nav a { color: rgba(148,163,184,0.85); text-decoration: none; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(148,163,184,0.12); transition: color 0.15s, background 0.15s; white-space: nowrap; }
+#aicare-common-nav a:hover { color: #e2eaf4; background: rgba(255,255,255,0.06); }
+#aicare-common-nav a.cn-active { color: #f59e0b !important; border-color: rgba(245,158,11,0.35) !important; background: rgba(245,158,11,0.08) !important; }
+
+/* ===================== DESIGN SYSTEM ===================== */
+:root {
+  --bg: #f8f7f5; --surface: #ffffff; --surface2: #f3f4f6;
+  --border: #e5e7eb; --text: #111827; --muted: #6b7280;
+  --accent: #a78bfa; --accent-hover: #8b5cf6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  font-size: 14px; line-height: 1.6; min-height: 100vh;
+}
+.page-container { max-width: 1200px; margin: 0 auto; padding: 32px 32px 80px; }
+@media (max-width: 768px) { .page-container { padding: 20px 16px 60px; } }
+
+/* ===================== HEADER ===================== */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.page-title { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-desc { color: var(--muted); font-size: 13px; }
+
+/* ===================== WORKLOAD PANEL ===================== */
+.workload-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; }
+.workload-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.workload-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.workload-settings { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.workload-settings label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.workload-settings input[type="number"] { width: 52px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); background: var(--bg); outline: none; }
+.workload-settings input[type="number"]:focus { border-color: var(--accent); }
+.workload-numbers { display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
+.wl-num { text-align: center; }
+.wl-num .wl-val { font-size: 28px; font-weight: 700; line-height: 1; }
+.wl-num .wl-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.workload-bar-bg { height: 10px; background: var(--surface2); border-radius: 99px; overflow: visible; position: relative; }
+.workload-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+.workload-bar-marker { position: absolute; top: -4px; width: 2px; height: 18px; background: var(--text); border-radius: 2px; transform: translateX(-50%); }
+.workload-bar-marker::after { content: attr(data-label); position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; white-space: nowrap; color: var(--text); font-weight: 600; }
+.workload-legend { display: flex; align-items: center; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.wl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.wl-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* ===================== STATS ===================== */
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+@media (max-width: 900px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; text-align: center; }
+.stat-card .stat-num { font-size: 30px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.stat-card .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+/* ===================== TOOLBAR ===================== */
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+.toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+select, input[type="text"] { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; }
+select:focus, input[type="text"]:focus { border-color: var(--accent); }
+input[type="text"] { min-width: 200px; }
+
+/* ===================== BUTTONS ===================== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-danger { background: transparent; color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.btn-danger:hover { background: rgba(239,68,68,0.1); }
+.btn-sm { padding: 4px 11px; font-size: 12px; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid transparent; padding: 5px 10px; }
+.btn-ghost:hover { color: var(--text); background: var(--surface2); }
+
+/* ===================== BADGES ===================== */
+.badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; white-space: nowrap; }
+.status-未着手 { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.25); }
+.status-進行中 { background: rgba(59,130,246,0.10); color: #2563eb; border: 1px solid rgba(59,130,246,0.25); }
+.status-完了   { background: rgba(16,185,129,0.10); color: #059669; border: 1px solid rgba(16,185,129,0.25); }
+.status-要確認 { background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.3); }
+.status-保留   { background: rgba(139,92,246,0.10); color: #7c3aed; border: 1px solid rgba(139,92,246,0.25); }
+.priority-最優先 { background: rgba(239,68,68,0.10); color: #dc2626; border: 1px solid rgba(239,68,68,0.25); }
+.priority-高     { background: rgba(249,115,22,0.10); color: #ea580c; border: 1px solid rgba(249,115,22,0.25); }
+.priority-中     { background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.3); }
+.priority-低     { background: rgba(107,114,128,0.12); color: #4b5563; border: 1px solid rgba(107,114,128,0.25); }
+.cat-badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.time-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; background: rgba(167,139,250,0.10); color: #7c3aed; border: 1px solid rgba(167,139,250,0.25); }
+.actual-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; background: rgba(16,185,129,0.10); color: #059669; border: 1px solid rgba(16,185,129,0.25); cursor: pointer; transition: background 0.15s; font-family: 'DM Mono', monospace; }
+.actual-badge:hover { background: rgba(16,185,129,0.18); }
+
+/* ===================== SECTION TITLE ===================== */
+.section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+
+/* ===================== TASK LIST ===================== */
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+.task-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; transition: border-color 0.15s, box-shadow 0.15s; }
+.task-item:hover { border-color: rgba(167,139,250,0.3); box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+.task-item.done { opacity: 0.5; }
+.task-item.done .task-name { text-decoration: line-through; }
+.task-item.sw-active { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+
+.task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: border-color 0.15s, background 0.15s; background: transparent; }
+.task-check:hover { border-color: var(--accent); }
+.task-check.checked { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.task-name { flex: 1; font-size: 14px; font-weight: 500; min-width: 0; word-break: break-word; }
+.task-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+.task-deadline { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.task-deadline.overdue { color: #ef4444; font-weight: 600; }
+.task-deadline.soon { color: #f59e0b; font-weight: 600; }
+.task-actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
+
+/* ===================== STOPWATCH ===================== */
+.sw-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; cursor: pointer; flex-shrink: 0;
+  transition: all 0.15s; color: var(--muted);
+}
+.sw-btn:hover { border-color: #10b981; color: #10b981; background: rgba(16,185,129,0.08); }
+.sw-btn.running { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.08); animation: sw-pulse 1.2s ease-in-out infinite; }
+@keyframes sw-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.25)} 50%{box-shadow:0 0 0 5px rgba(239,68,68,0)} }
+
+.sw-elapsed {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; font-weight: 500; color: #059669;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: 6px; padding: 2px 8px; white-space: nowrap;
+  min-width: 60px; text-align: center;
+}
+
+/* ===================== MODAL ===================== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; }
+.form-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; font-family: inherit; }
+.form-input:focus { border-color: var(--accent); }
+textarea.form-input { resize: vertical; min-height: 70px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+/* ===================== SESSION HISTORY ===================== */
+.session-modal { max-width: 500px; }
+.session-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.session-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; }
+.session-item .sess-date { color: var(--muted); font-size: 11px; min-width: 80px; }
+.session-item .sess-range { color: var(--muted); font-size: 11px; flex: 1; }
+.session-item .sess-dur { font-family: 'DM Mono', monospace; font-weight: 600; color: #059669; white-space: nowrap; }
+.session-total { margin-top: 14px; padding: 12px 16px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+.session-total .st-label { font-size: 12px; color: var(--muted); }
+.session-total .st-val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; color: #059669; }
+.session-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
+
+/* ===================== CATEGORY / VIEW ===================== */
+.cat-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.cat-tab { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--muted); transition: all 0.15s; }
+.cat-tab:hover { border-color: var(--accent); color: var(--text); }
+.cat-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.cat-manage-list { display: flex; flex-direction: column; gap: 6px; }
+.cat-manage-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+.cat-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.cat-manage-item .cat-manage-name { flex: 1; font-size: 13px; font-weight: 500; }
+.view-toggle { display: flex; gap: 2px; background: var(--surface2); border-radius: 8px; padding: 2px; }
+.view-btn { padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; border: none; background: transparent; color: var(--muted); transition: all 0.15s; }
+.view-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* ===================== KANBAN ===================== */
+.kanban-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; overflow-x: auto; }
+@media (max-width: 900px) { .kanban-board { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } }
+.kanban-col { min-width: 0; }
+.kanban-col-header { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.kanban-cards { display: flex; flex-direction: column; gap: 8px; }
+.kanban-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.kanban-card:hover { border-color: rgba(167,139,250,0.3); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+.kanban-card .kc-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+.kanban-card .kc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* ===================== EMPTY ===================== */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-stores.html">出展管理</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html">制作管理シート</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-brand-manager.html" target="_blank" style="color:#c96442 !important; border-color:rgba(201,100,66,0.4) !important; background:rgba(201,100,66,0.08) !important;">⚙ BM</a>
+  <span class="cn-sep">|</span>
+  <a href="yamakawa-tasks.html" style="color:#a78bfa !important; border-color:rgba(167,139,250,0.35) !important; background:rgba(167,139,250,0.08) !important;">✦ 山川タスク</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <div class="page-title">✦ 山川タスク</div>
+      <div class="page-desc">山川さんの個人タスク管理 — 工数・ストップウォッチ・記録</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-list-btn" onclick="setView('list')">リスト</button>
+        <button class="view-btn" id="view-kanban-btn" onclick="setView('kanban')">ボード</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openCatModal()">カテゴリ管理</button>
+      <button class="btn btn-primary" onclick="openAddModal()">＋ タスク追加</button>
+    </div>
+  </div>
+
+  <div class="workload-panel" id="workload-panel"></div>
+  <div class="stats-row" id="stats-row"></div>
+  <div class="cat-tabs" id="cat-tabs"></div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <input type="text" id="search-input" placeholder="タスクを検索..." oninput="renderView()">
+      <select id="filter-status" onchange="renderView()">
+        <option value="">すべてのステータス</option>
+        <option>未着手</option><option>進行中</option><option>要確認</option><option>保留</option><option>完了</option>
+      </select>
+      <select id="filter-priority" onchange="renderView()">
+        <option value="">すべての優先度</option>
+        <option>最優先</option><option>高</option><option>中</option><option>低</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
+      <input type="checkbox" id="hide-done" onchange="renderView()" style="cursor:pointer;"> 完了を非表示
+    </label>
+  </div>
+
+  <div id="main-view"></div>
+</div>
+
+<!-- Task Add/Edit Modal -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">タスク追加</div>
+    <div class="form-group">
+      <label class="form-label">タスク名 *</label>
+      <input type="text" class="form-input" id="f-name" placeholder="タスク名を入力">
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ・詳細</label>
+      <textarea class="form-input" id="f-memo" placeholder="詳細・メモ（任意）"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">カテゴリ</label>
+        <select class="form-input" id="f-category"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ステータス</label>
+        <select class="form-input" id="f-status">
+          <option>未着手</option><option>進行中</option><option>要確認</option><option>保留</option><option>完了</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">優先度</label>
+        <select class="form-input" id="f-priority">
+          <option>最優先</option><option>高</option><option selected>中</option><option>低</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">期日</label>
+        <input type="date" class="form-input" id="f-deadline">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">⏱ 見積り時間（h）</label>
+        <input type="number" class="form-input" id="f-hours" min="0" max="200" step="0.5" placeholder="例: 3">
+      </div>
+      <div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('task-modal')">キャンセル</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveTask()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session History Modal -->
+<div class="modal-overlay" id="session-modal">
+  <div class="modal session-modal">
+    <div class="modal-title" id="session-modal-title">時間記録</div>
+    <div id="session-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="session-clear-btn">記録を削除</button>
+      <button class="btn btn-secondary" onclick="closeModal('session-modal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-overlay" id="cat-modal">
+  <div class="modal">
+    <div class="modal-title">カテゴリ管理</div>
+    <div class="form-group" style="display:flex;gap:8px;align-items:flex-end;">
+      <div style="flex:1;">
+        <label class="form-label">カテゴリ名</label>
+        <input type="text" class="form-input" id="new-cat-name" placeholder="例: マーケ">
+      </div>
+      <div>
+        <label class="form-label">色</label>
+        <input type="color" id="new-cat-color" value="#a78bfa" style="height:36px;width:60px;border:1px solid var(--border);border-radius:8px;padding:2px;cursor:pointer;">
+      </div>
+      <button class="btn btn-primary" onclick="addCategory()">追加</button>
+    </div>
+    <div class="cat-manage-list" id="cat-manage-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('cat-modal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'yamakawa-tasks-v3';
+
+const DEFAULT_CATS = [
+  { id:'marketing', name:'マーケ',       color:'#a78bfa' },
+  { id:'creative',  name:'クリエイティブ', color:'#60a5fa' },
+  { id:'strategy',  name:'戦略',          color:'#f59e0b' },
+  { id:'admin',     name:'管理',          color:'#10b981' },
+  { id:'other',     name:'その他',        color:'#9ca3af' },
+];
+const DEFAULT_TASKS = [
+  { id:1, name:'insta画像制作',                  memo:'', category:'creative',  status:'未着手', priority:'高',    estimatedHours:3,  deadline:'', createdAt:Date.now() },
+  { id:2, name:'店舗制作の制作',                  memo:'', category:'creative',  status:'未着手', priority:'高',    estimatedHours:12, deadline:'', createdAt:Date.now() },
+  { id:3, name:'店舗制作の構成作成',               memo:'', category:'creative',  status:'未着手', priority:'中',    estimatedHours:4,  deadline:'', createdAt:Date.now() },
+  { id:4, name:'ウィンドウブレーカー作成',          memo:'', category:'creative',  status:'未着手', priority:'中',    estimatedHours:5,  deadline:'', createdAt:Date.now() },
+  { id:5, name:'ホットペッパーの画像制作（数種類）', memo:'', category:'marketing', status:'未着手', priority:'高',    estimatedHours:6,  deadline:'', createdAt:Date.now() },
+  { id:6, name:'自己紹介カードの制作',              memo:'', category:'creative',  status:'未着手', priority:'中',    estimatedHours:3,  deadline:'', createdAt:Date.now() },
+  { id:7, name:'サイトの構成制作',                 memo:'', category:'strategy',  status:'未着手', priority:'高',    estimatedHours:8,  deadline:'', createdAt:Date.now() },
+  { id:8, name:'フラッグシップ店の内容考案',         memo:'', category:'strategy',  status:'未着手', priority:'最優先', estimatedHours:6,  deadline:'', createdAt:Date.now() },
+];
+
+/* ===================== DATA ===================== */
+function loadData() {
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return null;
+}
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); }
+function initData() {
+  return { categories:DEFAULT_CATS, tasks:DEFAULT_TASKS, nextId:10,
+           workHoursPerDay:8, workDaysPerWeek:5,
+           sessions:{}, runningTaskId:null, runningStart:null };
+}
+
+let APP = loadData() || initData();
+if (!APP.workHoursPerDay) APP.workHoursPerDay = 8;
+if (!APP.workDaysPerWeek) APP.workDaysPerWeek = 5;
+if (!APP.sessions) APP.sessions = {};
+if (APP.runningTaskId === undefined) { APP.runningTaskId = null; APP.runningStart = null; }
+
+/* ── SEED TASKS (自動追加・一度だけ) ── */
+(function() {
+  const seeds = [
+    'アイケアグラス　ロゴ制作',
+    'SUJI ロゴ制作',
+    'TRINA　ロゴ制作',
+    'ASOBIBA　ロゴ制作',
+  ];
+  let added = false;
+  seeds.forEach(name => {
+    if (!APP.tasks.find(t => t.name === name)) {
+      APP.tasks.push({ id: APP.nextId++, name, memo:'', category:'creative', status:'未着手', priority:'高', estimatedHours:4, deadline:'', createdAt: Date.now() });
+      added = true;
+    }
+  });
+  if (added) saveData();
+})();
+
+/* ===================== STATE ===================== */
+let editingId = null;
+let activeCategory = 'all';
+let currentView = 'list';
+let swInterval = null;
+
+/* ===================== HELPERS ===================== */
+function getCategoryById(id) { return APP.categories.find(c=>c.id===id) || {name:id,color:'#9ca3af'}; }
+function catBadge(catId) { const cat=getCategoryById(catId); return `<span class="cat-badge" style="background:${cat.color}22;color:${cat.color};border:1px solid ${cat.color}55;">${cat.name}</span>`; }
+function statusBadge(s)   { return `<span class="badge status-${s}">${s}</span>`; }
+function priorityBadge(p) { return `<span class="badge priority-${p}">${p}</span>`; }
+function timeBadge(h)     { return h ? `<span class="time-badge">⏱ ${h}h</span>` : ''; }
+function formatDate(d) { if(!d) return ''; const dt=new Date(d); return `${dt.getMonth()+1}/${dt.getDate()}`; }
+function daysUntil(d) { if(!d) return null; const now=new Date(); now.setHours(0,0,0,0); return Math.ceil((new Date(d)-now)/86400000); }
+function deadlineLabel(d) {
+  if (!d) return '';
+  const diff = daysUntil(d);
+  if (diff < 0) return `<span class="task-deadline overdue">超過${Math.abs(diff)}日</span>`;
+  if (diff <= 3) return `<span class="task-deadline soon">あと${diff}日</span>`;
+  return `<span class="task-deadline">${formatDate(d)}</span>`;
+}
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ===================== STOPWATCH ===================== */
+function fmtDuration(sec) {
+  if (isNaN(sec) || sec < 0) sec = 0;
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function fmtDurationLong(sec) {
+  if (!sec) return '0分';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  let str = '';
+  if (h) str += `${h}時間`;
+  if (m) str += `${m}分`;
+  if (s && !h) str += `${s}秒`;
+  return str || '0秒';
+}
+function fmtTimestamp(ts) {
+  const d = new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function getTaskTotalSec(taskId) {
+  return (APP.sessions[taskId] || []).reduce((s, sess) => s + (sess.duration||0), 0);
+}
+function getTaskTotalSecAll() {
+  return Object.values(APP.sessions).flat().reduce((s, sess) => s + (sess.duration||0), 0);
+}
+
+function swToggle(taskId) {
+  if (APP.runningTaskId === taskId) {
+    swStop(true);
+  } else {
+    if (APP.runningTaskId !== null) swStop(false);
+    swBegin(taskId);
+  }
+}
+function swBegin(taskId) {
+  APP.runningTaskId = taskId;
+  APP.runningStart = Date.now();
+  saveData();
+  clearInterval(swInterval);
+  swInterval = setInterval(swTick, 500);
+  renderView();
+}
+function swStop(doRender) {
+  if (APP.runningTaskId === null) return;
+  const dur = Math.floor((Date.now() - APP.runningStart) / 1000);
+  if (dur >= 1) {
+    const tid = APP.runningTaskId;
+    if (!APP.sessions[tid]) APP.sessions[tid] = [];
+    APP.sessions[tid].push({ start: APP.runningStart, end: Date.now(), duration: dur });
+  }
+  APP.runningTaskId = null;
+  APP.runningStart = null;
+  clearInterval(swInterval);
+  swInterval = null;
+  saveData();
+  if (doRender) renderView();
+}
+function swTick() {
+  const el = document.getElementById('sw-live');
+  if (el && APP.runningStart) {
+    el.textContent = fmtDuration(Math.floor((Date.now() - APP.runningStart) / 1000));
+  }
+}
+
+/* ===================== SESSION MODAL ===================== */
+function openSessionModal(taskId) {
+  const task = APP.tasks.find(t => t.id === taskId);
+  if (!task) return;
+  const sessions = APP.sessions[taskId] || [];
+  const total = getTaskTotalSec(taskId);
+  document.getElementById('session-modal-title').textContent = `⏱ ${task.name}`;
+  document.getElementById('session-modal-body').innerHTML = sessions.length === 0
+    ? `<div class="session-empty">まだ記録がありません。<br>▶ ボタンで計測を開始してください。</div>`
+    : `<div class="session-list">
+        ${[...sessions].reverse().map((s,i) => `
+          <div class="session-item">
+            <span class="sess-date">${fmtTimestamp(s.start)}</span>
+            <span class="sess-range">〜 ${fmtTimestamp(s.end)}</span>
+            <span class="sess-dur">${fmtDuration(s.duration)}</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteSession(${taskId},${sessions.length-1-i})">×</button>
+          </div>
+        `).join('')}
+      </div>
+      <div class="session-total">
+        <span class="st-label">累計作業時間</span>
+        <span class="st-val">${fmtDurationLong(total)}</span>
+      </div>`;
+  document.getElementById('session-clear-btn').onclick = () => {
+    if (!confirm('この記録をすべて削除しますか？')) return;
+    delete APP.sessions[taskId];
+    saveData();
+    closeModal('session-modal');
+    renderView();
+  };
+  document.getElementById('session-modal').classList.add('open');
+}
+function deleteSession(taskId, idx) {
+  if (!APP.sessions[taskId]) return;
+  APP.sessions[taskId].splice(idx, 1);
+  saveData();
+  openSessionModal(taskId);
+  renderView();
+}
+
+/* ===================== WORKLOAD ===================== */
+function renderWorkload() {
+  const activeTasks = APP.tasks.filter(t => t.status !== '完了');
+  const totalH = activeTasks.reduce((s,t) => s+(parseFloat(t.estimatedHours)||0), 0);
+  const actualSec = getTaskTotalSecAll();
+  const actualH = actualSec / 3600;
+  const availH = APP.workHoursPerDay * APP.workDaysPerWeek;
+  const overH = totalH - availH;
+  const isOver = totalH > availH;
+  const fillColor = isOver ? '#ef4444' : '#a78bfa';
+  const pct = availH > 0 ? Math.min(totalH / availH * 100, 100) : 0;
+  const markerPct = availH > 0 ? Math.min(100, availH / Math.max(totalH, availH) * 100) : 100;
+  const runId = APP.runningTaskId;
+  const runTask = runId ? APP.tasks.find(t=>t.id===runId) : null;
+
+  document.getElementById('workload-panel').innerHTML = `
+    <div class="workload-top">
+      <div class="workload-title">⏱ 工数サマリー（未完了タスク合計）
+        ${runTask ? `<span style="margin-left:12px;font-size:11px;font-weight:500;color:#059669;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:6px;padding:2px 8px;">● 計測中: ${escHtml(runTask.name)}</span>` : ''}
+      </div>
+      <div class="workload-settings">
+        <label>1日の労働時間 <input type="number" value="${APP.workHoursPerDay}" min="1" max="24" step="0.5" onchange="updateWorkSetting('workHoursPerDay',this.value)"> h</label>
+        <label style="margin-left:6px;">週の稼働日数 <input type="number" value="${APP.workDaysPerWeek}" min="1" max="7" onchange="updateWorkSetting('workDaysPerWeek',this.value)"> 日</label>
+      </div>
+    </div>
+    <div class="workload-numbers">
+      <div class="wl-num">
+        <div class="wl-val" style="color:${isOver?'#ef4444':'#7c3aed'}">${totalH.toFixed(1)}h</div>
+        <div class="wl-label">合計見積り工数</div>
+      </div>
+      <div style="font-size:20px;color:var(--muted);align-self:center;">/</div>
+      <div class="wl-num">
+        <div class="wl-val" style="color:var(--muted)">${availH}h</div>
+        <div class="wl-label">基本労働時間（週）</div>
+      </div>
+      <div style="align-self:center;padding:6px 14px;background:${isOver?'rgba(239,68,68,0.08)':'rgba(16,185,129,0.08)'};border:1px solid ${isOver?'rgba(239,68,68,0.25)':'rgba(16,185,129,0.25)'};border-radius:8px;font-size:13px;font-weight:700;color:${isOver?'#dc2626':'#059669'};">
+        ${isOver ? `超過 +${overH.toFixed(1)}h` : `余裕 ${Math.abs(overH).toFixed(1)}h`}
+      </div>
+      ${actualH > 0 ? `
+      <div style="align-self:center;padding:6px 14px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;font-size:13px;font-weight:700;color:#059669;">
+        実績 ${fmtDurationLong(actualSec)}
+      </div>` : ''}
+    </div>
+    <div style="position:relative;">
+      <div class="workload-bar-bg">
+        <div class="workload-bar-fill" style="width:${pct}%;background:${fillColor};"></div>
+        ${totalH > 0 && availH > 0 ? `<div class="workload-bar-marker" style="left:${markerPct}%;" data-label="${availH}h（基準）"></div>` : ''}
+      </div>
+      <div class="workload-legend">
+        <span class="wl-legend-item"><span class="wl-dot" style="background:${fillColor}"></span>見積り ${totalH.toFixed(1)}h</span>
+        <span class="wl-legend-item"><span class="wl-dot" style="background:var(--text)"></span>基本労働 ${availH}h／週</span>
+        ${actualH > 0 ? `<span class="wl-legend-item"><span class="wl-dot" style="background:#059669"></span>実績作業 ${fmtDurationLong(actualSec)}</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function updateWorkSetting(key, val) {
+  const n = parseFloat(val);
+  if (!isNaN(n) && n > 0) { APP[key]=n; saveData(); renderWorkload(); }
+}
+
+/* ===================== STATS ===================== */
+function renderStats() {
+  const t = APP.tasks;
+  const doneRate = t.length ? Math.round(t.filter(x=>x.status==='完了').length / t.length * 100) : 0;
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${t.length}</div><div class="stat-label">全タスク</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#2563eb">${t.filter(x=>x.status==='進行中').length}</div><div class="stat-label">進行中</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#4b5563">${t.filter(x=>x.status==='未着手').length}</div><div class="stat-label">未着手</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#b45309">${t.filter(x=>x.status==='要確認').length}</div><div class="stat-label">要確認</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#059669">${doneRate}%</div><div class="stat-label">完了率</div></div>
+  `;
+}
+
+/* ===================== CAT TABS ===================== */
+function renderCatTabs() {
+  const all = APP.tasks.length;
+  let html = `<button class="cat-tab ${activeCategory==='all'?'active':''}" onclick="setCategory('all')">すべて (${all})</button>`;
+  APP.categories.forEach(c => {
+    const cnt = APP.tasks.filter(t=>t.category===c.id).length;
+    const a = activeCategory===c.id;
+    html += `<button class="cat-tab ${a?'active':''}" onclick="setCategory('${c.id}')" style="${a?`background:${c.color};border-color:${c.color};`:`border-color:${c.color}44;color:${c.color};`}">${c.name} (${cnt})</button>`;
+  });
+  document.getElementById('cat-tabs').innerHTML = html;
+}
+
+/* ===================== FILTER ===================== */
+function getFilteredTasks() {
+  const q  = document.getElementById('search-input')?.value.toLowerCase() || '';
+  const fs = document.getElementById('filter-status')?.value || '';
+  const fp = document.getElementById('filter-priority')?.value || '';
+  const hd = document.getElementById('hide-done')?.checked;
+  return APP.tasks.filter(t => {
+    if (activeCategory!=='all' && t.category!==activeCategory) return false;
+    if (q && !t.name.toLowerCase().includes(q) && !(t.memo||'').toLowerCase().includes(q)) return false;
+    if (fs && t.status!==fs) return false;
+    if (fp && t.priority!==fp) return false;
+    if (hd && t.status==='完了') return false;
+    return true;
+  });
+}
+
+/* ===================== LIST VIEW ===================== */
+function renderListView(tasks) {
+  const priorityOrder = {'最優先':0,'高':1,'中':2,'低':3};
+  const statusOrder   = {'進行中':0,'要確認':1,'未着手':2,'保留':3,'完了':4};
+  const sorted = [...tasks].sort((a,b) => {
+    const sd = (statusOrder[a.status]||99)-(statusOrder[b.status]||99);
+    return sd!==0 ? sd : (priorityOrder[a.priority]||99)-(priorityOrder[b.priority]||99);
+  });
+  const active = sorted.filter(t=>t.status!=='完了');
+  const done   = sorted.filter(t=>t.status==='完了');
+
+  function taskRow(t) {
+    const isRunning = APP.runningTaskId === t.id;
+    const totalSec  = getTaskTotalSec(t.id);
+    const curSec    = isRunning ? Math.floor((Date.now()-APP.runningStart)/1000) : 0;
+    return `
+    <div class="task-item ${t.status==='完了'?'done':''} ${isRunning?'sw-active':''}">
+      <button class="task-check ${t.status==='完了'?'checked':''}" onclick="toggleDone(${t.id})">${t.status==='完了'?'✓':''}</button>
+      <button class="sw-btn ${isRunning?'running':''}" onclick="swToggle(${t.id})" title="${isRunning?'停止（クリックで止める）':'計測開始'}">
+        ${isRunning?'⏹':'▶'}
+      </button>
+      <div class="task-name">${escHtml(t.name)}</div>
+      <div class="task-meta">
+        ${catBadge(t.category)}
+        ${statusBadge(t.status)}
+        ${priorityBadge(t.priority)}
+        ${timeBadge(t.estimatedHours)}
+        ${isRunning ? `<span class="sw-elapsed" id="sw-live">${fmtDuration(curSec)}</span>` : ''}
+        ${totalSec > 0 ? `<span class="actual-badge" onclick="openSessionModal(${t.id})" title="記録を見る">✓ ${fmtDuration(totalSec)}</span>` : ''}
+        ${deadlineLabel(t.deadline)}
+      </div>
+      <div class="task-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${t.id})" title="編集">✎</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})" title="削除">×</button>
+      </div>
+    </div>`;
+  }
+
+  if (!active.length && !done.length) {
+    return `<div class="empty-state"><div class="empty-icon">📋</div><p>タスクがありません。<br>「＋ タスク追加」から追加してください。</p></div>`;
+  }
+  const activeH = active.reduce((s,t)=>s+(parseFloat(t.estimatedHours)||0),0);
+  return `
+    ${active.length ? `
+      <div class="section-title" style="margin-top:0;">今あるタスク
+        <span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--muted);">${active.length}件 · 合計 ${activeH}h</span>
+      </div>
+      <div class="task-list" style="margin-bottom:32px;">${active.map(taskRow).join('')}</div>
+    ` : ''}
+    ${done.length ? `
+      <div class="section-title">完了済み
+        <span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--muted);">${done.length}件</span>
+      </div>
+      <div class="task-list">${done.map(taskRow).join('')}</div>
+    ` : ''}`;
+}
+
+/* ===================== KANBAN VIEW ===================== */
+function renderKanbanView(tasks) {
+  const statuses = ['未着手','進行中','要確認','保留','完了'];
+  const sc = {'未着手':'#9ca3af','進行中':'#2563eb','要確認':'#f59e0b','保留':'#7c3aed','完了':'#059669'};
+  return `<div class="kanban-board">${statuses.map(s => {
+    const cols = tasks.filter(t=>t.status===s);
+    const colH = cols.reduce((sum,t)=>sum+(parseFloat(t.estimatedHours)||0),0);
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <span style="color:${sc[s]}">${s}</span>
+        <span style="display:flex;gap:4px;align-items:center;">
+          <span style="background:${sc[s]}22;color:${sc[s]};border-radius:20px;padding:1px 7px;font-size:10px;">${cols.length}</span>
+          ${colH>0?`<span style="font-size:10px;color:var(--muted);">${colH}h</span>`:''}
+        </span>
+      </div>
+      <div class="kanban-cards">
+        ${cols.length ? cols.map(t => {
+          const totalSec = getTaskTotalSec(t.id);
+          return `<div class="kanban-card" onclick="openEditModal(${t.id})">
+            <div class="kc-name">${escHtml(t.name)}</div>
+            <div class="kc-meta">
+              ${catBadge(t.category)}${priorityBadge(t.priority)}${timeBadge(t.estimatedHours)}
+              ${totalSec>0?`<span class="actual-badge" onclick="event.stopPropagation();openSessionModal(${t.id})">✓ ${fmtDuration(totalSec)}</span>`:''}
+            </div>
+          </div>`;
+        }).join('') : `<div style="color:var(--muted);font-size:12px;padding:8px 0;">なし</div>`}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ===================== RENDER ===================== */
+function renderView() {
+  renderWorkload();
+  renderStats();
+  renderCatTabs();
+  const tasks = getFilteredTasks();
+  document.getElementById('main-view').innerHTML =
+    currentView==='kanban' ? renderKanbanView(tasks) : renderListView(tasks);
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('view-list-btn').classList.toggle('active', v==='list');
+  document.getElementById('view-kanban-btn').classList.toggle('active', v==='kanban');
+  renderView();
+}
+function setCategory(id) { activeCategory=id; renderView(); }
+
+/* ===================== TASK ACTIONS ===================== */
+function toggleDone(id) {
+  if (APP.runningTaskId===id) swStop(false);
+  const t = APP.tasks.find(x=>x.id===id);
+  if (!t) return;
+  t.status = t.status==='完了' ? '未着手' : '完了';
+  saveData(); renderView();
+}
+function deleteTask(id) {
+  if (!confirm('このタスクを削除しますか？')) return;
+  if (APP.runningTaskId===id) swStop(false);
+  APP.tasks = APP.tasks.filter(t=>t.id!==id);
+  saveData(); renderView();
+}
+
+/* ===================== TASK MODAL ===================== */
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'タスク追加';
+  document.getElementById('modal-save-btn').textContent = '追加';
+  ['f-name','f-memo','f-deadline','f-hours'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-status').value = '未着手';
+  document.getElementById('f-priority').value = '中';
+  populateCatSelect();
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),50);
+}
+function openEditModal(id) {
+  const t = APP.tasks.find(x=>x.id===id); if(!t) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'タスク編集';
+  document.getElementById('modal-save-btn').textContent = '保存';
+  document.getElementById('f-name').value = t.name;
+  document.getElementById('f-memo').value = t.memo||'';
+  document.getElementById('f-status').value = t.status;
+  document.getElementById('f-priority').value = t.priority;
+  document.getElementById('f-deadline').value = t.deadline||'';
+  document.getElementById('f-hours').value = t.estimatedHours||'';
+  populateCatSelect(t.category);
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),50);
+}
+function populateCatSelect(selected) {
+  document.getElementById('f-category').innerHTML = APP.categories.map(c=>
+    `<option value="${c.id}" ${selected===c.id?'selected':''}>${c.name}</option>`).join('');
+}
+function saveTask() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('タスク名を入力してください'); return; }
+  const data = { name, memo:document.getElementById('f-memo').value.trim(), category:document.getElementById('f-category').value, status:document.getElementById('f-status').value, priority:document.getElementById('f-priority').value, deadline:document.getElementById('f-deadline').value, estimatedHours:parseFloat(document.getElementById('f-hours').value)||0 };
+  if (editingId!==null) { const t=APP.tasks.find(x=>x.id===editingId); if(t) Object.assign(t,data); }
+  else APP.tasks.push({id:APP.nextId++,...data,createdAt:Date.now()});
+  saveData(); closeModal('task-modal'); renderView();
+}
+
+/* ===================== CATEGORY MODAL ===================== */
+function openCatModal() { renderCatManageList(); document.getElementById('cat-modal').classList.add('open'); }
+function renderCatManageList() {
+  document.getElementById('cat-manage-list').innerHTML = APP.categories.map(c=>`
+    <div class="cat-manage-item">
+      <div class="cat-color-dot" style="background:${c.color}"></div>
+      <div class="cat-manage-name">${escHtml(c.name)}</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}')">削除</button>
+    </div>`).join('');
+}
+function addCategory() {
+  const name=document.getElementById('new-cat-name').value.trim(); if(!name) return;
+  const color=document.getElementById('new-cat-color').value;
+  APP.categories.push({id:'cat_'+Date.now(),name,color});
+  saveData(); document.getElementById('new-cat-name').value='';
+  renderCatManageList(); renderCatTabs();
+}
+function deleteCategory(id) {
+  if (APP.tasks.some(t=>t.category===id)) {
+    if (!confirm('このカテゴリのタスクは「その他」に移動されます。削除しますか？')) return;
+    APP.tasks.forEach(t=>{if(t.category===id) t.category='other';});
+  }
+  APP.categories=APP.categories.filter(c=>c.id!==id);
+  saveData(); if(activeCategory===id) activeCategory='all';
+  renderCatManageList(); renderView();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ===================== EVENT LISTENERS ===================== */
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el) el.classList.remove('open');});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(el=>el.classList.remove('open'));
+  if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){
+    const m=document.querySelector('.modal-overlay.open');
+    if(m?.id==='task-modal') saveTask();
+  }
+});
+window.addEventListener('beforeunload', ()=>{ if(APP.runningTaskId!==null) swStop(false); });
+
+/* ===================== INIT ===================== */
+if (APP.runningTaskId !== null && APP.runningStart !== null) {
+  clearInterval(swInterval);
+  swInterval = setInterval(swTick, 500);
+}
+renderView();
+</script>
+</body>
+</html>

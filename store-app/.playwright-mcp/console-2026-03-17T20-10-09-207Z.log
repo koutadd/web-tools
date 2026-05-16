@@ -1,0 +1,35 @@
+[  136290ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1773778345467:0
+[  136322ms] ReferenceError: PurchaseItemsPanel is not defined
+    at OwnerDashboard (about://React/Server/webpack-internal:///(rsc)/./app/owner/%5Bid%5D/page.tsx?182:859:105)
+    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
+    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
+    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
+    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13)
+[  139356ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1773778345467 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/owner/cmmv11t650000xgck1sb52qsz:0
+[  141710ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/dev/hot-reloader/app/hot-reloader-app.js:113
+[  142302ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/owner/cmmv11t650000xgck1sb52qsz:0
+[  142597ms] Error: Cannot find module './vendor-chunks/@swc.js'
+Require stack:
+- /Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js
+- /Users/koutayamakawa/web-tools/store-app/.next/server/app/owner/[id]/page.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/load-components.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/build/utils.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/dev/static-paths-worker.js
+- /Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/compiled/jest-worker/processChild.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1455:15)
+    at <unknown> (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:57:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1065:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1070:22)
+    at Module._load (node:internal/modules/cjs/loader:1241:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1555:12)
+    at mod.require (file:///Users/koutayamakawa/web-tools/store-app/node_modules/next/dist/server/require-hook.js:68:28)
+    at require (node:internal/modules/helpers:190:16)
+    at __webpack_require__.f.require (file:///Users/koutayamakawa/web-tools/store-app/.next/server/webpack-runtime.js:190:28)
+[  147596ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/owner/cmmv11t650000xgck1sb52qsz:0
+[  147600ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/css/app/layout.css?v=1773778356681:0
+[  147602ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/main-app.js:0
+[  147602ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/_next/static/chunks/app-pages-internals.js:0
+[  150605ms] [WARNING] The resource http://localhost:3001/_next/static/css/app/layout.css?v=1773778356681 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/owner/cmmv11t650000xgck1sb52qsz:0
