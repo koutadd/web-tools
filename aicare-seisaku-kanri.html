@@ -1945,12 +1945,71 @@ async function gasGet(params) {
   return res.json();
 }
 
+// ── スプレッドシート直読み（GAS不要・常に最新）──────
+const _SHEET_SS_ID = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
+const _SHEET_TAB   = '店舗製作物';
+async function fetchSheetItems() {
+  const url = 'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID +
+    '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent(_SHEET_TAB);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Sheet fetch failed: ' + res.status);
+  const text = await res.text();
+  const json = text.replace(/^[^{]*/, '').replace(/\)\s*;?\s*$/, '');
+  const data = JSON.parse(json);
+  const rows = data.table.rows;
+  // headers=0 なので rows[i] = スプレッドシートの行 i+1 → rowNum = i+1 で GAS と一致
+  const cv = (cell) => (cell && cell.v != null) ? cell.v : '';
+  const cs = (cell) => String(cv(cell)).trim();
+  const cd = (cell) => { if (!cell) return ''; return (cell.f || String(cell.v||'')).trim(); };
+
+  const blocks = [];
+  for (let i = 0; i < rows.length; i++) {
+    const c = rows[i].c || [];
+    const hRaw = cv(c[7]);
+    const hNum = hRaw === '' ? NaN : parseFloat(hRaw);
+    const g = cs(c[6]);
+    if (hNum === 1) {
+      if (blocks.length > 0) blocks[blocks.length-1].end = i-1;
+      blocks.push({ start:i, end:-1, store: cs(c[5]), storeNo: cs(c[3]) });
+    }
+    if (hNum === 3 && g && blocks.length > 0) blocks[blocks.length-1].store = g;
+  }
+  if (blocks.length > 0) blocks[blocks.length-1].end = rows.length-1;
+
+  const items = [];
+  for (const b of blocks) {
+    if (!b.store) continue;
+    for (let i = b.start; i <= b.end; i++) {
+      const c = rows[i].c || [];
+      const iCol = cs(c[8]);
+      if (!iCol) continue;
+      items.push({
+        rowNum:      i + 1,
+        store:       b.store,
+        storeNo:     b.storeNo,
+        item:        iCol,
+        size:        cs(c[9]),
+        notes:       cs(c[10]),
+        format:      cs(c[11]),
+        requester:   cs(c[12]),
+        requestDate: cd(c[13]),
+        deadline:    cd(c[14]),
+        producer:    cs(c[15]),
+        status:      cs(c[16]),
+        urgent:      cs(c[18]),
+        cellUrl:     'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID + '/edit#gid=0&range=G'+(i+1),
+      });
+    }
+  }
+  return { items, sheetGid: 0 };
+}
+
 // ── データ読み込み ────────────────────────────────
 async function loadData() {
   const c = document.getElementById('items-container');
   c.innerHTML = '<div class="loading"><div class="spinner"></div><span>シートを読み込み中...</span></div>';
   try {
-    const data = await gasGet({ action: 'getItems' });
+    const data = await fetchSheetItems();
     if (data.error) throw new Error(data.error);
     // フォルダキャッシュをマージ
     if (data.sheetGid != null) {
