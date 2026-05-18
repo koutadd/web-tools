@@ -1,5 +1,6 @@
 .vercel
 node_modules
+store-app/.next/
 data/
 *.jsonl
 lp-research-engine/
