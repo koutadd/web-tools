@@ -774,9 +774,10 @@ function getItems() {
     const g = String(values[i][6] || '').trim();
     if (h === '1') {
       if (blocks.length > 0) blocks[blocks.length-1].end = i-1;
-      blocks.push({ start:i, end:-1, store:'', storeNo:String(values[i][3]||'') });
+      const fallbackName = String(values[i][5] || '').trim(); // F列: 店舗表示名をフォールバックに
+      blocks.push({ start:i, end:-1, store: fallbackName, storeNo:String(values[i][3]||'') });
     }
-    if (h === '3' && g && blocks.length > 0) blocks[blocks.length-1].store = g;
+    if (h === '3' && g && blocks.length > 0) blocks[blocks.length-1].store = g; // 正式名で上書き
   }
   if (blocks.length > 0) blocks[blocks.length-1].end = values.length-1;
 
@@ -1181,11 +1182,14 @@ function addRequest(storeName, itemName, size, notes, format, requester, request
   var sheet  = getSheet();
   var values = sheet.getDataRange().getValues();
   var storeGRow = -1;
+  var fallbackRow = -1;
   for (var i = 0; i < values.length; i++) {
     var h = String(values[i][7] || '').trim();
     var g = String(values[i][6] || '').trim();
     if (h === '3' && g === storeName) { storeGRow = i; break; }
+    if (h === '1' && String(values[i][5] || '').trim() === storeName && fallbackRow === -1) fallbackRow = i;
   }
+  if (storeGRow === -1) storeGRow = fallbackRow; // G列空の店舗はF列表示名で照合
   if (storeGRow === -1) throw new Error('店舗が見つかりません: ' + storeName);
   var insertAt = values.length + 1;
   for (var j = storeGRow + 1; j < values.length; j++) {
