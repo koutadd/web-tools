@@ -168,6 +168,76 @@
 </style>
 </head>
 <body>
+<!-- ── AICARE COMMON NAV START ── -->
+<style>
+#aicare-common-nav {
+  position: sticky; top: 0; z-index: 99999;
+  background: #040c18;
+  border-bottom: 1px solid rgba(245,158,11,0.18);
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 20px;
+  height: 42px; min-height: 42px; max-height: 42px;
+  overflow-x: auto; overflow-y: hidden;
+  flex-wrap: nowrap; white-space: nowrap;
+  scrollbar-width: none; -ms-overflow-style: none;
+  font-family: 'DM Mono', 'SF Mono', monospace; font-size: 11px; letter-spacing: 0.05em;
+  box-sizing: border-box;
+}
+#aicare-common-nav::-webkit-scrollbar { display: none; }
+#aicare-common-nav > * { flex-shrink: 0; }
+#aicare-common-nav .cn-label {
+  color: rgba(255,255,255,0.25); font-size: 10px; letter-spacing: 0.1em;
+  padding-right: 4px;
+}
+#aicare-common-nav .cn-sep {
+  color: rgba(255,255,255,0.15); padding: 0 2px; user-select: none;
+}
+#aicare-common-nav a {
+  color: rgba(148,163,184,0.85); text-decoration: none;
+  padding: 3px 10px; border-radius: 4px;
+  border: 1px solid rgba(148,163,184,0.12);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+#aicare-common-nav a:hover {
+  color: #e2eaf4; background: rgba(255,255,255,0.06);
+}
+#aicare-common-nav a.cn-active {
+  color: #f59e0b !important;
+  border-color: rgba(245,158,11,0.35) !important;
+  background: rgba(245,158,11,0.08) !important;
+}
+</style>
+<nav id="aicare-common-nav">
+  <span class="cn-label">eye care lab</span>
+  <span class="cn-sep">|</span>
+  <a href="aicare-top-prototype.html">サイト TOP</a>
+  <a href="aicare-sitemap.html">サイトマップ</a>
+  <a href="aicare-design-requirements.html">要件定義書</a>
+  <a href="aicare-lab-app.html">出店管理</a>
+  <a href="aicare-store-opening-schedule.html">出店スケジュール</a>
+  <a href="aicare-vision-check.html">視力チェック</a>
+  <a href="aicare-brand-overview.html">ブランドマップ</a>
+  <a href="eyecare-glass-branding.html">グラス</a>
+  <span class="cn-sep">|</span>
+  <a href="reference-sites.html">参考サイト集</a>
+  <span class="cn-sep">|</span>
+  <a href="aicare-schedule.html">全体スケジュール</a>
+  <a href="aicare-projects.html">プロジェクト管理</a>
+  <a href="aicare-seisaku-kanri.html">制作管理シート</a>
+  <a href="aicare-flagship.html">フラッグシップ</a>
+  <span class="cn-sep">|</span>
+  <a href="logo-gallery.html">Logo</a>
+</nav>
+<script>
+(function(){
+  var cur = location.pathname.split('/').pop() || '';
+  document.querySelectorAll('#aicare-common-nav a').forEach(function(a){
+    if(a.getAttribute('href') === cur) a.classList.add('cn-active');
+  });
+})();
+</script>
+<!-- ── AICARE COMMON NAV END ── -->
 
 <header>
   <div class="wrap head-grid">
