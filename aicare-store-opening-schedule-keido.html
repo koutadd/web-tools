@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店スケジュール ｜ アイケアLaBo 経堂店</title>
+<style>
+  :root{
+    --bg:#ffffff;--bg-soft:#fbfbfa;--ink:#1c2230;--ink-soft:#5d6573;
+    --line:#e9e9e6;--line-strong:#d3d3ce;
+    --aqua:#5ba3c7;--aqua-soft:#dcebf0;--aqua-bg:#eef6fa;
+    --sage:#7fa68c;--sage-bg:#eef4ef;
+    --amber:#c79248;--amber-bg:#f8f1e6;
+    --warn:#c0564a;--warn-bg:#fbeeec;
+    --shadow:0 1px 2px rgba(28,34,48,.04),0 8px 24px rgba(28,34,48,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+    line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:.01em}
+  .serif{font-family:"Yu Mincho","Hiragino Mincho ProN","YuMincho",serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+  header{border-bottom:1px solid var(--line);padding:46px 0 38px;
+    background:radial-gradient(1200px 240px at 78% -40px,var(--sage-bg),transparent 70%)}
+  .kicker{font-size:11px;letter-spacing:.34em;color:var(--sage);font-weight:700;text-transform:uppercase}
+  h1{font-size:34px;font-weight:600;margin:12px 0 6px;letter-spacing:.02em}
+  .sub{color:var(--ink-soft);font-size:14px}
+  .head-grid{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+  .count{text-align:right;border:1px solid var(--line-strong);border-radius:14px;
+    padding:18px 26px;background:var(--bg);box-shadow:var(--shadow);min-width:210px}
+  .count .lab{font-size:11px;letter-spacing:.22em;color:var(--ink-soft);text-transform:uppercase}
+  .count .num{font-size:46px;font-weight:700;line-height:1.05;margin-top:4px;font-family:"Yu Mincho",serif}
+  .count .num small{font-size:16px;font-weight:600;color:var(--ink-soft);margin-left:4px}
+  .count .date{font-size:12px;color:var(--sage);font-weight:700;margin-top:6px}
+
+  section{padding:42px 0}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .sec-head h2{font-size:20px;font-weight:600;letter-spacing:.03em}
+  .sec-head .en{font-size:11px;letter-spacing:.28em;color:var(--ink-soft);text-transform:uppercase}
+  .lead{color:var(--ink-soft);font-size:14px;max-width:780px;margin-bottom:8px}
+
+  .cp{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 4px}
+  .cp .node{border:1px solid var(--line-strong);border-radius:999px;padding:7px 15px;
+    font-size:12.5px;font-weight:600;background:var(--bg);white-space:nowrap}
+  .cp .node.hot{border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+  .cp .node.goal{border-color:var(--sage);color:#3c6b4e;background:var(--sage-bg)}
+  .cp .arr{color:var(--line-strong);font-size:14px}
+
+  .gantt-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--bg);box-shadow:var(--shadow)}
+  .gantt{min-width:880px}
+  .g-axis{display:grid;border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .g-axis .corner{padding:12px 14px;font-size:11px;color:var(--ink-soft);font-weight:700;letter-spacing:.1em;border-right:1px solid var(--line)}
+  .g-day{padding:8px 0 7px;text-align:center;font-size:10px;color:var(--ink-soft);border-right:1px solid var(--line)}
+  .g-day.wk{background:#f3f5f6}
+  .g-day .d{font-size:12px;font-weight:700;color:var(--ink);display:block;line-height:1.2}
+  .g-day .m{font-size:9px;letter-spacing:.04em}
+  .g-day.today{background:var(--sage-bg)}.g-day.today .d{color:var(--sage)}
+
+  .g-track{display:grid;border-bottom:1px solid var(--line);position:relative}
+  .g-track:last-child{border-bottom:none}
+  .g-track .t-label{padding:14px 14px;border-right:1px solid var(--line);font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;gap:8px;background:var(--bg)}
+  .t-dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .g-cells{position:relative;grid-column:2 / -1;display:grid}
+  .g-cell{border-right:1px solid var(--line);min-height:58px}
+  .g-cell.wk{background:#fafbfb}.g-cell.today{background:var(--sage-bg)}
+
+  .bar{position:absolute;top:50%;transform:translateY(-50%);height:30px;border-radius:8px;
+    display:flex;align-items:center;padding:0 10px;font-size:11.5px;font-weight:600;color:var(--ink);
+    cursor:pointer;border:1px solid rgba(0,0,0,.06);white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;transition:filter .15s,transform .15s}
+  .bar:hover{filter:brightness(.97);transform:translateY(-50%) scale(1.008)}
+  .bar.mile{width:auto!important;padding:0 11px 0 9px;background:var(--bg);border:1px dashed var(--line-strong)}
+  .bar.mile::before{content:"◆";font-size:9px;margin-right:7px;color:var(--sage)}
+  .bar.dl{border:1px solid var(--warn)!important;background:var(--warn-bg);color:var(--warn)}
+  .bar.dl::before{content:"⚑";font-size:10px;margin-right:6px}
+  .bar.goal{background:var(--sage-bg);border-color:var(--sage);color:#34603f;font-weight:700}
+  .bar.goal::before{content:"★";margin-right:6px;font-size:10px}
+  .bar .chk{width:14px;height:14px;border:1.5px solid currentColor;border-radius:4px;margin-right:8px;
+    flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:9px;opacity:.55}
+  .bar.done{opacity:.5;text-decoration:line-through}
+  .bar.done .chk{opacity:1;background:currentColor}
+  .bar.done .chk::after{content:"✓";color:#fff}
+  .b-aqua{background:var(--aqua-bg)}.d-aqua{background:var(--aqua)}
+  .b-sage{background:var(--sage-bg)}.d-sage{background:var(--sage)}
+  .b-amber{background:var(--amber-bg)}.d-amber{background:var(--amber)}
+
+  .specs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+  .spec{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--bg-soft)}
+  .spec .sl{font-size:11px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase;font-weight:700}
+  .spec .sv{font-size:15px;font-weight:700;margin-top:6px}
+  .spec .sv small{font-weight:600;color:var(--ink-soft);font-size:12px}
+  .spec ul{list-style:none;margin-top:8px;font-size:12px;color:var(--ink-soft)}
+  .spec li{padding:2px 0;display:flex;justify-content:space-between;gap:10px}
+  .spec li span:last-child{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+  .phases{display:grid;gap:10px}
+  .ph{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:16px 18px;
+    display:grid;grid-template-columns:96px 1fr auto;gap:18px;align-items:start;
+    transition:border-color .15s,box-shadow .15s}
+  .ph:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+  .ph.is-dl{border-left:3px solid var(--warn)}
+  .ph.is-goal{border-left:3px solid var(--sage)}
+  .ph .when{font-size:13px;font-weight:700}
+  .ph .when small{display:block;font-size:11px;color:var(--ink-soft);font-weight:600;margin-top:2px}
+  .ph .body h3{font-size:14.5px;font-weight:700;margin-bottom:4px}
+  .ph .body p{font-size:12.5px;color:var(--ink-soft)}
+  .ph .body .risk{margin-top:8px;font-size:11.5px;color:var(--warn);background:var(--warn-bg);
+    display:inline-block;padding:3px 9px;border-radius:6px;font-weight:600}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .tg-aqua{background:var(--aqua-bg);color:#2f6f8c}
+  .tg-sage{background:var(--sage-bg);color:#3c6b4e}
+  .tg-amber{background:var(--amber-bg);color:#9a6c24}
+  .ph .pchk{appearance:none;width:20px;height:20px;border:1.5px solid var(--line-strong);
+    border-radius:6px;cursor:pointer;flex:none;position:relative;background:var(--bg)}
+  .ph .pchk:checked{background:var(--sage);border-color:var(--sage)}
+  .ph .pchk:checked::after{content:"✓";color:#fff;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+  .ph.checked{opacity:.62}.ph.checked .body h3{text-decoration:line-through}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:22px 24px;background:var(--bg);box-shadow:var(--shadow)}
+  .panel h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .panel.warn h3{color:var(--warn)}
+  .panel ol{list-style:none}
+  .panel li{font-size:13px;color:var(--ink-soft);padding:9px 0 9px 26px;border-bottom:1px dashed var(--line);position:relative}
+  .panel li:last-child{border-bottom:none}
+  .panel.warn ol{counter-reset:r}
+  .panel.warn li::before{content:counter(r);counter-increment:r;position:absolute;left:0;top:8px;
+    width:18px;height:18px;border-radius:50%;background:var(--warn-bg);color:var(--warn);
+    font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panel.dec ol{counter-reset:d}
+  .panel.dec li::before{content:counter(d);counter-increment:d;position:absolute;left:0;top:8px;
+    width:18px;height:18px;border-radius:50%;background:var(--sage-bg);color:#3c6b4e;
+    font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panel li b{color:var(--ink)}
+
+  .now{border:1px solid var(--sage);background:var(--sage-bg);border-radius:14px;
+    padding:20px 24px;display:flex;align-items:center;gap:18px;margin:6px 0 0}
+  .now .ic{font-size:22px}
+  .now .tx h3{font-size:15px;font-weight:700;margin-bottom:3px}
+  .now .tx p{font-size:13px;color:var(--ink-soft)}
+
+  .alert{border:1px solid var(--warn);background:var(--warn-bg);border-radius:14px;
+    padding:18px 22px;display:flex;align-items:flex-start;gap:14px;font-size:13px;color:#7a3a32}
+  .alert .ic{font-size:18px;color:var(--warn)}
+  .alert b{color:var(--warn)}
+  .alert a{color:var(--warn);font-weight:700}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--ink-soft);font-size:12px}
+  .meta{display:flex;gap:22px;flex-wrap:wrap}
+  .meta b{color:var(--ink)}
+  a.back,a.cross{color:var(--sage);text-decoration:none;font-weight:700;font-size:12px}
+  a.back:hover,a.cross:hover{text-decoration:underline}
+
+  .ov{position:fixed;inset:0;background:rgba(20,24,34,.42);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+  .ov.on{display:flex}
+  .mod{background:var(--bg);border-radius:16px;max-width:480px;width:100%;padding:28px 30px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+  .mod .mk{font-size:11px;letter-spacing:.2em;color:var(--sage);font-weight:700;text-transform:uppercase}
+  .mod h3{font-size:19px;font-weight:700;margin:6px 0 4px}
+  .mod .mw{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:14px}
+  .mod p{font-size:13.5px;color:var(--ink);line-height:1.8;margin-bottom:12px}
+  .mod .rk{font-size:12.5px;color:var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:9px}
+  .mod .x{float:right;cursor:pointer;color:var(--ink-soft);font-size:20px;line-height:1;border:none;background:none}
+
+  @media(max-width:760px){
+    .wrap{padding:0 18px}
+    h1{font-size:26px}
+    .head-grid{flex-direction:column;align-items:flex-start}
+    .count{align-self:stretch;text-align:left}
+    .cols,.specs{grid-template-columns:1fr}
+    .ph{grid-template-columns:74px 1fr;gap:12px}
+    .ph .pchk{grid-column:2;justself:start;margin-top:6px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-grid">
+    <div>
+      <div class="kicker">Store Opening Schedule</div>
+      <h1 class="serif">アイケアLaBo 経堂店 出店スケジュール</h1>
+      <div class="sub">2026/06/15(日) グランドオープン 設定 ／ 内装仕様・実測 確定済み ／ 既存店改装</div>
+    </div>
+    <div class="count">
+      <div class="lab">Open まで</div>
+      <div class="num" id="cd">–<small>日</small></div>
+      <div class="date">2026.06.15 SUN</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="alert">
+      <div class="ic">⚠</div>
+      <div>
+        <b>経堂6/15 ＝ 日立6/15（完全同日オープン）。</b>
+        両店とも律速が同じ「家具検索（がくさん＝同一人物とのスピード擦り合わせ）」。がくさんのキャパ・内装屋キャパ・制作物・山川ディレクションが直列でなく<b>競合</b>します。
+        どちらかを数日ずらせるなら片方を前後させる方が両方の成功確率が上がります。判断材料として記載。
+        <a href="./aicare-store-opening-schedule.html">▶ 日立店スケジュールを開く</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:14px">
+    <div class="now">
+      <div class="ic">▶</div>
+      <div class="tx">
+        <h3>今すぐやる1個：内装屋に確定仕様（¥330万）で正式発注のLINEを今日送る</h3>
+        <p>経堂は仕様・実測すべて確定済み。日立のようなMTG・現地調査フェーズが不要＝今日すぐ発注を打てる。同時に家具検索をがくさんと至急スピード擦り合わせ（5/9以降止まっていた律速タスク）。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="en">Fixed Spec</span><h2>確定済み仕様（再決定不要）</h2></div>
+    <p class="lead">経堂は日立と違い内装仕様・費用・家具レイアウト・実測がすべて確定済み。残るは家具検索の最終確定→発注→施工。</p>
+    <div class="specs">
+      <div class="spec">
+        <div class="sl">物件（実測済）</div>
+        <div class="sv">86.95㎡ <small>台形 / 26.31坪</small></div>
+        <ul>
+          <li><span>周長</span><span>約39.86m</span></li>
+          <li><span>平均壁高</span><span>約2.34m</span></li>
+          <li><span>既存壁</span><span>赤・青塗装</span></li>
+          <li><span>天井</span><span>黒塗装</span></li>
+        </ul>
+      </div>
+      <div class="spec">
+        <div class="sl">内装仕様 確定</div>
+        <div class="sv">WHITE × SILVER <small>約¥330万</small></div>
+        <ul>
+          <li><span>床(エスリューム)</span><span>¥533,000</span></li>
+          <li><span>壁(外周)</span><span>¥610,000</span></li>
+          <li><span>間仕切壁</span><span>¥249,000</span></li>
+          <li><span>天井</span><span>¥430,000</span></li>
+          <li><span>ガラスパーティション</span><span>¥715,000</span></li>
+          <li><span>カーテン</span><span>¥288,000</span></li>
+        </ul>
+      </div>
+      <div class="spec">
+        <div class="sl">家具レイアウト 確定</div>
+        <div class="sv">配置確定 <small>選定が律速</small></div>
+        <ul>
+          <li><span>レセプション</span><span>2台</span></li>
+          <li><span>治療ベッド</span><span>2台</span></li>
+          <li><span>PD測定台</span><span>2台</span></li>
+          <li><span>円形ディスプレイ</span><span>1台</span></li>
+          <li><span>ガラス棚</span><span>AWF系</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="sec-head"><span class="en">Critical Path</span><h2>クリティカルパス</h2></div>
+    <div class="cp">
+      <span class="node">5/19-20 確定仕様で内装発注</span><span class="arr">→</span>
+      <span class="node hot">5/22 家具最終確定＆即発注</span><span class="arr">→</span>
+      <span class="node hot">5/23 発注完了</span><span class="arr">→</span>
+      <span class="node hot">6/10 施工完了</span><span class="arr">→</span>
+      <span class="node">6/12-13 設置</span><span class="arr">→</span>
+      <span class="node goal">6/15 オープン</span>
+    </div>
+    <p class="lead" style="margin-top:14px">仕様確定済みで発注は今日打てる＝日立よりリードがある。最大律速は家具検索（5/9以降停止）。改装案件のため赤青塗装の隠蔽工程が重い。</p>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="sec-head"><span class="en">Gantt</span><h2>物理工程ガント（3トラック）</h2></div>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+    <p class="lead" style="margin-top:12px;font-size:12.5px">バー／マイルストーンをクリックで詳細。チェックで完了（保存されます）。備品は原本WBSで調達管理＝ここでは設置のみ。</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="en">Phases</span><h2>工程詳細・進捗</h2></div>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section>
+    <div class="cols">
+      <div class="panel warn">
+        <h3>⚠ 3大破綻リスク</h3>
+        <ol>
+          <li><b>日立との同日6/15競合（最大リスク）。</b>家具検索のがくさん・内装屋・制作物・山川が2店分競合。どちらかを数日ずらす検討を推奨。</li>
+          <li><b>家具検索の律速（5/9以降停止）。</b>仕様は確定でも家具が止まっている。5/22に最終確定＆即発注しないと施工に間に合わない。</li>
+          <li><b>改装の塗装工程が重い。</b>赤・青の既存塗装＋黒天井の隠蔽が最難関。ケレン→シーラー→白3回。新築より工程が長い＝施工2.5週で収まるか要確認。</li>
+        </ol>
+      </div>
+      <div class="panel dec">
+        <h3>経堂の強み・確認事項</h3>
+        <ol>
+          <li><b>仕様・実測 確定済み。</b>MTG・LiDAR現地調査フェーズ不要。今日すぐ内装発注可＝日立より1〜2日リード。</li>
+          <li><b>内装屋は日立と同一か別か。</b>同一だと6/10施工完了が2店同日デッドラインで競合。別なら競合緩和。要確定。</li>
+          <li><b>13変数の多くが確定。</b>店舗名=経堂店、実測値あり。オープン日6/15確定で残変数を5/22までに確定。</li>
+          <li><b>備品は原本WBSで調達管理。</b>PDメーター含む必須品は5/1基準調達済・揃う前提。本スケジュールは6/12-13設置のみ。</li>
+          <li><b>マーケ・LINE・SNS導線。</b>原本WBSで別管理。6/15に間に合うか本部側進行を別途確認。</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="meta">
+      <span><b>オープン</b> 2026/06/15(日)</span>
+      <span><b>状態</b> 仕様確定済み・発注前進フェーズ</span>
+      <span><b>本体管理</b> wiki/projects/eyecare-labo-tasks.md（フルステート）</span>
+      <span><b>備品/マーケ</b> 原本オープンWBS（別管理）</span>
+    </div>
+    <div style="margin-top:14px">
+      <a class="cross" href="./aicare-store-opening-schedule.html">→ 日立店スケジュール</a>
+      <span style="color:var(--line-strong);margin:0 10px">／</span>
+      <a class="back" href="./">← web-tools トップへ</a>
+    </div>
+    <div style="margin-top:8px;font-size:11px">最終更新 2026-05-19 ／ アイケアLaBo 内部運用ツール</div>
+  </div>
+</footer>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeMod()">
+  <div class="mod">
+    <button class="x" onclick="closeMod()">×</button>
+    <div class="mk" id="mk"></div>
+    <h3 id="mh"></h3>
+    <div class="mw" id="mw"></div>
+    <p id="mp"></p>
+    <div class="rk" id="mr" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var START=new Date(2026,4,19), END=new Date(2026,5,15);
+  var DAY=864e5;
+  var TOTAL=Math.round((END-START)/DAY)+1;
+  function idx(y,m,d){ return Math.round((new Date(y,m-1,d)-START)/DAY); }
+  var WD=['日','月','火','水','木','金','土'];
+
+  var TRACKS=[
+    {key:'in', name:'内装・施工', dot:'d-sage'},
+    {key:'cr', name:'制作物',     dot:'d-aqua'},
+    {key:'op', name:'設置・開店', dot:'d-amber'}
+  ];
+
+  var T=[
+    {id:'k1', tr:'in', s:idx(2026,5,19), e:idx(2026,5,20), type:'bar', cls:'b-sage',
+      label:'確定仕様で内装屋へ正式発注', when:'5/19〜20',
+      detail:'仕様・費用（WHITE×SILVER 約¥330万）・実測すべて確定済み。ST-01の次アクション「内装屋にLINE連絡（確定仕様で発注前進）」を即実行。外装(ST-02)も同時。日立のようなMTG・現地調査は不要。',
+      risk:'今日動かないと、せっかくの「仕様確定済みリード」を失う。'},
+    {id:'k2', tr:'in', s:idx(2026,5,22), e:idx(2026,5,22), type:'dl',
+      label:'家具・什器 最終確定＆即発注', when:'5/22(木) ★最重要',
+      detail:'レイアウトは確定済み（レセプション2/治療ベッド2/PD測定台2/円形ディスプレイ1/ガラス棚AWF系）。残るは具体的な家具選定の確定。ガラス棚は内装屋経由（代理店20〜40%引）。',
+      risk:'家具検索が5/9以降止まっている最大律速。がくさんと至急スピード擦り合わせ。日立分とキャパ競合。'},
+    {id:'k3', tr:'in', s:idx(2026,5,23), e:idx(2026,5,23), type:'dl',
+      label:'内装・外装 発注完了', when:'5/23(金)',
+      detail:'内装・外装の全発注を完了。施工期間 約2.5週確保のためのデッドライン。改装の塗装工程が重い分、余裕は薄い。',
+      risk:'5/23を超えると6/15は黄信号。'},
+    {id:'k4', tr:'in', s:idx(2026,5,24), e:idx(2026,6,10), type:'bar', cls:'b-sage',
+      label:'内装・外装 施工（改装）', when:'5/24〜6/10',
+      detail:'既存店改装：赤・青塗装の隠蔽（ケレン→シーラー→白3回）＋黒天井→白＋床(エスリューム)＋ガラスパーティション＋カーテン。新築より工程長い。',
+      risk:'赤の隠蔽が最難関。改装ゆえ撤去・下地処理込みで2.5週に収まるか要確認。'},
+    {id:'k5', tr:'in', s:idx(2026,6,10), e:idx(2026,6,10), type:'dl',
+      label:'施工完了 デッドライン', when:'6/10(水)',
+      detail:'内装・外装の施工完了。日立と同日デッドライン＝内装屋が同一業者なら競合。'},
+
+    {id:'kc1', tr:'cr', s:idx(2026,5,22), e:idx(2026,5,22), type:'mile', cls:'b-aqua',
+      label:'13変数確定', when:'5/22(木)',
+      detail:'店舗名=経堂店・実測値は確定済み。住所/TEL/営業時間/定休日/最寄り駅/オープン日(6-15)/LINE QR/キャッチ/サブコピー/KV/ロゴv3 を確定。'},
+    {id:'kc2', tr:'cr', s:idx(2026,5,23), e:idx(2026,6,11), type:'bar', cls:'b-aqua',
+      label:'制作物 制作（A→C順）', when:'5/23〜6/11',
+      detail:'◎先行：チラシ/A1/のぼり/A型/カッティング/玄関扉。A分類はテンプレ差替えで即着手。C分類は実測済みなので日立より早く起こせる。全件 医療コンプラチェック必須（治療/治す/効く/視力回復 NG）。',
+      risk:'日立分の制作物と同じ6/11納品デッドラインに集中。'},
+    {id:'kc3', tr:'cr', s:idx(2026,6,11), e:idx(2026,6,11), type:'dl',
+      label:'制作物 全納品（コンプラ済）', when:'6/11(木)',
+      detail:'◎○系すべて納品済み。外から見える物（看板・のぼり・窓シート・チラシ）は特に厳格に再チェック済みであること。'},
+
+    {id:'ko1', tr:'op', s:idx(2026,6,12), e:idx(2026,6,13), type:'bar', cls:'b-amber',
+      label:'搬入・設置', when:'6/12〜13',
+      detail:'看板取付／什器・家具・備品搬入設置（PDメーター含む備品は原本WBSで調達済・揃う前提。設置・配置のみ）／カッティング施工／LINE QR・ホットペッパー公開準備。'},
+    {id:'ko2', tr:'op', s:idx(2026,6,14), e:idx(2026,6,14), type:'mile', cls:'b-amber',
+      label:'プレ・最終チェック', when:'6/14(土)',
+      detail:'全設置完了確認。外から見える物の医療コンプラ最終目視。備品（PDメーター等）の設置・動作確認。LINE/ホットペッパー公開最終チェック。'},
+    {id:'ko3', tr:'op', s:idx(2026,6,15), e:idx(2026,6,15), type:'goal',
+      label:'グランドオープン', when:'6/15(日)',
+      detail:'🎉 アイケアLaBo 経堂店 グランドオープン（日立店と同日）。'}
+  ];
+
+  var KEY='keido_open_schedule_v1';
+  var done={};
+  try{ done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ done={}; }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(done)); }catch(e){} }
+
+  (function(){
+    var now=new Date(), t=new Date(2026,5,15);
+    var diff=Math.ceil((t-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/DAY);
+    var el=document.getElementById('cd');
+    if(diff>0) el.innerHTML=diff+'<small>日</small>';
+    else if(diff===0) el.innerHTML='本日<small>OPEN</small>';
+    else el.innerHTML='OPEN済';
+  })();
+
+  var nowD=new Date();
+  var todayCol=Math.round((new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate())-START)/DAY);
+  var gantt=document.getElementById('gantt');
+  var colCss='240px repeat('+TOTAL+',minmax(30px,1fr))';
+
+  var ax=document.createElement('div'); ax.className='g-axis'; ax.style.gridTemplateColumns=colCss;
+  var corner=document.createElement('div'); corner.className='corner'; corner.textContent='2026'; ax.appendChild(corner);
+  for(var i=0;i<TOTAL;i++){
+    var dt=new Date(START.getTime()+i*DAY);
+    var c=document.createElement('div'); c.className='g-day';
+    var w=dt.getDay();
+    if(w===0||w===6) c.className+=' wk';
+    if(i===todayCol) c.className+=' today';
+    c.innerHTML='<span class="d">'+dt.getDate()+'</span><span class="m">'+((dt.getDate()===1||i===0)?(dt.getMonth()+1)+'月 ':'')+WD[w]+'</span>';
+    ax.appendChild(c);
+  }
+  gantt.appendChild(ax);
+
+  TRACKS.forEach(function(tr){
+    var row=document.createElement('div'); row.className='g-track'; row.style.gridTemplateColumns=colCss;
+    var lab=document.createElement('div'); lab.className='t-label';
+    lab.innerHTML='<span class="t-dot '+tr.dot+'"></span>'+tr.name;
+    row.appendChild(lab);
+    var cells=document.createElement('div'); cells.className='g-cells';
+    cells.style.gridTemplateColumns='repeat('+TOTAL+',minmax(30px,1fr))';
+    for(var i=0;i<TOTAL;i++){
+      var dt=new Date(START.getTime()+i*DAY), w=dt.getDay();
+      var cell=document.createElement('div'); cell.className='g-cell';
+      if(w===0||w===6) cell.className+=' wk';
+      if(i===todayCol) cell.className+=' today';
+      cells.appendChild(cell);
+    }
+    T.filter(function(x){return x.tr===tr.key;}).forEach(function(x){
+      var bar=document.createElement('div');
+      var span=x.e-x.s+1, pct=100/TOTAL;
+      bar.className='bar '+(x.cls||'');
+      if(x.type==='mile') bar.className+=' mile';
+      if(x.type==='dl') bar.className+=' dl';
+      if(x.type==='goal') bar.className+=' goal';
+      bar.style.left='calc('+(x.s*pct)+'% + 4px)';
+      if(x.type==='bar') bar.style.width='calc('+(span*pct)+'% - 8px)';
+      bar.dataset.id=x.id;
+      if(done[x.id]) bar.className+=' done';
+      var chk=(x.type==='bar')?'<span class="chk"></span>':'';
+      bar.innerHTML=chk+'<span>'+x.label+'</span>';
+      bar.addEventListener('click',function(ev){
+        if(ev.target.classList.contains('chk')){ toggle(x.id); return; }
+        openMod(x);
+      });
+      cells.appendChild(bar);
+    });
+    row.appendChild(cells);
+    gantt.appendChild(row);
+  });
+
+  var trMap={in:['内装・施工','tg-sage'],cr:['制作物','tg-aqua'],op:['設置・開店','tg-amber']};
+  var ph=document.getElementById('phases');
+  T.slice().sort(function(a,b){return a.s-b.s || a.e-b.e;}).forEach(function(x){
+    var isDL=x.type==='dl', isGoal=x.type==='goal';
+    var row=document.createElement('div');
+    row.className='ph'+(isDL?' is-dl':'')+(isGoal?' is-goal':'')+(done[x.id]?' checked':'');
+    row.dataset.id=x.id;
+    var tg=trMap[x.tr];
+    row.innerHTML=
+      '<div class="when">'+x.when.split(' ')[0]+'<small>'+(x.when.split(' ').slice(1).join(' ')||'&nbsp;')+'</small></div>'+
+      '<div class="body"><h3>'+x.label+'</h3><p>'+x.detail+'</p>'+
+        (x.risk?'<span class="risk">⚠ '+x.risk+'</span>':'')+'</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">'+
+        '<span class="tag '+tg[1]+'">'+tg[0]+'</span>'+
+        '<input type="checkbox" class="pchk" '+(done[x.id]?'checked':'')+' aria-label="完了">'+
+      '</div>';
+    row.querySelector('.pchk').addEventListener('change',function(){ toggle(x.id); });
+    ph.appendChild(row);
+  });
+
+  function toggle(id){
+    done[id]=!done[id]; save();
+    document.querySelectorAll('.bar[data-id="'+id+'"]').forEach(function(b){ b.classList.toggle('done',!!done[id]); });
+    document.querySelectorAll('.ph[data-id="'+id+'"]').forEach(function(p){
+      p.classList.toggle('checked',!!done[id]);
+      var c=p.querySelector('.pchk'); if(c) c.checked=!!done[id];
+    });
+  }
+
+  var ov=document.getElementById('ov');
+  function openMod(x){
+    document.getElementById('mk').textContent=trMap[x.tr][0];
+    document.getElementById('mh').textContent=x.label;
+    document.getElementById('mw').textContent=x.when;
+    document.getElementById('mp').textContent=x.detail;
+    var r=document.getElementById('mr');
+    if(x.risk){ r.style.display='block'; r.textContent='⚠ '+x.risk; } else r.style.display='none';
+    ov.classList.add('on');
+  }
+  window.closeMod=function(){ ov.classList.remove('on'); };
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeMod(); });
+})();
+</script>
+</body>
+</html>
