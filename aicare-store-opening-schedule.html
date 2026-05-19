@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出店スケジュール ｜ アイケアLaBo 日立店</title>
+<style>
+  :root{
+    --bg:#ffffff;--bg-soft:#fbfbfa;--ink:#1c2230;--ink-soft:#5d6573;
+    --line:#e9e9e6;--line-strong:#d3d3ce;
+    --aqua:#5ba3c7;--aqua-soft:#dcebf0;--aqua-bg:#eef6fa;
+    --sage:#7fa68c;--sage-bg:#eef4ef;
+    --amber:#c79248;--amber-bg:#f8f1e6;
+    --warn:#c0564a;--warn-bg:#fbeeec;
+    --shadow:0 1px 2px rgba(28,34,48,.04),0 8px 24px rgba(28,34,48,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+    line-height:1.7;-webkit-font-smoothing:antialiased;letter-spacing:.01em}
+  .serif{font-family:"Yu Mincho","Hiragino Mincho ProN","YuMincho",serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+  header{border-bottom:1px solid var(--line);padding:46px 0 38px;
+    background:radial-gradient(1200px 240px at 78% -40px,var(--aqua-bg),transparent 70%)}
+  .kicker{font-size:11px;letter-spacing:.34em;color:var(--aqua);font-weight:700;text-transform:uppercase}
+  h1{font-size:34px;font-weight:600;margin:12px 0 6px;letter-spacing:.02em}
+  .sub{color:var(--ink-soft);font-size:14px}
+  .head-grid{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+  .count{text-align:right;border:1px solid var(--line-strong);border-radius:14px;
+    padding:18px 26px;background:var(--bg);box-shadow:var(--shadow);min-width:210px}
+  .count .lab{font-size:11px;letter-spacing:.22em;color:var(--ink-soft);text-transform:uppercase}
+  .count .num{font-size:46px;font-weight:700;line-height:1.05;margin-top:4px;font-family:"Yu Mincho",serif}
+  .count .num small{font-size:16px;font-weight:600;color:var(--ink-soft);margin-left:4px}
+  .count .date{font-size:12px;color:var(--aqua);font-weight:700;margin-top:6px}
+
+  section{padding:42px 0}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .sec-head h2{font-size:20px;font-weight:600;letter-spacing:.03em}
+  .sec-head .en{font-size:11px;letter-spacing:.28em;color:var(--ink-soft);text-transform:uppercase}
+  .lead{color:var(--ink-soft);font-size:14px;max-width:780px;margin-bottom:8px}
+
+  .cp{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 4px}
+  .cp .node{border:1px solid var(--line-strong);border-radius:999px;padding:7px 15px;
+    font-size:12.5px;font-weight:600;background:var(--bg);white-space:nowrap}
+  .cp .node.hot{border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+  .cp .node.goal{border-color:var(--sage);color:#3c6b4e;background:var(--sage-bg)}
+  .cp .arr{color:var(--line-strong);font-size:14px}
+
+  .gantt-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--bg);box-shadow:var(--shadow)}
+  .gantt{min-width:880px}
+  .g-axis{display:grid;border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .g-axis .corner{padding:12px 14px;font-size:11px;color:var(--ink-soft);font-weight:700;letter-spacing:.1em;border-right:1px solid var(--line)}
+  .g-day{padding:8px 0 7px;text-align:center;font-size:10px;color:var(--ink-soft);border-right:1px solid var(--line)}
+  .g-day.wk{background:#f3f5f6}
+  .g-day .d{font-size:12px;font-weight:700;color:var(--ink);display:block;line-height:1.2}
+  .g-day .m{font-size:9px;letter-spacing:.04em}
+  .g-day.today{background:var(--aqua-bg)}.g-day.today .d{color:var(--aqua)}
+
+  .g-track{display:grid;border-bottom:1px solid var(--line);position:relative}
+  .g-track:last-child{border-bottom:none}
+  .g-track .t-label{padding:14px 14px;border-right:1px solid var(--line);font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;gap:8px;background:var(--bg)}
+  .t-dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .g-cells{position:relative;grid-column:2 / -1;display:grid}
+  .g-cell{border-right:1px solid var(--line);min-height:58px}
+  .g-cell.wk{background:#fafbfb}.g-cell.today{background:var(--aqua-bg)}
+
+  .bar{position:absolute;top:50%;transform:translateY(-50%);height:30px;border-radius:8px;
+    display:flex;align-items:center;padding:0 10px;font-size:11.5px;font-weight:600;color:var(--ink);
+    cursor:pointer;border:1px solid rgba(0,0,0,.06);white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;transition:filter .15s,transform .15s}
+  .bar:hover{filter:brightness(.97);transform:translateY(-50%) scale(1.008)}
+  .bar.mile{width:auto!important;padding:0 11px 0 9px;background:var(--bg);border:1px dashed var(--line-strong)}
+  .bar.mile::before{content:"◆";font-size:9px;margin-right:7px;color:var(--aqua)}
+  .bar.dl{border:1px solid var(--warn)!important;background:var(--warn-bg);color:var(--warn)}
+  .bar.dl::before{content:"⚑";font-size:10px;margin-right:6px}
+  .bar.goal{background:var(--sage-bg);border-color:var(--sage);color:#34603f;font-weight:700}
+  .bar.goal::before{content:"★";margin-right:6px;font-size:10px}
+  .bar .chk{width:14px;height:14px;border:1.5px solid currentColor;border-radius:4px;margin-right:8px;
+    flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:9px;opacity:.55}
+  .bar.done{opacity:.5;text-decoration:line-through}
+  .bar.done .chk{opacity:1;background:currentColor}
+  .bar.done .chk::after{content:"✓";color:#fff}
+  .b-aqua{background:var(--aqua-bg)}.d-aqua{background:var(--aqua)}
+  .b-sage{background:var(--sage-bg)}.d-sage{background:var(--sage)}
+  .b-amber{background:var(--amber-bg)}.d-amber{background:var(--amber)}
+
+  .phases{display:grid;gap:10px}
+  .ph{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:16px 18px;
+    display:grid;grid-template-columns:96px 1fr auto;gap:18px;align-items:start;
+    transition:border-color .15s,box-shadow .15s}
+  .ph:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+  .ph.is-dl{border-left:3px solid var(--warn)}
+  .ph.is-goal{border-left:3px solid var(--sage)}
+  .ph .when{font-size:13px;font-weight:700}
+  .ph .when small{display:block;font-size:11px;color:var(--ink-soft);font-weight:600;margin-top:2px}
+  .ph .body h3{font-size:14.5px;font-weight:700;margin-bottom:4px}
+  .ph .body p{font-size:12.5px;color:var(--ink-soft)}
+  .ph .body .risk{margin-top:8px;font-size:11.5px;color:var(--warn);background:var(--warn-bg);
+    display:inline-block;padding:3px 9px;border-radius:6px;font-weight:600}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .tg-aqua{background:var(--aqua-bg);color:#2f6f8c}
+  .tg-sage{background:var(--sage-bg);color:#3c6b4e}
+  .tg-amber{background:var(--amber-bg);color:#9a6c24}
+  .ph .pchk{appearance:none;width:20px;height:20px;border:1.5px solid var(--line-strong);
+    border-radius:6px;cursor:pointer;flex:none;position:relative;background:var(--bg)}
+  .ph .pchk:checked{background:var(--aqua);border-color:var(--aqua)}
+  .ph .pchk:checked::after{content:"✓";color:#fff;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+  .ph.checked{opacity:.62}.ph.checked .body h3{text-decoration:line-through}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:22px 24px;background:var(--bg);box-shadow:var(--shadow)}
+  .panel h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .panel.warn h3{color:var(--warn)}
+  .panel ol{list-style:none}
+  .panel li{font-size:13px;color:var(--ink-soft);padding:9px 0 9px 26px;border-bottom:1px dashed var(--line);position:relative}
+  .panel li:last-child{border-bottom:none}
+  .panel.warn ol{counter-reset:r}
+  .panel.warn li::before{content:counter(r);counter-increment:r;position:absolute;left:0;top:8px;
+    width:18px;height:18px;border-radius:50%;background:var(--warn-bg);color:var(--warn);
+    font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panel.dec ol{counter-reset:d}
+  .panel.dec li::before{content:counter(d);counter-increment:d;position:absolute;left:0;top:8px;
+    width:18px;height:18px;border-radius:50%;background:var(--aqua-bg);color:#2f6f8c;
+    font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panel li b{color:var(--ink)}
+
+  .now{border:1px solid var(--aqua);background:var(--aqua-bg);border-radius:14px;
+    padding:20px 24px;display:flex;align-items:center;gap:18px;margin:6px 0 0}
+  .now .ic{font-size:22px}
+  .now .tx h3{font-size:15px;font-weight:700;margin-bottom:3px}
+  .now .tx p{font-size:13px;color:var(--ink-soft)}
+
+  .ref{border:1px solid var(--line);background:var(--bg-soft);border-radius:12px;
+    padding:16px 20px;display:flex;align-items:flex-start;gap:14px;font-size:13px;color:var(--ink-soft)}
+  .ref .ic{font-size:18px;color:var(--amber)}
+  .ref b{color:var(--ink)}
+  .ref a{color:var(--aqua);font-weight:700;text-decoration:none}
+  .ref a:hover{text-decoration:underline}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--ink-soft);font-size:12px}
+  .meta{display:flex;gap:22px;flex-wrap:wrap}
+  .meta b{color:var(--ink)}
+  a.back{color:var(--aqua);text-decoration:none;font-weight:700;font-size:12px}
+  a.back:hover{text-decoration:underline}
+
+  .ov{position:fixed;inset:0;background:rgba(20,24,34,.42);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+  .ov.on{display:flex}
+  .mod{background:var(--bg);border-radius:16px;max-width:480px;width:100%;padding:28px 30px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+  .mod .mk{font-size:11px;letter-spacing:.2em;color:var(--aqua);font-weight:700;text-transform:uppercase}
+  .mod h3{font-size:19px;font-weight:700;margin:6px 0 4px}
+  .mod .mw{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:14px}
+  .mod p{font-size:13.5px;color:var(--ink);line-height:1.8;margin-bottom:12px}
+  .mod .rk{font-size:12.5px;color:var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:9px}
+  .mod .x{float:right;cursor:pointer;color:var(--ink-soft);font-size:20px;line-height:1;border:none;background:none}
+
+  @media(max-width:760px){
+    .wrap{padding:0 18px}
+    h1{font-size:26px}
+    .head-grid{flex-direction:column;align-items:flex-start}
+    .count{align-self:stretch;text-align:left}
+    .cols{grid-template-columns:1fr}
+    .ph{grid-template-columns:74px 1fr;gap:12px}
+    .ph .pchk{grid-column:2;justself:start;margin-top:6px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-grid">
+    <div>
+      <div class="kicker">Store Opening Schedule</div>
+      <h1 class="serif">アイケアLaBo 日立店 出店スケジュール</h1>
+      <div class="sub">2026/06/15(日) グランドオープン 確定 ／ 5/20 内装MTG 起点・逆算進行 ／ 物件審査 通過済み</div>
+    </div>
+    <div class="count">
+      <div class="lab">Open まで</div>
+      <div class="num" id="cd">–<small>日</small></div>
+      <div class="date">2026.06.15 SUN</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="now">
+      <div class="ic">▶</div>
+      <div class="tx">
+        <h3>今すぐやる1個：5/20 17:00 内装MTGを「決定の場」にする</h3>
+        <p>詳細共有で終わらせない。①現地調査日(5/21) ②仕様/費用/家具の確定方針 ③6/15逆算への内装屋合意 まで握る。ここで合意できないと6/15は物理的に不可能。</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:14px">
+    <div class="sec-head"><span class="en">Scope</span><h2>このページの守備範囲</h2></div>
+    <div class="ref">
+      <div class="ic">◆</div>
+      <div>
+        <b>このページ＝内装・施工・看板・設置の物理工程（6/15逆算）。</b>
+        マーケ・公式LINE・SNS・HPB・備品調達は別管理の「原本オープンWBS」が正本です。重複管理しません。
+        <b>PDメーターを含む店舗備品は原本WBSの必須品リスト（gid=227496202）で調達済み・揃う前提</b>のため、本スケジュールでは6/12-13に「設置・配置」のみ扱います。<br>
+        <a href="https://docs.google.com/spreadsheets/d/15Wlw2N3J-0cl-yj7wlrtLPWvisjgCpfkeijMVhdpwDY/edit?gid=227496202#gid=227496202" target="_blank" rel="noopener">▶ 原本オープンWBS（マーケ・LINE・SNS・備品の正本）を開く</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="sec-head"><span class="en">Critical Path</span><h2>クリティカルパス</h2></div>
+    <div class="cp">
+      <span class="node">5/20 MTG合意</span><span class="arr">→</span>
+      <span class="node">5/21 現地調査</span><span class="arr">→</span>
+      <span class="node hot">5/22 家具即発注</span><span class="arr">→</span>
+      <span class="node hot">5/23 内装発注</span><span class="arr">→</span>
+      <span class="node hot">6/10 施工完了</span><span class="arr">→</span>
+      <span class="node">6/12-13 設置</span><span class="arr">→</span>
+      <span class="node goal">6/15 オープン</span>
+    </div>
+    <p class="lead" style="margin-top:14px">経堂前例比でアグレッシブな日程。家具検索の律速化・施工期間超過・ビル看板許可遅延のどれかが滑ると6/15は崩れる。</p>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="sec-head"><span class="en">Gantt</span><h2>物理工程ガント（3トラック）</h2></div>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+    <p class="lead" style="margin-top:12px;font-size:12.5px">バー／マイルストーンをクリックで詳細。チェックで完了（保存されます）。備品はWBS側で調達管理＝ここでは設置のみ。</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="en">Phases</span><h2>工程詳細・進捗</h2></div>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section>
+    <div class="cols">
+      <div class="panel warn">
+        <h3>⚠ 3大破綻リスク</h3>
+        <ol>
+          <li><b>家具検索の律速化。</b>経堂で実際にボトルネック化。5/22に即発注しなければ施工に間に合わない。納期不明の什器（ガラス棚等）は内装屋経由で最優先発注。</li>
+          <li><b>施工期間が2.5週で収まらない。</b>経堂は5/6仕様確定でも5/18時点で未完了。物件規模が大きい／別業者だと6/10完了が崩れる。遅延兆候は即エスカレーション。</li>
+          <li><b>ビル管理の看板許可遅延。</b>C系（集合看板・袖看板）は許可前提。5/21現地調査と同時に管理会社へ可否確認を必ず投げる。</li>
+        </ol>
+      </div>
+      <div class="panel dec">
+        <h3>要決定・確認事項</h3>
+        <ol>
+          <li><b>物件審査：通過済み。</b>13差し替え変数（住所/TEL/最寄り駅/オープン日=6/15）の取得元が確保された。5/22までに全項目確定。</li>
+          <li><b>内装屋は経堂と同一か別業者か。</b>別業者だと施工リードタイムが読めず6/10の確度が下がる。5/20 MTGで確定。</li>
+          <li><b>備品はWBS側で調達管理。</b>PDメーター含む必須品（水色）は原本WBSで5/1基準調達済。本スケジュールは6/12-13の設置のみ。</li>
+          <li><b>AL-02 掲出物テンプレ。</b>A分類＝全店共通テンプレ前提なら制作物を5/23から先行量産可。</li>
+          <li><b>マーケ・LINE・SNS導線。</b>原本WBSで別管理。6/15オープンに間に合うよう本部側の進行を別途確認。</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="meta">
+      <span><b>オープン</b> 2026/06/15(日)</span>
+      <span><b>起点</b> 5/20 17:00 内装MTG</span>
+      <span><b>本体管理</b> wiki/projects/eyecare-labo-tasks.md（フルステート）</span>
+      <span><b>備品/マーケ</b> 原本オープンWBS（別管理）</span>
+    </div>
+    <div style="margin-top:14px"><a class="back" href="./">← web-tools トップへ</a></div>
+    <div style="margin-top:8px;font-size:11px">最終更新 2026-05-19 ／ アイケアLaBo 内部運用ツール</div>
+  </div>
+</footer>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeMod()">
+  <div class="mod">
+    <button class="x" onclick="closeMod()">×</button>
+    <div class="mk" id="mk"></div>
+    <h3 id="mh"></h3>
+    <div class="mw" id="mw"></div>
+    <p id="mp"></p>
+    <div class="rk" id="mr" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var START=new Date(2026,4,19), END=new Date(2026,5,15);
+  var DAY=864e5;
+  var TOTAL=Math.round((END-START)/DAY)+1;
+  function idx(y,m,d){ return Math.round((new Date(y,m-1,d)-START)/DAY); }
+  var WD=['日','月','火','水','木','金','土'];
+
+  var TRACKS=[
+    {key:'in', name:'内装・施工', dot:'d-aqua'},
+    {key:'cr', name:'制作物',     dot:'d-sage'},
+    {key:'op', name:'設置・開店', dot:'d-amber'}
+  ];
+
+  var T=[
+    {id:'t1', tr:'in', s:idx(2026,5,20), e:idx(2026,5,20), type:'mile', cls:'b-aqua',
+      label:'内装MTG(起点)', when:'5/20(火) 17:00',
+      detail:'内装屋との内装MTG（既設）。詳細共有＋現地調査日確定＋仕様/費用/家具の確定方針＋6/15逆算スケジュールへの合意を握る。Google Meet設定済み。'},
+    {id:'t2', tr:'in', s:idx(2026,5,21), e:idx(2026,5,21), type:'mile', cls:'b-aqua',
+      label:'現地調査 LiDAR+採寸', when:'5/21(水)',
+      detail:'Polycam/MagicPlanでLiDARスキャン＋手動採寸（壁高・扉高・柱位置）。同時にビル管理へ集合看板・袖看板の設置可否を確認（C系制作物の前提）。',
+      risk:'ビル管理の看板許可が遅いと、C系看板がオープンに間に合わない。'},
+    {id:'t3', tr:'in', s:idx(2026,5,22), e:idx(2026,5,22), type:'dl',
+      label:'仕様・費用・家具確定／即発注', when:'5/22(木) ★最重要',
+      detail:'間取り・内装仕様・費用・家具仕様を確定。家具・什器を即発注（ガラス棚は内装屋経由・納期要確認）。店舗制作物の13差し替え変数を確定。',
+      risk:'家具検索が最大の律速。ここで即発注しないと施工に間に合わず6/15破綻。'},
+    {id:'t4', tr:'in', s:idx(2026,5,23), e:idx(2026,5,23), type:'dl',
+      label:'内装・外装 正式発注', when:'5/23(金)',
+      detail:'内装屋へ正式発注。外装(ST-03)も同時。施工期間 約2.5週確保のためのデッドライン。',
+      risk:'5/23を1日でも超えると6/15は黄信号。'},
+    {id:'t5', tr:'in', s:idx(2026,5,24), e:idx(2026,6,10), type:'bar', cls:'b-aqua',
+      label:'内装・外装 施工', when:'5/24〜6/10',
+      detail:'内装・外装の施工期間。約2.5週確保。経堂前例だとここが最大の不確実点。',
+      risk:'物件規模が大きい／別業者だと6/10完了が崩れる。遅延兆候は即エスカレーション。'},
+    {id:'t6', tr:'in', s:idx(2026,6,10), e:idx(2026,6,10), type:'dl',
+      label:'施工完了 デッドライン', when:'6/10(水)',
+      detail:'内装・外装の施工完了デッドライン。ここを過ぎると設置・プレが押し出される。'},
+
+    {id:'c1', tr:'cr', s:idx(2026,5,22), e:idx(2026,5,22), type:'mile', cls:'b-sage',
+      label:'13変数確定', when:'5/22(木)',
+      detail:'店舗名/住所/TEL/営業時間/定休日/最寄り駅/地図/オープン日(6-15)/LINE QR/キャッチ/サブコピー/KV/ロゴv3。物件審査通過済みで取得元確保。'},
+    {id:'c2', tr:'cr', s:idx(2026,5,23), e:idx(2026,6,11), type:'bar', cls:'b-sage',
+      label:'制作物 制作（A→C順）', when:'5/23〜6/11',
+      detail:'◎先行：チラシ/A1/のぼり/A型/カッティング/玄関扉。A分類はテンプレ差替えで即着手。C分類（看板/集合案内/動線サインキット）は5/21現地調査後。全件 医療コンプラチェック必須（治療/治す/効く/視力回復 NG）。'},
+    {id:'c3', tr:'cr', s:idx(2026,6,11), e:idx(2026,6,11), type:'dl',
+      label:'制作物 全納品（コンプラ済）', when:'6/11(木)',
+      detail:'◎○系すべて納品済み。外から見える物（看板・のぼり・窓シート・チラシ）は特に厳格に再チェック済みであること。'},
+
+    {id:'o1', tr:'op', s:idx(2026,6,12), e:idx(2026,6,13), type:'bar', cls:'b-amber',
+      label:'搬入・設置', when:'6/12〜13',
+      detail:'看板取付（ビル許可前提）／什器・家具・備品搬入設置（PDメーター含む備品は原本WBSで調達済・揃う前提。設置・配置のみ）／カッティング施工／LINE QR・ホットペッパー公開準備。'},
+    {id:'o2', tr:'op', s:idx(2026,6,14), e:idx(2026,6,14), type:'mile', cls:'b-amber',
+      label:'プレ・最終チェック', when:'6/14(土)',
+      detail:'全設置完了確認。外から見える物の医療コンプラ最終目視。備品（PDメーター等）の設置・動作確認。LINE/ホットペッパー公開最終チェック。'},
+    {id:'o3', tr:'op', s:idx(2026,6,15), e:idx(2026,6,15), type:'goal',
+      label:'グランドオープン', when:'6/15(日)',
+      detail:'🎉 アイケアLaBo 日立店 グランドオープン。'}
+  ];
+
+  var KEY='hitachi_open_schedule_v2';
+  var done={};
+  try{ done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ done={}; }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(done)); }catch(e){} }
+
+  (function(){
+    var now=new Date(), t=new Date(2026,5,15);
+    var diff=Math.ceil((t-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/DAY);
+    var el=document.getElementById('cd');
+    if(diff>0) el.innerHTML=diff+'<small>日</small>';
+    else if(diff===0) el.innerHTML='本日<small>OPEN</small>';
+    else el.innerHTML='OPEN済';
+  })();
+
+  var nowD=new Date();
+  var todayCol=Math.round((new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate())-START)/DAY);
+  var gantt=document.getElementById('gantt');
+  var colCss='240px repeat('+TOTAL+',minmax(30px,1fr))';
+
+  var ax=document.createElement('div'); ax.className='g-axis'; ax.style.gridTemplateColumns=colCss;
+  var corner=document.createElement('div'); corner.className='corner'; corner.textContent='2026'; ax.appendChild(corner);
+  for(var i=0;i<TOTAL;i++){
+    var dt=new Date(START.getTime()+i*DAY);
+    var c=document.createElement('div'); c.className='g-day';
+    var w=dt.getDay();
+    if(w===0||w===6) c.className+=' wk';
+    if(i===todayCol) c.className+=' today';
+    c.innerHTML='<span class="d">'+dt.getDate()+'</span><span class="m">'+((dt.getDate()===1||i===0)?(dt.getMonth()+1)+'月 ':'')+WD[w]+'</span>';
+    ax.appendChild(c);
+  }
+  gantt.appendChild(ax);
+
+  TRACKS.forEach(function(tr){
+    var row=document.createElement('div'); row.className='g-track'; row.style.gridTemplateColumns=colCss;
+    var lab=document.createElement('div'); lab.className='t-label';
+    lab.innerHTML='<span class="t-dot '+tr.dot+'"></span>'+tr.name;
+    row.appendChild(lab);
+    var cells=document.createElement('div'); cells.className='g-cells';
+    cells.style.gridTemplateColumns='repeat('+TOTAL+',minmax(30px,1fr))';
+    for(var i=0;i<TOTAL;i++){
+      var dt=new Date(START.getTime()+i*DAY), w=dt.getDay();
+      var cell=document.createElement('div'); cell.className='g-cell';
+      if(w===0||w===6) cell.className+=' wk';
+      if(i===todayCol) cell.className+=' today';
+      cells.appendChild(cell);
+    }
+    T.filter(function(x){return x.tr===tr.key;}).forEach(function(x){
+      var bar=document.createElement('div');
+      var span=x.e-x.s+1, pct=100/TOTAL;
+      bar.className='bar '+(x.cls||'');
+      if(x.type==='mile') bar.className+=' mile';
+      if(x.type==='dl') bar.className+=' dl';
+      if(x.type==='goal') bar.className+=' goal';
+      bar.style.left='calc('+(x.s*pct)+'% + 4px)';
+      if(x.type==='bar') bar.style.width='calc('+(span*pct)+'% - 8px)';
+      bar.dataset.id=x.id;
+      if(done[x.id]) bar.className+=' done';
+      var chk=(x.type==='bar')?'<span class="chk"></span>':'';
+      bar.innerHTML=chk+'<span>'+x.label+'</span>';
+      bar.addEventListener('click',function(ev){
+        if(ev.target.classList.contains('chk')){ toggle(x.id); return; }
+        openMod(x);
+      });
+      cells.appendChild(bar);
+    });
+    row.appendChild(cells);
+    gantt.appendChild(row);
+  });
+
+  var trMap={in:['内装・施工','tg-aqua'],cr:['制作物','tg-sage'],op:['設置・開店','tg-amber']};
+  var ph=document.getElementById('phases');
+  T.slice().sort(function(a,b){return a.s-b.s || a.e-b.e;}).forEach(function(x){
+    var isDL=x.type==='dl', isGoal=x.type==='goal';
+    var row=document.createElement('div');
+    row.className='ph'+(isDL?' is-dl':'')+(isGoal?' is-goal':'')+(done[x.id]?' checked':'');
+    row.dataset.id=x.id;
+    var tg=trMap[x.tr];
+    row.innerHTML=
+      '<div class="when">'+x.when.split(' ')[0]+'<small>'+(x.when.split(' ').slice(1).join(' ')||'&nbsp;')+'</small></div>'+
+      '<div class="body"><h3>'+x.label+'</h3><p>'+x.detail+'</p>'+
+        (x.risk?'<span class="risk">⚠ '+x.risk+'</span>':'')+'</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">'+
+        '<span class="tag '+tg[1]+'">'+tg[0]+'</span>'+
+        '<input type="checkbox" class="pchk" '+(done[x.id]?'checked':'')+' aria-label="完了">'+
+      '</div>';
+    row.querySelector('.pchk').addEventListener('change',function(){ toggle(x.id); });
+    ph.appendChild(row);
+  });
+
+  function toggle(id){
+    done[id]=!done[id]; save();
+    document.querySelectorAll('.bar[data-id="'+id+'"]').forEach(function(b){ b.classList.toggle('done',!!done[id]); });
+    document.querySelectorAll('.ph[data-id="'+id+'"]').forEach(function(p){
+      p.classList.toggle('checked',!!done[id]);
+      var c=p.querySelector('.pchk'); if(c) c.checked=!!done[id];
+    });
+  }
+
+  var ov=document.getElementById('ov');
+  function openMod(x){
+    document.getElementById('mk').textContent=trMap[x.tr][0];
+    document.getElementById('mh').textContent=x.label;
+    document.getElementById('mw').textContent=x.when;
+    document.getElementById('mp').textContent=x.detail;
+    var r=document.getElementById('mr');
+    if(x.risk){ r.style.display='block'; r.textContent='⚠ '+x.risk; } else r.style.display='none';
+    ov.classList.add('on');
+  }
+  window.closeMod=function(){ ov.classList.remove('on'); };
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeMod(); });
+})();
+</script>
+</body>
+</html>
