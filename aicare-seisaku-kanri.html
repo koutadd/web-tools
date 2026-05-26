@@ -818,7 +818,7 @@ function updateStatus(rowNum, status) {
 }
 
 function batchMarkComplete() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(SS_ID);
   // 店舗マスターシート(gid=471267220)からD列にURLがある店舗Noを収集
   const dirSheet = ss.getSheets().find(s => s.getSheetId() === 471267220);
   if (!dirSheet) return { ok: false, error: '店舗マスターシートが見つかりません (gid=471267220)' };
