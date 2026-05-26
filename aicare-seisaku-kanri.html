@@ -746,6 +746,7 @@ function doGet(e) {
     else if (p.action === 'postRequest')      result = postRequest(p.token, p.channelId, p.store, p.storeNo, p.item, p.size, p.format, p.requester, p.requestDate, p.deadline, p.notes, p.urgent, p.mentionId);
     else if (p.action === 'addRequest')       result = addRequest(p.store, p.item, p.size, p.notes, p.format, p.requester, p.requestDate, p.deadline, p.urgent);
     else if (p.action === 'getAiSuggestion')  result = getAiSuggestion(p.apiKey, p.mediaType, p.notes);
+    else if (p.action === 'batchMarkComplete') result = batchMarkComplete();
     else result = { error: 'unknown action: ' + p.action };
   } catch(err) {
     result = { error: err.message };
@@ -775,7 +776,7 @@ function getItems() {
     if (h === '1') {
       if (blocks.length > 0) blocks[blocks.length-1].end = i-1;
       const fallbackName = String(values[i][5] || '').trim(); // F列: 店舗表示名をフォールバックに
-      blocks.push({ start:i, end:-1, store: fallbackName, storeNo:String(values[i][3]||'') });
+      blocks.push({ start:i, end:-1, store: fallbackName, storeNo:String(values[i][3]||''), storeComplete:String(values[i][0]||'').trim() });
     }
     if (h === '3' && g && blocks.length > 0) blocks[blocks.length-1].store = g; // 正式名で上書き
   }
@@ -800,7 +801,7 @@ function getItems() {
         requestDate: String(r[13] || '').trim(), // N: 依頼日
         deadline:    String(r[14] || '').trim(), // O: 納期
         producer:    String(r[15] || '').trim(), // P: 製作者
-        status:      String(r[16] || '').trim(), // Q: ステータス
+        status:      String(r[16] || '').trim() || (b.storeComplete === '完了' ? '完了' : ''), // Q: ステータス（A列=完了の場合フォールバック）
         urgent:      String(r[18] || '').trim(), // S: 急きもの
         cellUrl:     'https://docs.google.com/spreadsheets/d/' + SS_ID + '/edit#gid=' + sheetGid + '&range=G' + (i+1),
       });
@@ -812,6 +813,36 @@ function getItems() {
 function updateStatus(rowNum, status) {
   getSheet().getRange(rowNum, 17).setValue(status); // Q列=17番目
   return { ok: true };
+}
+
+function batchMarkComplete() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  // 店舗マスターシート(gid=471267220)からD列にURLがある店舗Noを収集
+  const dirSheet = ss.getSheets().find(s => s.getSheetId() === 471267220);
+  if (!dirSheet) return { ok: false, error: '店舗マスターシートが見つかりません (gid=471267220)' };
+  const dirValues = dirSheet.getDataRange().getValues();
+  const doneNos = new Set();
+  for (let i = 1; i < dirValues.length; i++) {
+    const no  = String(dirValues[i][1] || '').trim(); // B列: 店舗No
+    const url = String(dirValues[i][3] || '').trim(); // D列: フォルダURL
+    if (no && url && url.startsWith('http')) doneNos.add(no);
+  }
+  // 店舗製作物シートのQ列を更新
+  const prodSheet = getSheet();
+  const values = prodSheet.getDataRange().getValues();
+  let currentNo = '';
+  let count = 0;
+  for (let i = 0; i < values.length; i++) {
+    const h = String(values[i][7] || '').trim(); // H列: 通し番号
+    if (h === '1') currentNo = String(values[i][3] || '').trim(); // D列: 店舗No
+    const item   = String(values[i][8]  || '').trim(); // I列: 制作アイテム
+    const status = String(values[i][16] || '').trim(); // Q列: ステータス
+    if (item && !status && currentNo && doneNos.has(currentNo)) {
+      prodSheet.getRange(i + 1, 17).setValue('完了');
+      count++;
+    }
+  }
+  return { ok: true, count };
 }
 
 function createFolders(storeName, itemName) {
@@ -902,7 +933,10 @@ function postDelivery(token, channelId, store, storeNo, item, folderUrl, mention
     threadTs = parent.ts;
   }
   var atMark  = '@';
-  var mention = mentionId ? '<' + atMark + mentionId + '> ' : '';
+  var mention = mentionId
+    ? String(mentionId).split(',').map(function(id){ return id.trim(); }).filter(Boolean)
+        .map(function(id){ return '<' + atMark + id + '>'; }).join(' ') + ' '
+    : '';
   var label   = (storeNo ? storeNo + '_' : '') + store + '_' + item;
   var text    = mention + label + '\nこちら納品いたします！\n' + folderUrl;
   var reply = JSON.parse(UrlFetchApp.fetch('https://slack.com/api/chat.postMessage', {
@@ -1327,6 +1361,7 @@ function getAiSuggestion(apiKey, mediaType, notes) {
         <input class="search-input" id="search-input" type="text"
           placeholder="店舗・制作物で検索..." oninput="render()">
         <button class="reload-btn" onclick="reload()">↻ 更新</button>
+        <button class="btn btn-sm btn-secondary" id="batch-complete-btn" onclick="runBatchMarkComplete(this)" title="店舗マスターにフォルダURLがある店舗を一括完了にする">一括完了</button>
         <button class="btn btn-sm btn-secondary" onclick="showSetup()">⚙️</button>
       </div>
     </div>
@@ -1880,7 +1915,17 @@ const SS_ID_FRONT   = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
 const STATUS_LIST        = ['', '依頼前', '依頼済', '制作中', '確認中', '修正中', '完了'];
 const SLACK_DELIVERY_CH  = 'C0ANHC8B6QY'; // 納品通知チャンネル
 const SLACK_PRODUCTION_CH = 'C0AQKU2KL2D'; // 制作進行チャンネル
-const WASHIZU_SLACK_ID   = 'U0AKKRTQ006'; // Yuta Washizu / 鷲巣祐太 — 変更禁止
+// 「取り掛かります」「納品通知」のメンション固定3名（名前断片で slackMembers から ID を解決）
+const FIXED_MENTION_USERS = [
+  { name: 'Taichi Funatsu / 船津 太威智',  match: ['funatsu', '船津'] },
+  { name: 'Aiki Hasegawa / 長谷川愛生',     match: ['hasegawa', '長谷川'] },
+  { name: 'kouta yamakawa / 山川鴻太',     match: ['yamakawa', '山川'] },
+];
+// 納品通知でメンションする2名（取り掛かりますの3名から kouta を除いた集合）
+const DELIVERY_MENTION_MATCHES = [
+  ['funatsu', '船津'],
+  ['hasegawa', '長谷川'],
+];
 
 // ── 状態 ─────────────────────────────────────────
 let GAS_URL       = '';
@@ -1946,41 +1991,94 @@ async function gasGet(params) {
 }
 
 // ── スプレッドシート直読み（GAS不要・常に最新）──────
-const _SHEET_SS_ID = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
-const _SHEET_TAB   = '店舗製作物';
-async function fetchSheetItems() {
+const _SHEET_SS_ID  = '1Qe7Ri8rm_GQ21u5m6s533p0R9qAIKqbcBHP5HmLoLf0';
+const _SHEET_TAB    = '店舗製作物';
+const _MASTER_GID   = '471267220'; // 店舗マスター一覧シート
+
+// Driveフォルダのサブフォルダ名から取得した店舗別制作アイテム（静的データ）
+const _STORE_ITEMS_MAP = {
+  '016': ['チラシ3種'],
+  '018': ['チラシ3種'],
+  '020': ['制作物一式'],
+  '023': ['制作物一式'],
+  '028': ['チラシ3種', '集合看板ロゴ'],
+  '029': ['制作物一式'],
+  '035': ['ロゴ'],
+  '036': ['チラシ'],
+  '037': ['制作物一式'],
+  '039': ['看板類'],
+  '044': ['チラシ', '歩く看板', 'サインシート'],
+  '045': ['タペストリー', 'GAZAの日チラシ'],
+  '048': ['ポスト看板', '玄関', 'オープンチラシ'],
+  '049': ['チラシ', '入り口表札（マグネットシート）', '横断幕'],
+  '052': ['サインシート（入り口・路面店）', 'グランドオープンチラシ'],
+  '053': ['玄関サインシート', '玄関左横看板', '店舗右側壁面サイン', '置き看板', '駐車場プレート', 'チラシ'],
+  '055': ['チラシ', 'ロゴ'],
+  '057': ['眼精疲労チラシ', 'A1ポスター'],
+  '058': ['店舗外看板', 'グランドオープンチラシ', '窓面サインシート'],
+  '059': ['オープンチラシ', 'チラシ3種', '看板二種類'],
+  '060': ['置き看板'],
+  '062': ['置き看板', 'フロア看板・ポスト', '看板一式', 'オープンチラシ'],
+  '063': ['玄関カッティング', 'オープンチラシ'],
+  '067': ['店舗部屋前立て看板', '路上看板', 'チラシ', '看板一式'],
+  '069': ['オープンチラシ', 'サイン看板', '壁看板', '玄関カッティング'],
+  '073': ['オープンチラシ', '玄関看板', '窓カッティング', '集合看板（高所）', '入り口ドアカッティング'],
+  '076': ['玄関マグネット', 'チラシ'],
+  '081': ['サインシート（玄関側）', '置き看板', '店舗看板', 'サインシート（窓）', 'チラシ'],
+  '000':   ['名刺'],
+  '000_2': ['眼精疲労チラシ'],
+  '000_5': ['眼精疲労チラシ', 'チラシ'],
+  '000_6': ['サインシート', '看板', 'チラシ'],
+  '000_7': ['看板2種・集合看板・玄関シート', '看板二種類'],
+  '000_9': ['カッティング'],
+  '000_10': ['置き看板', '掲示板張り出しチラシ', 'サインシート', 'グランドオープンチラシ'],
+  '000_12': ['入り口看板（自動ドア上）', '自動ドアカッティング（右）', '自動ドアカッティング（左）', '置き看板', 'チラシ'],
+};
+
+async function fetchGviz(param) {
   const url = 'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID +
-    '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent(_SHEET_TAB);
+    '/gviz/tq?tqx=out:json&headers=0&' + param;
   const res = await fetch(url);
   if (!res.ok) throw new Error('Sheet fetch failed: ' + res.status);
   const text = await res.text();
   const json = text.replace(/^[^{]*/, '').replace(/\)\s*;?\s*$/, '');
-  const data = JSON.parse(json);
-  const rows = data.table.rows;
-  // headers=0 なので rows[i] = スプレッドシートの行 i+1 → rowNum = i+1 で GAS と一致
+  return JSON.parse(json).table.rows;
+}
+
+async function fetchSheetItems() {
   const cv = (cell) => (cell && cell.v != null) ? cell.v : '';
   const cs = (cell) => String(cv(cell)).trim();
   const cd = (cell) => { if (!cell) return ''; return (cell.f || String(cell.v||'')).trim(); };
 
+  // 店舗製作物 と 店舗マスター を並行取得
+  const [prodRows, masterRows] = await Promise.all([
+    fetchGviz('sheet=' + encodeURIComponent(_SHEET_TAB)),
+    fetchGviz('gid=' + _MASTER_GID),
+  ]);
+
+  // ── 店舗製作物 をパース ──
   const blocks = [];
-  for (let i = 0; i < rows.length; i++) {
-    const c = rows[i].c || [];
+  for (let i = 0; i < prodRows.length; i++) {
+    const c = prodRows[i].c || [];
     const hRaw = cv(c[7]);
     const hNum = hRaw === '' ? NaN : parseFloat(hRaw);
     const g = cs(c[6]);
     if (hNum === 1) {
       if (blocks.length > 0) blocks[blocks.length-1].end = i-1;
-      blocks.push({ start:i, end:-1, store: cs(c[5]), storeNo: cs(c[3]) });
+      blocks.push({ start:i, end:-1, store: cs(c[5]), storeNo: cs(c[3]), storeComplete: cs(c[0]) });
     }
     if (hNum === 3 && g && blocks.length > 0) blocks[blocks.length-1].store = g;
   }
-  if (blocks.length > 0) blocks[blocks.length-1].end = rows.length-1;
+  if (blocks.length > 0) blocks[blocks.length-1].end = prodRows.length-1;
 
   const items = [];
+  const existingNos = new Set(); // 店舗製作物に既に存在する店舗No
+
   for (const b of blocks) {
     if (!b.store) continue;
+    if (b.storeNo) existingNos.add(b.storeNo);
     for (let i = b.start; i <= b.end; i++) {
-      const c = rows[i].c || [];
+      const c = prodRows[i].c || [];
       const iCol = cs(c[8]);
       if (!iCol) continue;
       items.push({
@@ -1995,12 +2093,45 @@ async function fetchSheetItems() {
         requestDate: cd(c[13]),
         deadline:    cd(c[14]),
         producer:    cs(c[15]),
-        status:      cs(c[16]),
+        status:      cs(c[16]) || (b.storeComplete === '完了' ? '完了' : ''),
         urgent:      cs(c[18]),
         cellUrl:     'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID + '/edit#gid=0&range=G'+(i+1),
       });
     }
   }
+
+  // ── 店舗マスターから補完（店舗製作物に未登録 & フォルダURLあり → 完了として追加）──
+  for (let i = 1; i < masterRows.length; i++) { // 1行目はヘッダー
+    const c   = masterRows[i].c || [];
+    const no  = cs(c[1]); // B列: 店舗No
+    const name = cs(c[2]); // C列: 店舗名
+    const url  = cs(c[3]); // D列: フォルダURL
+    if (!no || !name || !url || !url.startsWith('http')) continue;
+    if (existingNos.has(no)) continue; // 店舗製作物に既にある
+    // 閉店・保留はスキップ
+    if (name.includes('閉店') || name.includes('保留') || name.includes('仮）')) continue;
+    const storeName  = 'アイケアLaBo' + name + '店';
+    const storeItems = _STORE_ITEMS_MAP[no] || ['オープンチラシ'];
+    for (const itemName of storeItems) {
+      items.push({
+        rowNum:      null,
+        store:       storeName,
+        storeNo:     no,
+        item:        itemName,
+        size:        '',
+        notes:       '',
+        format:      '',
+        requester:   '',
+        requestDate: '',
+        deadline:    '',
+        producer:    '',
+        status:      '完了',
+        urgent:      '',
+        cellUrl:     url,
+      });
+    }
+  }
+
   return { items, sheetGid: 0 };
 }
 
@@ -2031,6 +2162,27 @@ async function loadData() {
 async function reload() {
   await loadData();
   toast('最新データを取得しました', 'ok');
+}
+
+async function runBatchMarkComplete(btn) {
+  if (!GAS_URL) { toast('GAS URLを設定してください（⚙️）', 'err'); return; }
+  if (!confirm('店舗マスター(gid=471267220)でフォルダURLがある店舗の未設定アイテムを「完了」に一括更新します。よろしいですか？')) return;
+  btn.disabled = true;
+  btn.textContent = '処理中...';
+  try {
+    const res = await gasGet({ action: 'batchMarkComplete' });
+    if (res.ok) {
+      toast(`${res.count}件を完了に更新しました`, 'ok');
+      await loadData();
+    } else {
+      toast('エラー: ' + (res.error || '不明'), 'err');
+    }
+  } catch(e) {
+    toast('エラー: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '一括完了';
+  }
 }
 
 // ── ステータス更新 ────────────────────────────────
@@ -2957,10 +3109,7 @@ const DEFAULT_SLACK_SETTINGS = {
   channelId:   '',
   channelName: '制作管理',
   accounts: [],
-  mentionUsers: [
-    { name: 'Yuta Washizu / 鷲巣祐太',     userId: WASHIZU_SLACK_ID },
-    { name: 'kouta yamakawa / 山川鴻太', userId: '' },
-  ],
+  mentionUsers: FIXED_MENTION_USERS.map(u => ({ name: u.name, userId: '' })),
   workspace: { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' },
   slackMembers: [],
 };
@@ -2977,14 +3126,62 @@ function loadSlackCfg() {
     _slackSettings = { ...DEFAULT_SLACK_SETTINGS };
   }
   if (!_slackSettings.mentionUsers?.length) {
-    _slackSettings.mentionUsers = DEFAULT_SLACK_SETTINGS.mentionUsers;
+    _slackSettings.mentionUsers = FIXED_MENTION_USERS.map(u => ({ name: u.name, userId: '' }));
   }
-  // WashizuのIDは定数で固定 — localStorageの値を無視して常に上書き
-  const washizuEntry = _slackSettings.mentionUsers.find(u => u.name.includes('Washizu') || u.name.includes('鷲巣'));
-  if (washizuEntry) washizuEntry.userId = WASHIZU_SLACK_ID;
   if (!_slackSettings.workspace) _slackSettings.workspace = { slackBotToken: '', chatworkToken: '', chatworkRoomId: '' };
   if (!_slackSettings.slackMembers) _slackSettings.slackMembers = [];
+  // 旧: Washizu/鷲巣 が含まれていた場合は新3名構成に置き換える（手入力のIDは保持）
+  const hasLegacy = _slackSettings.mentionUsers.some(u => /washizu|鷲巣|鷲果/i.test(u.name || ''));
+  if (hasLegacy) {
+    const prevById = {};
+    _slackSettings.mentionUsers.forEach(u => { if (u.userId) prevById[u.name] = u.userId; });
+    _slackSettings.mentionUsers = FIXED_MENTION_USERS.map(u => ({
+      name: u.name,
+      userId: prevById[u.name] || '',
+    }));
+  }
+  // 不足エントリ補完（順序は FIXED_MENTION_USERS に合わせる）
+  const byName = {};
+  _slackSettings.mentionUsers.forEach(u => { byName[u.name] = u; });
+  _slackSettings.mentionUsers = FIXED_MENTION_USERS.map(u => byName[u.name] || { name: u.name, userId: '' });
+  // userId 未設定なら slackMembers から名前断片で自動解決
+  syncFixedMentionIds(_slackSettings);
   return _slackSettings;
+}
+
+// slackMembers から FIXED_MENTION_USERS の userId を自動補完
+function syncFixedMentionIds(cfg) {
+  const members = cfg.slackMembers || [];
+  if (!members.length) return;
+  FIXED_MENTION_USERS.forEach(def => {
+    const entry = cfg.mentionUsers.find(u => u.name === def.name);
+    if (!entry || entry.userId) return;
+    const found = members.find(m =>
+      [m.name, m.realName, m.displayName].some(n => {
+        if (!n) return false;
+        const ln = String(n).toLowerCase();
+        return def.match.some(frag => frag === frag.toLowerCase()
+          ? ln.includes(frag.toLowerCase())
+          : String(n).includes(frag));
+      })
+    );
+    if (found?.id) entry.userId = found.id;
+  });
+}
+
+// 名前断片に一致する slackMembers のSlackユーザーIDを返す（見つからなければ空文字）
+function findSlackIdByFragments(cfg, fragments) {
+  const members = cfg.slackMembers || [];
+  const m = members.find(mm =>
+    [mm.name, mm.realName, mm.displayName].some(n => {
+      if (!n) return false;
+      const ln = String(n).toLowerCase();
+      return fragments.some(frag => frag === frag.toLowerCase()
+        ? ln.includes(frag.toLowerCase())
+        : String(n).includes(frag));
+    })
+  );
+  return m?.id || '';
 }
 
 function persistSlackCfg() {
@@ -3005,6 +3202,10 @@ async function postDeliveryNotification(rowNum) {
   if (btn) { btn.disabled = true; btn.textContent = '送信中...'; }
 
   try {
+    const deliveryMentionIds = DELIVERY_MENTION_MATCHES
+      .map(frags => findSlackIdByFragments(cfg, frags))
+      .filter(Boolean)
+      .join(',');
     const res = await gasGet({
       action:    'postDelivery',
       token,
@@ -3013,7 +3214,7 @@ async function postDeliveryNotification(rowNum) {
       storeNo:   item.storeNo || '',
       item:      item.item,
       folderUrl: driveUrl,
-      mentionId: WASHIZU_SLACK_ID,
+      mentionId: deliveryMentionIds,
     });
     if (res.error) throw new Error(res.error);
     toast('納品通知をSlackに送信しました ✅', 'ok');
@@ -3161,6 +3362,7 @@ async function testAndConnectSlack() {
     if (!cfg.workspace) cfg.workspace = {};
     cfg.workspace.slackBotToken = token;
     cfg.slackMembers = members;
+    syncFixedMentionIds(cfg);
     persistSlackCfg();
     statusEl.textContent = `✅ 接続成功！${members.length}名を取得しました`;
     statusEl.style.color = 'var(--green)';
@@ -3236,6 +3438,7 @@ async function fetchSlackMembers() {
     const members = res.members || [];
     const cfg = loadSlackCfg();
     cfg.slackMembers = members;
+    syncFixedMentionIds(cfg);
     persistSlackCfg();
     statusEl.innerHTML = `<span class="ws-connected-badge">✓ ${members.length}名のメンバーを取得しました</span>`;
     toast(`${members.length}名のSlackメンバーを取得しました`, 'ok');
