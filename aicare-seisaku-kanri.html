@@ -746,6 +746,8 @@ function doGet(e) {
     else if (p.action === 'postRequest')      result = postRequest(p.token, p.channelId, p.store, p.storeNo, p.item, p.size, p.format, p.requester, p.requestDate, p.deadline, p.notes, p.urgent, p.mentionId);
     else if (p.action === 'addRequest')       result = addRequest(p.store, p.item, p.size, p.notes, p.format, p.requester, p.requestDate, p.deadline, p.urgent);
     else if (p.action === 'getAiSuggestion')  result = getAiSuggestion(p.apiKey, p.mediaType, p.notes);
+    else if (p.action === 'getRefImages')     result = getRefImages(p.store, p.storeNo || '');
+    else if (p.action === 'getRefImageFull')  result = getRefImageFull(p.id);
     else if (p.action === 'batchMarkComplete') result = batchMarkComplete();
     else result = { error: 'unknown action: ' + p.action };
   } catch(err) {
@@ -1308,6 +1310,88 @@ function getAiSuggestion(apiKey, mediaType, notes) {
   var cand = (data.candidates || [])[0] || {};
   var text = ((((cand.content || {}).parts || [])[0]) || {}).text || 'AIの返答を取得できませんでした';
   return { ok: true, suggestion: text };
+}
+
+// 店舗フォルダ内の画像を集める（モーダル「参考画像（店舗フォルダ）」用）
+function getRefImages(storeName, storeNo) {
+  if (!storeName) return { ok: true, images: [] };
+  var parent = DriveApp.getFolderById(PARENT_FOLDER);
+  var shortName = String(storeName || '').replace(/^アイケアLaBo/, '');
+  var sf = findStoreFolderOnly_(parent, storeName, shortName);
+  if (!sf) return { ok: true, images: [] };
+  var images = [];
+  var IMG_RE = /\.(jpe?g|png|gif|webp|heic|bmp|tiff?)$/i;
+  var seen = {};
+  function pushImage(f) {
+    var id = f.getId();
+    if (seen[id]) return;
+    var name = f.getName();
+    var mime = f.getMimeType() || '';
+    if (!IMG_RE.test(name) && mime.indexOf('image/') !== 0) return;
+    seen[id] = true;
+    images.push({ id: id, name: name, thumb: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w240', mime: mime });
+  }
+  var directFiles = sf.getFiles();
+  while (directFiles.hasNext() && images.length < 200) pushImage(directFiles.next());
+  var preferred = ['参考画像', '参考資料', 'reference', 'Reference', 'ref'];
+  for (var i = 0; i < preferred.length; i++) {
+    var it = sf.getFoldersByName(preferred[i]);
+    while (it.hasNext()) {
+      var sub = it.next();
+      var ff = sub.getFiles();
+      while (ff.hasNext() && images.length < 200) pushImage(ff.next());
+    }
+  }
+  var subFolders = sf.getFolders();
+  while (subFolders.hasNext() && images.length < 200) {
+    var sub2 = subFolders.next();
+    if (preferred.indexOf(sub2.getName()) >= 0) continue;
+    for (var j = 0; j < preferred.length; j++) {
+      var it2 = sub2.getFoldersByName(preferred[j]);
+      while (it2.hasNext() && images.length < 200) {
+        var deep = it2.next();
+        var dfs = deep.getFiles();
+        while (dfs.hasNext() && images.length < 200) pushImage(dfs.next());
+      }
+    }
+  }
+  return { ok: true, images: images };
+}
+
+function findStoreFolderOnly_(parent, storeName, shortName) {
+  var suffix = '_' + storeName;
+  var key = normalizeStoreName(shortName);
+  var all = parent.getFolders();
+  var numberedMatch = null, legacyMatch = null, looseMatch = null;
+  while (all.hasNext()) {
+    var f = all.next();
+    var n = f.getName();
+    if (normalizeStoreName(n) === key) {
+      if (/^\d{1,4}(_\d{1,3})?_/.test(n)) {
+        if (!numberedMatch) numberedMatch = f;
+      } else if (!looseMatch) {
+        looseMatch = f;
+      }
+    }
+    if (n === storeName || (suffix && n.endsWith(suffix))) {
+      if (!legacyMatch) legacyMatch = f;
+    }
+  }
+  return numberedMatch || legacyMatch || looseMatch || null;
+}
+
+function getRefImageFull(fileId) {
+  if (!fileId) return { error: 'id is required' };
+  try {
+    var file = DriveApp.getFileById(fileId);
+    var mime = file.getMimeType() || 'application/octet-stream';
+    if (mime.indexOf('image/') !== 0) return { error: 'not an image: ' + mime };
+    var blob = file.getBlob();
+    var b64 = Utilities.base64Encode(blob.getBytes());
+    return { ok: true, data: 'data:' + mime + ';base64,' + b64, name: file.getName() };
+  } catch (err) {
+    return { error: err.message };
+  }
 }</pre>
         <button class="btn btn-primary btn-sm copy-code-btn" onclick="copyGasCode()">コードをコピー</button>
       </div>
@@ -2034,9 +2118,19 @@ function showSetup() {
 // ── GAS 呼び出し ──────────────────────────────────
 async function gasGet(params) {
   const url = GAS_URL + '?' + new URLSearchParams(params).toString();
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
+  // GAS 再デプロイ中などの transient 失敗を 1 回だけリトライ（GET は idempotent）
+  let lastErr;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      if (attempt === 0) await new Promise(r => setTimeout(r, 600));
+    }
+  }
+  throw lastErr;
 }
 
 // ── スプレッドシート直読み（GAS不要・常に最新）──────
