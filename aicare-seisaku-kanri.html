@@ -2262,6 +2262,51 @@ async function fetchGviz(param) {
   return JSON.parse(json).table.rows;
 }
 
+// シート上の任意行の Q列(ステータス)を gviz で軽量に読む（書込後の検証用）
+async function readSheetStatus(rowNum) {
+  if (!rowNum) return null;
+  try {
+    const tq  = 'select Q limit 1 offset ' + (rowNum - 1);
+    const url = 'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID +
+      '/gviz/tq?tqx=out:json&headers=0&sheet=' + encodeURIComponent(_SHEET_TAB) +
+      '&tq=' + encodeURIComponent(tq) + '&_t=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const text = await res.text();
+    const json = text.replace(/^[^{]*/, '').replace(/\)\s*;?\s*$/, '');
+    const data = JSON.parse(json);
+    const cell = data.table.rows && data.table.rows[0] && data.table.rows[0].c && data.table.rows[0].c[0];
+    return cell ? String(cell.v == null ? '' : cell.v).trim() : '';
+  } catch(e) {
+    console.warn('readSheetStatus error:', e);
+    return null;
+  }
+}
+
+// 書込後の検証 — 期待値とシート実値を比較し、不一致なら強制的にユーザーに警告
+// gviz の最終整合性遅延に備えて 3 段階で再試行
+async function verifyStatusWrite(item, expectedStatus) {
+  if (!item || !item.rowNum) return; // フォールバック項目（rowNum=null）はスキップ
+  const delays = [1500, 2500, 4000]; // 最大 8 秒で確認
+  const exp = String(expectedStatus || '').trim();
+  let last = null;
+  for (const d of delays) {
+    await new Promise(r => setTimeout(r, d));
+    // ユーザーが同じ行に別の変更を加えていたら検証を中止
+    if (item._verifyExpected && item._verifyExpected !== exp) return;
+    last = await readSheetStatus(item.rowNum);
+    if (last === null) continue;                 // 一時的失敗 → 次の遅延で再試行
+    if (last === exp) return;                    // ✅ 一致 → 検証OK
+    // 一致しなければ次のリトライへ
+  }
+  // 全リトライで不一致 → 強い警告 + ローカル状態をシート実値に同期
+  toast('⚠️ シートへの書込が反映されていません（行 ' + item.rowNum + ' / 期待「' + (exp||'(空)') + '」/ 実値「' + (last==null?'?':(last||'(空)')) + '」）。再試行するかシートを直接ご確認ください。', 'err');
+  if (last !== null) {
+    item.status = last;
+    try { updateCounts(); render(); } catch(_) {}
+  }
+}
+
 async function fetchSheetItems() {
   const cv = (cell) => (cell && cell.v != null) ? cell.v : '';
   const cs = (cell) => String(cv(cell)).trim();
@@ -2438,6 +2483,9 @@ async function changeStatus(itemId, newStatus) {
     }
     toast('保存しました', 'ok');
     if (newStatus === '完了') setTimeout(() => openGuide(item), 400);
+    // 書込が本当にシートへ反映されたか後追い検証（沈黙の失敗を防ぐ）
+    item._verifyExpected = newStatus;
+    verifyStatusWrite(item, newStatus).catch(err => console.warn('verify error', err));
   } catch(e) {
     if (sel) { sel.classList.remove('saving'); sel.disabled = false; sel.value = item.status; }
     saveBar(false);
@@ -4522,7 +4570,10 @@ async function submitQuickAdd() {
 
     toast('制作物を追加しました ✅', 'ok');
     closeQuickAddModal();
-    setTimeout(() => loadData(), 800);
+    // gviz の最終整合性遅延に備えて少し長めに待ってからリロード
+    setTimeout(() => loadData(), 2000);
+    // 書込が本当に依頼済として反映されたかを検証
+    verifyStatusWrite({ rowNum: rowNum }, '依頼済').catch(err => console.warn('verify error', err));
   } catch(e) {
     if (statEl) statEl.textContent = '❌ ' + e.message;
     toast('追加失敗: ' + e.message, 'err');
