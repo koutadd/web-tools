@@ -129,12 +129,22 @@
       object-fit: contain; display: block;
       background: #f8fafc;
     }
+    .pdf-preview .pdf-frame {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border: 0; display: block;
+      background: #f8fafc;
+      pointer-events: none; /* クリックは親カードに通す */
+    }
     .pdf-preview .pdf-overlay {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 8px; color: var(--muted); font-size: .8rem;
+      background: #f8fafc;
+      transition: opacity .25s;
     }
+    .pdf-preview.is-loaded .pdf-overlay { opacity: 0; pointer-events: none; }
     .pdf-preview .pdf-icon { font-size: 3rem; }
 
     /* カード情報エリア */
@@ -459,18 +469,60 @@ function filterRender() {
       <div class="gallery-grid${isCollapsed ? ' hidden' : ''}">${cards}</div>
     </div>`;
   }).join('');
+
+  attachPreviewLoader();
+}
+
+// ── プレビュー遅延ロード ──────────────────────────
+// Drive の thumbnail エンドポイントはサインインへのリダイレクトを返し
+// ブラウザの ORB に弾かれるので、代わりに /preview iframe を使う。
+// 118件あるため IntersectionObserver で可視カードのみ読み込む。
+let _previewIO = null;
+function attachPreviewLoader() {
+  const targets = document.querySelectorAll('.pdf-preview[data-pdf-id]');
+  if (!targets.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach(loadPreviewIframe);
+    return;
+  }
+
+  if (_previewIO) _previewIO.disconnect();
+  _previewIO = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      loadPreviewIframe(en.target);
+      _previewIO.unobserve(en.target);
+    });
+  }, { rootMargin: '300px 0px' });
+
+  targets.forEach(el => _previewIO.observe(el));
+}
+
+function loadPreviewIframe(el) {
+  if (el.dataset.loaded === '1') return;
+  const id = el.dataset.pdfId;
+  if (!id) return;
+  el.dataset.loaded = '1';
+  const iframe = document.createElement('iframe');
+  iframe.className = 'pdf-frame';
+  iframe.src = `https://drive.google.com/file/d/${id}/preview`;
+  iframe.loading = 'lazy';
+  iframe.referrerPolicy = 'no-referrer';
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'autoplay');
+  iframe.title = el.dataset.pdfName || 'PDF preview';
+  iframe.addEventListener('load', () => el.classList.add('is-loaded'));
+  el.appendChild(iframe);
 }
 
 function renderCard(store, item, pdf, folderUrl) {
-  const thumbUrl = `https://drive.google.com/thumbnail?id=${esc(pdf.id)}&sz=w800`;
   const openUrl  = pdf.url;
   const fUrl     = folderUrl || '';
 
   return `<div class="pdf-card" onclick="window.open('${esc(openUrl)}','_blank')">
-    <div class="pdf-preview">
-      <img class="pdf-thumb" src="${esc(thumbUrl)}" alt="${esc(pdf.name)}"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="pdf-overlay" style="display:none;">
+    <div class="pdf-preview" data-pdf-id="${esc(pdf.id)}" data-pdf-name="${esc(pdf.name)}">
+      <div class="pdf-overlay">
         <div class="pdf-icon">📄</div>
         <div style="font-size:.72rem;color:var(--muted);text-align:center;">${esc(pdf.name)}</div>
       </div>
