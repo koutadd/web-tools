@@ -125,6 +125,14 @@
     .store-toggle { margin-left: auto; color: var(--muted2); font-size: .7rem; transition: transform .2s; }
     .store-toggle.closed { transform: rotate(-90deg); }
     .store-items { border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; overflow: hidden; }
+    .store-add-btn {
+      margin-left: auto; display: inline-flex; align-items: center; gap: 4px;
+      background: #ffffff; color: #2563eb; border: 1px solid #bfdbfe;
+      border-radius: 6px; padding: 3px 9px; font-size: .68rem; font-weight: 700;
+      cursor: pointer; transition: all .12s; font-family: inherit; line-height: 1.4;
+    }
+    .store-add-btn:hover { background: #eff6ff; border-color: #60a5fa; color: #1d4ed8; }
+    .store-add-btn + .store-toggle { margin-left: 8px; }
 
     /* ── アイテム行 ── */
     .item-row {
@@ -2019,6 +2027,71 @@ function getRefImageFull(fileId) {
   </div>
 </div>
 
+<!-- 店舗ごとの軽量「制作物追加」モーダル（シートのみ・Slack通知なし） -->
+<div class="modal-overlay" id="quick-add-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-hdr">
+      <span class="modal-title" id="quick-add-title">＋ 制作物を追加</span>
+      <button class="modal-close" onclick="closeQuickAddModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        この店舗にシート上で制作物を追加します（ステータス：<b>依頼済</b>）。<br>
+        <span style="color:var(--muted2);">Slack通知は飛びません。依頼通知も併せて飛ばしたい場合は、上部の「✉️ 制作依頼する」をご利用ください。</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">店舗</label>
+          <input type="text" id="qa-store" readonly
+            style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;background:#f8fafc;color:var(--text);font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">制作物 / 媒体 <span style="color:var(--red);">*</span></label>
+          <input type="text" id="qa-item" placeholder="チラシ、のぼり、看板..." autocomplete="off"
+            style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;">
+            <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">サイズ</label>
+            <input type="text" id="qa-size" placeholder="A4、B2..." autocomplete="off"
+              style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">納期</label>
+            <input type="date" id="qa-deadline"
+              style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;">
+            <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">依頼者</label>
+            <input type="text" id="qa-requester" autocomplete="off"
+              style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">仕上げ</label>
+            <input type="text" id="qa-format" placeholder="光沢、マット..." autocomplete="off"
+              style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">備考</label>
+          <textarea id="qa-notes" rows="2" placeholder="補足事項があれば..."
+            style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:.74rem;color:var(--muted);cursor:pointer;">
+          <input type="checkbox" id="qa-urgent"> ⚡ 急ぎ案件にする
+        </label>
+      </div>
+      <button id="qa-submit-btn" onclick="submitQuickAdd()"
+        style="width:100%;margin-top:16px;background:#2563eb;color:#fff;border:none;border-radius:7px;padding:10px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;">
+        ＋ 制作物を追加（依頼済として記録）
+      </button>
+      <div id="qa-status" style="font-size:.72rem;text-align:center;margin-top:8px;min-height:16px;color:var(--muted);"></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -2443,10 +2516,12 @@ function render() {
         ${inProg?`<span style="font-size:.62rem;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:10px;padding:1px 7px;">対応中 ${inProg}</span>`:''}
         ${notStart?`<span style="font-size:.62rem;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;padding:1px 7px;">未着手 ${notStart}</span>`:''}`;
       const cards = items.map(item => renderCard(item)).join('');
+      const sNoAttr = items[0]?.storeNo ? esc(items[0].storeNo) : '';
       return `<div class="card-store-group">
         <div class="store-header" onclick="toggleGroup('${esc(gid)}')">
           ${storeNo}<span class="store-name">${esc(store)}</span>
           <div style="display:flex;gap:5px;align-items:center;margin-left:10px;">${countBadges}</div>
+          <button class="store-add-btn" data-store="${esc(store)}" data-storeno="${sNoAttr}" onclick="event.stopPropagation();openQuickAddFromBtn(this)" title="この店舗に制作物を追加">＋制作物</button>
           <span class="store-toggle" id="tog_${esc(gid)}">▼</span>
         </div>
         <div id="${esc(gid)}" style="padding-top:10px;">
@@ -2477,10 +2552,12 @@ function render() {
       ${done?`<span style="font-size:.62rem;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:10px;padding:1px 7px;">完了 ${done}</span>`:''}
       ${inProg?`<span style="font-size:.62rem;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:10px;padding:1px 7px;">対応中 ${inProg}</span>`:''}
       ${notStart?`<span style="font-size:.62rem;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;padding:1px 7px;">未着手 ${notStart}</span>`:''}`;
+    const sNoAttr = items[0]?.storeNo ? esc(items[0].storeNo) : '';
     return `<div class="store-group">
       <div class="store-header" onclick="toggleGroup('${esc(gid)}')">
         ${storeNo}<span class="store-name">${esc(store)}</span>
         <div style="display:flex;gap:5px;align-items:center;margin-left:10px;">${countBadges}</div>
+        <button class="store-add-btn" data-store="${esc(store)}" data-storeno="${sNoAttr}" onclick="event.stopPropagation();openQuickAddFromBtn(this)" title="この店舗に制作物を追加">＋制作物</button>
         <span class="store-toggle" id="tog_${esc(gid)}">▼</span>
       </div>
       <div class="store-items" id="${esc(gid)}">${rows}</div>
@@ -4362,6 +4439,93 @@ async function submitRequest() {
     closeRequestModal();
     // データを再読み込み
     setTimeout(() => loadData(), 1500);
+  }
+}
+
+// ── 軽量「制作物追加」（店舗ヘッダーの＋ボタン用 / シートのみ・Slack通知なし） ───
+function openQuickAddFromBtn(btnEl) {
+  const store   = btnEl?.dataset?.store   || '';
+  const storeNo = btnEl?.dataset?.storeno || '';
+  openQuickAddModal(store, storeNo);
+}
+
+function openQuickAddModal(storeName, storeNo) {
+  const modal = document.getElementById('quick-add-modal');
+  if (!modal) return;
+  document.getElementById('qa-store').value     = storeName || '';
+  document.getElementById('qa-item').value      = '';
+  document.getElementById('qa-size').value      = '';
+  document.getElementById('qa-deadline').value  = '';
+  document.getElementById('qa-requester').value = '';
+  document.getElementById('qa-format').value    = '';
+  document.getElementById('qa-notes').value     = '';
+  document.getElementById('qa-urgent').checked  = false;
+  const statEl = document.getElementById('qa-status');
+  if (statEl) statEl.textContent = '';
+  const btn = document.getElementById('qa-submit-btn');
+  if (btn) { btn.disabled = false; btn.textContent = '＋ 制作物を追加（依頼済として記録）'; }
+  const title = document.getElementById('quick-add-title');
+  if (title) title.textContent = `＋ ${storeName} に制作物を追加`;
+  modal.classList.add('open');
+  setTimeout(() => { document.getElementById('qa-item')?.focus(); }, 60);
+}
+
+function closeQuickAddModal() {
+  const modal = document.getElementById('quick-add-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function submitQuickAdd() {
+  if (!GAS_URL) { toast('GAS URLを設定してください（⚙️）', 'err'); return; }
+  const store     = (document.getElementById('qa-store')?.value || '').trim();
+  const item      = (document.getElementById('qa-item')?.value || '').trim();
+  const size      = (document.getElementById('qa-size')?.value || '').trim();
+  const dlRaw     = (document.getElementById('qa-deadline')?.value || '').trim();
+  const requester = (document.getElementById('qa-requester')?.value || '').trim();
+  const format    = (document.getElementById('qa-format')?.value || '').trim();
+  const notes     = (document.getElementById('qa-notes')?.value || '').trim();
+  const urgent    = document.getElementById('qa-urgent')?.checked ? 'true' : 'false';
+
+  if (!store) { toast('店舗が指定されていません', 'err'); return; }
+  if (!item)  { toast('制作物 / 媒体を入力してください', 'err'); return; }
+
+  // YYYY-MM-DD → YYYY/MM/DD（既存シートと表記を揃える）
+  const deadline = dlRaw ? dlRaw.replace(/-/g, '/') : '';
+  const today    = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit' }).replace(/\//g,'/');
+
+  const btn    = document.getElementById('qa-submit-btn');
+  const statEl = document.getElementById('qa-status');
+  if (btn) { btn.disabled = true; btn.textContent = '追加中...'; }
+  if (statEl) statEl.textContent = '📊 シートに行追加中...';
+
+  try {
+    const res = await gasGet({ action: 'addRequest', store, item, size, notes, format, requester, requestDate: today, deadline, urgent });
+    if (res.error) throw new Error(res.error);
+    const rowNum = res.rowNum;
+    if (statEl) statEl.textContent = `✅ 行 ${rowNum} に追加 → ステータスを「依頼済」に設定中...`;
+    try {
+      const res2 = await gasGet({ action: 'updateStatus', row: rowNum, status: '依頼済' });
+      if (res2.error) throw new Error(res2.error);
+    } catch(e) {
+      // ステータス設定失敗でも行追加自体は成功しているので警告のみ
+      console.warn('updateStatus failed:', e);
+      toast('追加は完了しましたが、ステータス設定に失敗: ' + e.message, 'err');
+    }
+
+    // 履歴保存（既存の依頼モーダルと同じ履歴を共有）
+    if (store)     saveReqHistory('store', store);
+    if (item)      saveReqHistory('item', item);
+    if (size)      saveReqHistory('size', size);
+    if (format)    saveReqHistory('format', format);
+    if (requester) saveReqHistory('requester', requester);
+
+    toast('制作物を追加しました ✅', 'ok');
+    closeQuickAddModal();
+    setTimeout(() => loadData(), 800);
+  } catch(e) {
+    if (statEl) statEl.textContent = '❌ ' + e.message;
+    toast('追加失敗: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '＋ 制作物を追加（依頼済として記録）'; }
   }
 }
 
