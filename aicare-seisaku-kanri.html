@@ -2252,9 +2252,10 @@ const _STORE_ITEMS_MAP = {
 };
 
 async function fetchGviz(param) {
+  // 書き込み直後の再読込で古い値が返らないようキャッシュバスター + no-store を付与
   const url = 'https://docs.google.com/spreadsheets/d/' + _SHEET_SS_ID +
-    '/gviz/tq?tqx=out:json&headers=0&' + param;
-  const res = await fetch(url);
+    '/gviz/tq?tqx=out:json&headers=0&' + param + '&_t=' + Date.now();
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error('Sheet fetch failed: ' + res.status);
   const text = await res.text();
   const json = text.replace(/^[^{]*/, '').replace(/\)\s*;?\s*$/, '');
